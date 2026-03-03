@@ -156,6 +156,9 @@ const Browse = () => {
 
   const series = contents.filter((c) => c.section === "series");
   const filmes = contents.filter((c) => c.section === "filmes");
+  const novelas = contents.filter((c) => c.section === "novelas");
+  const animes = contents.filter((c) => c.section === "animes");
+  const documentarios = contents.filter((c) => c.section === "documentarios");
   const exclusivos = contents.filter((c) => c.section === "exclusivos");
   const watchlistItems = contents.filter((c) => watchlistIds.has(c.id));
 
@@ -191,6 +194,9 @@ const Browse = () => {
     { label: "Início", icon: "🏠", action: () => { setMenuOpen(false); window.scrollTo({ top: 0, behavior: "smooth" }); } },
     { label: "Séries", icon: "📺", action: () => { setMenuOpen(false); document.getElementById("séries")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Filmes", icon: "🎬", action: () => { setMenuOpen(false); document.getElementById("filmes")?.scrollIntoView({ behavior: "smooth" }); } },
+    { label: "Novelas", icon: "💕", action: () => { setMenuOpen(false); document.getElementById("novelas")?.scrollIntoView({ behavior: "smooth" }); } },
+    { label: "Animes", icon: "🎌", action: () => { setMenuOpen(false); document.getElementById("animes")?.scrollIntoView({ behavior: "smooth" }); } },
+    { label: "Documentários", icon: "🎥", action: () => { setMenuOpen(false); document.getElementById("documentarios")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Exclusivos", icon: "⭐", action: () => { setMenuOpen(false); document.getElementById("exclusivos")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Minha Lista", icon: "🔖", action: () => { setMenuOpen(false); document.getElementById("minha-lista")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Perfil", icon: "👤", action: () => { setMenuOpen(false); setProfileOpen(true); } },
@@ -346,7 +352,81 @@ const Browse = () => {
           </div>
         </section>
 
-        {/* EXCLUSIVOS */}
+        {/* NOVELAS */}
+        <section id="novelas" className="py-10 sm:py-16 px-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl sm:text-3xl font-bold neon-text-purple">Novelas Queer</h2>
+              {isAdmin && (
+                <button onClick={() => handleNew("novelas", "serie")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Adicionar novela">
+                  <Plus className="w-5 h-5 text-primary" />
+                </button>
+              )}
+            </div>
+            {novelas.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+                {novelas.map((n) => (
+                  <ContentCard key={n.id} item={n} isAdmin={isAdmin} onEdit={() => handleEdit(n)} onDelete={() => handleDelete(n.id)} onClickTrack={() => trackClick(n.id)} isInWatchlist={watchlistIds.has(n.id)} onToggleWatchlist={() => toggleWatchlist(n.id)} />
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-8">
+                {isAdmin ? "Clique no + para adicionar novelas" : "Em breve novos conteúdos!"}
+              </p>
+            )}
+          </div>
+        </section>
+
+        {/* ANIMES */}
+        <section id="animes" className="py-10 sm:py-16 px-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl sm:text-3xl font-bold neon-text-blue">Animes Queer</h2>
+              {isAdmin && (
+                <button onClick={() => handleNew("animes", "serie")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Adicionar anime">
+                  <Plus className="w-5 h-5 text-primary" />
+                </button>
+              )}
+            </div>
+            {animes.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+                {animes.map((a) => (
+                  <ContentCard key={a.id} item={a} isAdmin={isAdmin} onEdit={() => handleEdit(a)} onDelete={() => handleDelete(a.id)} onClickTrack={() => trackClick(a.id)} isInWatchlist={watchlistIds.has(a.id)} onToggleWatchlist={() => toggleWatchlist(a.id)} />
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-8">
+                {isAdmin ? "Clique no + para adicionar animes" : "Em breve novos conteúdos!"}
+              </p>
+            )}
+          </div>
+        </section>
+
+        {/* DOCUMENTÁRIOS */}
+        <section id="documentarios" className="py-10 sm:py-16 px-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl sm:text-3xl font-bold">Documentários</h2>
+              {isAdmin && (
+                <button onClick={() => handleNew("documentarios", "filme")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Adicionar documentário">
+                  <Plus className="w-5 h-5 text-primary" />
+                </button>
+              )}
+            </div>
+            {documentarios.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+                {documentarios.map((d) => (
+                  <ContentCard key={d.id} item={d} isAdmin={isAdmin} onEdit={() => handleEdit(d)} onDelete={() => handleDelete(d.id)} onClickTrack={() => trackClick(d.id)} isInWatchlist={watchlistIds.has(d.id)} onToggleWatchlist={() => toggleWatchlist(d.id)} />
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-8">
+                {isAdmin ? "Clique no + para adicionar documentários" : "Em breve novos conteúdos!"}
+              </p>
+            )}
+          </div>
+        </section>
+
         <section id="exclusivos" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6">
