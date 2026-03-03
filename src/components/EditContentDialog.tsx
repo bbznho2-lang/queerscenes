@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Trash2, Save } from "lucide-react";
 import { toast } from "sonner";
@@ -17,6 +18,7 @@ interface ContentItem {
   player_url: string | null;
   section: string;
   position: number;
+  is_premium: boolean;
 }
 
 interface Episode {
@@ -43,6 +45,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved }: Props) => {
   const [playerUrl, setPlayerUrl] = useState("");
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [bannerPreview, setBannerPreview] = useState("");
+  const [isPremium, setIsPremium] = useState(false);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [saving, setSaving] = useState(false);
 
@@ -55,6 +58,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved }: Props) => {
       setSection(content.section);
       setPlayerUrl(content.player_url || "");
       setBannerPreview(content.banner_url || "");
+      setIsPremium(content.is_premium || false);
       // Load episodes
       supabase
         .from("episodes")
@@ -70,6 +74,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved }: Props) => {
       setSection("series");
       setPlayerUrl("");
       setBannerPreview("");
+      setIsPremium(false);
       setEpisodes([]);
     }
   }, [content, open]);
@@ -106,6 +111,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved }: Props) => {
         section,
         player_url: playerUrl || null,
         banner_url: bannerUrl,
+        is_premium: isPremium,
       };
 
       let contentId = content?.id;
@@ -221,6 +227,11 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved }: Props) => {
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          <div className="flex items-center justify-between py-2">
+            <label className="text-sm text-muted-foreground">Conteúdo Premium?</label>
+            <Switch checked={isPremium} onCheckedChange={setIsPremium} />
           </div>
 
           <div>
