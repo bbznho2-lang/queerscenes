@@ -186,6 +186,10 @@ const Index = () => {
               "Conteúdo gratuito + exclusivo",
               "Experiência premium",
               "Comunidade e representatividade",
+              "Multiplataforma e acessível",
+              "Atualizações constantes",
+              "Segurança e privacidade",
+              "Suporte dedicado 24/7",
             ].map((text, i) => (
               <motion.div key={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={i + 1}
                 className="flex items-center gap-3 p-4 rounded-xl bg-card neon-border-purple"
