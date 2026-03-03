@@ -1,65 +1,69 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Play, Lock, Sparkles, Diamond, Star, Zap, Heart, Film, Crown, ArrowRight, HelpCircle, ChevronDown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Play, Lock, Sparkles, Diamond, Star, Zap, Heart, Film, Crown, ArrowRight, HelpCircle, Tv, Smartphone, Tablet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
+const fade = {
+  hidden: { opacity: 0, y: 20 },
   visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.1, duration: 0.6, ease: "easeOut" as const },
+    opacity: 1, y: 0,
+    transition: { delay: i * 0.08, duration: 0.5, ease: "easeOut" as const },
   }),
 };
 
 const Index = () => {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate("/browse");
+  };
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       {/* HERO */}
-      <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-primary/10 blur-[120px]" />
-          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-secondary/10 blur-[100px]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-accent/5 blur-[150px]" />
+      <section className="relative min-h-[100svh] flex items-center justify-center px-4 py-16">
+        {/* BG glows */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/3 left-1/4 w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-primary/15 blur-[120px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-60 sm:w-80 h-60 sm:h-80 rounded-full bg-secondary/10 blur-[100px]" />
         </div>
 
-        <div className="relative z-10 max-w-4xl mx-auto text-center">
-          <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}>
-            <span className="inline-block px-4 py-1.5 rounded-full text-sm font-medium bg-muted text-primary border border-border mb-8">
+        <div className="relative z-10 max-w-3xl mx-auto text-center">
+          <motion.div initial="hidden" animate="visible" variants={fade} custom={0}>
+            <span className="inline-block px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium neon-border-purple text-primary mb-6">
               🎬 Streaming LGBTQIA+
             </span>
           </motion.div>
 
           <motion.h1
-            className="text-5xl sm:text-7xl md:text-8xl font-bold tracking-tight mb-6"
-            initial="hidden" animate="visible" variants={fadeUp} custom={1}
+            className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight mb-5 neon-text-purple"
+            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+            initial="hidden" animate="visible" variants={fade} custom={1}
           >
-            <span className="rainbow-text">QUEER SCENES</span>
+            QUEER SCENES
           </motion.h1>
 
-          <motion.p
-            className="text-xl sm:text-2xl text-muted-foreground max-w-2xl mx-auto mb-4 font-light"
-            initial="hidden" animate="visible" variants={fadeUp} custom={2}
-          >
+          <motion.p className="text-base sm:text-xl text-muted-foreground max-w-xl mx-auto mb-3 font-light" initial="hidden" animate="visible" variants={fade} custom={2}>
             O streaming feito para a comunidade LGBTQIA+.
           </motion.p>
 
-          <motion.p
-            className="text-base sm:text-lg text-muted-foreground/80 max-w-xl mx-auto mb-10"
-            initial="hidden" animate="visible" variants={fadeUp} custom={3}
-          >
-            Reviva os momentos mais icônicos, emocionantes e inesquecíveis do cinema e das séries com representatividade real.
-            Uma plataforma feita para quem quer se ver na tela. 🌈
+          <motion.p className="text-sm sm:text-base text-muted-foreground/70 max-w-md mx-auto mb-8" initial="hidden" animate="visible" variants={fade} custom={3}>
+            Reviva os momentos mais icônicos, emocionantes e inesquecíveis do cinema e das séries com representatividade real. 🌈
           </motion.p>
 
-          <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={4}>
-            <Button size="lg" className="text-lg px-10 py-6 rounded-full glow-primary bg-primary text-primary-foreground hover:bg-primary/90 gap-2">
+          <motion.div initial="hidden" animate="visible" variants={fade} custom={4}>
+            <Button
+              size="lg"
+              onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
+              className="text-base sm:text-lg px-8 sm:px-10 py-5 sm:py-6 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple gap-2"
+            >
               <Play className="w-5 h-5" />
               ACESSAR O QUEER SCENES
             </Button>
@@ -68,45 +72,49 @@ const Index = () => {
       </section>
 
       {/* LOGIN */}
-      <section className="relative py-20 px-4">
-        <div className="max-w-md mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}>
-            <Card className="bg-card border-border glow-rainbow rainbow-border overflow-hidden">
+      <section id="login" className="relative py-16 sm:py-20 px-4">
+        <div className="max-w-sm sm:max-w-md mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0}>
+            <Card className="bg-card neon-border-purple overflow-hidden">
               <CardHeader className="text-center pb-2">
-                <div className="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
+                <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                   <Lock className="w-5 h-5 text-primary" />
                 </div>
-                <CardTitle className="text-2xl">ÁREA DE ACESSO</CardTitle>
+                <CardTitle className="text-xl sm:text-2xl neon-text-purple">ÁREA DE ACESSO</CardTitle>
                 <p className="text-muted-foreground text-sm mt-1">Entre para continuar</p>
               </CardHeader>
-              <CardContent className="space-y-4 pt-4">
-                <div className="space-y-2">
-                  <label className="text-sm text-muted-foreground">E-mail</label>
-                  <Input
-                    type="email"
-                    placeholder="seu@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="bg-muted border-border"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm text-muted-foreground">Senha</label>
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                    value={senha}
-                    onChange={(e) => setSenha(e.target.value)}
-                    className="bg-muted border-border"
-                  />
-                </div>
-                <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full">
-                  ENTRAR
-                </Button>
-                <p className="text-center text-sm text-muted-foreground">
-                  Não tem conta?{" "}
-                  <button className="text-primary hover:underline font-medium">Criar acesso</button>
-                </p>
+              <CardContent className="pt-4">
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm text-muted-foreground">E-mail</label>
+                    <Input
+                      type="email"
+                      placeholder="seu@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="bg-muted border-border focus:border-primary"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm text-muted-foreground">Senha</label>
+                    <Input
+                      type="password"
+                      placeholder="••••••••"
+                      value={senha}
+                      onChange={(e) => setSenha(e.target.value)}
+                      className="bg-muted border-border focus:border-primary"
+                      required
+                    />
+                  </div>
+                  <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full glow-purple">
+                    ENTRAR
+                  </Button>
+                  <p className="text-center text-sm text-muted-foreground">
+                    Não tem conta?{" "}
+                    <button type="button" className="text-secondary hover:underline font-medium">Criar acesso</button>
+                  </p>
+                </form>
               </CardContent>
             </Card>
           </motion.div>
@@ -114,140 +122,109 @@ const Index = () => {
       </section>
 
       {/* SOBRE */}
-      <section className="py-24 px-4">
+      <section className="py-16 sm:py-24 px-4">
         <div className="max-w-4xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0} className="text-center mb-12">
-            <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-              <Film className="inline w-10 h-10 mr-3 text-primary" />
-              SOBRE O <span className="rainbow-text">QUEER SCENES</span>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
+            <h2 className="text-3xl sm:text-5xl font-bold">
+              <Film className="inline w-8 sm:w-10 h-8 sm:h-10 mr-2 text-primary" />
+              SOBRE O <span className="neon-text-purple">QUEER SCENES</span>
             </h2>
           </motion.div>
 
-          <motion.p
-            className="text-lg text-muted-foreground text-center max-w-2xl mx-auto mb-12"
-            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={1}
-          >
-            O Queer Scenes é uma plataforma de streaming dedicada exclusivamente a histórias, cenas e produções com protagonismo LGBTQIA+.
+          <motion.p className="text-base sm:text-lg text-muted-foreground text-center max-w-2xl mx-auto mb-10" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
+            Uma plataforma de streaming dedicada exclusivamente a histórias e produções com protagonismo LGBTQIA+.
           </motion.p>
 
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
               { icon: Star, text: "Momentos icônicos do cinema queer" },
               { icon: Heart, text: "Séries com representatividade real" },
-              { icon: Sparkles, text: "Cenas emocionantes que marcaram gerações" },
+              { icon: Sparkles, text: "Cenas que marcaram gerações" },
               { icon: Crown, text: "Conteúdos exclusivos para membros" },
             ].map((item, i) => (
-              <motion.div
-                key={i}
-                initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={i + 2}
-              >
-                <Card className="bg-card border-border hover:border-primary/40 transition-colors group">
-                  <CardContent className="flex items-center gap-4 p-5">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
-                      <item.icon className="w-5 h-5 text-primary" />
+              <motion.div key={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={i + 2}>
+                <Card className="bg-card border-border hover:border-primary/40 transition-all group">
+                  <CardContent className="flex items-center gap-3 p-4">
+                    <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                      <item.icon className="w-4 h-4 text-primary" />
                     </div>
-                    <span className="text-foreground font-medium">{item.text}</span>
+                    <span className="text-foreground text-sm sm:text-base">{item.text}</span>
                   </CardContent>
                 </Card>
               </motion.div>
             ))}
           </div>
-
-          <motion.p
-            className="text-center text-muted-foreground mt-10 max-w-lg mx-auto"
-            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={6}
-          >
-            Nossa missão é criar um espaço onde a comunidade possa assistir, se emocionar e se sentir representada.
-          </motion.p>
         </div>
       </section>
 
       {/* DIFERENCIAL */}
-      <section className="py-24 px-4 relative">
-        <div className="absolute inset-0 bg-muted/30" />
+      <section className="py-16 sm:py-24 px-4 relative">
+        <div className="absolute inset-0 bg-muted/20" />
         <div className="relative max-w-4xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0} className="text-center mb-14">
-            <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-              <Diamond className="inline w-10 h-10 mr-3 text-accent" />
-              POR QUE É <span className="rainbow-text">DIFERENTE</span>?
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
+            <h2 className="text-3xl sm:text-5xl font-bold">
+              <Diamond className="inline w-8 sm:w-10 h-8 sm:h-10 mr-2 text-secondary" />
+              POR QUE É <span className="neon-text-blue">DIFERENTE</span>?
             </h2>
           </motion.div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               "Curadoria 100% LGBTQIA+",
               "Interface moderna e imersiva",
               "Conteúdo gratuito + exclusivo",
               "Experiência premium",
-              "Comunidade que apoia representatividade",
+              "Comunidade e representatividade",
             ].map((text, i) => (
-              <motion.div
-                key={i}
-                initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={i + 1}
-                className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border"
+              <motion.div key={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={i + 1}
+                className="flex items-center gap-3 p-4 rounded-xl bg-card neon-border-purple"
               >
-                <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
-                <span className="text-foreground">{text}</span>
+                <div className="w-2 h-2 rounded-full bg-secondary shrink-0" />
+                <span className="text-foreground text-sm sm:text-base">{text}</span>
               </motion.div>
             ))}
           </div>
 
-          <motion.div
-            className="text-center mt-14"
-            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={7}
-          >
-            <p className="text-xl text-muted-foreground">Não é só assistir.</p>
-            <p className="text-3xl font-bold rainbow-text mt-1">É pertencer.</p>
+          <motion.div className="text-center mt-12" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={7}>
+            <p className="text-lg text-muted-foreground">Não é só assistir.</p>
+            <p className="text-2xl sm:text-3xl font-bold neon-text-purple mt-1">É pertencer.</p>
           </motion.div>
         </div>
       </section>
 
       {/* PLANOS */}
-      <section className="py-24 px-4">
+      <section className="py-16 sm:py-24 px-4">
         <div className="max-w-4xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0} className="text-center mb-14">
-            <h2 className="text-4xl sm:text-5xl font-bold">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
+            <h2 className="text-3xl sm:text-5xl font-bold">
               🌈 <span className="rainbow-text">PLANOS</span>
             </h2>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
-            {/* Free */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={1}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
               <Card className="bg-card border-border h-full">
-                <CardHeader className="text-center">
-                  <CardTitle className="text-2xl">Free</CardTitle>
-                </CardHeader>
+                <CardHeader className="text-center"><CardTitle className="text-xl">Free</CardTitle></CardHeader>
                 <CardContent className="space-y-3">
                   {["Acesso a conteúdos selecionados", "Atualizações semanais"].map((t, i) => (
-                    <div key={i} className="flex items-center gap-2 text-muted-foreground">
-                      <Sparkles className="w-4 h-4 text-secondary shrink-0" />
-                      <span>{t}</span>
+                    <div key={i} className="flex items-center gap-2 text-muted-foreground text-sm">
+                      <Sparkles className="w-4 h-4 text-secondary shrink-0" /><span>{t}</span>
                     </div>
                   ))}
                 </CardContent>
               </Card>
             </motion.div>
 
-            {/* Premium */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={2}>
-              <Card className="border-primary/50 h-full glow-primary rainbow-border overflow-hidden bg-card">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2}>
+              <Card className="h-full neon-border-purple neon-pulse bg-card overflow-hidden">
                 <CardHeader className="text-center">
-                  <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-primary/20 text-primary mb-2">
-                    RECOMENDADO
-                  </span>
-                  <CardTitle className="text-2xl rainbow-text">Premium</CardTitle>
+                  <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-primary/20 text-primary mb-2">RECOMENDADO</span>
+                  <CardTitle className="text-xl neon-text-purple">Premium</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {[
-                    "Acesso completo",
-                    "Conteúdos exclusivos",
-                    "Lançamentos antecipados",
-                    "Experiência sem limites",
-                  ].map((t, i) => (
-                    <div key={i} className="flex items-center gap-2 text-muted-foreground">
-                      <Zap className="w-4 h-4 text-accent shrink-0" />
-                      <span>{t}</span>
+                  {["Acesso completo", "Conteúdos exclusivos", "Lançamentos antecipados", "Experiência sem limites"].map((t, i) => (
+                    <div key={i} className="flex items-center gap-2 text-muted-foreground text-sm">
+                      <Zap className="w-4 h-4 text-secondary shrink-0" /><span>{t}</span>
                     </div>
                   ))}
                 </CardContent>
@@ -257,35 +234,60 @@ const Index = () => {
         </div>
       </section>
 
+      {/* DISPOSITIVOS */}
+      <section className="py-16 sm:py-24 px-4">
+        <div className="max-w-3xl mx-auto text-center">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0}>
+            <h2 className="text-3xl sm:text-5xl font-bold mb-6">
+              Assista em <span className="neon-text-blue">qualquer lugar</span>
+            </h2>
+            <div className="flex justify-center gap-8 sm:gap-12 mt-8">
+              {[
+                { icon: Smartphone, label: "Celular" },
+                { icon: Tablet, label: "Tablet" },
+                { icon: Tv, label: "Desktop" },
+              ].map((d, i) => (
+                <motion.div key={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={i + 1}
+                  className="flex flex-col items-center gap-2"
+                >
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-card neon-border-purple flex items-center justify-center">
+                    <d.icon className="w-7 h-7 text-primary" />
+                  </div>
+                  <span className="text-xs sm:text-sm text-muted-foreground">{d.label}</span>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* FAQ */}
-      <section className="py-24 px-4">
-        <div className="max-w-3xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0} className="text-center mb-14">
-            <h2 className="text-4xl sm:text-5xl font-bold">
-              <HelpCircle className="inline w-10 h-10 mr-3 text-primary" />
-              <span className="rainbow-text">FAQ</span> – Perguntas Frequentes
+      <section className="py-16 sm:py-24 px-4">
+        <div className="max-w-2xl mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
+            <h2 className="text-3xl sm:text-5xl font-bold">
+              <HelpCircle className="inline w-8 sm:w-10 h-8 sm:h-10 mr-2 text-secondary" />
+              <span className="neon-text-blue">FAQ</span>
             </h2>
           </motion.div>
 
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={1}>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
             <Accordion type="single" collapsible className="space-y-3">
               {[
                 { q: "O Queer Scenes é gratuito?", a: "Sim. Temos conteúdos gratuitos disponíveis. Também oferecemos plano premium com acesso completo." },
                 { q: "Preciso criar uma conta?", a: "Sim. Para acessar o conteúdo é necessário criar login com e-mail e senha." },
                 { q: "O conteúdo é apenas LGBTQIA+?", a: "Sim. O foco da plataforma é exclusivamente histórias, cenas e produções com representatividade LGBTQIA+." },
                 { q: "Posso cancelar o plano premium?", a: "Sim. O cancelamento pode ser feito a qualquer momento." },
-                { q: "O Queer Scenes funciona no celular?", a: "Sim. A plataforma é adaptada para celular, tablet e desktop." },
+                { q: "Funciona no celular?", a: "Sim. A plataforma é adaptada para celular, tablet e desktop." },
               ].map((item, i) => (
-                <AccordionItem key={i} value={`faq-${i}`} className="bg-card border border-border rounded-xl px-5 data-[state=open]:border-primary/40 transition-colors">
-                  <AccordionTrigger className="text-left text-foreground hover:no-underline py-5">
+                <AccordionItem key={i} value={`faq-${i}`} className="bg-card border border-border rounded-xl px-4 sm:px-5 data-[state=open]:border-primary/40 transition-colors">
+                  <AccordionTrigger className="text-left text-foreground hover:no-underline py-4 text-sm sm:text-base">
                     <span className="flex items-center gap-3">
-                      <span className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">{i + 1}</span>
+                      <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">{i + 1}</span>
                       {item.q}
                     </span>
                   </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground pb-5">
-                    {item.a}
-                  </AccordionContent>
+                  <AccordionContent className="text-muted-foreground pb-4 text-sm">{item.a}</AccordionContent>
                 </AccordionItem>
               ))}
             </Accordion>
@@ -293,17 +295,21 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="py-24 px-4 text-center">
-        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}>
-          <Button size="lg" className="text-lg px-12 py-7 rounded-full glow-primary bg-primary text-primary-foreground hover:bg-primary/90 gap-3">
+      {/* CTA FINAL */}
+      <section className="py-16 sm:py-24 px-4 text-center">
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0}>
+          <Button
+            size="lg"
+            onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
+            className="text-base sm:text-lg px-10 py-6 sm:py-7 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple gap-3"
+          >
             ACESSAR O QUEER SCENES
             <ArrowRight className="w-5 h-5" />
           </Button>
         </motion.div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground">
+      <footer className="border-t border-border py-6 sm:py-8 text-center text-xs sm:text-sm text-muted-foreground">
         <p>© 2026 Queer Scenes. Todos os direitos reservados. 🌈</p>
       </footer>
     </div>

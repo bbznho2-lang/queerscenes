@@ -6,48 +6,48 @@
 
 @layer base {
   :root {
-    --background: 260 20% 6%;
+    --background: 240 15% 4%;
     --foreground: 0 0% 95%;
 
-    --card: 260 18% 10%;
+    --card: 240 12% 7%;
     --card-foreground: 0 0% 95%;
 
-    --popover: 260 18% 10%;
+    --popover: 240 12% 7%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 300 80% 60%;
-    --primary-foreground: 260 20% 6%;
+    --primary: 270 100% 50%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 180 60% 50%;
-    --secondary-foreground: 260 20% 6%;
+    --secondary: 185 100% 50%;
+    --secondary-foreground: 240 15% 4%;
 
-    --muted: 260 15% 15%;
-    --muted-foreground: 260 10% 60%;
+    --muted: 240 10% 12%;
+    --muted-foreground: 240 5% 55%;
 
-    --accent: 45 100% 60%;
-    --accent-foreground: 260 20% 6%;
+    --accent: 270 100% 50%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 260 15% 18%;
-    --input: 260 15% 18%;
-    --ring: 300 80% 60%;
+    --border: 240 10% 14%;
+    --input: 240 10% 14%;
+    --ring: 270 100% 50%;
 
     --radius: 0.75rem;
 
-    --gradient-rainbow: linear-gradient(135deg, hsl(0 80% 60%), hsl(30 90% 55%), hsl(55 90% 55%), hsl(120 60% 50%), hsl(200 80% 55%), hsl(270 70% 60%), hsl(320 80% 60%));
-    --gradient-primary: linear-gradient(135deg, hsl(300 80% 60%), hsl(260 80% 55%));
-    --gradient-card: linear-gradient(145deg, hsl(260 18% 12%), hsl(260 18% 8%));
+    --neon-purple: 270 100% 50%;
+    --neon-blue: 185 100% 50%;
+    --neon-pink: 320 100% 55%;
 
-    --sidebar-background: 260 18% 10%;
+    --sidebar-background: 240 12% 7%;
     --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 300 80% 60%;
-    --sidebar-primary-foreground: 260 20% 6%;
-    --sidebar-accent: 260 15% 15%;
+    --sidebar-primary: 270 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 10% 12%;
     --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 260 15% 18%;
-    --sidebar-ring: 300 80% 60%;
+    --sidebar-border: 240 10% 14%;
+    --sidebar-ring: 270 100% 50%;
   }
 }
 
@@ -66,33 +66,72 @@
   }
 }
 
+/* Neon utilities */
+.neon-text-purple {
+  color: hsl(270 100% 50%);
+  text-shadow: 0 0 10px hsl(270 100% 50% / 0.5), 0 0 30px hsl(270 100% 50% / 0.3);
+}
+
+.neon-text-blue {
+  color: hsl(185 100% 50%);
+  text-shadow: 0 0 10px hsl(185 100% 50% / 0.5), 0 0 30px hsl(185 100% 50% / 0.3);
+}
+
 .rainbow-text {
-  background: var(--gradient-rainbow);
+  background: linear-gradient(135deg, hsl(0 80% 60%), hsl(30 90% 55%), hsl(55 90% 55%), hsl(120 60% 50%), hsl(200 80% 55%), hsl(270 70% 60%), hsl(320 80% 60%));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.rainbow-border {
-  position: relative;
+.glow-purple {
+  box-shadow: 0 0 20px -5px hsl(270 100% 50% / 0.5), 0 0 40px -10px hsl(270 100% 50% / 0.3);
 }
 
-.rainbow-border::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: var(--gradient-rainbow);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-}
-
-.glow-primary {
-  box-shadow: 0 0 40px -10px hsl(300 80% 60% / 0.4);
+.glow-blue {
+  box-shadow: 0 0 20px -5px hsl(185 100% 50% / 0.5), 0 0 40px -10px hsl(185 100% 50% / 0.3);
 }
 
 .glow-rainbow {
-  box-shadow: 0 0 60px -15px hsl(300 80% 60% / 0.3), 0 0 40px -10px hsl(200 80% 55% / 0.2);
+  box-shadow: 0 0 30px -10px hsl(270 100% 50% / 0.3), 0 0 20px -5px hsl(185 100% 50% / 0.2);
+}
+
+.neon-border-purple {
+  border: 1px solid hsl(270 100% 50% / 0.4);
+  box-shadow: inset 0 0 20px hsl(270 100% 50% / 0.05), 0 0 15px hsl(270 100% 50% / 0.1);
+}
+
+.neon-border-blue {
+  border: 1px solid hsl(185 100% 50% / 0.4);
+  box-shadow: inset 0 0 20px hsl(185 100% 50% / 0.05), 0 0 15px hsl(185 100% 50% / 0.1);
+}
+
+@keyframes neon-pulse {
+  0%, 100% { box-shadow: 0 0 20px hsl(270 100% 50% / 0.3), 0 0 40px hsl(270 100% 50% / 0.1); }
+  50% { box-shadow: 0 0 30px hsl(270 100% 50% / 0.5), 0 0 60px hsl(270 100% 50% / 0.2); }
+}
+
+.neon-pulse {
+  animation: neon-pulse 3s ease-in-out infinite;
+}
+
+@keyframes border-glow {
+  0%, 100% { border-color: hsl(270 100% 50% / 0.4); }
+  50% { border-color: hsl(185 100% 50% / 0.6); }
+}
+
+.border-glow-anim {
+  animation: border-glow 4s ease-in-out infinite;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(240 15% 4%);
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(270 100% 50% / 0.4);
+  border-radius: 3px;
 }
