@@ -45,11 +45,32 @@ const Index = () => {
           </motion.div>
 
           <motion.h1
-            className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight mb-5 neon-text-pink"
+            className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight mb-5"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             initial="hidden" animate="visible" variants={fade} custom={1}
           >
-            QUEER SCENES
+            {"QUEER SCENES".split("").map((char, i) => {
+              if (char === " ") return <span key={i}>&nbsp;</span>;
+              const colors = [
+                "hsl(0, 90%, 55%)",     // red
+                "hsl(30, 95%, 55%)",    // orange
+                "hsl(55, 95%, 55%)",    // yellow
+                "hsl(120, 70%, 50%)",   // green
+                "hsl(210, 100%, 55%)",  // blue
+                "hsl(280, 80%, 55%)",   // purple
+                "hsl(330, 85%, 55%)",   // pink
+              ];
+              const color = colors[i % colors.length];
+              return (
+                <span key={i} style={{
+                  color,
+                  textShadow: `0 0 10px ${color.replace(")", " / 0.6)")}, 0 0 30px ${color.replace(")", " / 0.3)")}`,
+                  display: "inline-block",
+                }}>
+                  {char}
+                </span>
+              );
+            })}
           </motion.h1>
 
           <motion.p className="text-base sm:text-xl text-muted-foreground max-w-xl mx-auto mb-3 font-light" initial="hidden" animate="visible" variants={fade} custom={2}>
