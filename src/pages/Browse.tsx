@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Play, Plus, Menu, X, User, Bookmark, Search } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Play, Plus, Menu, X, Search, User, Bookmark, LogOut, HeadphonesIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ProfileDialog from "@/components/ProfileDialog";
+import SupportDialog from "@/components/SupportDialog";
+import TitlesTicker from "@/components/TitlesTicker";
 
 const SERIES = [
   { id: 1, title: "Amor em Cores", year: 2024, tag: "Romance", img: "/placeholder.svg" },
@@ -47,8 +50,6 @@ const ContentCard = ({ item, large }: ContentCardProps) => {
     >
       <img src={item.img} alt={item.title} className="w-full h-full object-cover bg-muted" />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent opacity-80" />
-      
-      {/* Info */}
       <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
         <span className="inline-block px-2 py-0.5 text-[10px] sm:text-xs rounded bg-primary/20 text-primary font-medium mb-1.5">
           {item.tag}
@@ -56,15 +57,11 @@ const ContentCard = ({ item, large }: ContentCardProps) => {
         <h3 className="text-sm sm:text-base font-semibold text-foreground leading-tight">{item.title}</h3>
         <p className="text-xs text-muted-foreground">{item.year}</p>
       </div>
-
-      {/* Hover overlay */}
       <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
         <Button size="sm" className="bg-primary text-primary-foreground rounded-full glow-purple gap-1 opacity-0 group-hover:opacity-100 transition-opacity text-xs">
           <Play className="w-3 h-3" /> Assistir
         </Button>
       </div>
-
-      {/* Neon glow on hover */}
       <div className="absolute inset-0 rounded-xl border border-transparent group-hover:border-primary/50 group-hover:shadow-[0_0_20px_hsl(270_100%_50%/0.2)] transition-all pointer-events-none" />
     </motion.div>
   );
@@ -72,63 +69,144 @@ const ContentCard = ({ item, large }: ContentCardProps) => {
 
 const Browse = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [supportOpen, setSupportOpen] = useState(false);
   const [myList] = useState<number[]>([1, 7, 15]);
+  const navigate = useNavigate();
 
-  const navItems = ["Início", "Séries", "Filmes", "Exclusivos", "Minha Lista"];
+  const allContent = [...SERIES, ...FILMES, ...EXCLUSIVOS];
+  const filteredContent = searchQuery.trim()
+    ? allContent.filter((c) => c.title.toLowerCase().includes(searchQuery.toLowerCase()))
+    : [];
+
+  const menuItems = [
+    { label: "Início", icon: "🏠", action: () => { setMenuOpen(false); window.scrollTo({ top: 0, behavior: "smooth" }); } },
+    { label: "Séries", icon: "📺", action: () => { setMenuOpen(false); document.getElementById("séries")?.scrollIntoView({ behavior: "smooth" }); } },
+    { label: "Filmes", icon: "🎬", action: () => { setMenuOpen(false); document.getElementById("filmes")?.scrollIntoView({ behavior: "smooth" }); } },
+    { label: "Exclusivos", icon: "⭐", action: () => { setMenuOpen(false); document.getElementById("exclusivos")?.scrollIntoView({ behavior: "smooth" }); } },
+    { label: "Minha Lista", icon: "🔖", action: () => { setMenuOpen(false); document.getElementById("minha-lista")?.scrollIntoView({ behavior: "smooth" }); } },
+    { label: "Perfil", icon: "👤", action: () => { setMenuOpen(false); setProfileOpen(true); } },
+    { label: "Suporte", icon: "💬", action: () => { setMenuOpen(false); setSupportOpen(true); } },
+  ];
 
   return (
     <div className="min-h-screen bg-background">
       {/* HEADER */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-7xl mx-auto px-4 h-14 sm:h-16 flex items-center justify-between">
-          <Link to="/browse" className="text-lg sm:text-xl font-bold neon-text-purple" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          {/* Left: Hamburger */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-muted transition-colors"
+          >
+            {menuOpen ? <X className="w-5 h-5 text-foreground" /> : <Menu className="w-5 h-5 text-foreground" />}
+          </button>
+
+          {/* Center: Logo */}
+          <Link
+            to="/"
+            className="absolute left-1/2 -translate-x-1/2 text-lg sm:text-xl font-bold neon-text-purple"
+            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+          >
             QUEER SCENES
           </Link>
 
-          {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-6">
-            {navItems.map((item) => (
-              <a key={item} href={`#${item.toLowerCase().replace(" ", "-")}`}
-                className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                {item}
-              </a>
-            ))}
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center hover:bg-primary/20 transition-colors cursor-pointer">
-              <User className="w-4 h-4 text-muted-foreground" />
-            </div>
-            <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
-              {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
+          {/* Right: Search */}
+          <button
+            onClick={() => setSearchOpen(!searchOpen)}
+            className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-muted transition-colors"
+          >
+            <Search className="w-5 h-5 text-foreground" />
+          </button>
         </div>
 
-        {/* Mobile nav */}
-        {menuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-            className="md:hidden bg-card border-b border-border px-4 py-4 space-y-3"
-          >
-            {navItems.map((item) => (
-              <a key={item} href={`#${item.toLowerCase().replace(" ", "-")}`}
-                className="block text-sm text-muted-foreground hover:text-primary transition-colors"
-                onClick={() => setMenuOpen(false)}>
-                {item}
-              </a>
-            ))}
-          </motion.div>
-        )}
+        {/* Search bar */}
+        <AnimatePresence>
+          {searchOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden border-b border-border"
+            >
+              <div className="max-w-7xl mx-auto px-4 py-3">
+                <input
+                  autoFocus
+                  type="text"
+                  placeholder="Buscar séries, filmes..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-muted/50 border border-border rounded-full px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
+                />
+                {searchQuery.trim() && (
+                  <div className="mt-2 space-y-1 max-h-60 overflow-y-auto">
+                    {filteredContent.length > 0 ? (
+                      filteredContent.map((c) => (
+                        <button
+                          key={c.id}
+                          onClick={() => { navigate(`/player/${c.id}`); setSearchOpen(false); setSearchQuery(""); }}
+                          className="w-full text-left px-3 py-2 rounded-lg hover:bg-muted/50 flex items-center gap-3 text-sm transition-colors"
+                        >
+                          <Play className="w-3 h-3 text-primary flex-shrink-0" />
+                          <span className="text-foreground">{c.title}</span>
+                          <span className="text-muted-foreground text-xs ml-auto">{c.tag}</span>
+                        </button>
+                      ))
+                    ) : (
+                      <p className="text-muted-foreground text-xs text-center py-3">Nenhum resultado encontrado.</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Mobile menu */}
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="bg-card border-b border-border px-4 py-4 space-y-1"
+            >
+              {menuItems.map((item) => (
+                <button
+                  key={item.label}
+                  onClick={item.action}
+                  className="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                >
+                  <span>{item.icon}</span>
+                  <span>{item.label}</span>
+                </button>
+              ))}
+              {/* Sair */}
+              <div className="border-t border-border pt-2 mt-2">
+                <button
+                  onClick={() => { setMenuOpen(false); navigate("/"); }}
+                  className="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-accent hover:bg-accent/10 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Sair</span>
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       <main className="pt-14 sm:pt-16">
+        {/* Ticker */}
+        <TitlesTicker />
+
         {/* HERO BANNER */}
         <section id="início" className="relative h-[60vh] sm:h-[70vh] flex items-end">
           <img src="/placeholder.svg" alt="Banner principal" className="absolute inset-0 w-full h-full object-cover bg-muted" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-r from-background/80 to-transparent" />
-
           <div className="relative z-10 p-6 sm:p-10 md:p-16 max-w-2xl">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
               <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-3 leading-tight">
@@ -202,6 +280,10 @@ const Browse = () => {
       <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground">
         <p>© 2026 Queer Scenes. Todos os direitos reservados. 🌈</p>
       </footer>
+
+      {/* Dialogs */}
+      <ProfileDialog open={profileOpen} onOpenChange={setProfileOpen} />
+      <SupportDialog open={supportOpen} onOpenChange={setSupportOpen} />
     </div>
   );
 };
