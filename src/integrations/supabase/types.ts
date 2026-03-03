@@ -14,11 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      content_clicks: {
+        Row: {
+          clicked_at: string
+          content_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          clicked_at?: string
+          content_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          clicked_at?: string
+          content_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_clicks_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "contents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contents: {
         Row: {
           banner_url: string | null
           created_at: string
           id: string
+          is_premium: boolean
           player_url: string | null
           position: number
           section: string
@@ -32,6 +62,7 @@ export type Database = {
           banner_url?: string | null
           created_at?: string
           id?: string
+          is_premium?: boolean
           player_url?: string | null
           position?: number
           section?: string
@@ -45,6 +76,7 @@ export type Database = {
           banner_url?: string | null
           created_at?: string
           id?: string
+          is_premium?: boolean
           player_url?: string | null
           position?: number
           section?: string
@@ -90,6 +122,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          is_premium: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_premium?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_premium?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {

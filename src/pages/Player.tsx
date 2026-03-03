@@ -16,6 +16,7 @@ interface ContentItem {
   player_url: string | null;
   section: string;
   position: number;
+  is_premium: boolean;
 }
 
 interface Episode {

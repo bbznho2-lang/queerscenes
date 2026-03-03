@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Plus, Menu, X, Search, Bookmark, LogOut, Pencil, Trash2 } from "lucide-react";
+import { Play, Plus, Menu, X, Search, Bookmark, LogOut, Pencil, Trash2, Crown, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProfileDialog from "@/components/ProfileDialog";
 import SupportDialog from "@/components/SupportDialog";
@@ -21,6 +21,7 @@ interface ContentItem {
   player_url: string | null;
   section: string;
   position: number;
+  is_premium: boolean;
 }
 
 const ContentCard = ({
@@ -28,11 +29,13 @@ const ContentCard = ({
   isAdmin,
   onEdit,
   onDelete,
+  onClickTrack,
 }: {
   item: ContentItem;
   isAdmin: boolean;
   onEdit: () => void;
   onDelete: () => void;
+  onClickTrack: () => void;
 }) => {
   const navigate = useNavigate();
   return (
@@ -40,7 +43,7 @@ const ContentCard = ({
       className="group relative rounded-xl overflow-hidden cursor-pointer aspect-[2/3]"
       whileHover={{ scale: 1.03 }}
       transition={{ duration: 0.2 }}
-      onClick={() => navigate(`/player/${item.id}`)}
+      onClick={() => { onClickTrack(); navigate(`/player/${item.id}`); }}
     >
       <img
         src={item.banner_url || "/placeholder.svg"}
@@ -48,6 +51,12 @@ const ContentCard = ({
         className="w-full h-full object-cover bg-muted"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent opacity-80" />
+      {/* Premium badge */}
+      {item.is_premium && (
+        <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-secondary/90 text-secondary-foreground text-[10px] font-bold flex items-center gap-1">
+          <Crown className="w-3 h-3" /> PREMIUM
+        </div>
+      )}
       <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
         <span className="inline-block px-2 py-0.5 text-[10px] sm:text-xs rounded bg-primary/20 text-primary font-medium mb-1.5">
           {item.tag}
@@ -61,16 +70,16 @@ const ContentCard = ({
         </Button>
       </div>
       {isAdmin && (
-        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+        <div className="absolute top-2 right-2 flex gap-1 z-10">
           <button
             onClick={(e) => { e.stopPropagation(); onEdit(); }}
-            className="w-8 h-8 rounded-full bg-card/90 flex items-center justify-center hover:bg-primary/20 transition-colors"
+            className="w-8 h-8 rounded-full bg-card/90 flex items-center justify-center hover:bg-primary/20 transition-colors shadow-md"
           >
             <Pencil className="w-3.5 h-3.5 text-primary" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); onDelete(); }}
-            className="w-8 h-8 rounded-full bg-card/90 flex items-center justify-center hover:bg-destructive/20 transition-colors"
+            className="w-8 h-8 rounded-full bg-card/90 flex items-center justify-center hover:bg-destructive/20 transition-colors shadow-md"
           >
             <Trash2 className="w-3.5 h-3.5 text-destructive" />
           </button>
@@ -131,6 +140,12 @@ const Browse = () => {
     setEditOpen(true);
   };
 
+  const trackClick = async (contentId: string) => {
+    if (user) {
+      await supabase.from("content_clicks").insert({ content_id: contentId, user_id: user.id });
+    }
+  };
+
   const menuItems = [
     { label: "Início", icon: "🏠", action: () => { setMenuOpen(false); window.scrollTo({ top: 0, behavior: "smooth" }); } },
     { label: "Séries", icon: "📺", action: () => { setMenuOpen(false); document.getElementById("séries")?.scrollIntoView({ behavior: "smooth" }); } },
@@ -139,6 +154,7 @@ const Browse = () => {
     { label: "Minha Lista", icon: "🔖", action: () => { setMenuOpen(false); document.getElementById("minha-lista")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Perfil", icon: "👤", action: () => { setMenuOpen(false); setProfileOpen(true); } },
     { label: "Suporte", icon: "💬", action: () => { setMenuOpen(false); setSupportOpen(true); } },
+    ...(isAdmin ? [{ label: "Painel Admin", icon: "⚙️", action: () => { setMenuOpen(false); navigate("/admin"); } }] : []),
     { label: "Entrar pro Premium", icon: "💎", action: () => { setMenuOpen(false); navigate("/#planos"); }, premium: true },
   ];
 
@@ -246,7 +262,7 @@ const Browse = () => {
             {series.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
                 {series.map((s) => (
-                  <ContentCard key={s.id} item={s} isAdmin={isAdmin} onEdit={() => handleEdit(s)} onDelete={() => handleDelete(s.id)} />
+                  <ContentCard key={s.id} item={s} isAdmin={isAdmin} onEdit={() => handleEdit(s)} onDelete={() => handleDelete(s.id)} onClickTrack={() => trackClick(s.id)} />
                 ))}
               </div>
             ) : (
@@ -264,7 +280,7 @@ const Browse = () => {
             {filmes.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
                 {filmes.map((f) => (
-                  <ContentCard key={f.id} item={f} isAdmin={isAdmin} onEdit={() => handleEdit(f)} onDelete={() => handleDelete(f.id)} />
+                  <ContentCard key={f.id} item={f} isAdmin={isAdmin} onEdit={() => handleEdit(f)} onDelete={() => handleDelete(f.id)} onClickTrack={() => trackClick(f.id)} />
                 ))}
               </div>
             ) : (
@@ -284,7 +300,7 @@ const Browse = () => {
             {exclusivos.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 {exclusivos.map((e) => (
-                  <ContentCard key={e.id} item={e} isAdmin={isAdmin} onEdit={() => handleEdit(e)} onDelete={() => handleDelete(e.id)} />
+                  <ContentCard key={e.id} item={e} isAdmin={isAdmin} onEdit={() => handleEdit(e)} onDelete={() => handleDelete(e.id)} onClickTrack={() => trackClick(e.id)} />
                 ))}
               </div>
             ) : (
