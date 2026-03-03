@@ -82,6 +82,11 @@
   text-shadow: 0 0 10px hsl(330 85% 55% / 0.5), 0 0 30px hsl(330 85% 55% / 0.3);
 }
 
+.neon-text-bi-blue {
+  color: hsl(230 70% 45%);
+  text-shadow: 0 0 10px hsl(230 70% 45% / 0.5), 0 0 30px hsl(230 70% 45% / 0.3);
+}
+
 .neon-text-red {
   color: hsl(0 90% 55%);
   text-shadow: 0 0 10px hsl(0 90% 55% / 0.5), 0 0 30px hsl(0 90% 55% / 0.3);
