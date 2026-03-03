@@ -18,7 +18,7 @@
     --primary: 280 80% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 100% 55%;
+    --secondary: 230 70% 40%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 240 10% 12%;
@@ -37,7 +37,7 @@
     --radius: 0.75rem;
 
     --neon-purple: 280 80% 55%;
-    --neon-blue: 210 100% 55%;
+    --neon-blue: 230 70% 40%;
     --neon-pink: 330 85% 55%;
 
     --sidebar-background: 240 12% 7%;
@@ -73,8 +73,8 @@
 }
 
 .neon-text-blue {
-  color: hsl(210 100% 55%);
-  text-shadow: 0 0 10px hsl(210 100% 55% / 0.5), 0 0 30px hsl(210 100% 55% / 0.3);
+  color: hsl(230 70% 40%);
+  text-shadow: 0 0 10px hsl(230 70% 40% / 0.5), 0 0 30px hsl(230 70% 40% / 0.3);
 }
 
 .neon-text-pink {
@@ -127,7 +127,7 @@
 }
 
 .glow-blue {
-  box-shadow: 0 0 20px -5px hsl(210 100% 55% / 0.5), 0 0 40px -10px hsl(210 100% 55% / 0.3);
+  box-shadow: 0 0 20px -5px hsl(230 70% 40% / 0.5), 0 0 40px -10px hsl(230 70% 40% / 0.3);
 }
 
 .glow-pink {
@@ -144,8 +144,8 @@
 }
 
 .neon-border-blue {
-  border: 1px solid hsl(210 100% 55% / 0.4);
-  box-shadow: inset 0 0 20px hsl(210 100% 55% / 0.05), 0 0 15px hsl(210 100% 55% / 0.1);
+  border: 1px solid hsl(230 70% 40% / 0.4);
+  box-shadow: inset 0 0 20px hsl(230 70% 40% / 0.05), 0 0 15px hsl(230 70% 40% / 0.1);
 }
 
 .neon-border-pink {
