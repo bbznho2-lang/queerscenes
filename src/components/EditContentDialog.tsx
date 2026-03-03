@@ -34,9 +34,10 @@ interface Props {
   onOpenChange: (v: boolean) => void;
   content: ContentItem | null;
   onSaved: () => void;
+  defaults?: { section: string; type: string };
 }
 
-const EditContentDialog = ({ open, onOpenChange, content, onSaved }: Props) => {
+const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: Props) => {
   const [title, setTitle] = useState("");
   const [year, setYear] = useState(2025);
   const [tag, setTag] = useState("Drama");
@@ -70,8 +71,8 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved }: Props) => {
       setTitle("");
       setYear(2025);
       setTag("Drama");
-      setType("filme");
-      setSection("series");
+      setType(defaults?.type || "filme");
+      setSection(defaults?.section || "series");
       setPlayerUrl("");
       setBannerPreview("");
       setIsPremium(false);

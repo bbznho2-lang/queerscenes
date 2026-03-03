@@ -112,6 +112,7 @@ const Browse = () => {
   const [supportOpen, setSupportOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [editingContent, setEditingContent] = useState<ContentItem | null>(null);
+  const [newDefaults, setNewDefaults] = useState<{ section: string; type: string }>({ section: "series", type: "filme" });
   const [contents, setContents] = useState<ContentItem[]>([]);
   const [watchlistIds, setWatchlistIds] = useState<Set<string>>(new Set());
   const { user, isAdmin, signOut } = useAuth();
@@ -174,8 +175,9 @@ const Browse = () => {
     setEditOpen(true);
   };
 
-  const handleNew = () => {
+  const handleNew = (defaultSection?: string, defaultType?: string) => {
     setEditingContent(null);
+    setNewDefaults({ section: defaultSection || "series", type: defaultType || "filme" });
     setEditOpen(true);
   };
 
@@ -212,7 +214,7 @@ const Browse = () => {
 
           <div className="flex items-center gap-2">
             {isAdmin && (
-              <button onClick={handleNew} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-primary/20 transition-colors" title="Adicionar conteúdo">
+              <button onClick={() => handleNew()} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-primary/20 transition-colors" title="Adicionar conteúdo">
                 <Plus className="w-5 h-5 text-primary" />
               </button>
             )}
@@ -297,7 +299,14 @@ const Browse = () => {
         {/* SÉRIES */}
         <section id="séries" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-6 neon-text-purple">Séries Queer em Alta</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl sm:text-3xl font-bold neon-text-purple">Séries Queer em Alta</h2>
+              {isAdmin && (
+                <button onClick={() => handleNew("series", "serie")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Adicionar série">
+                  <Plus className="w-5 h-5 text-primary" />
+                </button>
+              )}
+            </div>
             {series.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
                 {series.map((s) => (
@@ -315,7 +324,14 @@ const Browse = () => {
         {/* FILMES */}
         <section id="filmes" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-6 neon-text-blue">Filmes Icônicos</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl sm:text-3xl font-bold neon-text-blue">Filmes Icônicos</h2>
+              {isAdmin && (
+                <button onClick={() => handleNew("filmes", "filme")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Adicionar filme">
+                  <Plus className="w-5 h-5 text-primary" />
+                </button>
+              )}
+            </div>
             {filmes.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
                 {filmes.map((f) => (
@@ -333,9 +349,16 @@ const Browse = () => {
         {/* EXCLUSIVOS */}
         <section id="exclusivos" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-6">
-              <span className="rainbow-text">Exclusivos Queer Scenes</span>
-            </h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl sm:text-3xl font-bold">
+                <span className="rainbow-text">Exclusivos Queer Scenes</span>
+              </h2>
+              {isAdmin && (
+                <button onClick={() => handleNew("exclusivos", "filme")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Adicionar exclusivo">
+                  <Plus className="w-5 h-5 text-primary" />
+                </button>
+              )}
+            </div>
             {exclusivos.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 {exclusivos.map((e) => (
@@ -375,7 +398,7 @@ const Browse = () => {
 
       <ProfileDialog open={profileOpen} onOpenChange={setProfileOpen} />
       <SupportDialog open={supportOpen} onOpenChange={setSupportOpen} />
-      <EditContentDialog open={editOpen} onOpenChange={setEditOpen} content={editingContent} onSaved={fetchContents} />
+      <EditContentDialog open={editOpen} onOpenChange={setEditOpen} content={editingContent} onSaved={fetchContents} defaults={newDefaults} />
     </div>
   );
 };
