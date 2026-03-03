@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Play, Lock, Sparkles, Diamond, Star, Zap, Heart, Film, Crown, ArrowRight, HelpCircle, Tv, Smartphone, Tablet } from "lucide-react";
+import { Play, Lock, Sparkles, Diamond, Star, Zap, Heart, Film, Crown, ArrowRight, HelpCircle, Tv, Smartphone, Tablet, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +18,7 @@ const fade = {
 const Index = () => {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = (e: React.FormEvent) => {
@@ -98,14 +99,23 @@ const Index = () => {
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm text-muted-foreground">Senha</label>
-                    <Input
-                      type="password"
-                      placeholder="••••••••"
-                      value={senha}
-                      onChange={(e) => setSenha(e.target.value)}
-                      className="bg-muted border-border focus:border-primary"
-                      required
-                    />
+                    <div className="relative">
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        value={senha}
+                        onChange={(e) => setSenha(e.target.value)}
+                        className="bg-muted border-border focus:border-primary pr-10"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                   </div>
                   <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full glow-purple">
                     ENTRAR
