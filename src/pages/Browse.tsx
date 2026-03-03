@@ -180,7 +180,7 @@ const Browse = () => {
                   onClick={item.action}
                   className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
                     item.premium
-                      ? "neon-text-bi-blue font-semibold hover:bg-secondary/10"
+                      ? "text-muted-foreground font-semibold hover:text-foreground hover:bg-muted/50"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   }`}
                 >
