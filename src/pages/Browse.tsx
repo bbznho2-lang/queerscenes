@@ -30,12 +30,16 @@ const ContentCard = ({
   onEdit,
   onDelete,
   onClickTrack,
+  isInWatchlist,
+  onToggleWatchlist,
 }: {
   item: ContentItem;
   isAdmin: boolean;
   onEdit: () => void;
   onDelete: () => void;
   onClickTrack: () => void;
+  isInWatchlist: boolean;
+  onToggleWatchlist: () => void;
 }) => {
   const navigate = useNavigate();
   return (
@@ -57,6 +61,16 @@ const ContentCard = ({
           <Crown className="w-3 h-3" /> PREMIUM
         </div>
       )}
+      {/* Add to watchlist button */}
+      <button
+        onClick={(e) => { e.stopPropagation(); onToggleWatchlist(); }}
+        className={`absolute top-2 ${isAdmin ? 'top-12' : 'top-2'} right-2 z-10 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-colors ${
+          isInWatchlist ? 'bg-primary text-primary-foreground' : 'bg-card/90 hover:bg-primary/20 text-primary'
+        }`}
+        title={isInWatchlist ? "Remover da lista" : "Adicionar à lista"}
+      >
+        {isInWatchlist ? <Bookmark className="w-3.5 h-3.5 fill-current" /> : <Plus className="w-3.5 h-3.5" />}
+      </button>
       <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
         <span className="inline-block px-2 py-0.5 text-[10px] sm:text-xs rounded bg-primary/20 text-primary font-medium mb-1.5">
           {item.tag}
@@ -99,6 +113,7 @@ const Browse = () => {
   const [editOpen, setEditOpen] = useState(false);
   const [editingContent, setEditingContent] = useState<ContentItem | null>(null);
   const [contents, setContents] = useState<ContentItem[]>([]);
+  const [watchlistIds, setWatchlistIds] = useState<Set<string>>(new Set());
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -111,13 +126,37 @@ const Browse = () => {
     setContents(data || []);
   };
 
+  const fetchWatchlist = async () => {
+    if (!user) return;
+    const { data } = await supabase.from("watchlist").select("content_id").eq("user_id", user.id);
+    setWatchlistIds(new Set((data || []).map((w: any) => w.content_id)));
+  };
+
+  const toggleWatchlist = async (contentId: string) => {
+    if (!user) { toast.error("Faça login primeiro"); return; }
+    if (watchlistIds.has(contentId)) {
+      await supabase.from("watchlist").delete().eq("user_id", user.id).eq("content_id", contentId);
+      setWatchlistIds((prev) => { const n = new Set(prev); n.delete(contentId); return n; });
+      toast.success("Removido da sua lista");
+    } else {
+      await supabase.from("watchlist").insert({ user_id: user.id, content_id: contentId });
+      setWatchlistIds((prev) => new Set(prev).add(contentId));
+      toast.success("Adicionado à sua lista");
+    }
+  };
+
   useEffect(() => {
     fetchContents();
   }, []);
 
+  useEffect(() => {
+    fetchWatchlist();
+  }, [user]);
+
   const series = contents.filter((c) => c.section === "series");
   const filmes = contents.filter((c) => c.section === "filmes");
   const exclusivos = contents.filter((c) => c.section === "exclusivos");
+  const watchlistItems = contents.filter((c) => watchlistIds.has(c.id));
 
   const filteredContent = searchQuery.trim()
     ? contents.filter((c) => c.title.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -262,7 +301,7 @@ const Browse = () => {
             {series.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
                 {series.map((s) => (
-                  <ContentCard key={s.id} item={s} isAdmin={isAdmin} onEdit={() => handleEdit(s)} onDelete={() => handleDelete(s.id)} onClickTrack={() => trackClick(s.id)} />
+                  <ContentCard key={s.id} item={s} isAdmin={isAdmin} onEdit={() => handleEdit(s)} onDelete={() => handleDelete(s.id)} onClickTrack={() => trackClick(s.id)} isInWatchlist={watchlistIds.has(s.id)} onToggleWatchlist={() => toggleWatchlist(s.id)} />
                 ))}
               </div>
             ) : (
@@ -280,7 +319,7 @@ const Browse = () => {
             {filmes.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
                 {filmes.map((f) => (
-                  <ContentCard key={f.id} item={f} isAdmin={isAdmin} onEdit={() => handleEdit(f)} onDelete={() => handleDelete(f.id)} onClickTrack={() => trackClick(f.id)} />
+                  <ContentCard key={f.id} item={f} isAdmin={isAdmin} onEdit={() => handleEdit(f)} onDelete={() => handleDelete(f.id)} onClickTrack={() => trackClick(f.id)} isInWatchlist={watchlistIds.has(f.id)} onToggleWatchlist={() => toggleWatchlist(f.id)} />
                 ))}
               </div>
             ) : (
@@ -300,7 +339,7 @@ const Browse = () => {
             {exclusivos.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 {exclusivos.map((e) => (
-                  <ContentCard key={e.id} item={e} isAdmin={isAdmin} onEdit={() => handleEdit(e)} onDelete={() => handleDelete(e.id)} onClickTrack={() => trackClick(e.id)} />
+                  <ContentCard key={e.id} item={e} isAdmin={isAdmin} onEdit={() => handleEdit(e)} onDelete={() => handleDelete(e.id)} onClickTrack={() => trackClick(e.id)} isInWatchlist={watchlistIds.has(e.id)} onToggleWatchlist={() => toggleWatchlist(e.id)} />
                 ))}
               </div>
             ) : (
@@ -317,7 +356,15 @@ const Browse = () => {
             <h2 className="text-2xl sm:text-3xl font-bold mb-6 flex items-center gap-2">
               <Bookmark className="w-6 h-6 text-secondary" /> Minha Lista
             </h2>
-            <p className="text-muted-foreground text-center py-12">Sua lista está vazia. Adicione títulos para assistir depois!</p>
+            {watchlistItems.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+                {watchlistItems.map((w) => (
+                  <ContentCard key={w.id} item={w} isAdmin={isAdmin} onEdit={() => handleEdit(w)} onDelete={() => handleDelete(w.id)} onClickTrack={() => trackClick(w.id)} isInWatchlist={true} onToggleWatchlist={() => toggleWatchlist(w.id)} />
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-12">Sua lista está vazia. Clique no + nos cards para adicionar!</p>
+            )}
           </div>
         </section>
       </main>
