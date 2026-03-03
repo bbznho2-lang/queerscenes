@@ -39,7 +39,7 @@ const Index = () => {
 
         <div className="relative z-10 max-w-3xl mx-auto text-center">
           <motion.div initial="hidden" animate="visible" variants={fade} custom={0}>
-            <span className="inline-block px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium neon-border-pink text-accent mb-6">
+            <span className="inline-block px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium neon-border-pink neon-text-pink mb-6">
               🎬 Streaming LGBTQIA+
             </span>
           </motion.div>
@@ -64,7 +64,7 @@ const Index = () => {
             <Button
               size="lg"
               onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
-              className="text-base sm:text-lg px-8 sm:px-10 py-5 sm:py-6 rounded-full bg-accent text-accent-foreground hover:bg-accent/90 glow-pink gap-2"
+              className="text-base sm:text-lg px-8 sm:px-10 py-5 sm:py-6 rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-blue gap-2 neon-text-blue"
             >
               <Play className="w-5 h-5" />
               ACESSAR O QUEER SCENES
