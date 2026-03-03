@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 const fade = {
   hidden: { opacity: 0, y: 20 },
@@ -19,11 +21,26 @@ const Index = () => {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { signIn, signUp } = useAuth();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate("/browse");
+    setLoading(true);
+    try {
+      if (isSignUp) {
+        const { error } = await signUp(email, senha);
+        if (error) { toast.error(error.message); return; }
+        toast.success("Conta criada! Entrando...");
+      }
+      const { error } = await signIn(email, senha);
+      if (error) { toast.error(error.message); return; }
+      navigate("/browse");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -118,13 +135,15 @@ const Index = () => {
                       </button>
                     </div>
                   </div>
-                  <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full glow-purple">
-                    ENTRAR
-                  </Button>
-                  <p className="text-center text-sm text-muted-foreground">
-                    Não tem conta?{" "}
-                    <button type="button" className="text-secondary hover:underline font-medium">Criar acesso</button>
-                  </p>
+                   <Button type="submit" disabled={loading} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full glow-purple">
+                     {loading ? "Entrando..." : isSignUp ? "CRIAR CONTA" : "ENTRAR"}
+                   </Button>
+                   <p className="text-center text-sm text-muted-foreground">
+                     {isSignUp ? "Já tem conta? " : "Não tem conta? "}
+                     <button type="button" onClick={() => setIsSignUp(!isSignUp)} className="text-secondary hover:underline font-medium">
+                       {isSignUp ? "Fazer login" : "Criar acesso"}
+                     </button>
+                   </p>
                 </form>
               </CardContent>
             </Card>

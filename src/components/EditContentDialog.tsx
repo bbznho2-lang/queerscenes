@@ -1,0 +1,294 @@
+import { useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { Plus, Trash2, Save } from "lucide-react";
+import { toast } from "sonner";
+
+interface ContentItem {
+  id: string;
+  title: string;
+  year: number;
+  tag: string;
+  type: string;
+  banner_url: string | null;
+  player_url: string | null;
+  section: string;
+  position: number;
+}
+
+interface Episode {
+  id: string;
+  content_id: string;
+  title: string;
+  episode_number: number;
+  player_url: string | null;
+}
+
+interface Props {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  content: ContentItem | null;
+  onSaved: () => void;
+}
+
+const EditContentDialog = ({ open, onOpenChange, content, onSaved }: Props) => {
+  const [title, setTitle] = useState("");
+  const [year, setYear] = useState(2025);
+  const [tag, setTag] = useState("Drama");
+  const [type, setType] = useState("filme");
+  const [section, setSection] = useState("filmes");
+  const [playerUrl, setPlayerUrl] = useState("");
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [bannerPreview, setBannerPreview] = useState("");
+  const [episodes, setEpisodes] = useState<Episode[]>([]);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (content) {
+      setTitle(content.title);
+      setYear(content.year);
+      setTag(content.tag);
+      setType(content.type);
+      setSection(content.section);
+      setPlayerUrl(content.player_url || "");
+      setBannerPreview(content.banner_url || "");
+      // Load episodes
+      supabase
+        .from("episodes")
+        .select("*")
+        .eq("content_id", content.id)
+        .order("episode_number")
+        .then(({ data }) => setEpisodes(data || []));
+    } else {
+      setTitle("");
+      setYear(2025);
+      setTag("Drama");
+      setType("filme");
+      setSection("series");
+      setPlayerUrl("");
+      setBannerPreview("");
+      setEpisodes([]);
+    }
+  }, [content, open]);
+
+  const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setBannerFile(file);
+      setBannerPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      let bannerUrl = content?.banner_url || null;
+
+      if (bannerFile) {
+        const ext = bannerFile.name.split(".").pop();
+        const path = `${Date.now()}.${ext}`;
+        const { error: uploadErr } = await supabase.storage
+          .from("banners")
+          .upload(path, bannerFile);
+        if (uploadErr) throw uploadErr;
+        const { data: urlData } = supabase.storage.from("banners").getPublicUrl(path);
+        bannerUrl = urlData.publicUrl;
+      }
+
+      const payload = {
+        title,
+        year,
+        tag,
+        type,
+        section,
+        player_url: playerUrl || null,
+        banner_url: bannerUrl,
+      };
+
+      let contentId = content?.id;
+
+      if (content) {
+        const { error } = await supabase.from("contents").update(payload).eq("id", content.id);
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase.from("contents").insert(payload).select().single();
+        if (error) throw error;
+        contentId = data.id;
+      }
+
+      // Save episodes
+      if (contentId && type === "serie") {
+        for (const ep of episodes) {
+          if (ep.id.startsWith("new-")) {
+            await supabase.from("episodes").insert({
+              content_id: contentId,
+              title: ep.title,
+              episode_number: ep.episode_number,
+              player_url: ep.player_url,
+            });
+          } else {
+            await supabase.from("episodes").update({
+              title: ep.title,
+              episode_number: ep.episode_number,
+              player_url: ep.player_url,
+            }).eq("id", ep.id);
+          }
+        }
+      }
+
+      toast.success("Salvo com sucesso!");
+      onSaved();
+      onOpenChange(false);
+    } catch (err: any) {
+      toast.error(err.message || "Erro ao salvar");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const addEpisode = () => {
+    setEpisodes([
+      ...episodes,
+      {
+        id: `new-${Date.now()}`,
+        content_id: content?.id || "",
+        title: `Episódio ${episodes.length + 1}`,
+        episode_number: episodes.length + 1,
+        player_url: "",
+      },
+    ]);
+  };
+
+  const removeEpisode = async (ep: Episode) => {
+    if (!ep.id.startsWith("new-")) {
+      await supabase.from("episodes").delete().eq("id", ep.id);
+    }
+    setEpisodes(episodes.filter((e) => e.id !== ep.id));
+  };
+
+  const updateEpisode = (id: string, field: string, value: any) => {
+    setEpisodes(episodes.map((e) => (e.id === id ? { ...e, [field]: value } : e)));
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-card border-border max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="neon-text-purple">
+            {content ? "Editar Conteúdo" : "Novo Conteúdo"}
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          <div>
+            <label className="text-sm text-muted-foreground">Título</label>
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} className="bg-muted border-border" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-sm text-muted-foreground">Ano</label>
+              <Input type="number" value={year} onChange={(e) => setYear(+e.target.value)} className="bg-muted border-border" />
+            </div>
+            <div>
+              <label className="text-sm text-muted-foreground">Tag</label>
+              <Input value={tag} onChange={(e) => setTag(e.target.value)} className="bg-muted border-border" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-sm text-muted-foreground">Tipo</label>
+              <Select value={type} onValueChange={setType}>
+                <SelectTrigger className="bg-muted border-border"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="serie">Série</SelectItem>
+                  <SelectItem value="filme">Filme</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-sm text-muted-foreground">Seção</label>
+              <Select value={section} onValueChange={setSection}>
+                <SelectTrigger className="bg-muted border-border"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="series">Séries</SelectItem>
+                  <SelectItem value="filmes">Filmes</SelectItem>
+                  <SelectItem value="exclusivos">Exclusivos</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div>
+            <label className="text-sm text-muted-foreground">Player URL (embed externo)</label>
+            <Input
+              value={playerUrl}
+              onChange={(e) => setPlayerUrl(e.target.value)}
+              placeholder="https://youtube.com/embed/..."
+              className="bg-muted border-border"
+            />
+          </div>
+
+          <div>
+            <label className="text-sm text-muted-foreground">Banner / Imagem</label>
+            <input type="file" accept="image/*" onChange={handleBannerChange} className="block w-full text-sm text-muted-foreground mt-1" />
+            {bannerPreview && (
+              <img src={bannerPreview} alt="preview" className="mt-2 rounded-lg h-32 w-full object-cover" />
+            )}
+          </div>
+
+          {/* Episodes (only for series) */}
+          {type === "serie" && (
+            <div className="space-y-3 border-t border-border pt-4">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-semibold text-foreground">Episódios</label>
+                <Button size="sm" variant="outline" onClick={addEpisode} className="gap-1 text-xs">
+                  <Plus className="w-3 h-3" /> Adicionar
+                </Button>
+              </div>
+              {episodes.map((ep) => (
+                <div key={ep.id} className="bg-muted/50 rounded-lg p-3 space-y-2">
+                  <div className="flex gap-2">
+                    <Input
+                      value={ep.episode_number}
+                      onChange={(e) => updateEpisode(ep.id, "episode_number", +e.target.value)}
+                      type="number"
+                      className="w-16 bg-muted border-border"
+                      placeholder="Nº"
+                    />
+                    <Input
+                      value={ep.title}
+                      onChange={(e) => updateEpisode(ep.id, "title", e.target.value)}
+                      className="bg-muted border-border flex-1"
+                      placeholder="Nome do episódio"
+                    />
+                    <Button size="icon" variant="ghost" onClick={() => removeEpisode(ep)} className="text-destructive">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <Input
+                    value={ep.player_url || ""}
+                    onChange={(e) => updateEpisode(ep.id, "player_url", e.target.value)}
+                    placeholder="URL do player (embed)"
+                    className="bg-muted border-border text-xs"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+
+          <Button onClick={handleSave} disabled={saving} className="w-full bg-primary text-primary-foreground rounded-full glow-purple gap-2">
+            <Save className="w-4 h-4" />
+            {saving ? "Salvando..." : "Salvar"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default EditContentDialog;
