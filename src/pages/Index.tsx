@@ -34,17 +34,18 @@ const Index = () => {
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-1/3 left-1/4 w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-primary/15 blur-[120px]" />
           <div className="absolute bottom-1/4 right-1/4 w-60 sm:w-80 h-60 sm:h-80 rounded-full bg-secondary/10 blur-[100px]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/3 w-72 sm:w-80 h-72 sm:h-80 rounded-full bg-accent/12 blur-[110px]" />
         </div>
 
         <div className="relative z-10 max-w-3xl mx-auto text-center">
           <motion.div initial="hidden" animate="visible" variants={fade} custom={0}>
-            <span className="inline-block px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium neon-border-purple text-primary mb-6">
+            <span className="inline-block px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium neon-border-pink text-accent mb-6">
               🎬 Streaming LGBTQIA+
             </span>
           </motion.div>
 
           <motion.h1
-            className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight mb-5 neon-text-purple"
+            className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight mb-5 neon-text-pink"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             initial="hidden" animate="visible" variants={fade} custom={1}
           >
@@ -63,7 +64,7 @@ const Index = () => {
             <Button
               size="lg"
               onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
-              className="text-base sm:text-lg px-8 sm:px-10 py-5 sm:py-6 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple gap-2"
+              className="text-base sm:text-lg px-8 sm:px-10 py-5 sm:py-6 rounded-full bg-accent text-accent-foreground hover:bg-accent/90 glow-pink gap-2"
             >
               <Play className="w-5 h-5" />
               ACESSAR O QUEER SCENES
@@ -76,12 +77,12 @@ const Index = () => {
       <section id="login" className="relative py-16 sm:py-20 px-4">
         <div className="max-w-sm sm:max-w-md mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0}>
-            <Card className="bg-card neon-border-purple overflow-hidden">
+            <Card className="bg-card neon-border-pink overflow-hidden">
               <CardHeader className="text-center pb-2">
-                <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
-                  <Lock className="w-5 h-5 text-primary" />
+                <div className="mx-auto w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mb-3">
+                  <Lock className="w-5 h-5 text-accent" />
                 </div>
-                <CardTitle className="text-xl sm:text-2xl neon-text-purple">ÁREA DE ACESSO</CardTitle>
+                <CardTitle className="text-xl sm:text-2xl neon-text-pink">ÁREA DE ACESSO</CardTitle>
                 <p className="text-muted-foreground text-sm mt-1">Entre para continuar</p>
               </CardHeader>
               <CardContent className="pt-4">
