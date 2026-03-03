@@ -89,6 +89,7 @@ const Browse = () => {
     { label: "Minha Lista", icon: "🔖", action: () => { setMenuOpen(false); document.getElementById("minha-lista")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Perfil", icon: "👤", action: () => { setMenuOpen(false); setProfileOpen(true); } },
     { label: "Suporte", icon: "💬", action: () => { setMenuOpen(false); setSupportOpen(true); } },
+    { label: "Entrar pro Premium", icon: "💎", action: () => { setMenuOpen(false); navigate("/#planos"); }, premium: true },
   ];
 
   return (
@@ -173,11 +174,15 @@ const Browse = () => {
               exit={{ opacity: 0, x: -20 }}
               className="bg-card border-b border-border px-4 py-4 space-y-1"
             >
-              {menuItems.map((item) => (
+              {menuItems.map((item: any) => (
                 <button
                   key={item.label}
                   onClick={item.action}
-                  className="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                  className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                    item.premium
+                      ? "neon-text-bi-blue font-semibold hover:bg-secondary/10"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  }`}
                 >
                   <span>{item.icon}</span>
                   <span>{item.label}</span>
