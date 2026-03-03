@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Play, Lock, Sparkles, Diamond, Star, Zap, Heart, Film, Crown, ArrowRight } from "lucide-react";
+import { Play, Lock, Sparkles, Diamond, Star, Zap, Heart, Film, Crown, ArrowRight, HelpCircle, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -256,7 +257,42 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA FINAL */}
+      {/* FAQ */}
+      <section className="py-24 px-4">
+        <div className="max-w-3xl mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0} className="text-center mb-14">
+            <h2 className="text-4xl sm:text-5xl font-bold">
+              <HelpCircle className="inline w-10 h-10 mr-3 text-primary" />
+              <span className="rainbow-text">FAQ</span> – Perguntas Frequentes
+            </h2>
+          </motion.div>
+
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={1}>
+            <Accordion type="single" collapsible className="space-y-3">
+              {[
+                { q: "O Queer Scenes é gratuito?", a: "Sim. Temos conteúdos gratuitos disponíveis. Também oferecemos plano premium com acesso completo." },
+                { q: "Preciso criar uma conta?", a: "Sim. Para acessar o conteúdo é necessário criar login com e-mail e senha." },
+                { q: "O conteúdo é apenas LGBTQIA+?", a: "Sim. O foco da plataforma é exclusivamente histórias, cenas e produções com representatividade LGBTQIA+." },
+                { q: "Posso cancelar o plano premium?", a: "Sim. O cancelamento pode ser feito a qualquer momento." },
+                { q: "O Queer Scenes funciona no celular?", a: "Sim. A plataforma é adaptada para celular, tablet e desktop." },
+              ].map((item, i) => (
+                <AccordionItem key={i} value={`faq-${i}`} className="bg-card border border-border rounded-xl px-5 data-[state=open]:border-primary/40 transition-colors">
+                  <AccordionTrigger className="text-left text-foreground hover:no-underline py-5">
+                    <span className="flex items-center gap-3">
+                      <span className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">{i + 1}</span>
+                      {item.q}
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground pb-5">
+                    {item.a}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </motion.div>
+        </div>
+      </section>
+
       <section className="py-24 px-4 text-center">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}>
           <Button size="lg" className="text-lg px-12 py-7 rounded-full glow-primary bg-primary text-primary-foreground hover:bg-primary/90 gap-3">
