@@ -97,9 +97,9 @@ const Player = () => {
         )}
       </div>
 
-      <div className={isMobile ? "w-full h-[100dvh]" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-8"}>
-        <div className={isMobile ? "w-full h-full" : "w-full max-w-5xl"}>
-          <div className={isMobile ? "relative h-full bg-card overflow-hidden" : "relative aspect-video bg-card rounded-2xl overflow-hidden neon-border-purple"}>
+      <div className={isMobile ? "w-full px-0 pt-14" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-8"}>
+        <div className={isMobile ? "w-full" : "w-full max-w-5xl"}>
+          <div className={isMobile ? "relative w-full aspect-video bg-card overflow-hidden" : "relative aspect-video bg-card rounded-2xl overflow-hidden neon-border-purple"}>
             {activePlayerUrl ? (
               isEmbed || !isDirectVideo ? (
                 <iframe
