@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Play, Lock, Sparkles, Diamond, Star, Zap, Heart, Film, Crown, ArrowRight, HelpCircle, Tv, Smartphone, Tablet, Eye, EyeOff } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
+import heroBgMobile from "@/assets/hero-bg-mobile.jpg";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,7 +50,8 @@ const Index = () => {
       {/* HERO */}
       <section className="relative min-h-[100svh] flex items-center justify-center px-4 py-16">
         {/* BG image */}
-        <img src={heroBg} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <img src={heroBg} alt="" className="absolute inset-0 w-full h-full object-cover hidden sm:block" />
+        <img src={heroBgMobile} alt="" className="absolute inset-0 w-full h-full object-cover sm:hidden" />
         <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
         <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background" />
 
