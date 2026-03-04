@@ -79,9 +79,9 @@ const ContentCard = ({
         </span>
         <h3 className="text-sm sm:text-base font-semibold text-foreground leading-tight">{item.title}</h3>
         <p className="text-xs text-muted-foreground">{item.year} · {item.type === "serie" ? "Série" : "Filme"}</p>
-        {item.synopsis && (
-          <p className="text-[10px] sm:text-xs text-muted-foreground/80 mt-1 line-clamp-2 leading-snug">{item.synopsis}</p>
-        )}
+        <p className="text-[10px] sm:text-xs text-muted-foreground/80 mt-1 line-clamp-2 leading-snug">
+          {item.synopsis?.trim() || "Sem sinopse cadastrada."}
+        </p>
       </div>
       <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
         <Button size="sm" className="bg-primary text-primary-foreground rounded-full glow-purple gap-1 opacity-0 group-hover:opacity-100 transition-opacity text-xs">
