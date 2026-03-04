@@ -65,12 +65,12 @@ const Player = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <div className="flex items-center justify-between gap-3 p-4 sm:p-6">
+      <div className="flex items-center justify-between gap-3 p-3 sm:p-6 absolute top-0 left-0 right-0 z-10">
         <div className="flex items-center gap-3">
           <button onClick={() => navigate("/browse")} className="text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <span className="text-sm text-muted-foreground">Voltar ao catálogo</span>
+          <span className="text-sm text-muted-foreground hidden sm:inline">Voltar ao catálogo</span>
         </div>
         {isAdmin && content && (
           <button onClick={() => setEditOpen(true)} className="w-9 h-9 rounded-full bg-card flex items-center justify-center hover:bg-primary/20 transition-colors neon-border-purple">
@@ -79,18 +79,17 @@ const Player = () => {
         )}
       </div>
 
-      <div className="flex-1 flex items-center justify-center px-4 pb-8">
-        <div className="w-full max-w-5xl">
-          {/* Video area */}
-          <div className="relative aspect-video bg-card rounded-2xl overflow-hidden neon-border-purple">
+      {/* Video area - full width on mobile */}
+      <div className="w-full sm:flex-1 sm:flex sm:items-center sm:justify-center sm:px-4 sm:pt-16 sm:pb-8">
+        <div className="w-full sm:max-w-5xl">
+          <div className="relative aspect-video bg-card sm:rounded-2xl overflow-hidden sm:neon-border-purple">
             {activePlayerUrl ? (
               <iframe
                 src={activePlayerUrl}
-                className="w-full h-full border-0"
+                className="absolute inset-0 w-full h-full border-0"
                 allowFullScreen
                 allow="autoplay *; encrypted-media *; fullscreen *"
                 referrerPolicy="no-referrer"
-                sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
                 style={{ border: 0 }}
               />
             ) : (
@@ -129,9 +128,9 @@ const Player = () => {
           </div>
 
           {/* Info */}
-          <div className="mt-6">
-            <h1 className="text-xl sm:text-2xl font-bold">{content?.title || "Carregando..."}</h1>
-            <div className="flex gap-2 mt-3">
+          <div className="mt-4 sm:mt-6 px-4 sm:px-0">
+            <h1 className="text-lg sm:text-2xl font-bold">{content?.title || "Carregando..."}</h1>
+            <div className="flex flex-wrap gap-2 mt-2 sm:mt-3">
               <span className="px-2 py-0.5 text-xs rounded bg-primary/20 text-primary">{content?.tag}</span>
               <span className="px-2 py-0.5 text-xs rounded bg-secondary/20 text-secondary">{content?.year}</span>
               <span className="px-2 py-0.5 text-xs rounded bg-muted text-muted-foreground">{content?.type === "serie" ? "Série" : "Filme"}</span>
@@ -140,7 +139,7 @@ const Player = () => {
 
           {/* Episodes list */}
           {content?.type === "serie" && episodes.length > 0 && (
-            <div className="mt-8 space-y-2">
+            <div className="mt-6 sm:mt-8 space-y-2 px-4 sm:px-0 pb-8">
               <h3 className="text-lg font-semibold mb-3">Episódios</h3>
               {episodes.map((ep) => (
                 <button
