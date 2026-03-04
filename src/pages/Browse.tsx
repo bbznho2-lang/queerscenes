@@ -7,6 +7,7 @@ import ProfileDialog from "@/components/ProfileDialog";
 import SupportDialog from "@/components/SupportDialog";
 import TitlesTicker from "@/components/TitlesTicker";
 import EditContentDialog from "@/components/EditContentDialog";
+import AutoScrollRow from "@/components/AutoScrollRow";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -314,11 +315,13 @@ const Browse = () => {
               )}
             </div>
             {series.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+              <AutoScrollRow>
                 {series.map((s) => (
-                  <ContentCard key={s.id} item={s} isAdmin={isAdmin} onEdit={() => handleEdit(s)} onDelete={() => handleDelete(s.id)} onClickTrack={() => trackClick(s.id)} isInWatchlist={watchlistIds.has(s.id)} onToggleWatchlist={() => toggleWatchlist(s.id)} />
+                  <div key={s.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
+                    <ContentCard item={s} isAdmin={isAdmin} onEdit={() => handleEdit(s)} onDelete={() => handleDelete(s.id)} onClickTrack={() => trackClick(s.id)} isInWatchlist={watchlistIds.has(s.id)} onToggleWatchlist={() => toggleWatchlist(s.id)} />
+                  </div>
                 ))}
-              </div>
+              </AutoScrollRow>
             ) : (
               <p className="text-muted-foreground text-center py-8">
                 {isAdmin ? "Clique no + para adicionar séries" : "Em breve novos conteúdos!"}
@@ -339,11 +342,13 @@ const Browse = () => {
               )}
             </div>
             {filmes.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+              <AutoScrollRow>
                 {filmes.map((f) => (
-                  <ContentCard key={f.id} item={f} isAdmin={isAdmin} onEdit={() => handleEdit(f)} onDelete={() => handleDelete(f.id)} onClickTrack={() => trackClick(f.id)} isInWatchlist={watchlistIds.has(f.id)} onToggleWatchlist={() => toggleWatchlist(f.id)} />
+                  <div key={f.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
+                    <ContentCard item={f} isAdmin={isAdmin} onEdit={() => handleEdit(f)} onDelete={() => handleDelete(f.id)} onClickTrack={() => trackClick(f.id)} isInWatchlist={watchlistIds.has(f.id)} onToggleWatchlist={() => toggleWatchlist(f.id)} />
+                  </div>
                 ))}
-              </div>
+              </AutoScrollRow>
             ) : (
               <p className="text-muted-foreground text-center py-8">
                 {isAdmin ? "Clique no + para adicionar filmes" : "Em breve novos conteúdos!"}
@@ -364,11 +369,13 @@ const Browse = () => {
               )}
             </div>
             {novelas.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+              <AutoScrollRow>
                 {novelas.map((n) => (
-                  <ContentCard key={n.id} item={n} isAdmin={isAdmin} onEdit={() => handleEdit(n)} onDelete={() => handleDelete(n.id)} onClickTrack={() => trackClick(n.id)} isInWatchlist={watchlistIds.has(n.id)} onToggleWatchlist={() => toggleWatchlist(n.id)} />
+                  <div key={n.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
+                    <ContentCard item={n} isAdmin={isAdmin} onEdit={() => handleEdit(n)} onDelete={() => handleDelete(n.id)} onClickTrack={() => trackClick(n.id)} isInWatchlist={watchlistIds.has(n.id)} onToggleWatchlist={() => toggleWatchlist(n.id)} />
+                  </div>
                 ))}
-              </div>
+              </AutoScrollRow>
             ) : (
               <p className="text-muted-foreground text-center py-8">
                 {isAdmin ? "Clique no + para adicionar novelas" : "Em breve novos conteúdos!"}
@@ -389,11 +396,13 @@ const Browse = () => {
               )}
             </div>
             {animes.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+              <AutoScrollRow>
                 {animes.map((a) => (
-                  <ContentCard key={a.id} item={a} isAdmin={isAdmin} onEdit={() => handleEdit(a)} onDelete={() => handleDelete(a.id)} onClickTrack={() => trackClick(a.id)} isInWatchlist={watchlistIds.has(a.id)} onToggleWatchlist={() => toggleWatchlist(a.id)} />
+                  <div key={a.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
+                    <ContentCard item={a} isAdmin={isAdmin} onEdit={() => handleEdit(a)} onDelete={() => handleDelete(a.id)} onClickTrack={() => trackClick(a.id)} isInWatchlist={watchlistIds.has(a.id)} onToggleWatchlist={() => toggleWatchlist(a.id)} />
+                  </div>
                 ))}
-              </div>
+              </AutoScrollRow>
             ) : (
               <p className="text-muted-foreground text-center py-8">
                 {isAdmin ? "Clique no + para adicionar animes" : "Em breve novos conteúdos!"}
@@ -416,11 +425,13 @@ const Browse = () => {
               )}
             </div>
             {exclusivos.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              <AutoScrollRow>
                 {exclusivos.map((e) => (
-                  <ContentCard key={e.id} item={e} isAdmin={isAdmin} onEdit={() => handleEdit(e)} onDelete={() => handleDelete(e.id)} onClickTrack={() => trackClick(e.id)} isInWatchlist={watchlistIds.has(e.id)} onToggleWatchlist={() => toggleWatchlist(e.id)} />
+                  <div key={e.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
+                    <ContentCard item={e} isAdmin={isAdmin} onEdit={() => handleEdit(e)} onDelete={() => handleDelete(e.id)} onClickTrack={() => trackClick(e.id)} isInWatchlist={watchlistIds.has(e.id)} onToggleWatchlist={() => toggleWatchlist(e.id)} />
+                  </div>
                 ))}
-              </div>
+              </AutoScrollRow>
             ) : (
               <p className="text-muted-foreground text-center py-8">
                 {isAdmin ? "Clique no + para adicionar exclusivos" : "Em breve novos conteúdos!"}
@@ -436,11 +447,13 @@ const Browse = () => {
               <Bookmark className="w-6 h-6 text-secondary" /> Minha Lista
             </h2>
             {watchlistItems.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+              <AutoScrollRow>
                 {watchlistItems.map((w) => (
-                  <ContentCard key={w.id} item={w} isAdmin={isAdmin} onEdit={() => handleEdit(w)} onDelete={() => handleDelete(w.id)} onClickTrack={() => trackClick(w.id)} isInWatchlist={true} onToggleWatchlist={() => toggleWatchlist(w.id)} />
+                  <div key={w.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
+                    <ContentCard item={w} isAdmin={isAdmin} onEdit={() => handleEdit(w)} onDelete={() => handleDelete(w.id)} onClickTrack={() => trackClick(w.id)} isInWatchlist={true} onToggleWatchlist={() => toggleWatchlist(w.id)} />
+                  </div>
                 ))}
-              </div>
+              </AutoScrollRow>
             ) : (
               <p className="text-muted-foreground text-center py-12">Sua lista está vazia. Clique no + nos cards para adicionar!</p>
             )}
