@@ -66,14 +66,11 @@ const Player = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <div className="flex items-center justify-between gap-3 p-3 sm:p-6 absolute top-0 left-0 right-0 z-10">
-        <div className="flex items-center gap-3">
-          <button onClick={() => navigate("/browse")} className="text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <span className="text-sm text-muted-foreground hidden sm:inline">Voltar ao catálogo</span>
-        </div>
+        <button onClick={() => navigate("/browse")} className="w-9 h-9 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors">
+          <ArrowLeft className="w-5 h-5 text-foreground" />
+        </button>
         {isAdmin && content && (
-          <button onClick={() => setEditOpen(true)} className="w-9 h-9 rounded-full bg-card flex items-center justify-center hover:bg-primary/20 transition-colors neon-border-purple">
+          <button onClick={() => setEditOpen(true)} className="hidden sm:flex w-9 h-9 rounded-full bg-card flex items-center justify-center hover:bg-primary/20 transition-colors neon-border-purple">
             <Pencil className="w-4 h-4 text-primary" />
           </button>
         )}
