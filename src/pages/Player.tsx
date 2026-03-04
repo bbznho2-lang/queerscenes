@@ -44,8 +44,18 @@ const Player = () => {
       setContent(data);
       if (data.type === "serie") {
         const { data: eps } = await supabase.from("episodes").select("*").eq("content_id", id).order("episode_number");
-        setEpisodes(eps || []);
-        if (eps && eps.length > 0) setCurrentEp(eps[0]);
+        const normalizedEpisodes = eps || [];
+        setEpisodes(normalizedEpisodes);
+
+        if (normalizedEpisodes.length > 0) {
+          const firstPlayable = normalizedEpisodes.find((ep) => Boolean(ep.player_url?.trim()));
+          setCurrentEp(firstPlayable || normalizedEpisodes[0]);
+        } else {
+          setCurrentEp(null);
+        }
+      } else {
+        setEpisodes([]);
+        setCurrentEp(null);
       }
     }
   };
@@ -57,29 +67,44 @@ const Player = () => {
   const rawPlayerUrl = currentEp?.player_url || content?.player_url;
 
   const getDriveEmbedUrl = (url: string) => {
-    const fileMatch = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
+    const trimmedUrl = url.trim();
+
+    try {
+      const parsed = new URL(trimmedUrl);
+      if (parsed.hostname.includes("drive.google.com")) {
+        const fileFromPath = parsed.pathname.match(/\/file\/d\/([^/]+)/)?.[1];
+        const fileFromQuery = parsed.searchParams.get("id");
+        const driveFileId = fileFromPath || fileFromQuery;
+
+        if (driveFileId) {
+          return `https://drive.google.com/file/d/${driveFileId}/preview`;
+        }
+      }
+    } catch {
+      // mantém fallback regex abaixo
+    }
+
+    const fileMatch = trimmedUrl.match(/drive\.google\.com\/file\/d\/([^/]+)/);
     if (fileMatch?.[1]) return `https://drive.google.com/file/d/${fileMatch[1]}/preview`;
 
-    const idMatch = url.match(/[?&]id=([^&]+)/);
-    if (url.includes("drive.google.com") && idMatch?.[1]) {
+    const idMatch = trimmedUrl.match(/[?&]id=([^&]+)/);
+    if (trimmedUrl.includes("drive.google.com") && idMatch?.[1]) {
       return `https://drive.google.com/file/d/${idMatch[1]}/preview`;
     }
 
-    return url;
+    return trimmedUrl;
   };
 
   const activePlayerUrl = rawPlayerUrl ? getDriveEmbedUrl(rawPlayerUrl) : rawPlayerUrl;
   const hasPlayerUrl = Boolean(activePlayerUrl);
-  const iframeClassName = isMobile
-    ? "absolute inset-0 w-full h-full border-0"
-    : "absolute inset-0 w-full h-full border-0";
+  const iframeClassName = "absolute inset-0 w-full h-full border-0";
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <div className={isMobile ? "flex items-center justify-between gap-3 p-2" : "flex items-center justify-between gap-3 p-3 sm:p-6 absolute top-0 left-0 right-0 z-10"}>
+      <div className={isMobile ? "absolute top-0 left-0 right-0 z-20 flex items-center justify-between gap-3 p-2 pointer-events-none" : "flex items-center justify-between gap-3 p-3 sm:p-6 absolute top-0 left-0 right-0 z-10"}>
         <button
           onClick={() => navigate("/browse")}
-          className={isMobile ? "w-7 h-7 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors" : "w-9 h-9 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors"}
+          className={isMobile ? "pointer-events-auto w-7 h-7 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors" : "w-9 h-9 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors"}
         >
           <ArrowLeft className={isMobile ? "w-3.5 h-3.5 text-foreground" : "w-5 h-5 text-foreground"} />
         </button>
@@ -90,26 +115,32 @@ const Player = () => {
         )}
       </div>
 
-      <div className={isMobile ? "w-full px-0 -mt-2" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-8"}>
+      <div className={isMobile ? "w-full px-0" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-8"}>
         <div className={isMobile ? "w-full" : "w-full max-w-5xl"}>
           <div className={isMobile ? "relative w-full aspect-video bg-card overflow-hidden" : "relative aspect-video bg-card rounded-2xl overflow-hidden neon-border-purple"}>
             {hasPlayerUrl ? (
               <iframe
+                key={activePlayerUrl ?? "player"}
                 src={activePlayerUrl ?? undefined}
                 title={content?.title ? `Player de ${content.title}` : "Player"}
                 className={iframeClassName}
                 allowFullScreen
-                allow="autoplay *; encrypted-media *; fullscreen *"
-                referrerPolicy="no-referrer"
-                loading="lazy"
+                allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                loading="eager"
                 style={{ border: 0 }}
               />
             ) : (
-              <img
-                src={content?.banner_url || "/placeholder.svg"}
-                alt={content?.title ? `Capa de ${content.title}` : "Capa do conteúdo"}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
+              <div className="absolute inset-0">
+                <img
+                  src={content?.banner_url || "/placeholder.svg"}
+                  alt={content?.title ? `Capa de ${content.title}` : "Capa do conteúdo"}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]" />
+                <div className="absolute inset-0 flex items-center justify-center px-4 text-center">
+                  <p className="text-sm text-foreground">Vídeo indisponível neste item. Se quiser, eu já deixo o campo de link pronto para você atualizar.</p>
+                </div>
+              </div>
             )}
           </div>
         </div>
