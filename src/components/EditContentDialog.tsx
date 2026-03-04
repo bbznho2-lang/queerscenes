@@ -48,6 +48,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
   const [bannerPreview, setBannerPreview] = useState("");
   const [bannerUrlInput, setBannerUrlInput] = useState("");
   const [isPremium, setIsPremium] = useState(false);
+  const [synopsis, setSynopsis] = useState("");
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [saving, setSaving] = useState(false);
 
@@ -62,6 +63,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setBannerPreview(content.banner_url || "");
       setBannerUrlInput(content.banner_url || "");
       setIsPremium(content.is_premium || false);
+      setSynopsis((content as any).synopsis || "");
       // Load episodes
       supabase
         .from("episodes")
@@ -79,6 +81,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setBannerPreview("");
       setBannerUrlInput("");
       setIsPremium(false);
+      setSynopsis("");
       setEpisodes([]);
     }
   }, [content, open]);
@@ -119,6 +122,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         player_url: playerUrl || null,
         banner_url: bannerUrl,
         is_premium: isPremium,
+        synopsis: synopsis || null,
       };
 
       let contentId = content?.id;
@@ -244,6 +248,16 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
           <div className="flex items-center justify-between py-2">
             <label className="text-sm text-muted-foreground">Conteúdo Premium?</label>
             <Switch checked={isPremium} onCheckedChange={setIsPremium} />
+          </div>
+
+          <div>
+            <label className="text-sm text-muted-foreground">Sinopse</label>
+            <textarea
+              value={synopsis}
+              onChange={(e) => setSynopsis(e.target.value)}
+              placeholder="Escreva uma sinopse para o conteúdo..."
+              className="w-full mt-1 rounded-md bg-muted border border-border px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 min-h-[80px] resize-y"
+            />
           </div>
 
           <div>

@@ -156,6 +156,10 @@ const Player = () => {
           </div>
         </div>
 
+        {(content as any)?.synopsis && (
+          <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{(content as any).synopsis}</p>
+        )}
+
         {content?.type === "serie" && episodes.length > 0 && (
           <div className="mt-6 sm:mt-8 space-y-2">
             <h3 className="text-lg font-semibold mb-3">Episódios</h3>
