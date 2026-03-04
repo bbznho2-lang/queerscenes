@@ -71,14 +71,17 @@ const Player = () => {
   const activePlayerUrl = rawPlayerUrl ? getDriveEmbedUrl(rawPlayerUrl) : rawPlayerUrl;
   const hasPlayerUrl = Boolean(activePlayerUrl);
   const iframeClassName = isMobile
-    ? "absolute left-0 -top-[12%] h-[124%] w-full border-0"
+    ? "absolute left-0 -top-[20%] h-[140%] w-full border-0"
     : "absolute inset-0 w-full h-full border-0";
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <div className={isMobile ? "flex items-center justify-between gap-3 p-3" : "flex items-center justify-between gap-3 p-3 sm:p-6 absolute top-0 left-0 right-0 z-10"}>
-        <button onClick={() => navigate("/browse")} className="w-9 h-9 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors">
-          <ArrowLeft className="w-5 h-5 text-foreground" />
+      <div className={isMobile ? "flex items-center justify-between gap-3 p-2.5" : "flex items-center justify-between gap-3 p-3 sm:p-6 absolute top-0 left-0 right-0 z-10"}>
+        <button
+          onClick={() => navigate("/browse")}
+          className={isMobile ? "w-8 h-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors" : "w-9 h-9 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors"}
+        >
+          <ArrowLeft className={isMobile ? "w-4 h-4 text-foreground" : "w-5 h-5 text-foreground"} />
         </button>
         {isAdmin && content && (
           <button onClick={() => setEditOpen(true)} className="hidden sm:flex w-9 h-9 rounded-full bg-card flex items-center justify-center hover:bg-primary/20 transition-colors neon-border-purple">
@@ -87,9 +90,9 @@ const Player = () => {
         )}
       </div>
 
-      <div className={isMobile ? "w-full px-3" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-8"}>
-        <div className={isMobile ? "w-full max-w-xl mx-auto" : "w-full max-w-5xl"}>
-          <div className={isMobile ? "relative w-full aspect-video bg-card rounded-xl overflow-hidden" : "relative aspect-video bg-card rounded-2xl overflow-hidden neon-border-purple"}>
+      <div className={isMobile ? "w-full px-0" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-8"}>
+        <div className={isMobile ? "w-full" : "w-full max-w-5xl"}>
+          <div className={isMobile ? "relative w-full aspect-video bg-card overflow-hidden" : "relative aspect-video bg-card rounded-2xl overflow-hidden neon-border-purple"}>
             {hasPlayerUrl ? (
               <iframe
                 src={activePlayerUrl ?? undefined}
@@ -129,13 +132,13 @@ const Player = () => {
               <button
                 key={ep.id}
                 onClick={() => setCurrentEp(ep)}
-                className={`w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors ${
+                className={`w-full text-left rounded-xl flex items-center transition-colors ${isMobile ? "px-3 py-2.5 gap-2.5" : "px-4 py-3 gap-3"} ${
                   currentEp?.id === ep.id ? "bg-primary/10 border border-primary/30" : "bg-card border border-border hover:border-primary/20"
                 }`}
               >
-                <span className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-foreground">{ep.episode_number}</span>
-                <span className="text-sm text-foreground">{ep.title}</span>
-                {currentEp?.id === ep.id && <Play className="w-3 h-3 text-primary ml-auto" />}
+                <span className={isMobile ? "w-7 h-7 rounded-full bg-muted flex items-center justify-center text-[11px] font-bold text-foreground" : "w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-foreground"}>{ep.episode_number}</span>
+                <span className={isMobile ? "text-xs text-foreground" : "text-sm text-foreground"}>{ep.title}</span>
+                {currentEp?.id === ep.id && <Play className={isMobile ? "w-3 h-3 text-primary ml-auto" : "w-3 h-3 text-primary ml-auto"} />}
               </button>
             ))}
           </div>
