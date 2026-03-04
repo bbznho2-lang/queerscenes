@@ -70,6 +70,9 @@ const Player = () => {
 
   const activePlayerUrl = rawPlayerUrl ? getDriveEmbedUrl(rawPlayerUrl) : rawPlayerUrl;
   const hasPlayerUrl = Boolean(activePlayerUrl);
+  const iframeClassName = isMobile
+    ? "absolute left-0 -top-[12%] h-[124%] w-full border-0"
+    : "absolute inset-0 w-full h-full border-0";
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -91,7 +94,7 @@ const Player = () => {
               <iframe
                 src={activePlayerUrl ?? undefined}
                 title={content?.title ? `Player de ${content.title}` : "Player"}
-                className="absolute inset-0 w-full h-full border-0"
+                className={iframeClassName}
                 allowFullScreen
                 allow="autoplay *; encrypted-media *; fullscreen *"
                 referrerPolicy="no-referrer"
