@@ -14,7 +14,7 @@ interface ProfileDialogProps {
 
 const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [email] = useState("usuario@email.com");
+  const [email] = useState("user@email.com");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [showCurrent, setShowCurrent] = useState(false);
@@ -25,20 +25,20 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
     if (file) {
       const url = URL.createObjectURL(file);
       setAvatarUrl(url);
-      toast.success("Foto atualizada!");
+      toast.success("Photo updated!");
     }
   };
 
   const handlePasswordChange = () => {
     if (!currentPassword || !newPassword) {
-      toast.error("Preencha ambos os campos de senha.");
+      toast.error("Please fill in both password fields.");
       return;
     }
     if (newPassword.length < 6) {
-      toast.error("A nova senha deve ter pelo menos 6 caracteres.");
+      toast.error("New password must be at least 6 characters.");
       return;
     }
-    toast.success("Senha alterada com sucesso!");
+    toast.success("Password changed successfully!");
     setCurrentPassword("");
     setNewPassword("");
   };
@@ -48,12 +48,11 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
       <DialogContent className="bg-card border-border max-w-md">
         <DialogHeader>
           <DialogTitle className="neon-text-purple text-xl" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-            Meu Perfil
+            My Profile
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6 pt-2">
-          {/* Avatar */}
           <div className="flex flex-col items-center gap-3">
             <div className="relative">
               <Avatar className="w-24 h-24 border-2 border-primary/40">
@@ -67,7 +66,6 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
             </div>
           </div>
 
-          {/* Email */}
           <div className="space-y-2">
             <Label className="text-muted-foreground text-xs">Email</Label>
             <div className="px-3 py-2.5 rounded-md bg-muted/50 border border-border text-sm text-foreground">
@@ -75,13 +73,12 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
             </div>
           </div>
 
-          {/* Change Password */}
           <div className="space-y-3">
-            <Label className="text-muted-foreground text-xs">Trocar Senha</Label>
+            <Label className="text-muted-foreground text-xs">Change Password</Label>
             <div className="relative">
               <Input
                 type={showCurrent ? "text" : "password"}
-                placeholder="Senha atual"
+                placeholder="Current password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 className="bg-muted/50 border-border pr-10"
@@ -97,7 +94,7 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
             <div className="relative">
               <Input
                 type={showNew ? "text" : "password"}
-                placeholder="Nova senha"
+                placeholder="New password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 className="bg-muted/50 border-border pr-10"
@@ -114,7 +111,7 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
               onClick={handlePasswordChange}
               className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full glow-purple"
             >
-              Alterar Senha
+              Change Password
             </Button>
           </div>
         </div>

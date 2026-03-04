@@ -21,7 +21,7 @@ const fade = {
 
 const Index = () => {
   const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -33,11 +33,11 @@ const Index = () => {
     setLoading(true);
     try {
       if (isSignUp) {
-        const { error } = await signUp(email, senha);
+        const { error } = await signUp(email, password);
         if (error) { toast.error(error.message); return; }
-        toast.success("Conta criada! Entrando...");
+        toast.success("Account created! Signing in...");
       }
-      const { error } = await signIn(email, senha);
+      const { error } = await signIn(email, password);
       if (error) { toast.error(error.message); return; }
       navigate("/browse");
     } finally {
@@ -49,7 +49,6 @@ const Index = () => {
     <div className="min-h-screen bg-background overflow-x-hidden">
       {/* HERO */}
       <section className="relative min-h-[100svh] flex items-center justify-center px-4 py-16">
-        {/* BG image */}
         <img src={heroBg} alt="" className="absolute inset-0 w-full h-full object-cover hidden sm:block" />
         <img src={heroBgMobile} alt="" className="absolute inset-0 w-full h-full object-cover sm:hidden" />
         <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
@@ -58,7 +57,7 @@ const Index = () => {
         <div className="relative z-10 max-w-3xl mx-auto text-center">
           <motion.div initial="hidden" animate="visible" variants={fade} custom={0}>
             <span className="inline-block px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium neon-border-pink neon-text-pink mb-6">
-              🎬 Streaming LGBTQIA+
+              🎬 LGBTQIA+ Streaming
             </span>
           </motion.div>
 
@@ -71,11 +70,11 @@ const Index = () => {
           </motion.h1>
 
           <motion.p className="text-base sm:text-xl text-muted-foreground max-w-xl mx-auto mb-3 font-light" initial="hidden" animate="visible" variants={fade} custom={2}>
-            O streaming feito para a comunidade LGBTQIA+.
+            The streaming platform made for the LGBTQIA+ community.
           </motion.p>
 
           <motion.p className="text-sm sm:text-base text-muted-foreground/70 max-w-md mx-auto mb-8" initial="hidden" animate="visible" variants={fade} custom={3}>
-            Reviva os momentos mais icônicos, emocionantes e inesquecíveis do cinema e das séries com representatividade real. 🌈
+            Relive the most iconic, emotional, and unforgettable moments from cinema and TV with real representation. 🌈
           </motion.p>
 
           <motion.div initial="hidden" animate="visible" variants={fade} custom={4}>
@@ -85,7 +84,7 @@ const Index = () => {
               className="text-base sm:text-lg px-8 sm:px-10 py-5 sm:py-6 rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-blue gap-2"
             >
               <Play className="w-5 h-5" />
-              ACESSAR O QUEER SCENES
+              ACCESS QUEER SCENES
             </Button>
           </motion.div>
         </div>
@@ -100,16 +99,16 @@ const Index = () => {
                 <div className="mx-auto w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mb-3">
                   <Lock className="w-5 h-5 text-accent" />
                 </div>
-                <CardTitle className="text-xl sm:text-2xl neon-text-pink">ÁREA DE ACESSO</CardTitle>
-                <p className="text-muted-foreground text-sm mt-1">Entre para continuar</p>
+                <CardTitle className="text-xl sm:text-2xl neon-text-pink">LOGIN</CardTitle>
+                <p className="text-muted-foreground text-sm mt-1">Sign in to continue</p>
               </CardHeader>
               <CardContent className="pt-4">
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm text-muted-foreground">E-mail</label>
+                    <label className="text-sm text-muted-foreground">Email</label>
                     <Input
                       type="email"
-                      placeholder="seu@email.com"
+                      placeholder="your@email.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="bg-muted border-border focus:border-primary"
@@ -117,13 +116,13 @@ const Index = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm text-muted-foreground">Senha</label>
+                    <label className="text-sm text-muted-foreground">Password</label>
                     <div className="relative">
                       <Input
                         type={showPassword ? "text" : "password"}
                         placeholder="••••••••"
-                        value={senha}
-                        onChange={(e) => setSenha(e.target.value)}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         className="bg-muted border-border focus:border-primary pr-10"
                         required
                       />
@@ -137,12 +136,12 @@ const Index = () => {
                     </div>
                   </div>
                    <Button type="submit" disabled={loading} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full glow-purple">
-                     {loading ? "Entrando..." : isSignUp ? "CRIAR CONTA" : "ENTRAR"}
+                     {loading ? "Signing in..." : isSignUp ? "CREATE ACCOUNT" : "SIGN IN"}
                    </Button>
                    <p className="text-center text-sm text-muted-foreground">
-                     {isSignUp ? "Já tem conta? " : "Não tem conta? "}
+                     {isSignUp ? "Already have an account? " : "Don't have an account? "}
                      <button type="button" onClick={() => setIsSignUp(!isSignUp)} className="text-secondary hover:underline font-medium">
-                       {isSignUp ? "Fazer login" : "Criar acesso"}
+                       {isSignUp ? "Sign in" : "Create account"}
                      </button>
                    </p>
                 </form>
@@ -152,26 +151,26 @@ const Index = () => {
         </div>
       </section>
 
-      {/* SOBRE */}
+      {/* ABOUT */}
       <section className="py-16 sm:py-24 px-4">
         <div className="max-w-4xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
             <h2 className="text-3xl sm:text-5xl font-bold">
               <Film className="inline w-8 sm:w-10 h-8 sm:h-10 mr-2 text-primary" />
-              SOBRE O <span className="neon-text-purple">QUEER SCENES</span>
+              ABOUT <span className="neon-text-purple">QUEER SCENES</span>
             </h2>
           </motion.div>
 
           <motion.p className="text-base sm:text-lg text-muted-foreground text-center max-w-2xl mx-auto mb-10" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
-            Uma plataforma de streaming dedicada exclusivamente a histórias e produções com protagonismo LGBTQIA+.
+            A streaming platform exclusively dedicated to stories and productions with LGBTQIA+ protagonism.
           </motion.p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
-              { icon: Star, text: "Momentos icônicos do cinema queer" },
-              { icon: Heart, text: "Séries com representatividade real" },
-              { icon: Sparkles, text: "Cenas que marcaram gerações" },
-              { icon: Crown, text: "Conteúdos exclusivos para membros" },
+              { icon: Star, text: "Iconic moments from queer cinema" },
+              { icon: Heart, text: "Series with real representation" },
+              { icon: Sparkles, text: "Scenes that marked generations" },
+              { icon: Crown, text: "Exclusive content for members" },
             ].map((item, i) => (
               <motion.div key={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={i + 2}>
                 <Card className="bg-card border-border hover:border-primary/40 transition-all group">
@@ -188,28 +187,28 @@ const Index = () => {
         </div>
       </section>
 
-      {/* DIFERENCIAL */}
+      {/* WHY DIFFERENT */}
       <section className="py-16 sm:py-24 px-4 relative">
         <div className="absolute inset-0 bg-muted/20" />
         <div className="relative max-w-4xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
             <h2 className="text-3xl sm:text-5xl font-bold">
               <Diamond className="inline w-8 sm:w-10 h-8 sm:h-10 mr-2 text-secondary" />
-              POR QUE É <span className="neon-text-blue">DIFERENTE</span>?
+              WHY IS IT <span className="neon-text-blue">DIFFERENT</span>?
             </h2>
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              "Curadoria 100% LGBTQIA+",
-              "Interface moderna e imersiva",
-              "Conteúdo gratuito + exclusivo",
-              "Experiência premium",
-              "Comunidade e representatividade",
-              "Multiplataforma e acessível",
-              "Atualizações constantes",
-              "Segurança e privacidade",
-              "Suporte dedicado 24/7",
+              "100% LGBTQIA+ curated content",
+              "Modern and immersive interface",
+              "Free + exclusive content",
+              "Premium experience",
+              "Community and representation",
+              "Multi-platform and accessible",
+              "Constant updates",
+              "Security and privacy",
+              "Dedicated 24/7 support",
             ].map((text, i) => (
               <motion.div key={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={i + 1}
                 className="flex items-center gap-3 p-4 rounded-xl bg-card neon-border-purple"
@@ -221,32 +220,32 @@ const Index = () => {
           </div>
 
           <motion.div className="text-center mt-12" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={7}>
-            <p className="text-lg text-muted-foreground">Não é só assistir.</p>
-            <p className="text-2xl sm:text-3xl font-bold neon-text-purple mt-1">É pertencer.</p>
+            <p className="text-lg text-muted-foreground">It's not just watching.</p>
+            <p className="text-2xl sm:text-3xl font-bold neon-text-purple mt-1">It's belonging.</p>
           </motion.div>
         </div>
       </section>
 
-      {/* PLANOS */}
+      {/* PLANS */}
       <section className="py-16 sm:py-24 px-4">
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
             <h2 className="text-3xl sm:text-5xl font-bold">
-              🌈 <span className="rainbow-text">PLANOS PREMIUM</span>
+              🌈 <span className="rainbow-text">PREMIUM PLANS</span>
             </h2>
-            <p className="text-muted-foreground mt-3 text-sm sm:text-base">Escolha o plano ideal para você</p>
+            <p className="text-muted-foreground mt-3 text-sm sm:text-base">Choose the ideal plan for you</p>
           </motion.div>
 
-          {/* Benefícios Premium */}
+          {/* Premium Benefits */}
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1} className="mb-10">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl mx-auto">
               {[
-                { icon: Crown, text: "Todos os conteúdos Premium liberados" },
-                { icon: Zap, text: "Lançamentos antecipados antes de todos" },
-                { icon: Heart, text: "Faça pedidos do que deseja assistir" },
-                { icon: Star, text: "Acesso completo e sem limites" },
-                { icon: Film, text: "Coleção exclusiva de cenas e séries" },
-                { icon: Sparkles, text: "Suporte prioritário 24/7" },
+                { icon: Crown, text: "All Premium content unlocked" },
+                { icon: Zap, text: "Early releases before everyone" },
+                { icon: Heart, text: "Request what you want to watch" },
+                { icon: Star, text: "Complete and unlimited access" },
+                { icon: Film, text: "Exclusive collection of scenes and series" },
+                { icon: Sparkles, text: "Priority 24/7 support" },
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border">
                   <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
@@ -258,24 +257,24 @@ const Index = () => {
             </div>
           </motion.div>
 
-          {/* Cards de preço */}
+          {/* Price Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2}>
               <Card className="bg-card neon-border-purple h-full">
                 <CardHeader className="text-center pb-2">
-                  <CardTitle className="text-xl neon-text-purple">Mensal</CardTitle>
+                  <CardTitle className="text-xl neon-text-purple">Monthly</CardTitle>
                 </CardHeader>
                 <CardContent className="text-center space-y-4">
                   <div>
-                    <span className="text-4xl sm:text-5xl font-bold text-foreground">€14,99</span>
-                    <span className="text-muted-foreground text-sm">/mês</span>
+                    <span className="text-4xl sm:text-5xl font-bold text-foreground">€14.99</span>
+                    <span className="text-muted-foreground text-sm">/month</span>
                   </div>
-                  <p className="text-muted-foreground text-sm">Cancele quando quiser</p>
+                  <p className="text-muted-foreground text-sm">Cancel anytime</p>
                   <Button
                     onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
                     className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple"
                   >
-                    ASSINAR MENSAL
+                    SUBSCRIBE MONTHLY
                   </Button>
                 </CardContent>
               </Card>
@@ -285,23 +284,23 @@ const Index = () => {
               <Card className="h-full neon-border-pink neon-pulse bg-card overflow-hidden relative">
                 <div className="absolute top-0 right-0 left-0">
                   <span className="block w-full text-center py-1.5 text-xs font-semibold bg-secondary text-secondary-foreground">
-                    🔥 2 MESES GRÁTIS
+                    🔥 2 MONTHS FREE
                   </span>
                 </div>
                 <CardHeader className="text-center pb-2 pt-10">
-                  <CardTitle className="text-xl neon-text-pink">Anual</CardTitle>
+                  <CardTitle className="text-xl neon-text-pink">Yearly</CardTitle>
                 </CardHeader>
                 <CardContent className="text-center space-y-4">
                   <div>
-                    <span className="text-4xl sm:text-5xl font-bold text-foreground">€149,99</span>
-                    <span className="text-muted-foreground text-sm">/ano</span>
+                    <span className="text-4xl sm:text-5xl font-bold text-foreground">€149.99</span>
+                    <span className="text-muted-foreground text-sm">/year</span>
                   </div>
-                  <p className="text-muted-foreground text-sm">Equivale a ~€12,50/mês</p>
+                  <p className="text-muted-foreground text-sm">That's ~€12.50/month</p>
                   <Button
                     onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
                     className="w-full rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-blue"
                   >
-                    ASSINAR ANUAL
+                    SUBSCRIBE YEARLY
                   </Button>
                 </CardContent>
               </Card>
@@ -310,16 +309,16 @@ const Index = () => {
         </div>
       </section>
 
-      {/* DISPOSITIVOS */}
+      {/* DEVICES */}
       <section className="py-16 sm:py-24 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0}>
             <h2 className="text-3xl sm:text-5xl font-bold mb-6">
-              Assista em <span className="neon-text-blue">qualquer lugar</span>
+              Watch <span className="neon-text-blue">anywhere</span>
             </h2>
             <div className="flex justify-center gap-8 sm:gap-12 mt-8">
               {[
-                { icon: Smartphone, label: "Celular" },
+                { icon: Smartphone, label: "Mobile" },
                 { icon: Tablet, label: "Tablet" },
                 { icon: Tv, label: "Desktop" },
               ].map((d, i) => (
@@ -350,11 +349,11 @@ const Index = () => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
             <Accordion type="single" collapsible className="space-y-3">
               {[
-                { q: "O Queer Scenes é gratuito?", a: "Sim. Temos conteúdos gratuitos disponíveis. Também oferecemos plano premium com acesso completo." },
-                { q: "Preciso criar uma conta?", a: "Sim. Para acessar o conteúdo é necessário criar login com e-mail e senha." },
-                { q: "O conteúdo é apenas LGBTQIA+?", a: "Sim. O foco da plataforma é exclusivamente histórias, cenas e produções com representatividade LGBTQIA+." },
-                { q: "Posso cancelar o plano premium?", a: "Sim. O cancelamento pode ser feito a qualquer momento." },
-                { q: "Funciona no celular?", a: "Sim. A plataforma é adaptada para celular, tablet e desktop." },
+                { q: "Is Queer Scenes free?", a: "Yes. We have free content available. We also offer a premium plan with full access." },
+                { q: "Do I need to create an account?", a: "Yes. To access the content you need to create a login with email and password." },
+                { q: "Is the content only LGBTQIA+?", a: "Yes. The platform's focus is exclusively on stories, scenes, and productions with LGBTQIA+ representation." },
+                { q: "Can I cancel the premium plan?", a: "Yes. Cancellation can be done at any time." },
+                { q: "Does it work on mobile?", a: "Yes. The platform is adapted for mobile, tablet, and desktop." },
               ].map((item, i) => (
                 <AccordionItem key={i} value={`faq-${i}`} className="bg-card border border-border rounded-xl px-4 sm:px-5 data-[state=open]:border-primary/40 transition-colors">
                   <AccordionTrigger className="text-left text-foreground hover:no-underline py-4 text-sm sm:text-base">
@@ -371,7 +370,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA FINAL */}
+      {/* FINAL CTA */}
       <section className="py-16 sm:py-24 px-4 text-center">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0}>
           <Button
@@ -379,14 +378,14 @@ const Index = () => {
             onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
             className="text-base sm:text-lg px-10 py-6 sm:py-7 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple gap-3"
           >
-            ACESSAR O QUEER SCENES
+            ACCESS QUEER SCENES
             <ArrowRight className="w-5 h-5" />
           </Button>
         </motion.div>
       </section>
 
       <footer className="border-t border-border py-6 sm:py-8 text-center text-xs sm:text-sm text-muted-foreground">
-        <p>© 2026 Queer Scenes. Todos os direitos reservados. 🌈</p>
+        <p>© 2026 Queer Scenes. All rights reserved. 🌈</p>
       </footer>
     </div>
   );

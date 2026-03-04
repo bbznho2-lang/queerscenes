@@ -20,10 +20,10 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !email.trim() || !message.trim()) {
-      toast.error("Preencha todos os campos.");
+      toast.error("Please fill in all fields.");
       return;
     }
-    toast.success("Mensagem enviada! Responderemos em breve.");
+    toast.success("Message sent! We'll respond soon.");
     setName("");
     setEmail("");
     setMessage("");
@@ -35,15 +35,15 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
       <DialogContent className="bg-card border-border max-w-md">
         <DialogHeader>
           <DialogTitle className="neon-text-blue text-xl" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-            Suporte
+            Support
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
           <div className="space-y-2">
-            <Label className="text-muted-foreground text-xs">Nome</Label>
+            <Label className="text-muted-foreground text-xs">Name</Label>
             <Input
-              placeholder="Seu nome"
+              placeholder="Your name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="bg-muted/50 border-border"
@@ -55,7 +55,7 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
             <Label className="text-muted-foreground text-xs">Email</Label>
             <Input
               type="email"
-              placeholder="seu@email.com"
+              placeholder="your@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="bg-muted/50 border-border"
@@ -64,9 +64,9 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label className="text-muted-foreground text-xs">Mensagem</Label>
+            <Label className="text-muted-foreground text-xs">Message</Label>
             <Textarea
-              placeholder="Como podemos ajudar?"
+              placeholder="How can we help?"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               className="bg-muted/50 border-border min-h-[100px] resize-none"
@@ -75,13 +75,13 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
           </div>
 
           <Button type="submit" className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-full glow-blue gap-2">
-            <Send className="w-4 h-4" /> Enviar Mensagem
+            <Send className="w-4 h-4" /> Send Message
           </Button>
         </form>
 
         <div className="border-t border-border pt-4 mt-2">
           <p className="text-xs text-muted-foreground text-center mb-3">
-            Para respostas mais rápidas:
+            For faster responses:
           </p>
           <a
             href="https://t.me/queerscenes"
@@ -89,7 +89,7 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full neon-border-purple text-primary hover:bg-primary/10 transition-colors text-sm font-medium"
           >
-            <MessageCircle className="w-4 h-4" /> Entrar no Telegram
+            <MessageCircle className="w-4 h-4" /> Join Telegram
           </a>
         </div>
       </DialogContent>

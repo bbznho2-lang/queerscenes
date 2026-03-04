@@ -46,7 +46,6 @@ const Player = () => {
         const { data: eps } = await supabase.from("episodes").select("*").eq("content_id", id).order("episode_number");
         const normalizedEpisodes = eps || [];
         setEpisodes(normalizedEpisodes);
-
         if (normalizedEpisodes.length > 0) {
           const firstPlayable = normalizedEpisodes.find((ep) => Boolean(ep.player_url?.trim()));
           setCurrentEp(firstPlayable || normalizedEpisodes[0]);
@@ -68,55 +67,32 @@ const Player = () => {
 
   const getEmbedUrl = (url: string) => {
     const trimmedUrl = url.trim();
-
     try {
       const parsed = new URL(trimmedUrl);
-
-      // Google Drive
       if (parsed.hostname.includes("drive.google.com")) {
         const fileFromPath = parsed.pathname.match(/\/file\/d\/([^/]+)/)?.[1];
         const fileFromQuery = parsed.searchParams.get("id");
         const driveFileId = fileFromPath || fileFromQuery;
-        if (driveFileId) {
-          return `https://drive.google.com/file/d/${driveFileId}/preview`;
-        }
+        if (driveFileId) return `https://drive.google.com/file/d/${driveFileId}/preview`;
       }
-
-      // Dailymotion - www.dailymotion.com/video/XXXX or dai.ly/XXXX
       if (parsed.hostname.includes("dailymotion.com")) {
         const videoId = parsed.pathname.match(/\/video\/([a-zA-Z0-9]+)/)?.[1];
-        if (videoId) {
-          return `https://www.dailymotion.com/embed/video/${videoId}`;
-        }
+        if (videoId) return `https://www.dailymotion.com/embed/video/${videoId}`;
       }
       if (parsed.hostname === "dai.ly") {
         const videoId = parsed.pathname.replace("/", "");
-        if (videoId) {
-          return `https://www.dailymotion.com/embed/video/${videoId}`;
-        }
+        if (videoId) return `https://www.dailymotion.com/embed/video/${videoId}`;
       }
-
-      // YouTube
       if (parsed.hostname.includes("youtube.com") || parsed.hostname === "youtu.be") {
         let videoId = parsed.searchParams.get("v");
-        if (!videoId && parsed.hostname === "youtu.be") {
-          videoId = parsed.pathname.slice(1);
-        }
-        if (videoId) {
-          return `https://www.youtube.com/embed/${videoId}`;
-        }
+        if (!videoId && parsed.hostname === "youtu.be") videoId = parsed.pathname.slice(1);
+        if (videoId) return `https://www.youtube.com/embed/${videoId}`;
       }
-    } catch {
-      // fallback regex below
-    }
-
-    // Regex fallbacks
+    } catch { /* fallback */ }
     const driveMatch = trimmedUrl.match(/drive\.google\.com\/file\/d\/([^/]+)/);
     if (driveMatch?.[1]) return `https://drive.google.com/file/d/${driveMatch[1]}/preview`;
-
     const dailymotionMatch = trimmedUrl.match(/dailymotion\.com\/video\/([a-zA-Z0-9]+)/);
     if (dailymotionMatch?.[1]) return `https://www.dailymotion.com/embed/video/${dailymotionMatch[1]}`;
-
     return trimmedUrl;
   };
 
@@ -147,7 +123,7 @@ const Player = () => {
               <iframe
                 key={activePlayerUrl ?? "player"}
                 src={activePlayerUrl ?? undefined}
-                title={content?.title ? `Player de ${content.title}` : "Player"}
+                title={content?.title ? `Player - ${content.title}` : "Player"}
                 className={iframeClassName}
                 allowFullScreen
                 allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
@@ -158,12 +134,12 @@ const Player = () => {
               <div className="absolute inset-0">
                 <img
                   src={content?.banner_url || "/placeholder.svg"}
-                  alt={content?.title ? `Capa de ${content.title}` : "Capa do conteúdo"}
+                  alt={content?.title ? `Cover - ${content.title}` : "Content cover"}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]" />
                 <div className="absolute inset-0 flex items-center justify-center px-4 text-center">
-                  <p className="text-sm text-foreground">Vídeo indisponível neste item. Se quiser, eu já deixo o campo de link pronto para você atualizar.</p>
+                  <p className="text-sm text-foreground">Video unavailable for this item. The link field is ready for you to update.</p>
                 </div>
               </div>
             )}
@@ -173,11 +149,11 @@ const Player = () => {
 
       <div className="w-full max-w-5xl mx-auto px-4 sm:px-0 pb-8">
         <div className="mt-4 sm:mt-6">
-          <h1 className="text-lg sm:text-2xl font-bold">{content?.title || "Carregando..."}</h1>
+          <h1 className="text-lg sm:text-2xl font-bold">{content?.title || "Loading..."}</h1>
           <div className="flex flex-wrap gap-2 mt-2 sm:mt-3">
             <span className="px-2 py-0.5 text-xs rounded bg-primary/20 text-primary">{content?.tag}</span>
             <span className="px-2 py-0.5 text-xs rounded bg-secondary/20 text-secondary">{content?.year}</span>
-            <span className="px-2 py-0.5 text-xs rounded bg-muted text-muted-foreground">{content?.type === "serie" ? "Série" : "Filme"}</span>
+            <span className="px-2 py-0.5 text-xs rounded bg-muted text-muted-foreground">{content?.type === "serie" ? "Series" : "Movie"}</span>
           </div>
         </div>
 
@@ -187,7 +163,7 @@ const Player = () => {
 
         {content?.type === "serie" && episodes.length > 0 && (
           <div className="mt-6 sm:mt-8 space-y-2">
-            <h3 className="text-lg font-semibold mb-3">Episódios</h3>
+            <h3 className="text-lg font-semibold mb-3">Episodes</h3>
             {episodes.map((ep) => (
               <button
                 key={ep.id}

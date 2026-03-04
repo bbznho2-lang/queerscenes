@@ -57,19 +57,17 @@ const ContentCard = ({
         className="w-full h-full object-cover bg-muted"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent opacity-80" />
-      {/* Premium badge */}
       {item.is_premium && (
         <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-secondary/90 text-secondary-foreground text-[10px] font-bold flex items-center gap-1">
           <Crown className="w-3 h-3" /> PREMIUM
         </div>
       )}
-      {/* Add to watchlist button */}
       <button
         onClick={(e) => { e.stopPropagation(); onToggleWatchlist(); }}
         className={`absolute top-2 ${isAdmin ? 'top-12' : 'top-2'} right-2 z-10 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-colors ${
           isInWatchlist ? 'bg-primary text-primary-foreground' : 'bg-card/90 hover:bg-primary/20 text-primary'
         }`}
-        title={isInWatchlist ? "Remover da lista" : "Adicionar à lista"}
+        title={isInWatchlist ? "Remove from list" : "Add to list"}
       >
         {isInWatchlist ? <Bookmark className="w-3.5 h-3.5 fill-current" /> : <Plus className="w-3.5 h-3.5" />}
       </button>
@@ -78,14 +76,14 @@ const ContentCard = ({
           {item.tag}
         </span>
         <h3 className="text-sm sm:text-base font-semibold text-foreground leading-tight">{item.title}</h3>
-        <p className="text-xs text-muted-foreground">{item.year} · {item.type === "serie" ? "Série" : "Filme"}</p>
+        <p className="text-xs text-muted-foreground">{item.year} · {item.type === "serie" ? "Series" : "Movie"}</p>
         <p className="text-[10px] sm:text-xs text-muted-foreground/80 mt-1 line-clamp-2 leading-snug">
-          {item.synopsis?.trim() || "Sem sinopse cadastrada."}
+          {item.synopsis?.trim() || "No synopsis available."}
         </p>
       </div>
       <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
         <Button size="sm" className="bg-primary text-primary-foreground rounded-full glow-purple gap-1 opacity-0 group-hover:opacity-100 transition-opacity text-xs">
-          <Play className="w-3 h-3" /> Assistir
+          <Play className="w-3 h-3" /> Watch
         </Button>
       </div>
       {isAdmin && (
@@ -139,15 +137,15 @@ const Browse = () => {
   };
 
   const toggleWatchlist = async (contentId: string) => {
-    if (!user) { toast.error("Faça login primeiro"); return; }
+    if (!user) { toast.error("Please sign in first"); return; }
     if (watchlistIds.has(contentId)) {
       await supabase.from("watchlist").delete().eq("user_id", user.id).eq("content_id", contentId);
       setWatchlistIds((prev) => { const n = new Set(prev); n.delete(contentId); return n; });
-      toast.success("Removido da sua lista");
+      toast.success("Removed from your list");
     } else {
       await supabase.from("watchlist").insert({ user_id: user.id, content_id: contentId });
       setWatchlistIds((prev) => new Set(prev).add(contentId));
-      toast.success("Adicionado à sua lista");
+      toast.success("Added to your list");
     }
   };
 
@@ -172,10 +170,10 @@ const Browse = () => {
     : [];
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Tem certeza que deseja excluir?")) return;
+    if (!confirm("Are you sure you want to delete this?")) return;
     const { error } = await supabase.from("contents").delete().eq("id", id);
     if (error) toast.error(error.message);
-    else { toast.success("Excluído!"); fetchContents(); }
+    else { toast.success("Deleted!"); fetchContents(); }
   };
 
   const handleEdit = (item: ContentItem) => {
@@ -196,18 +194,17 @@ const Browse = () => {
   };
 
   const menuItems = [
-    { label: "Início", icon: "🏠", action: () => { setMenuOpen(false); window.scrollTo({ top: 0, behavior: "smooth" }); } },
-    { label: "Séries", icon: "📺", action: () => { setMenuOpen(false); document.getElementById("séries")?.scrollIntoView({ behavior: "smooth" }); } },
-    { label: "Filmes", icon: "🎬", action: () => { setMenuOpen(false); document.getElementById("filmes")?.scrollIntoView({ behavior: "smooth" }); } },
-    { label: "Novelas", icon: "💕", action: () => { setMenuOpen(false); document.getElementById("novelas")?.scrollIntoView({ behavior: "smooth" }); } },
-    { label: "Animes", icon: "🎌", action: () => { setMenuOpen(false); document.getElementById("animes")?.scrollIntoView({ behavior: "smooth" }); } },
-    
-    { label: "Exclusivos", icon: "⭐", action: () => { setMenuOpen(false); document.getElementById("exclusivos")?.scrollIntoView({ behavior: "smooth" }); } },
-    { label: "Minha Lista", icon: "🔖", action: () => { setMenuOpen(false); document.getElementById("minha-lista")?.scrollIntoView({ behavior: "smooth" }); } },
-    { label: "Perfil", icon: "👤", action: () => { setMenuOpen(false); setProfileOpen(true); } },
-    { label: "Suporte", icon: "💬", action: () => { setMenuOpen(false); setSupportOpen(true); } },
-    ...(isAdmin ? [{ label: "Painel Admin", icon: "⚙️", action: () => { setMenuOpen(false); navigate("/admin"); } }] : []),
-    { label: "Entrar pro Premium", icon: "💎", action: () => { setMenuOpen(false); navigate("/#planos"); }, premium: true },
+    { label: "Home", icon: "🏠", action: () => { setMenuOpen(false); window.scrollTo({ top: 0, behavior: "smooth" }); } },
+    { label: "Series", icon: "📺", action: () => { setMenuOpen(false); document.getElementById("séries")?.scrollIntoView({ behavior: "smooth" }); } },
+    { label: "Movies", icon: "🎬", action: () => { setMenuOpen(false); document.getElementById("filmes")?.scrollIntoView({ behavior: "smooth" }); } },
+    { label: "Soap Operas", icon: "💕", action: () => { setMenuOpen(false); document.getElementById("novelas")?.scrollIntoView({ behavior: "smooth" }); } },
+    { label: "Anime", icon: "🎌", action: () => { setMenuOpen(false); document.getElementById("animes")?.scrollIntoView({ behavior: "smooth" }); } },
+    { label: "Exclusives", icon: "⭐", action: () => { setMenuOpen(false); document.getElementById("exclusivos")?.scrollIntoView({ behavior: "smooth" }); } },
+    { label: "My List", icon: "🔖", action: () => { setMenuOpen(false); document.getElementById("minha-lista")?.scrollIntoView({ behavior: "smooth" }); } },
+    { label: "Profile", icon: "👤", action: () => { setMenuOpen(false); setProfileOpen(true); } },
+    { label: "Support", icon: "💬", action: () => { setMenuOpen(false); setSupportOpen(true); } },
+    ...(isAdmin ? [{ label: "Admin Panel", icon: "⚙️", action: () => { setMenuOpen(false); navigate("/admin"); } }] : []),
+    { label: "Go Premium", icon: "💎", action: () => { setMenuOpen(false); navigate("/#planos"); }, premium: true },
   ];
 
   return (
@@ -225,7 +222,7 @@ const Browse = () => {
 
           <div className="flex items-center gap-2">
             {isAdmin && (
-              <button onClick={() => handleNew()} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-primary/20 transition-colors" title="Adicionar conteúdo">
+              <button onClick={() => handleNew()} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-primary/20 transition-colors" title="Add content">
                 <Plus className="w-5 h-5 text-primary" />
               </button>
             )}
@@ -240,7 +237,7 @@ const Browse = () => {
           {searchOpen && (
             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden border-b border-border">
               <div className="max-w-7xl mx-auto px-4 py-3">
-                <input autoFocus type="text" placeholder="Buscar séries, filmes..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full bg-muted/50 border border-border rounded-full px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" />
+                <input autoFocus type="text" placeholder="Search series, movies..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full bg-muted/50 border border-border rounded-full px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" />
                 {searchQuery.trim() && (
                   <div className="mt-2 space-y-1 max-h-60 overflow-y-auto">
                     {filteredContent.length > 0 ? (
@@ -252,7 +249,7 @@ const Browse = () => {
                         </button>
                       ))
                     ) : (
-                      <p className="text-muted-foreground text-xs text-center py-3">Nenhum resultado encontrado.</p>
+                      <p className="text-muted-foreground text-xs text-center py-3">No results found.</p>
                     )}
                   </div>
                 )}
@@ -274,7 +271,7 @@ const Browse = () => {
               <div className="border-t border-border pt-2 mt-2">
                 <button onClick={async () => { setMenuOpen(false); await signOut(); navigate("/"); }} className="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-accent hover:bg-accent/10 transition-colors">
                   <LogOut className="w-4 h-4" />
-                  <span>Sair</span>
+                  <span>Sign Out</span>
                 </button>
               </div>
             </motion.div>
@@ -287,33 +284,33 @@ const Browse = () => {
 
         {/* HERO BANNER */}
         <section className="relative h-[60vh] sm:h-[70vh] flex items-end">
-          <img src={contents[0]?.banner_url || "/placeholder.svg"} alt="Banner principal" className="absolute inset-0 w-full h-full object-cover bg-muted" />
+          <img src={contents[0]?.banner_url || "/placeholder.svg"} alt="Main banner" className="absolute inset-0 w-full h-full object-cover bg-muted" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-r from-background/80 to-transparent" />
           <div className="relative z-10 p-6 sm:p-10 md:p-16 max-w-2xl">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
               <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-3 leading-tight">
-                {contents[0]?.title || "Título da Produção em Destaque"}
+                {contents[0]?.title || "Featured Production Title"}
               </h1>
               <p className="text-sm sm:text-base text-muted-foreground mb-5 max-w-md line-clamp-3">
-                {contents[0]?.synopsis || "Uma história de amor, coragem e liberdade que vai transformar sua forma de ver o mundo."}
+                {contents[0]?.synopsis || "A story of love, courage, and freedom that will transform the way you see the world."}
               </p>
               <div className="flex flex-wrap gap-3">
                 <Button onClick={() => contents[0] && navigate(`/player/${contents[0].id}`)} className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full glow-purple gap-2">
-                  <Play className="w-4 h-4" /> Assistir Agora
+                  <Play className="w-4 h-4" /> Watch Now
                 </Button>
               </div>
             </motion.div>
           </div>
         </section>
 
-        {/* SÉRIES */}
+        {/* SERIES */}
         <section id="séries" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl sm:text-3xl font-bold neon-text-purple">Séries Queer em Alta</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold neon-text-purple">Trending Queer Series</h2>
               {isAdmin && (
-                <button onClick={() => handleNew("series", "serie")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Adicionar série">
+                <button onClick={() => handleNew("series", "serie")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add series">
                   <Plus className="w-5 h-5 text-primary" />
                 </button>
               )}
@@ -328,19 +325,19 @@ const Browse = () => {
               </AutoScrollRow>
             ) : (
               <p className="text-muted-foreground text-center py-8">
-                {isAdmin ? "Clique no + para adicionar séries" : "Em breve novos conteúdos!"}
+                {isAdmin ? "Click + to add series" : "New content coming soon!"}
               </p>
             )}
           </div>
         </section>
 
-        {/* FILMES */}
+        {/* MOVIES */}
         <section id="filmes" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl sm:text-3xl font-bold neon-text-blue">Filmes Icônicos</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold neon-text-blue">Iconic Movies</h2>
               {isAdmin && (
-                <button onClick={() => handleNew("filmes", "filme")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Adicionar filme">
+                <button onClick={() => handleNew("filmes", "filme")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add movie">
                   <Plus className="w-5 h-5 text-primary" />
                 </button>
               )}
@@ -355,19 +352,19 @@ const Browse = () => {
               </AutoScrollRow>
             ) : (
               <p className="text-muted-foreground text-center py-8">
-                {isAdmin ? "Clique no + para adicionar filmes" : "Em breve novos conteúdos!"}
+                {isAdmin ? "Click + to add movies" : "New content coming soon!"}
               </p>
             )}
           </div>
         </section>
 
-        {/* NOVELAS */}
+        {/* SOAP OPERAS */}
         <section id="novelas" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl sm:text-3xl font-bold neon-text-purple">Novelas Queer</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold neon-text-purple">Queer Soap Operas</h2>
               {isAdmin && (
-                <button onClick={() => handleNew("novelas", "serie")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Adicionar novela">
+                <button onClick={() => handleNew("novelas", "serie")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add soap opera">
                   <Plus className="w-5 h-5 text-primary" />
                 </button>
               )}
@@ -382,19 +379,19 @@ const Browse = () => {
               </AutoScrollRow>
             ) : (
               <p className="text-muted-foreground text-center py-8">
-                {isAdmin ? "Clique no + para adicionar novelas" : "Em breve novos conteúdos!"}
+                {isAdmin ? "Click + to add soap operas" : "New content coming soon!"}
               </p>
             )}
           </div>
         </section>
 
-        {/* ANIMES */}
+        {/* ANIME */}
         <section id="animes" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl sm:text-3xl font-bold neon-text-blue">Animes Queer</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold neon-text-blue">Queer Anime</h2>
               {isAdmin && (
-                <button onClick={() => handleNew("animes", "serie")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Adicionar anime">
+                <button onClick={() => handleNew("animes", "serie")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add anime">
                   <Plus className="w-5 h-5 text-primary" />
                 </button>
               )}
@@ -409,21 +406,21 @@ const Browse = () => {
               </AutoScrollRow>
             ) : (
               <p className="text-muted-foreground text-center py-8">
-                {isAdmin ? "Clique no + para adicionar animes" : "Em breve novos conteúdos!"}
+                {isAdmin ? "Click + to add anime" : "New content coming soon!"}
               </p>
             )}
           </div>
         </section>
 
-
+        {/* EXCLUSIVES */}
         <section id="exclusivos" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl sm:text-3xl font-bold">
-                <span className="rainbow-text">Exclusivos Queer Scenes</span>
+                <span className="rainbow-text">Queer Scenes Exclusives</span>
               </h2>
               {isAdmin && (
-                <button onClick={() => handleNew("exclusivos", "filme")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Adicionar exclusivo">
+                <button onClick={() => handleNew("exclusivos", "filme")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add exclusive">
                   <Plus className="w-5 h-5 text-primary" />
                 </button>
               )}
@@ -438,17 +435,17 @@ const Browse = () => {
               </AutoScrollRow>
             ) : (
               <p className="text-muted-foreground text-center py-8">
-                {isAdmin ? "Clique no + para adicionar exclusivos" : "Em breve novos conteúdos!"}
+                {isAdmin ? "Click + to add exclusives" : "New content coming soon!"}
               </p>
             )}
           </div>
         </section>
 
-        {/* MINHA LISTA */}
+        {/* MY LIST */}
         <section id="minha-lista" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-2xl sm:text-3xl font-bold mb-6 flex items-center gap-2">
-              <Bookmark className="w-6 h-6 text-secondary" /> Minha Lista
+              <Bookmark className="w-6 h-6 text-secondary" /> My List
             </h2>
             {watchlistItems.length > 0 ? (
               <AutoScrollRow>
@@ -459,14 +456,14 @@ const Browse = () => {
                 ))}
               </AutoScrollRow>
             ) : (
-              <p className="text-muted-foreground text-center py-12">Sua lista está vazia. Clique no + nos cards para adicionar!</p>
+              <p className="text-muted-foreground text-center py-12">Your list is empty. Click the + on cards to add!</p>
             )}
           </div>
         </section>
       </main>
 
       <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground">
-        <p>© 2026 Queer Scenes. Todos os direitos reservados. 🌈</p>
+        <p>© 2026 Queer Scenes. All rights reserved. 🌈</p>
       </footer>
 
       <ProfileDialog open={profileOpen} onOpenChange={setProfileOpen} />

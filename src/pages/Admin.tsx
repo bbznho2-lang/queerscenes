@@ -47,27 +47,21 @@ const Admin = () => {
 
   const fetchData = async () => {
     setLoadingData(true);
-
-    // Fetch profiles
     const { data: profilesData } = await supabase
       .from("profiles")
       .select("*")
       .order("created_at", { ascending: false });
     setProfiles(profilesData || []);
 
-    // Fetch click stats - get clicks with content titles
     const { data: clicks } = await supabase
       .from("content_clicks")
       .select("content_id");
 
     if (clicks && clicks.length > 0) {
-      // Count clicks per content
       const countMap: Record<string, number> = {};
       clicks.forEach((c: any) => {
         countMap[c.content_id] = (countMap[c.content_id] || 0) + 1;
       });
-
-      // Get content titles
       const contentIds = Object.keys(countMap);
       const { data: contents } = await supabase
         .from("contents")
@@ -84,7 +78,6 @@ const Admin = () => {
 
       setClickStats(stats);
     }
-
     setLoadingData(false);
   };
 
@@ -94,11 +87,11 @@ const Admin = () => {
       .update({ is_premium: !profile.is_premium })
       .eq("id", profile.id);
     if (error) {
-      toast.error("Erro ao atualizar");
+      toast.error("Error updating");
       return;
     }
     toast.success(
-      profile.is_premium ? "Premium removido" : "Premium ativado"
+      profile.is_premium ? "Premium removed" : "Premium activated"
     );
     setProfiles(
       profiles.map((p) =>
@@ -109,7 +102,7 @@ const Admin = () => {
 
   const chartConfig = {
     clicks: {
-      label: "Cliques",
+      label: "Clicks",
       color: "hsl(var(--primary))",
     },
   };
@@ -117,7 +110,7 @@ const Admin = () => {
   if (loading || loadingData) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Carregando...</div>
+        <div className="animate-pulse text-muted-foreground">Loading...</div>
       </div>
     );
   }
@@ -140,13 +133,12 @@ const Admin = () => {
             className="text-lg font-bold neon-text-purple"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
-            Painel Admin
+            Admin Panel
           </h1>
         </div>
       </header>
 
       <main className="pt-20 px-4 pb-12 max-w-7xl mx-auto space-y-8">
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
             <Card className="bg-card border-border">
@@ -156,7 +148,7 @@ const Admin = () => {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-foreground">{totalUsers}</p>
-                  <p className="text-xs text-muted-foreground">Usuários totais</p>
+                  <p className="text-xs text-muted-foreground">Total users</p>
                 </div>
               </CardContent>
             </Card>
@@ -169,7 +161,7 @@ const Admin = () => {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-foreground">{premiumUsers}</p>
-                  <p className="text-xs text-muted-foreground">Usuários premium</p>
+                  <p className="text-xs text-muted-foreground">Premium users</p>
                 </div>
               </CardContent>
             </Card>
@@ -182,19 +174,18 @@ const Admin = () => {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-foreground">{totalClicks}</p>
-                  <p className="text-xs text-muted-foreground">Cliques totais</p>
+                  <p className="text-xs text-muted-foreground">Total clicks</p>
                 </div>
               </CardContent>
             </Card>
           </motion.div>
         </div>
 
-        {/* Chart */}
         <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <BarChart3 className="w-5 h-5 text-primary" />
-              Conteúdos Mais Clicados
+              Most Clicked Content
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -210,27 +201,26 @@ const Admin = () => {
               </ChartContainer>
             ) : (
               <p className="text-muted-foreground text-center py-12 text-sm">
-                Nenhum clique registrado ainda. Os dados aparecerão quando os usuários clicarem nos conteúdos.
+                No clicks recorded yet. Data will appear when users interact with content.
               </p>
             )}
           </CardContent>
         </Card>
 
-        {/* Users Table */}
         <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <Mail className="w-5 h-5 text-secondary" />
-              Gerenciar Usuários
+              Manage Users
             </CardTitle>
           </CardHeader>
           <CardContent>
             {profiles.length > 0 ? (
               <div className="space-y-2">
                 <div className="grid grid-cols-[1fr_auto_auto] gap-4 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
-                  <span>E-mail</span>
+                  <span>Email</span>
                   <span>Premium</span>
-                  <span>Data</span>
+                  <span>Date</span>
                 </div>
                 {profiles.map((p) => (
                   <div
@@ -238,21 +228,21 @@ const Admin = () => {
                     className="grid grid-cols-[1fr_auto_auto] gap-4 items-center px-3 py-3 rounded-lg hover:bg-muted/30 transition-colors"
                   >
                     <span className="text-sm text-foreground truncate">
-                      {p.email || "Sem e-mail"}
+                      {p.email || "No email"}
                     </span>
                     <Switch
                       checked={p.is_premium}
                       onCheckedChange={() => togglePremium(p)}
                     />
                     <span className="text-xs text-muted-foreground">
-                      {new Date(p.created_at).toLocaleDateString("pt-BR")}
+                      {new Date(p.created_at).toLocaleDateString("en-US")}
                     </span>
                   </div>
                 ))}
               </div>
             ) : (
               <p className="text-muted-foreground text-center py-8 text-sm">
-                Nenhum usuário registrado ainda.
+                No users registered yet.
               </p>
             )}
           </CardContent>
