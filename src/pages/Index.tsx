@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Play, Lock, Sparkles, Diamond, Star, Zap, Heart, Film, Crown, ArrowRight, HelpCircle, Tv, Smartphone, Tablet, Eye, EyeOff } from "lucide-react";
+import heroBg from "@/assets/hero-bg.jpg";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,12 +48,10 @@ const Index = () => {
     <div className="min-h-screen bg-background overflow-x-hidden">
       {/* HERO */}
       <section className="relative min-h-[100svh] flex items-center justify-center px-4 py-16">
-        {/* BG glows */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/3 left-1/4 w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-primary/15 blur-[120px]" />
-          <div className="absolute bottom-1/4 right-1/4 w-60 sm:w-80 h-60 sm:h-80 rounded-full bg-secondary/10 blur-[100px]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/3 w-72 sm:w-80 h-72 sm:h-80 rounded-full bg-accent/12 blur-[110px]" />
-        </div>
+        {/* BG image */}
+        <img src={heroBg} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background" />
 
         <div className="relative z-10 max-w-3xl mx-auto text-center">
           <motion.div initial="hidden" animate="visible" variants={fade} custom={0}>
