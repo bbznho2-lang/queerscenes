@@ -73,7 +73,7 @@ const Player = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <div className="flex items-center justify-between gap-3 p-3 sm:p-6 absolute top-0 left-0 right-0 z-10">
+      <div className={isMobile ? "flex items-center justify-between gap-3 p-3" : "flex items-center justify-between gap-3 p-3 sm:p-6 absolute top-0 left-0 right-0 z-10"}>
         <button onClick={() => navigate("/browse")} className="w-9 h-9 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors">
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
@@ -84,9 +84,9 @@ const Player = () => {
         )}
       </div>
 
-      <div className={isMobile ? "w-full px-0" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-8"}>
-        <div className={isMobile ? "w-full" : "w-full max-w-5xl"}>
-          <div className={isMobile ? "relative w-full aspect-square bg-card overflow-hidden" : "relative aspect-video bg-card rounded-2xl overflow-hidden neon-border-purple"}>
+      <div className={isMobile ? "w-full px-3" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-8"}>
+        <div className={isMobile ? "w-full max-w-xl mx-auto" : "w-full max-w-5xl"}>
+          <div className={isMobile ? "relative w-full aspect-video bg-card rounded-xl overflow-hidden" : "relative aspect-video bg-card rounded-2xl overflow-hidden neon-border-purple"}>
             {hasPlayerUrl ? (
               <iframe
                 src={activePlayerUrl ?? undefined}
