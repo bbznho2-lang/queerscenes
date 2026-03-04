@@ -64,7 +64,6 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setBannerUrlInput(content.banner_url || "");
       setIsPremium(content.is_premium || false);
       setSynopsis((content as any).synopsis || "");
-      // Load episodes
       supabase
         .from("episodes")
         .select("*")
@@ -136,7 +135,6 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         contentId = data.id;
       }
 
-      // Save episodes
       if (contentId && type === "serie") {
         for (const ep of episodes) {
           if (ep.id.startsWith("new-")) {
@@ -156,11 +154,11 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         }
       }
 
-      toast.success("Salvo com sucesso!");
+      toast.success("Saved successfully!");
       onSaved();
       onOpenChange(false);
     } catch (err: any) {
-      toast.error(err.message || "Erro ao salvar");
+      toast.error(err.message || "Error saving");
     } finally {
       setSaving(false);
     }
@@ -172,7 +170,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       {
         id: `new-${Date.now()}`,
         content_id: content?.id || "",
-        title: `Episódio ${episodes.length + 1}`,
+        title: `Episode ${episodes.length + 1}`,
         episode_number: episodes.length + 1,
         player_url: "",
       },
@@ -195,19 +193,19 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       <DialogContent className="bg-card border-border max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="neon-text-purple">
-            {content ? "Editar Conteúdo" : "Novo Conteúdo"}
+            {content ? "Edit Content" : "New Content"}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <div>
-            <label className="text-sm text-muted-foreground">Título</label>
+            <label className="text-sm text-muted-foreground">Title</label>
             <Input value={title} onChange={(e) => setTitle(e.target.value)} className="bg-muted border-border" />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-sm text-muted-foreground">Ano</label>
+              <label className="text-sm text-muted-foreground">Year</label>
               <Input type="number" value={year} onChange={(e) => setYear(+e.target.value)} className="bg-muted border-border" />
             </div>
             <div>
@@ -218,50 +216,49 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-sm text-muted-foreground">Tipo</label>
+              <label className="text-sm text-muted-foreground">Type</label>
               <Select value={type} onValueChange={setType}>
                 <SelectTrigger className="bg-muted border-border"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="serie">Série</SelectItem>
-                  <SelectItem value="filme">Filme</SelectItem>
-                  <SelectItem value="novela">Novela</SelectItem>
+                  <SelectItem value="serie">Series</SelectItem>
+                  <SelectItem value="filme">Movie</SelectItem>
+                  <SelectItem value="novela">Soap Opera</SelectItem>
                   <SelectItem value="anime">Anime</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <label className="text-sm text-muted-foreground">Seção</label>
+              <label className="text-sm text-muted-foreground">Section</label>
               <Select value={section} onValueChange={setSection}>
                 <SelectTrigger className="bg-muted border-border"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="series">Séries</SelectItem>
-                  <SelectItem value="filmes">Filmes</SelectItem>
-                  <SelectItem value="novelas">Novelas</SelectItem>
-                  <SelectItem value="animes">Animes</SelectItem>
-                  
-                  <SelectItem value="exclusivos">Exclusivos</SelectItem>
+                  <SelectItem value="series">Series</SelectItem>
+                  <SelectItem value="filmes">Movies</SelectItem>
+                  <SelectItem value="novelas">Soap Operas</SelectItem>
+                  <SelectItem value="animes">Anime</SelectItem>
+                  <SelectItem value="exclusivos">Exclusives</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div className="flex items-center justify-between py-2">
-            <label className="text-sm text-muted-foreground">Conteúdo Premium?</label>
+            <label className="text-sm text-muted-foreground">Premium Content?</label>
             <Switch checked={isPremium} onCheckedChange={setIsPremium} />
           </div>
 
           <div>
-            <label className="text-sm text-muted-foreground">Sinopse</label>
+            <label className="text-sm text-muted-foreground">Synopsis</label>
             <textarea
               value={synopsis}
               onChange={(e) => setSynopsis(e.target.value)}
-              placeholder="Escreva uma sinopse para o conteúdo..."
+              placeholder="Write a synopsis for the content..."
               className="w-full mt-1 rounded-md bg-muted border border-border px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 min-h-[80px] resize-y"
             />
           </div>
 
           <div>
-            <label className="text-sm text-muted-foreground">Player URL (embed externo)</label>
+            <label className="text-sm text-muted-foreground">Player URL (external embed)</label>
             <Input
               value={playerUrl}
               onChange={(e) => setPlayerUrl(e.target.value)}
@@ -271,27 +268,26 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
           </div>
 
           <div>
-            <label className="text-sm text-muted-foreground">Banner / Imagem</label>
+            <label className="text-sm text-muted-foreground">Banner / Image</label>
             <Input
               value={bannerUrlInput}
               onChange={(e) => { setBannerUrlInput(e.target.value); setBannerFile(null); setBannerPreview(e.target.value); }}
               placeholder="https://image.tmdb.org/t/p/w780/..."
               className="bg-muted border-border mt-1"
             />
-            <p className="text-xs text-muted-foreground my-1">ou faça upload:</p>
+            <p className="text-xs text-muted-foreground my-1">or upload:</p>
             <input type="file" accept="image/*" onChange={handleBannerChange} className="block w-full text-sm text-muted-foreground" />
             {bannerPreview && (
               <img src={bannerPreview} alt="preview" className="mt-2 rounded-lg h-32 w-full object-cover" />
             )}
           </div>
 
-          {/* Episodes (only for series) */}
           {type === "serie" && (
             <div className="space-y-3 border-t border-border pt-4">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-semibold text-foreground">Episódios</label>
+                <label className="text-sm font-semibold text-foreground">Episodes</label>
                 <Button size="sm" variant="outline" onClick={addEpisode} className="gap-1 text-xs">
-                  <Plus className="w-3 h-3" /> Adicionar
+                  <Plus className="w-3 h-3" /> Add
                 </Button>
               </div>
               {episodes.map((ep) => (
@@ -302,13 +298,13 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                       onChange={(e) => updateEpisode(ep.id, "episode_number", +e.target.value)}
                       type="number"
                       className="w-16 bg-muted border-border"
-                      placeholder="Nº"
+                      placeholder="No."
                     />
                     <Input
                       value={ep.title}
                       onChange={(e) => updateEpisode(ep.id, "title", e.target.value)}
                       className="bg-muted border-border flex-1"
-                      placeholder="Nome do episódio"
+                      placeholder="Episode name"
                     />
                     <Button size="icon" variant="ghost" onClick={() => removeEpisode(ep)} className="text-destructive">
                       <Trash2 className="w-4 h-4" />
@@ -317,7 +313,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                   <Input
                     value={ep.player_url || ""}
                     onChange={(e) => updateEpisode(ep.id, "player_url", e.target.value)}
-                    placeholder="URL do player (embed)"
+                    placeholder="Player URL (embed)"
                     className="bg-muted border-border text-xs"
                   />
                 </div>
@@ -327,7 +323,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
 
           <Button onClick={handleSave} disabled={saving} className="w-full bg-primary text-primary-foreground rounded-full glow-purple gap-2">
             <Save className="w-4 h-4" />
-            {saving ? "Salvando..." : "Salvar"}
+            {saving ? "Saving..." : "Save"}
           </Button>
         </div>
       </DialogContent>
