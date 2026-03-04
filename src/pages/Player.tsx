@@ -73,16 +73,7 @@ const Player = () => {
 
   const activePlayerUrl = rawPlayerUrl ? getDriveEmbedUrl(rawPlayerUrl) : rawPlayerUrl;
 
-  const isEmbed = Boolean(
-    activePlayerUrl &&
-      (activePlayerUrl.includes("youtube") ||
-        activePlayerUrl.includes("youtu.be") ||
-        activePlayerUrl.includes("vimeo") ||
-        activePlayerUrl.includes("embed") ||
-        activePlayerUrl.includes("drive.google.com"))
-  );
-
-  const isDirectVideo = Boolean(activePlayerUrl && /\.(mp4|webm|ogg|m3u8)(\?.*)?$/i.test(activePlayerUrl));
+  const hasPlayerUrl = Boolean(activePlayerUrl);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -100,25 +91,15 @@ const Player = () => {
       <div className={isMobile ? "w-full px-0 pt-14" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-8"}>
         <div className={isMobile ? "w-full" : "w-full max-w-5xl"}>
           <div className={isMobile ? "relative w-full aspect-video bg-card overflow-hidden" : "relative aspect-video bg-card rounded-2xl overflow-hidden neon-border-purple"}>
-            {activePlayerUrl ? (
-              isEmbed || !isDirectVideo ? (
-                <iframe
-                  src={activePlayerUrl}
-                  className="absolute inset-0 w-full h-full border-0"
-                  allowFullScreen
-                  allow="autoplay *; encrypted-media *; fullscreen *"
-                  referrerPolicy="no-referrer"
-                  style={{ border: 0 }}
-                />
-              ) : (
-                <video
-                  src={activePlayerUrl}
-                  className="absolute inset-0 w-full h-full object-cover bg-background"
-                  controls
-                  playsInline
-                  preload="metadata"
-                />
-              )
+            {hasPlayerUrl ? (
+              <iframe
+                src={activePlayerUrl ?? undefined}
+                className="absolute inset-0 w-full h-full border-0"
+                allowFullScreen
+                allow="autoplay *; encrypted-media *; fullscreen *"
+                referrerPolicy="no-referrer"
+                style={{ border: 0 }}
+              />
             ) : (
               <>
                 <img src={content?.banner_url || "/placeholder.svg"} alt="Player" className="w-full h-full object-cover" />
