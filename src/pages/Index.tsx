@@ -229,39 +229,80 @@ const Index = () => {
 
       {/* PLANOS */}
       <section className="py-16 sm:py-24 px-4">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
             <h2 className="text-3xl sm:text-5xl font-bold">
-              🌈 <span className="rainbow-text">PLANOS</span>
+              🌈 <span className="rainbow-text">PLANOS PREMIUM</span>
             </h2>
+            <p className="text-muted-foreground mt-3 text-sm sm:text-base">Escolha o plano ideal para você</p>
           </motion.div>
 
+          {/* Benefícios Premium */}
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1} className="mb-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl mx-auto">
+              {[
+                { icon: Crown, text: "Todos os conteúdos Premium liberados" },
+                { icon: Zap, text: "Lançamentos antecipados antes de todos" },
+                { icon: Heart, text: "Faça pedidos do que deseja assistir" },
+                { icon: Star, text: "Acesso completo e sem limites" },
+                { icon: Film, text: "Coleção exclusiva de cenas e séries" },
+                { icon: Sparkles, text: "Suporte prioritário 24/7" },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <item.icon className="w-4 h-4 text-primary" />
+                  </div>
+                  <span className="text-foreground text-sm">{item.text}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Cards de preço */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
-              <Card className="bg-card border-border h-full">
-                <CardHeader className="text-center"><CardTitle className="text-xl">Free</CardTitle></CardHeader>
-                <CardContent className="space-y-3">
-                  {["Acesso a conteúdos selecionados", "Atualizações semanais"].map((t, i) => (
-                    <div key={i} className="flex items-center gap-2 text-muted-foreground text-sm">
-                      <Sparkles className="w-4 h-4 text-secondary shrink-0" /><span>{t}</span>
-                    </div>
-                  ))}
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2}>
+              <Card className="bg-card neon-border-purple h-full">
+                <CardHeader className="text-center pb-2">
+                  <CardTitle className="text-xl neon-text-purple">Mensal</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center space-y-4">
+                  <div>
+                    <span className="text-4xl sm:text-5xl font-bold text-foreground">€14,99</span>
+                    <span className="text-muted-foreground text-sm">/mês</span>
+                  </div>
+                  <p className="text-muted-foreground text-sm">Cancele quando quiser</p>
+                  <Button
+                    onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
+                    className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple"
+                  >
+                    ASSINAR MENSAL
+                  </Button>
                 </CardContent>
               </Card>
             </motion.div>
 
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2}>
-              <Card className="h-full neon-border-purple neon-pulse bg-card overflow-hidden">
-                <CardHeader className="text-center">
-                  <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-primary/20 text-primary mb-2">RECOMENDADO</span>
-                  <CardTitle className="text-xl neon-text-purple">Premium</CardTitle>
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={3}>
+              <Card className="h-full neon-border-pink neon-pulse bg-card overflow-hidden relative">
+                <div className="absolute top-0 right-0 left-0">
+                  <span className="block w-full text-center py-1.5 text-xs font-semibold bg-secondary text-secondary-foreground">
+                    🔥 2 MESES GRÁTIS
+                  </span>
+                </div>
+                <CardHeader className="text-center pb-2 pt-10">
+                  <CardTitle className="text-xl neon-text-pink">Anual</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  {["Acesso completo", "Conteúdos exclusivos", "Lançamentos antecipados", "Experiência sem limites"].map((t, i) => (
-                    <div key={i} className="flex items-center gap-2 text-muted-foreground text-sm">
-                      <Zap className="w-4 h-4 text-secondary shrink-0" /><span>{t}</span>
-                    </div>
-                  ))}
+                <CardContent className="text-center space-y-4">
+                  <div>
+                    <span className="text-4xl sm:text-5xl font-bold text-foreground">€149,99</span>
+                    <span className="text-muted-foreground text-sm">/ano</span>
+                  </div>
+                  <p className="text-muted-foreground text-sm">Equivale a ~€12,50/mês</p>
+                  <Button
+                    onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
+                    className="w-full rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-blue"
+                  >
+                    ASSINAR ANUAL
+                  </Button>
                 </CardContent>
               </Card>
             </motion.div>
