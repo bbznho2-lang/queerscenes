@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
 
 interface Props {
   children: React.ReactNode;
@@ -8,19 +8,19 @@ interface Props {
 const AutoScrollRow = ({ children, speed = 1 }: Props) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const isPaused = useRef(false);
-  const [canScroll, setCanScroll] = useState(false);
+  const canScrollRef = useRef(false);
 
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
 
-    const check = () => setCanScroll(el.scrollWidth > el.clientWidth + 4);
+    const check = () => { canScrollRef.current = el.scrollWidth > el.clientWidth + 4; };
     check();
     const ro = new ResizeObserver(check);
     ro.observe(el);
 
     const interval = setInterval(() => {
-      if (isPaused.current || !canScroll) return;
+      if (isPaused.current || !canScrollRef.current) return;
       if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 2) {
         el.scrollTo({ left: 0, behavior: "smooth" });
       } else {
@@ -43,7 +43,7 @@ const AutoScrollRow = ({ children, speed = 1 }: Props) => {
       el.removeEventListener("touchend", resume);
       el.removeEventListener("mouseenter", pause);
     };
-  }, [speed, canScroll]);
+  }, [speed]);
 
   return (
     <div
