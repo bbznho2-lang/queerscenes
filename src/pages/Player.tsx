@@ -71,17 +71,17 @@ const Player = () => {
   const activePlayerUrl = rawPlayerUrl ? getDriveEmbedUrl(rawPlayerUrl) : rawPlayerUrl;
   const hasPlayerUrl = Boolean(activePlayerUrl);
   const iframeClassName = isMobile
-    ? "absolute left-0 -top-[20%] h-[140%] w-full border-0"
+    ? "absolute inset-0 w-full h-full border-0"
     : "absolute inset-0 w-full h-full border-0";
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <div className={isMobile ? "flex items-center justify-between gap-3 p-2.5" : "flex items-center justify-between gap-3 p-3 sm:p-6 absolute top-0 left-0 right-0 z-10"}>
+      <div className={isMobile ? "flex items-center justify-between gap-3 p-2" : "flex items-center justify-between gap-3 p-3 sm:p-6 absolute top-0 left-0 right-0 z-10"}>
         <button
           onClick={() => navigate("/browse")}
-          className={isMobile ? "w-8 h-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors" : "w-9 h-9 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors"}
+          className={isMobile ? "w-7 h-7 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors" : "w-9 h-9 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors"}
         >
-          <ArrowLeft className={isMobile ? "w-4 h-4 text-foreground" : "w-5 h-5 text-foreground"} />
+          <ArrowLeft className={isMobile ? "w-3.5 h-3.5 text-foreground" : "w-5 h-5 text-foreground"} />
         </button>
         {isAdmin && content && (
           <button onClick={() => setEditOpen(true)} className="hidden sm:flex w-9 h-9 rounded-full bg-card flex items-center justify-center hover:bg-primary/20 transition-colors neon-border-purple">
@@ -90,7 +90,7 @@ const Player = () => {
         )}
       </div>
 
-      <div className={isMobile ? "w-full px-0" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-8"}>
+      <div className={isMobile ? "w-full px-0 -mt-2" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-8"}>
         <div className={isMobile ? "w-full" : "w-full max-w-5xl"}>
           <div className={isMobile ? "relative w-full aspect-video bg-card overflow-hidden" : "relative aspect-video bg-card rounded-2xl overflow-hidden neon-border-purple"}>
             {hasPlayerUrl ? (
