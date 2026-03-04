@@ -52,6 +52,7 @@ export type Database = {
           player_url: string | null
           position: number
           section: string
+          synopsis: string | null
           tag: string
           title: string
           type: string
@@ -66,6 +67,7 @@ export type Database = {
           player_url?: string | null
           position?: number
           section?: string
+          synopsis?: string | null
           tag?: string
           title?: string
           type?: string
@@ -80,6 +82,7 @@ export type Database = {
           player_url?: string | null
           position?: number
           section?: string
+          synopsis?: string | null
           tag?: string
           title?: string
           type?: string
