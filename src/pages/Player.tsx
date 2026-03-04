@@ -86,12 +86,11 @@ const Player = () => {
             {activePlayerUrl ? (
               <iframe
                 src={activePlayerUrl}
-                className="w-full h-full"
+                className="w-full h-full border-0"
                 allowFullScreen
-                allow="autoplay; encrypted-media"
-                frameBorder="0"
+                allow="autoplay; encrypted-media; fullscreen"
                 referrerPolicy="no-referrer"
-                sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                style={{ border: 0 }}
               />
             ) : (
               <>
