@@ -295,8 +295,8 @@ const Browse = () => {
               <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-3 leading-tight">
                 {contents[0]?.title || "Título da Produção em Destaque"}
               </h1>
-              <p className="text-sm sm:text-base text-muted-foreground mb-5 max-w-md">
-                Uma história de amor, coragem e liberdade que vai transformar sua forma de ver o mundo.
+              <p className="text-sm sm:text-base text-muted-foreground mb-5 max-w-md line-clamp-3">
+                {contents[0]?.synopsis || "Uma história de amor, coragem e liberdade que vai transformar sua forma de ver o mundo."}
               </p>
               <div className="flex flex-wrap gap-3">
                 <Button onClick={() => contents[0] && navigate(`/player/${contents[0].id}`)} className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full glow-purple gap-2">
