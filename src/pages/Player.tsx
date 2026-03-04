@@ -90,6 +90,8 @@ const Player = () => {
                 allowFullScreen
                 allow="autoplay; encrypted-media"
                 frameBorder="0"
+                referrerPolicy="no-referrer"
+                sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
               />
             ) : (
               <>
