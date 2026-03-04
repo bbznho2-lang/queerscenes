@@ -54,8 +54,14 @@ const Player = () => {
 
   useEffect(() => { fetchContent(); }, [id]);
 
-  const activePlayerUrl = currentEp?.player_url || content?.player_url;
-  const isEmbed = activePlayerUrl && (activePlayerUrl.includes("youtube") || activePlayerUrl.includes("vimeo") || activePlayerUrl.includes("embed") || activePlayerUrl.includes("iframe"));
+  const rawPlayerUrl = currentEp?.player_url || content?.player_url;
+  
+  // Convert Google Drive view links to embeddable preview links
+  const activePlayerUrl = rawPlayerUrl
+    ? rawPlayerUrl.replace(/drive\.google\.com\/file\/d\/([^/]+)\/view.*/, 'drive.google.com/file/d/$1/preview')
+    : rawPlayerUrl;
+    
+  const isEmbed = activePlayerUrl && (activePlayerUrl.includes("youtube") || activePlayerUrl.includes("vimeo") || activePlayerUrl.includes("embed") || activePlayerUrl.includes("iframe") || activePlayerUrl.includes("drive.google.com"));
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
