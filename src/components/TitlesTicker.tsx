@@ -10,8 +10,6 @@ const TitlesTicker = () => {
   const [contents, setContents] = useState<{ id: string; title: string }[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const autoScrollRef = useRef<number | null>(null);
-  const isHovering = useRef(false);
 
   useEffect(() => {
     supabase.from("contents").select("id, title").order("title").then(({ data }) => {
@@ -26,42 +24,6 @@ const TitlesTicker = () => {
     const first = c.title.charAt(0).toUpperCase();
     if (titlesByLetter[first]) titlesByLetter[first].push(c);
   });
-
-  // Auto-scroll the alphabet bar
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-
-    const startAutoScroll = () => {
-      if (autoScrollRef.current) return;
-      autoScrollRef.current = window.setInterval(() => {
-        if (isHovering.current) return;
-        if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 2) {
-          el.scrollTo({ left: 0, behavior: "smooth" });
-        } else {
-          el.scrollBy({ left: 1, behavior: "auto" });
-        }
-      }, 30);
-    };
-
-    startAutoScroll();
-
-    const handleTouch = () => { isHovering.current = true; };
-    const handleTouchEnd = () => { setTimeout(() => { isHovering.current = false; }, 2000); };
-
-    el.addEventListener("touchstart", handleTouch, { passive: true });
-    el.addEventListener("touchend", handleTouchEnd, { passive: true });
-    el.addEventListener("mouseenter", handleTouch);
-    el.addEventListener("mouseleave", () => { isHovering.current = false; });
-
-    return () => {
-      if (autoScrollRef.current) clearInterval(autoScrollRef.current);
-      el.removeEventListener("touchstart", handleTouch);
-      el.removeEventListener("touchend", handleTouchEnd);
-      el.removeEventListener("mouseenter", handleTouch);
-      el.removeEventListener("mouseleave", () => {});
-    };
-  }, []);
 
   const titles = selected ? titlesByLetter[selected] || [] : [];
 
