@@ -88,8 +88,9 @@ const Player = () => {
                 src={activePlayerUrl}
                 className="w-full h-full border-0"
                 allowFullScreen
-                allow="autoplay; encrypted-media; fullscreen"
+                allow="autoplay *; encrypted-media *; fullscreen *"
                 referrerPolicy="no-referrer"
+                sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
                 style={{ border: 0 }}
               />
             ) : (
