@@ -46,6 +46,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
   const [playerUrl, setPlayerUrl] = useState("");
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [bannerPreview, setBannerPreview] = useState("");
+  const [bannerUrlInput, setBannerUrlInput] = useState("");
   const [isPremium, setIsPremium] = useState(false);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [saving, setSaving] = useState(false);
@@ -59,6 +60,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setSection(content.section);
       setPlayerUrl(content.player_url || "");
       setBannerPreview(content.banner_url || "");
+      setBannerUrlInput(content.banner_url || "");
       setIsPremium(content.is_premium || false);
       // Load episodes
       supabase
@@ -75,6 +77,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setSection(defaults?.section || "series");
       setPlayerUrl("");
       setBannerPreview("");
+      setBannerUrlInput("");
       setIsPremium(false);
       setEpisodes([]);
     }
@@ -85,6 +88,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
     if (file) {
       setBannerFile(file);
       setBannerPreview(URL.createObjectURL(file));
+      setBannerUrlInput("");
     }
   };
 
@@ -102,6 +106,8 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         if (uploadErr) throw uploadErr;
         const { data: urlData } = supabase.storage.from("banners").getPublicUrl(path);
         bannerUrl = urlData.publicUrl;
+      } else if (bannerUrlInput.trim()) {
+        bannerUrl = bannerUrlInput.trim();
       }
 
       const payload = {
@@ -252,7 +258,14 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
 
           <div>
             <label className="text-sm text-muted-foreground">Banner / Imagem</label>
-            <input type="file" accept="image/*" onChange={handleBannerChange} className="block w-full text-sm text-muted-foreground mt-1" />
+            <Input
+              value={bannerUrlInput}
+              onChange={(e) => { setBannerUrlInput(e.target.value); setBannerFile(null); setBannerPreview(e.target.value); }}
+              placeholder="https://image.tmdb.org/t/p/w780/..."
+              className="bg-muted border-border mt-1"
+            />
+            <p className="text-xs text-muted-foreground my-1">ou faça upload:</p>
+            <input type="file" accept="image/*" onChange={handleBannerChange} className="block w-full text-sm text-muted-foreground" />
             {bannerPreview && (
               <img src={bannerPreview} alt="preview" className="mt-2 rounded-lg h-32 w-full object-cover" />
             )}
