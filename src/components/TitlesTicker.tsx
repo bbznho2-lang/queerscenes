@@ -1,65 +1,90 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-
-const ALL_TITLES: Record<string, string[]> = {
-  A: ["Amor em Cores", "Arco-Íris Urbano"],
-  B: ["Brilho Próprio", "Blue is the Warmest Color"],
-  C: ["Corações Rebeldes", "Carol", "Call Me by Your Name"],
-  D: ["Disobedience"],
-  E: ["Elite", "Euphoria", "Estranho Amor"],
-  F: ["Firebird"],
-  G: ["Garotas Malvadas"],
-  H: ["Heartstopper", "Hoje Eu Quero Voltar Sozinho"],
-  I: ["Identidade"],
-  J: ["Juno"],
-  K: ["Kiss Me"],
-  L: ["Liberdade", "Laços Invisíveis", "La Vie d'Adèle"],
-  M: ["Moonlight", "My Beautiful Laundrette"],
-  N: ["Noites Queer", "Neon Nights", "Nas Estrelas"],
-  O: ["Orgulho", "O Primeiro Beijo"],
-  P: ["Pose", "Pride", "Portrait of a Lady on Fire"],
-  Q: ["QS: Raízes", "QS: Espelho", "QS: Pulso", "QS: Aurora"],
-  R: ["Respira Fundo"],
-  S: ["Sex Education", "Saving Face", "Supernova"],
-  T: ["The Half of It", "Thelma"],
-  U: ["Un Año Sin Lluvia"],
-  V: ["Vozes Livres", "Vida Real"],
-  W: ["Weekend"],
-  X: [],
-  Y: ["Young Royals"],
-  Z: [],
-};
+import { supabase } from "@/integrations/supabase/client";
 
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
 const TitlesTicker = () => {
   const [selected, setSelected] = useState<string | null>(null);
+  const [contents, setContents] = useState<{ id: string; title: string }[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const autoScrollRef = useRef<number | null>(null);
+  const isHovering = useRef(false);
 
-  const titles = selected ? ALL_TITLES[selected] || [] : [];
+  useEffect(() => {
+    supabase.from("contents").select("id, title").order("title").then(({ data }) => {
+      setContents(data || []);
+    });
+  }, []);
+
+  // Group titles by first letter
+  const titlesByLetter: Record<string, { id: string; title: string }[]> = {};
+  ALPHABET.forEach((l) => (titlesByLetter[l] = []));
+  contents.forEach((c) => {
+    const first = c.title.charAt(0).toUpperCase();
+    if (titlesByLetter[first]) titlesByLetter[first].push(c);
+  });
+
+  // Auto-scroll the alphabet bar
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const startAutoScroll = () => {
+      if (autoScrollRef.current) return;
+      autoScrollRef.current = window.setInterval(() => {
+        if (isHovering.current) return;
+        if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 2) {
+          el.scrollTo({ left: 0, behavior: "smooth" });
+        } else {
+          el.scrollBy({ left: 1, behavior: "auto" });
+        }
+      }, 30);
+    };
+
+    startAutoScroll();
+
+    const handleTouch = () => { isHovering.current = true; };
+    const handleTouchEnd = () => { setTimeout(() => { isHovering.current = false; }, 2000); };
+
+    el.addEventListener("touchstart", handleTouch, { passive: true });
+    el.addEventListener("touchend", handleTouchEnd, { passive: true });
+    el.addEventListener("mouseenter", handleTouch);
+    el.addEventListener("mouseleave", () => { isHovering.current = false; });
+
+    return () => {
+      if (autoScrollRef.current) clearInterval(autoScrollRef.current);
+      el.removeEventListener("touchstart", handleTouch);
+      el.removeEventListener("touchend", handleTouchEnd);
+      el.removeEventListener("mouseenter", handleTouch);
+      el.removeEventListener("mouseleave", () => {});
+    };
+  }, []);
+
+  const titles = selected ? titlesByLetter[selected] || [] : [];
 
   return (
     <div className="border-b border-border bg-card/50">
-      {/* Alphabet bar */}
+      {/* Alphabet bar - auto scrolling */}
       <div
         ref={scrollRef}
-        className="flex overflow-x-auto gap-1 px-3 py-2.5 scrollbar-hide"
+        className="flex overflow-x-auto gap-1 px-3 py-2 scrollbar-hide"
         style={{ scrollbarWidth: "none" }}
       >
         {ALPHABET.map((letter) => {
-          const hasTitles = (ALL_TITLES[letter] || []).length > 0;
+          const hasTitles = titlesByLetter[letter].length > 0;
           const isSelected = selected === letter;
           return (
             <button
               key={letter}
               onClick={() => setSelected(isSelected ? null : letter)}
-              className={`flex-shrink-0 w-8 h-8 rounded-lg text-xs font-bold transition-all ${
+              className={`flex-shrink-0 w-9 h-9 rounded-lg text-xs font-bold transition-all ${
                 isSelected
-                  ? "bg-primary text-primary-foreground glow-purple"
+                  ? "bg-primary text-primary-foreground glow-purple scale-110"
                   : hasTitles
-                  ? "bg-muted/50 text-foreground hover:bg-primary/20 hover:text-primary"
+                  ? "bg-muted/50 text-foreground hover:bg-primary/20 hover:text-primary active:scale-95"
                   : "bg-muted/20 text-muted-foreground/40 cursor-default"
               }`}
               disabled={!hasTitles}
@@ -79,14 +104,14 @@ const TitlesTicker = () => {
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden border-t border-border"
           >
-            <div className="px-4 py-3 flex flex-wrap gap-2">
-              {titles.map((title, i) => (
+            <div className="px-3 py-3 flex flex-wrap gap-2">
+              {titles.map((item) => (
                 <button
-                  key={i}
-                  onClick={() => navigate(`/player/${i + 1}`)}
-                  className="px-3 py-1.5 rounded-full bg-muted/50 text-sm text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors border border-border hover:border-primary/40"
+                  key={item.id}
+                  onClick={() => navigate(`/player/${item.id}`)}
+                  className="px-3 py-1.5 rounded-full bg-muted/50 text-sm text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors border border-border hover:border-primary/40 active:scale-95"
                 >
-                  {title}
+                  {item.title}
                 </button>
               ))}
             </div>
