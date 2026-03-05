@@ -364,7 +364,7 @@ const Browse = () => {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl sm:text-3xl font-bold neon-text-purple">Queer Soap Operas</h2>
               {isAdmin && (
-                <button onClick={() => handleNew("novelas", "serie")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add soap opera">
+                <button onClick={() => handleNew("novelas", "novela")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add soap opera">
                   <Plus className="w-5 h-5 text-primary" />
                 </button>
               )}
@@ -391,7 +391,7 @@ const Browse = () => {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl sm:text-3xl font-bold neon-text-blue">Queer Anime</h2>
               {isAdmin && (
-                <button onClick={() => handleNew("animes", "serie")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add anime">
+                <button onClick={() => handleNew("animes", "anime")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add anime">
                   <Plus className="w-5 h-5 text-primary" />
                 </button>
               )}
