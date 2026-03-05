@@ -76,7 +76,7 @@ const ContentCard = ({
           {item.tag}
         </span>
         <h3 className="text-sm sm:text-base font-semibold text-foreground leading-tight">{item.title}</h3>
-        <p className="text-xs text-muted-foreground">{item.year} · {item.type === "serie" ? "Series" : "Movie"}</p>
+        <p className="text-xs text-muted-foreground">{item.year} · {item.type === "serie" ? "Series" : item.type === "novela" ? "Soap Opera" : item.type === "anime" ? "Anime" : "Movie"}</p>
         <p className="text-[10px] sm:text-xs text-muted-foreground/80 mt-1 line-clamp-2 leading-snug">
           {item.synopsis?.trim() || "No synopsis available."}
         </p>
