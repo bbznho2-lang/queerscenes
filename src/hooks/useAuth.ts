@@ -59,12 +59,21 @@ export const useAuth = () => {
     return { error };
   };
 
-  const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
+  const signUp = async (email: string, password: string, firstName?: string, lastName?: string) => {
+    const { error, data } = await supabase.auth.signUp({
       email,
       password,
       options: { emailRedirectTo: window.location.origin }
     });
+    if (!error && data.user) {
+      // Update profile with name
+      if (firstName || lastName) {
+        await supabase
+          .from('profiles')
+          .update({ first_name: firstName, last_name: lastName })
+          .eq('user_id', data.user.id);
+      }
+    }
     return { error };
   };
 

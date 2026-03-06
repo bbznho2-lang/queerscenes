@@ -130,24 +130,36 @@ export type Database = {
         Row: {
           created_at: string
           email: string | null
+          first_name: string | null
           id: string
           is_premium: boolean
+          last_name: string | null
+          premium_expires_at: string | null
+          premium_plan: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
           email?: string | null
+          first_name?: string | null
           id?: string
           is_premium?: boolean
+          last_name?: string | null
+          premium_expires_at?: string | null
+          premium_plan?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
           email?: string | null
+          first_name?: string | null
           id?: string
           is_premium?: boolean
+          last_name?: string | null
+          premium_expires_at?: string | null
+          premium_plan?: string | null
           updated_at?: string
           user_id?: string
         }
