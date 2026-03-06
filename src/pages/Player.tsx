@@ -30,12 +30,13 @@ interface Episode {
 const Player = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isAdmin } = useAuth();
+  const { user, isAdmin } = useAuth();
   const isMobile = useIsMobile();
   const [content, setContent] = useState<ContentItem | null>(null);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [currentEp, setCurrentEp] = useState<Episode | null>(null);
   const [editOpen, setEditOpen] = useState(false);
+  const [premiumBlocked, setPremiumBlocked] = useState(false);
 
   const fetchContent = async () => {
     if (!id) return;
