@@ -43,6 +43,24 @@ const Player = () => {
     const { data } = await supabase.from("contents").select("*").eq("id", id).single();
     if (data) {
       setContent(data);
+
+      // Check premium access
+      if (data.is_premium && !isAdmin) {
+        if (!user) {
+          setPremiumBlocked(true);
+        } else {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("is_premium, premium_expires_at")
+            .eq("user_id", user.id)
+            .maybeSingle();
+          const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
+          setPremiumBlocked(!(profile?.is_premium && notExpired));
+        }
+      } else {
+        setPremiumBlocked(false);
+      }
+
       if (data.type === "serie") {
         const { data: eps } = await supabase.from("episodes").select("*").eq("content_id", id).order("episode_number");
         const normalizedEpisodes = eps || [];
