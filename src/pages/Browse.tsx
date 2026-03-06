@@ -128,8 +128,25 @@ const Browse = () => {
   const [newDefaults, setNewDefaults] = useState<{ section: string; type: string }>({ section: "series", type: "filme" });
   const [contents, setContents] = useState<ContentItem[]>([]);
   const [watchlistIds, setWatchlistIds] = useState<Set<string>>(new Set());
+  const [userIsPremium, setUserIsPremium] = useState(false);
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchPremium = async () => {
+      if (!user) { setUserIsPremium(false); return; }
+      const { data } = await supabase
+        .from("profiles")
+        .select("is_premium, premium_expires_at")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (data) {
+        const notExpired = !data.premium_expires_at || new Date(data.premium_expires_at) > new Date();
+        setUserIsPremium(data.is_premium && notExpired);
+      }
+    };
+    fetchPremium();
+  }, [user]);
 
   const fetchContents = async () => {
     const { data } = await supabase
