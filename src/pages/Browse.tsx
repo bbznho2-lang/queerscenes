@@ -34,6 +34,7 @@ const ContentCard = ({
   onClickTrack,
   isInWatchlist,
   onToggleWatchlist,
+  userIsPremium,
 }: {
   item: ContentItem;
   isAdmin: boolean;
@@ -42,14 +43,23 @@ const ContentCard = ({
   onClickTrack: () => void;
   isInWatchlist: boolean;
   onToggleWatchlist: () => void;
+  userIsPremium: boolean;
 }) => {
   const navigate = useNavigate();
+  const handleClick = () => {
+    if (item.is_premium && !isAdmin && !userIsPremium) {
+      toast.error("Conteúdo exclusivo para assinantes Premium. Assine um plano para assistir!");
+      return;
+    }
+    onClickTrack();
+    navigate(`/player/${item.id}`);
+  };
   return (
     <motion.div
       className="group relative rounded-xl overflow-hidden cursor-pointer aspect-[2/3]"
       whileHover={{ scale: 1.03 }}
       transition={{ duration: 0.2 }}
-      onClick={() => { onClickTrack(); navigate(`/player/${item.id}`); }}
+      onClick={handleClick}
     >
       <img
         src={item.banner_url || "/placeholder.svg"}
