@@ -346,7 +346,7 @@ const Browse = () => {
               <AutoScrollRow>
                 {series.map((s) => (
                   <div key={s.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={s} isAdmin={isAdmin} onEdit={() => handleEdit(s)} onDelete={() => handleDelete(s.id)} onClickTrack={() => trackClick(s.id)} isInWatchlist={watchlistIds.has(s.id)} onToggleWatchlist={() => toggleWatchlist(s.id)} />
+                    <ContentCard item={s} isAdmin={isAdmin} onEdit={() => handleEdit(s)} onDelete={() => handleDelete(s.id)} onClickTrack={() => trackClick(s.id)} isInWatchlist={watchlistIds.has(s.id)} onToggleWatchlist={() => toggleWatchlist(s.id)} userIsPremium={userIsPremium} />
                   </div>
                 ))}
               </AutoScrollRow>
@@ -373,7 +373,7 @@ const Browse = () => {
               <AutoScrollRow>
                 {filmes.map((f) => (
                   <div key={f.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={f} isAdmin={isAdmin} onEdit={() => handleEdit(f)} onDelete={() => handleDelete(f.id)} onClickTrack={() => trackClick(f.id)} isInWatchlist={watchlistIds.has(f.id)} onToggleWatchlist={() => toggleWatchlist(f.id)} />
+                    <ContentCard item={f} isAdmin={isAdmin} onEdit={() => handleEdit(f)} onDelete={() => handleDelete(f.id)} onClickTrack={() => trackClick(f.id)} isInWatchlist={watchlistIds.has(f.id)} onToggleWatchlist={() => toggleWatchlist(f.id)} userIsPremium={userIsPremium} />
                   </div>
                 ))}
               </AutoScrollRow>
@@ -400,7 +400,7 @@ const Browse = () => {
               <AutoScrollRow>
                 {novelas.map((n) => (
                   <div key={n.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={n} isAdmin={isAdmin} onEdit={() => handleEdit(n)} onDelete={() => handleDelete(n.id)} onClickTrack={() => trackClick(n.id)} isInWatchlist={watchlistIds.has(n.id)} onToggleWatchlist={() => toggleWatchlist(n.id)} />
+                    <ContentCard item={n} isAdmin={isAdmin} onEdit={() => handleEdit(n)} onDelete={() => handleDelete(n.id)} onClickTrack={() => trackClick(n.id)} isInWatchlist={watchlistIds.has(n.id)} onToggleWatchlist={() => toggleWatchlist(n.id)} userIsPremium={userIsPremium} />
                   </div>
                 ))}
               </AutoScrollRow>
@@ -427,7 +427,7 @@ const Browse = () => {
               <AutoScrollRow>
                 {animes.map((a) => (
                   <div key={a.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={a} isAdmin={isAdmin} onEdit={() => handleEdit(a)} onDelete={() => handleDelete(a.id)} onClickTrack={() => trackClick(a.id)} isInWatchlist={watchlistIds.has(a.id)} onToggleWatchlist={() => toggleWatchlist(a.id)} />
+                    <ContentCard item={a} isAdmin={isAdmin} onEdit={() => handleEdit(a)} onDelete={() => handleDelete(a.id)} onClickTrack={() => trackClick(a.id)} isInWatchlist={watchlistIds.has(a.id)} onToggleWatchlist={() => toggleWatchlist(a.id)} userIsPremium={userIsPremium} />
                   </div>
                 ))}
               </AutoScrollRow>
@@ -456,7 +456,7 @@ const Browse = () => {
               <AutoScrollRow>
                 {exclusivos.map((e) => (
                   <div key={e.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={e} isAdmin={isAdmin} onEdit={() => handleEdit(e)} onDelete={() => handleDelete(e.id)} onClickTrack={() => trackClick(e.id)} isInWatchlist={watchlistIds.has(e.id)} onToggleWatchlist={() => toggleWatchlist(e.id)} />
+                    <ContentCard item={e} isAdmin={isAdmin} onEdit={() => handleEdit(e)} onDelete={() => handleDelete(e.id)} onClickTrack={() => trackClick(e.id)} isInWatchlist={watchlistIds.has(e.id)} onToggleWatchlist={() => toggleWatchlist(e.id)} userIsPremium={userIsPremium} />
                   </div>
                 ))}
               </AutoScrollRow>
@@ -478,7 +478,7 @@ const Browse = () => {
               <AutoScrollRow>
                 {watchlistItems.map((w) => (
                   <div key={w.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={w} isAdmin={isAdmin} onEdit={() => handleEdit(w)} onDelete={() => handleDelete(w.id)} onClickTrack={() => trackClick(w.id)} isInWatchlist={true} onToggleWatchlist={() => toggleWatchlist(w.id)} />
+                    <ContentCard item={w} isAdmin={isAdmin} onEdit={() => handleEdit(w)} onDelete={() => handleDelete(w.id)} onClickTrack={() => trackClick(w.id)} isInWatchlist={true} onToggleWatchlist={() => toggleWatchlist(w.id)} userIsPremium={userIsPremium} />
                   </div>
                 ))}
               </AutoScrollRow>
