@@ -34,6 +34,7 @@ const ContentCard = ({
   onClickTrack,
   isInWatchlist,
   onToggleWatchlist,
+  userIsPremium,
 }: {
   item: ContentItem;
   isAdmin: boolean;
@@ -42,14 +43,23 @@ const ContentCard = ({
   onClickTrack: () => void;
   isInWatchlist: boolean;
   onToggleWatchlist: () => void;
+  userIsPremium: boolean;
 }) => {
   const navigate = useNavigate();
+  const handleClick = () => {
+    if (item.is_premium && !isAdmin && !userIsPremium) {
+      toast.error("Conteúdo exclusivo para assinantes Premium. Assine um plano para assistir!");
+      return;
+    }
+    onClickTrack();
+    navigate(`/player/${item.id}`);
+  };
   return (
     <motion.div
       className="group relative rounded-xl overflow-hidden cursor-pointer aspect-[2/3]"
       whileHover={{ scale: 1.03 }}
       transition={{ duration: 0.2 }}
-      onClick={() => { onClickTrack(); navigate(`/player/${item.id}`); }}
+      onClick={handleClick}
     >
       <img
         src={item.banner_url || "/placeholder.svg"}
@@ -118,8 +128,25 @@ const Browse = () => {
   const [newDefaults, setNewDefaults] = useState<{ section: string; type: string }>({ section: "series", type: "filme" });
   const [contents, setContents] = useState<ContentItem[]>([]);
   const [watchlistIds, setWatchlistIds] = useState<Set<string>>(new Set());
+  const [userIsPremium, setUserIsPremium] = useState(false);
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchPremium = async () => {
+      if (!user) { setUserIsPremium(false); return; }
+      const { data } = await supabase
+        .from("profiles")
+        .select("is_premium, premium_expires_at")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (data) {
+        const notExpired = !data.premium_expires_at || new Date(data.premium_expires_at) > new Date();
+        setUserIsPremium(data.is_premium && notExpired);
+      }
+    };
+    fetchPremium();
+  }, [user]);
 
   const fetchContents = async () => {
     const { data } = await supabase
@@ -319,7 +346,7 @@ const Browse = () => {
               <AutoScrollRow>
                 {series.map((s) => (
                   <div key={s.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={s} isAdmin={isAdmin} onEdit={() => handleEdit(s)} onDelete={() => handleDelete(s.id)} onClickTrack={() => trackClick(s.id)} isInWatchlist={watchlistIds.has(s.id)} onToggleWatchlist={() => toggleWatchlist(s.id)} />
+                    <ContentCard item={s} isAdmin={isAdmin} onEdit={() => handleEdit(s)} onDelete={() => handleDelete(s.id)} onClickTrack={() => trackClick(s.id)} isInWatchlist={watchlistIds.has(s.id)} onToggleWatchlist={() => toggleWatchlist(s.id)} userIsPremium={userIsPremium} />
                   </div>
                 ))}
               </AutoScrollRow>
@@ -346,7 +373,7 @@ const Browse = () => {
               <AutoScrollRow>
                 {filmes.map((f) => (
                   <div key={f.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={f} isAdmin={isAdmin} onEdit={() => handleEdit(f)} onDelete={() => handleDelete(f.id)} onClickTrack={() => trackClick(f.id)} isInWatchlist={watchlistIds.has(f.id)} onToggleWatchlist={() => toggleWatchlist(f.id)} />
+                    <ContentCard item={f} isAdmin={isAdmin} onEdit={() => handleEdit(f)} onDelete={() => handleDelete(f.id)} onClickTrack={() => trackClick(f.id)} isInWatchlist={watchlistIds.has(f.id)} onToggleWatchlist={() => toggleWatchlist(f.id)} userIsPremium={userIsPremium} />
                   </div>
                 ))}
               </AutoScrollRow>
@@ -373,7 +400,7 @@ const Browse = () => {
               <AutoScrollRow>
                 {novelas.map((n) => (
                   <div key={n.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={n} isAdmin={isAdmin} onEdit={() => handleEdit(n)} onDelete={() => handleDelete(n.id)} onClickTrack={() => trackClick(n.id)} isInWatchlist={watchlistIds.has(n.id)} onToggleWatchlist={() => toggleWatchlist(n.id)} />
+                    <ContentCard item={n} isAdmin={isAdmin} onEdit={() => handleEdit(n)} onDelete={() => handleDelete(n.id)} onClickTrack={() => trackClick(n.id)} isInWatchlist={watchlistIds.has(n.id)} onToggleWatchlist={() => toggleWatchlist(n.id)} userIsPremium={userIsPremium} />
                   </div>
                 ))}
               </AutoScrollRow>
@@ -400,7 +427,7 @@ const Browse = () => {
               <AutoScrollRow>
                 {animes.map((a) => (
                   <div key={a.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={a} isAdmin={isAdmin} onEdit={() => handleEdit(a)} onDelete={() => handleDelete(a.id)} onClickTrack={() => trackClick(a.id)} isInWatchlist={watchlistIds.has(a.id)} onToggleWatchlist={() => toggleWatchlist(a.id)} />
+                    <ContentCard item={a} isAdmin={isAdmin} onEdit={() => handleEdit(a)} onDelete={() => handleDelete(a.id)} onClickTrack={() => trackClick(a.id)} isInWatchlist={watchlistIds.has(a.id)} onToggleWatchlist={() => toggleWatchlist(a.id)} userIsPremium={userIsPremium} />
                   </div>
                 ))}
               </AutoScrollRow>
@@ -429,7 +456,7 @@ const Browse = () => {
               <AutoScrollRow>
                 {exclusivos.map((e) => (
                   <div key={e.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={e} isAdmin={isAdmin} onEdit={() => handleEdit(e)} onDelete={() => handleDelete(e.id)} onClickTrack={() => trackClick(e.id)} isInWatchlist={watchlistIds.has(e.id)} onToggleWatchlist={() => toggleWatchlist(e.id)} />
+                    <ContentCard item={e} isAdmin={isAdmin} onEdit={() => handleEdit(e)} onDelete={() => handleDelete(e.id)} onClickTrack={() => trackClick(e.id)} isInWatchlist={watchlistIds.has(e.id)} onToggleWatchlist={() => toggleWatchlist(e.id)} userIsPremium={userIsPremium} />
                   </div>
                 ))}
               </AutoScrollRow>
@@ -451,7 +478,7 @@ const Browse = () => {
               <AutoScrollRow>
                 {watchlistItems.map((w) => (
                   <div key={w.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={w} isAdmin={isAdmin} onEdit={() => handleEdit(w)} onDelete={() => handleDelete(w.id)} onClickTrack={() => trackClick(w.id)} isInWatchlist={true} onToggleWatchlist={() => toggleWatchlist(w.id)} />
+                    <ContentCard item={w} isAdmin={isAdmin} onEdit={() => handleEdit(w)} onDelete={() => handleDelete(w.id)} onClickTrack={() => trackClick(w.id)} isInWatchlist={true} onToggleWatchlist={() => toggleWatchlist(w.id)} userIsPremium={userIsPremium} />
                   </div>
                 ))}
               </AutoScrollRow>

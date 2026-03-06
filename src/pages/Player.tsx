@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { ArrowLeft, Play, Pencil } from "lucide-react";
+import { ArrowLeft, Play, Pencil, Crown, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -30,18 +30,37 @@ interface Episode {
 const Player = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isAdmin } = useAuth();
+  const { user, isAdmin } = useAuth();
   const isMobile = useIsMobile();
   const [content, setContent] = useState<ContentItem | null>(null);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [currentEp, setCurrentEp] = useState<Episode | null>(null);
   const [editOpen, setEditOpen] = useState(false);
+  const [premiumBlocked, setPremiumBlocked] = useState(false);
 
   const fetchContent = async () => {
     if (!id) return;
     const { data } = await supabase.from("contents").select("*").eq("id", id).single();
     if (data) {
       setContent(data);
+
+      // Check premium access
+      if (data.is_premium && !isAdmin) {
+        if (!user) {
+          setPremiumBlocked(true);
+        } else {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("is_premium, premium_expires_at")
+            .eq("user_id", user.id)
+            .maybeSingle();
+          const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
+          setPremiumBlocked(!(profile?.is_premium && notExpired));
+        }
+      } else {
+        setPremiumBlocked(false);
+      }
+
       if (data.type === "serie") {
         const { data: eps } = await supabase.from("episodes").select("*").eq("content_id", id).order("episode_number");
         const normalizedEpisodes = eps || [];
@@ -119,7 +138,16 @@ const Player = () => {
       <div className={isMobile ? "w-full px-0" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-8"}>
         <div className={isMobile ? "w-full" : "w-full max-w-5xl"}>
           <div className={isMobile ? "relative w-full aspect-video bg-card overflow-hidden" : "relative aspect-video bg-card rounded-2xl overflow-hidden neon-border-purple"}>
-            {hasPlayerUrl ? (
+            {premiumBlocked ? (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/90 backdrop-blur-sm px-6 text-center">
+                <Lock className="w-12 h-12 text-secondary mb-4" />
+                <h2 className="text-xl font-bold mb-2 flex items-center gap-2"><Crown className="w-5 h-5 text-secondary" /> Conteúdo Premium</h2>
+                <p className="text-muted-foreground text-sm mb-4">Este conteúdo é exclusivo para assinantes Premium.</p>
+                <button onClick={() => navigate("/#planos")} className="px-6 py-2.5 rounded-full bg-secondary text-secondary-foreground font-semibold hover:bg-secondary/90 transition-colors">
+                  Assinar Premium
+                </button>
+              </div>
+            ) : hasPlayerUrl ? (
               <iframe
                 key={activePlayerUrl ?? "player"}
                 src={activePlayerUrl ?? undefined}
