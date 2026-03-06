@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Camera, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProfileDialogProps {
   open: boolean;
@@ -14,11 +15,33 @@ interface ProfileDialogProps {
 
 const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [email] = useState("user@email.com");
+  const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const load = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      setEmail(user.email || "");
+      const { data } = await supabase
+        .from("profiles")
+        .select("first_name, last_name")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (data) {
+        setFirstName(data.first_name || "");
+        setLastName(data.last_name || "");
+      }
+    };
+    load();
+  }, [open]);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -29,19 +52,38 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
     }
   };
 
-  const handlePasswordChange = () => {
-    if (!currentPassword || !newPassword) {
-      toast.error("Please fill in both password fields.");
+  const handleSaveName = async () => {
+    setSaving(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setSaving(false); return; }
+    const { error } = await supabase
+      .from("profiles")
+      .update({ first_name: firstName, last_name: lastName })
+      .eq("user_id", user.id);
+    setSaving(false);
+    if (error) toast.error("Erro ao salvar nome.");
+    else toast.success("Nome atualizado!");
+  };
+
+  const handlePasswordChange = async () => {
+    if (!newPassword) {
+      toast.error("Preencha a nova senha.");
       return;
     }
     if (newPassword.length < 6) {
-      toast.error("New password must be at least 6 characters.");
+      toast.error("A nova senha deve ter pelo menos 6 caracteres.");
       return;
     }
-    toast.success("Password changed successfully!");
-    setCurrentPassword("");
-    setNewPassword("");
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) toast.error(error.message);
+    else {
+      toast.success("Senha alterada com sucesso!");
+      setCurrentPassword("");
+      setNewPassword("");
+    }
   };
+
+  const initials = `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase() || "QS";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -57,7 +99,7 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
             <div className="relative">
               <Avatar className="w-24 h-24 border-2 border-primary/40">
                 <AvatarImage src={avatarUrl || undefined} />
-                <AvatarFallback className="bg-muted text-2xl">QS</AvatarFallback>
+                <AvatarFallback className="bg-muted text-2xl">{initials}</AvatarFallback>
               </Avatar>
               <label className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center cursor-pointer hover:bg-primary/80 transition-colors">
                 <Camera className="w-4 h-4 text-primary-foreground" />
@@ -65,6 +107,20 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
               </label>
             </div>
           </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label className="text-muted-foreground text-xs">Nome</Label>
+              <Input value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="Nome" className="bg-muted/50 border-border" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-muted-foreground text-xs">Sobrenome</Label>
+              <Input value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Sobrenome" className="bg-muted/50 border-border" />
+            </div>
+          </div>
+          <Button onClick={handleSaveName} disabled={saving} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full glow-purple">
+            {saving ? "Salvando..." : "Salvar Nome"}
+          </Button>
 
           <div className="space-y-2">
             <Label className="text-muted-foreground text-xs">Email</Label>
@@ -74,44 +130,33 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
           </div>
 
           <div className="space-y-3">
-            <Label className="text-muted-foreground text-xs">Change Password</Label>
+            <Label className="text-muted-foreground text-xs">Alterar Senha</Label>
             <div className="relative">
               <Input
                 type={showCurrent ? "text" : "password"}
-                placeholder="Current password"
+                placeholder="Senha atual"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 className="bg-muted/50 border-border pr-10"
               />
-              <button
-                type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                onClick={() => setShowCurrent(!showCurrent)}
-              >
+              <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" onClick={() => setShowCurrent(!showCurrent)}>
                 {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
             <div className="relative">
               <Input
                 type={showNew ? "text" : "password"}
-                placeholder="New password"
+                placeholder="Nova senha"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 className="bg-muted/50 border-border pr-10"
               />
-              <button
-                type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                onClick={() => setShowNew(!showNew)}
-              >
+              <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" onClick={() => setShowNew(!showNew)}>
                 {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
-            <Button
-              onClick={handlePasswordChange}
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full glow-purple"
-            >
-              Change Password
+            <Button onClick={handlePasswordChange} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full glow-purple">
+              Alterar Senha
             </Button>
           </div>
         </div>
