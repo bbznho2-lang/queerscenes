@@ -22,6 +22,8 @@ const fade = {
 const Index = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -33,9 +35,15 @@ const Index = () => {
     setLoading(true);
     try {
       if (isSignUp) {
-        const { error } = await signUp(email, password);
+        if (!firstName.trim() || !lastName.trim()) {
+          toast.error("Please enter your first and last name");
+          return;
+        }
+        const { error } = await signUp(email, password, firstName.trim(), lastName.trim());
         if (error) { toast.error(error.message); return; }
-        toast.success("Account created! Signing in...");
+        toast.success("Account created! Check your email to confirm.");
+        setLoading(false);
+        return;
       }
       const { error } = await signIn(email, password);
       if (error) { toast.error(error.message); return; }
@@ -104,6 +112,32 @@ const Index = () => {
               </CardHeader>
               <CardContent className="pt-4">
                 <form onSubmit={handleLogin} className="space-y-4">
+                  {isSignUp && (
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <label className="text-sm text-muted-foreground">First Name</label>
+                        <Input
+                          type="text"
+                          placeholder="John"
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          className="bg-muted border-border focus:border-primary"
+                          required={isSignUp}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm text-muted-foreground">Last Name</label>
+                        <Input
+                          type="text"
+                          placeholder="Doe"
+                          value={lastName}
+                          onChange={(e) => setLastName(e.target.value)}
+                          className="bg-muted border-border focus:border-primary"
+                          required={isSignUp}
+                        />
+                      </div>
+                    </div>
+                  )}
                   <div className="space-y-2">
                     <label className="text-sm text-muted-foreground">Email</label>
                     <Input
@@ -266,7 +300,7 @@ const Index = () => {
                 </CardHeader>
                 <CardContent className="text-center space-y-4">
                   <div>
-                    <span className="text-4xl sm:text-5xl font-bold text-foreground">€14.99</span>
+                    <span className="text-4xl sm:text-5xl font-bold text-foreground">€15.99</span>
                     <span className="text-muted-foreground text-sm">/month</span>
                   </div>
                   <p className="text-muted-foreground text-sm">Cancel anytime</p>
@@ -292,10 +326,10 @@ const Index = () => {
                 </CardHeader>
                 <CardContent className="text-center space-y-4">
                   <div>
-                    <span className="text-4xl sm:text-5xl font-bold text-foreground">€149.99</span>
+                    <span className="text-4xl sm:text-5xl font-bold text-foreground">€159.99</span>
                     <span className="text-muted-foreground text-sm">/year</span>
                   </div>
-                  <p className="text-muted-foreground text-sm">That's ~€12.50/month</p>
+                  <p className="text-muted-foreground text-sm">That's ~€13.33/month</p>
                   <Button
                     onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
                     className="w-full rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-blue"
