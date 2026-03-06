@@ -141,10 +141,10 @@ const Player = () => {
             {premiumBlocked ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/90 backdrop-blur-sm px-6 text-center">
                 <Lock className="w-12 h-12 text-secondary mb-4" />
-                <h2 className="text-xl font-bold mb-2 flex items-center gap-2"><Crown className="w-5 h-5 text-secondary" /> Conteúdo Premium</h2>
-                <p className="text-muted-foreground text-sm mb-4">Este conteúdo é exclusivo para assinantes Premium.</p>
-                <button onClick={() => navigate("/#planos")} className="px-6 py-2.5 rounded-full bg-secondary text-secondary-foreground font-semibold hover:bg-secondary/90 transition-colors">
-                  Assinar Premium
+                <h2 className="text-xl font-bold mb-2 flex items-center gap-2"><Crown className="w-5 h-5 text-secondary" /> Premium Content</h2>
+                <p className="text-muted-foreground text-sm mb-4">This content is exclusive to Premium subscribers.</p>
+                <button onClick={() => navigate("/")} className="px-6 py-2.5 rounded-full bg-secondary text-secondary-foreground font-semibold hover:bg-secondary/90 transition-colors">
+                  Subscribe Premium
                 </button>
               </div>
             ) : hasPlayerUrl ? (

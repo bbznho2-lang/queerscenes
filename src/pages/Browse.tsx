@@ -48,7 +48,9 @@ const ContentCard = ({
   const navigate = useNavigate();
   const handleClick = () => {
     if (item.is_premium && !isAdmin && !userIsPremium) {
-      toast.error("Conteúdo exclusivo para assinantes Premium. Assine um plano para assistir!");
+      toast.error("This content is exclusive to Premium subscribers. Subscribe to a plan to watch!");
+      navigate("/#planos");
+
       return;
     }
     onClickTrack();
@@ -231,7 +233,7 @@ const Browse = () => {
     { label: "Profile", icon: "👤", action: () => { setMenuOpen(false); setProfileOpen(true); } },
     { label: "Support", icon: "💬", action: () => { setMenuOpen(false); setSupportOpen(true); } },
     ...(isAdmin ? [{ label: "Admin Panel", icon: "⚙️", action: () => { setMenuOpen(false); navigate("/admin"); } }] : []),
-    { label: "Go Premium", icon: "💎", action: () => { setMenuOpen(false); navigate("/#planos"); }, premium: true },
+    { label: "Go Premium", icon: "💎", action: () => { setMenuOpen(false); navigate("/"); setTimeout(() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" }), 300); }, premium: true },
   ];
 
   return (
@@ -310,8 +312,9 @@ const Browse = () => {
         <TitlesTicker />
 
         {/* HERO BANNER */}
+        {contents.length > 0 && (
         <section className="relative h-[60vh] sm:h-[70vh] flex items-end">
-          <img src={contents[0]?.banner_url || "/placeholder.svg"} alt="Main banner" className="absolute inset-0 w-full h-full object-cover bg-muted" />
+          <img key={contents[0]?.id} src={contents[0]?.banner_url || "/placeholder.svg"} alt="Main banner" className="absolute inset-0 w-full h-full object-cover bg-muted" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-r from-background/80 to-transparent" />
           <div className="relative z-10 p-6 sm:p-10 md:p-16 max-w-2xl">
@@ -330,6 +333,7 @@ const Browse = () => {
             </motion.div>
           </div>
         </section>
+        )}
 
         {/* SERIES */}
         <section id="séries" className="py-10 sm:py-16 px-4">

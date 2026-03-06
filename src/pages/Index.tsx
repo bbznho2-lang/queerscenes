@@ -41,7 +41,8 @@ const Index = () => {
         }
         const { error } = await signUp(email, password, firstName.trim(), lastName.trim());
         if (error) { toast.error(error.message); return; }
-        toast.success("Account created! Check your email to confirm.");
+        toast.success("Account created! You can now sign in.");
+        setIsSignUp(false);
         setLoading(false);
         return;
       }
@@ -261,7 +262,7 @@ const Index = () => {
       </section>
 
       {/* PLANS */}
-      <section className="py-16 sm:py-24 px-4">
+      <section id="planos" className="py-16 sm:py-24 px-4">
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
             <h2 className="text-3xl sm:text-5xl font-bold">
