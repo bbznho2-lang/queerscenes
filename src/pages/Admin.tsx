@@ -329,7 +329,7 @@ const Admin = () => {
                           />
                         </div>
                         <span className="text-xs text-muted-foreground hidden sm:block">
-                          {new Date(p.created_at).toLocaleDateString("pt-BR")}
+                          {new Date(p.created_at).toLocaleDateString("en-US")}
                         </span>
                         <div className="sm:hidden flex items-center gap-2">
                           <Switch
@@ -387,7 +387,7 @@ const Admin = () => {
                                 expired ? 'bg-destructive/10 text-destructive' :
                                 'bg-secondary/10 text-secondary'
                               }`}>
-                                {!p.is_premium ? "Free" : expired ? "Expired" : `Active until ${new Date(p.premium_expires_at!).toLocaleDateString("pt-BR")}`}
+                                {!p.is_premium ? "Free" : expired ? "Expired" : `Active until ${new Date(p.premium_expires_at!).toLocaleDateString("en-US")}`}
                               </div>
                             </div>
                           </div>

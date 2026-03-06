@@ -61,23 +61,23 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
       .update({ first_name: firstName, last_name: lastName })
       .eq("user_id", user.id);
     setSaving(false);
-    if (error) toast.error("Erro ao salvar nome.");
-    else toast.success("Nome atualizado!");
+    if (error) toast.error("Error saving name.");
+    else toast.success("Name updated!");
   };
 
   const handlePasswordChange = async () => {
     if (!newPassword) {
-      toast.error("Preencha a nova senha.");
+      toast.error("Please enter a new password.");
       return;
     }
     if (newPassword.length < 6) {
-      toast.error("A nova senha deve ter pelo menos 6 caracteres.");
+      toast.error("New password must be at least 6 characters.");
       return;
     }
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     if (error) toast.error(error.message);
     else {
-      toast.success("Senha alterada com sucesso!");
+      toast.success("Password changed successfully!");
       setCurrentPassword("");
       setNewPassword("");
     }
@@ -92,6 +92,7 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
           <DialogTitle className="neon-text-purple text-xl" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             My Profile
           </DialogTitle>
+
         </DialogHeader>
 
         <div className="space-y-6 pt-2">
@@ -110,16 +111,16 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label className="text-muted-foreground text-xs">Nome</Label>
-              <Input value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="Nome" className="bg-muted/50 border-border" />
+              <Label className="text-muted-foreground text-xs">First Name</Label>
+              <Input value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="First name" className="bg-muted/50 border-border" />
             </div>
             <div className="space-y-1">
-              <Label className="text-muted-foreground text-xs">Sobrenome</Label>
-              <Input value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Sobrenome" className="bg-muted/50 border-border" />
+              <Label className="text-muted-foreground text-xs">Last Name</Label>
+              <Input value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Last name" className="bg-muted/50 border-border" />
             </div>
           </div>
           <Button onClick={handleSaveName} disabled={saving} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full glow-purple">
-            {saving ? "Salvando..." : "Salvar Nome"}
+            {saving ? "Saving..." : "Save Name"}
           </Button>
 
           <div className="space-y-2">
@@ -130,11 +131,11 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
           </div>
 
           <div className="space-y-3">
-            <Label className="text-muted-foreground text-xs">Alterar Senha</Label>
+            <Label className="text-muted-foreground text-xs">Change Password</Label>
             <div className="relative">
               <Input
                 type={showCurrent ? "text" : "password"}
-                placeholder="Senha atual"
+                placeholder="Current password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 className="bg-muted/50 border-border pr-10"
@@ -146,7 +147,7 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
             <div className="relative">
               <Input
                 type={showNew ? "text" : "password"}
-                placeholder="Nova senha"
+                placeholder="New password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 className="bg-muted/50 border-border pr-10"
@@ -156,7 +157,7 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
               </button>
             </div>
             <Button onClick={handlePasswordChange} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full glow-purple">
-              Alterar Senha
+              Change Password
             </Button>
           </div>
         </div>
