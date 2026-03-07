@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Play, Lock, Sparkles, Diamond, Star, Zap, Heart, Film, Crown, ArrowRight, HelpCircle, Tv, Smartphone, Tablet, Eye, EyeOff } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
 import heroBgMobile from "@/assets/hero-bg-mobile.jpg";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,8 +28,45 @@ const Index = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isPremiumUser, setIsPremiumUser] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(false);
   const navigate = useNavigate();
-  const { signIn, signUp } = useAuth();
+  const { user, loading: authLoading, isAdmin, signIn, signUp } = useAuth();
+
+  useEffect(() => {
+    let active = true;
+
+    const loadPremiumStatus = async () => {
+      if (!user) {
+        if (active) {
+          setIsPremiumUser(false);
+          setProfileLoading(false);
+        }
+        return;
+      }
+
+      setProfileLoading(true);
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("is_premium, premium_expires_at")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (!active) return;
+      const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
+      setIsPremiumUser(Boolean(profile?.is_premium && notExpired));
+      setProfileLoading(false);
+    };
+
+    void loadPremiumStatus();
+
+    return () => {
+      active = false;
+    };
+  }, [user]);
+
+  const showNameFields = isSignUp || email.trim().length > 0;
+  const showSubscribeActions = !authLoading && !profileLoading && !isAdmin && !isPremiumUser;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,7 +151,7 @@ const Index = () => {
               </CardHeader>
               <CardContent className="pt-4">
                 <form onSubmit={handleLogin} className="space-y-4">
-                  {isSignUp && (
+                  {showNameFields && (
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-2">
                         <label className="text-sm text-muted-foreground">First Name</label>
@@ -269,6 +307,9 @@ const Index = () => {
               🌈 <span className="rainbow-text">PREMIUM PLANS</span>
             </h2>
             <p className="text-muted-foreground mt-3 text-sm sm:text-base">Choose the ideal plan for you</p>
+            {!showSubscribeActions && !authLoading && !profileLoading && (
+              <p className="text-secondary mt-3 text-sm font-medium">Your account already has premium access.</p>
+            )}
           </motion.div>
 
           {/* Premium Benefits */}
@@ -305,12 +346,14 @@ const Index = () => {
                     <span className="text-muted-foreground text-sm">/month</span>
                   </div>
                   <p className="text-muted-foreground text-sm">Cancel anytime</p>
-                  <Button
-                    onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
-                    className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple"
-                  >
-                    SUBSCRIBE MONTHLY
-                  </Button>
+                  {showSubscribeActions && (
+                    <Button
+                      onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
+                      className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple"
+                    >
+                      SUBSCRIBE MONTHLY
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
@@ -331,12 +374,14 @@ const Index = () => {
                     <span className="text-muted-foreground text-sm">/year</span>
                   </div>
                   <p className="text-muted-foreground text-sm">That's ~€13.33/month</p>
-                  <Button
-                    onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
-                    className="w-full rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-blue"
-                  >
-                    SUBSCRIBE YEARLY
-                  </Button>
+                  {showSubscribeActions && (
+                    <Button
+                      onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
+                      className="w-full rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-blue"
+                    >
+                      SUBSCRIBE YEARLY
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
