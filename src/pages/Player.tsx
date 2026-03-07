@@ -30,7 +30,7 @@ interface Episode {
 const Player = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, loading: authLoading } = useAuth();
   const isMobile = useIsMobile();
   const [content, setContent] = useState<ContentItem | null>(null);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
@@ -44,18 +44,26 @@ const Player = () => {
     if (data) {
       setContent(data);
 
-      // Check premium access
-      if (data.is_premium && !isAdmin) {
-        if (!user) {
+      // Check premium access only after auth state is ready
+      if (data.is_premium) {
+        if (authLoading) {
+          setPremiumBlocked(true);
+        } else if (isAdmin) {
+          setPremiumBlocked(false);
+        } else if (!user) {
           setPremiumBlocked(true);
         } else {
-          const { data: profile } = await supabase
+          const { data: profile, error: profileError } = await supabase
             .from("profiles")
             .select("is_premium, premium_expires_at")
             .eq("user_id", user.id)
             .maybeSingle();
-          const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
-          setPremiumBlocked(!(profile?.is_premium && notExpired));
+          if (profileError) {
+            setPremiumBlocked(true);
+          } else {
+            const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
+            setPremiumBlocked(!(profile?.is_premium && notExpired));
+          }
         }
       } else {
         setPremiumBlocked(false);
@@ -80,7 +88,7 @@ const Player = () => {
 
   useEffect(() => {
     fetchContent();
-  }, [id]);
+  }, [id, user?.id, isAdmin, authLoading]);
 
   const rawPlayerUrl = currentEp?.player_url || content?.player_url;
 
