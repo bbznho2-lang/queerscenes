@@ -151,7 +151,7 @@ const Index = () => {
               </CardHeader>
               <CardContent className="pt-4">
                 <form onSubmit={handleLogin} className="space-y-4">
-                  {isSignUp && (
+                  {showNameFields && (
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-2">
                         <label className="text-sm text-muted-foreground">First Name</label>
