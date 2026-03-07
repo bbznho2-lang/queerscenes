@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Play, Lock, Sparkles, Diamond, Star, Zap, Heart, Film, Crown, ArrowRight, HelpCircle, Tv, Smartphone, Tablet, Eye, EyeOff } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
 import heroBgMobile from "@/assets/hero-bg-mobile.jpg";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,8 +28,45 @@ const Index = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isPremiumUser, setIsPremiumUser] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(false);
   const navigate = useNavigate();
-  const { signIn, signUp } = useAuth();
+  const { user, loading: authLoading, isAdmin, signIn, signUp } = useAuth();
+
+  useEffect(() => {
+    let active = true;
+
+    const loadPremiumStatus = async () => {
+      if (!user) {
+        if (active) {
+          setIsPremiumUser(false);
+          setProfileLoading(false);
+        }
+        return;
+      }
+
+      setProfileLoading(true);
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("is_premium, premium_expires_at")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (!active) return;
+      const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
+      setIsPremiumUser(Boolean(profile?.is_premium && notExpired));
+      setProfileLoading(false);
+    };
+
+    void loadPremiumStatus();
+
+    return () => {
+      active = false;
+    };
+  }, [user]);
+
+  const showNameFields = isSignUp || email.trim().length > 0;
+  const showSubscribeActions = !authLoading && !profileLoading && !isAdmin && !isPremiumUser;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
