@@ -209,6 +209,48 @@ const Admin = () => {
     );
   };
 
+  const grantPremiumByEmail = async () => {
+    const emailTrimmed = premiumEmail.trim().toLowerCase();
+    if (!emailTrimmed) {
+      toast.error("Please enter an email address");
+      return;
+    }
+    setAddingPremium(true);
+    try {
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("email", emailTrimmed)
+        .maybeSingle();
+
+      if (error) {
+        toast.error("Error searching for user");
+        return;
+      }
+
+      if (!profile) {
+        toast.error("No user found with this email. They need to create an account first.");
+        return;
+      }
+
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ is_premium: true, premium_plan: "lifetime", premium_expires_at: null })
+        .eq("id", profile.id);
+
+      if (updateError) {
+        toast.error("Error granting premium");
+        return;
+      }
+
+      toast.success(`Premium granted to ${emailTrimmed}!`);
+      setPremiumEmail("");
+      fetchData();
+    } finally {
+      setAddingPremium(false);
+    }
+  };
+
   const chartConfig = {
     clicks: {
       label: "Clicks",
