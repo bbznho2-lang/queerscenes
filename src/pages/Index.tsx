@@ -65,7 +65,7 @@ const Index = () => {
     };
   }, [user]);
 
-  const showNameFields = isSignUp || email.trim().length > 0;
+  const showNameFields = isSignUp;
   const showSubscribeActions = !authLoading && !profileLoading && !isAdmin && !isPremiumUser;
 
   const handleLogin = async (e: React.FormEvent) => {
