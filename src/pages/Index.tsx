@@ -307,6 +307,9 @@ const Index = () => {
               🌈 <span className="rainbow-text">PREMIUM PLANS</span>
             </h2>
             <p className="text-muted-foreground mt-3 text-sm sm:text-base">Choose the ideal plan for you</p>
+            {!showSubscribeActions && !authLoading && !profileLoading && (
+              <p className="text-secondary mt-3 text-sm font-medium">Your account already has premium access.</p>
+            )}
           </motion.div>
 
           {/* Premium Benefits */}
@@ -343,12 +346,14 @@ const Index = () => {
                     <span className="text-muted-foreground text-sm">/month</span>
                   </div>
                   <p className="text-muted-foreground text-sm">Cancel anytime</p>
-                  <Button
-                    onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
-                    className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple"
-                  >
-                    SUBSCRIBE MONTHLY
-                  </Button>
+                  {showSubscribeActions && (
+                    <Button
+                      onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
+                      className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple"
+                    >
+                      SUBSCRIBE MONTHLY
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
@@ -369,12 +374,14 @@ const Index = () => {
                     <span className="text-muted-foreground text-sm">/year</span>
                   </div>
                   <p className="text-muted-foreground text-sm">That's ~€13.33/month</p>
-                  <Button
-                    onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
-                    className="w-full rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-blue"
-                  >
-                    SUBSCRIBE YEARLY
-                  </Button>
+                  {showSubscribeActions && (
+                    <Button
+                      onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
+                      className="w-full rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-blue"
+                    >
+                      SUBSCRIBE YEARLY
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
