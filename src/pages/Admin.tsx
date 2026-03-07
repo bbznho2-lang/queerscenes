@@ -85,6 +85,8 @@ const Admin = () => {
   const [clickStats, setClickStats] = useState<ClickStat[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
+  const [premiumEmail, setPremiumEmail] = useState("");
+  const [addingPremium, setAddingPremium] = useState(false);
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
