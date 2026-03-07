@@ -233,7 +233,7 @@ const Browse = () => {
     { label: "Profile", icon: "👤", action: () => { setMenuOpen(false); setProfileOpen(true); } },
     { label: "Support", icon: "💬", action: () => { setMenuOpen(false); setSupportOpen(true); } },
     ...(isAdmin ? [{ label: "Admin Panel", icon: "⚙️", action: () => { setMenuOpen(false); navigate("/admin"); } }] : []),
-    { label: "Go Premium", icon: "💎", action: () => { setMenuOpen(false); navigate("/"); setTimeout(() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" }), 300); }, premium: true },
+    ...(!isAdmin && !userIsPremium ? [{ label: "Go Premium", icon: "💎", action: () => { setMenuOpen(false); navigate("/"); setTimeout(() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" }), 300); }, premium: true }] : []),
   ];
 
   return (
