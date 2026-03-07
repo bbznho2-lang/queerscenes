@@ -29,7 +29,7 @@ const Index = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isPremiumUser, setIsPremiumUser] = useState(false);
-  const [profileLoading, setProfileLoading] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(true);
   const navigate = useNavigate();
   const { user, loading: authLoading, isAdmin, signIn, signUp } = useAuth();
 
@@ -65,7 +65,7 @@ const Index = () => {
     };
   }, [user]);
 
-  const showNameFields = isSignUp || email.trim().length > 0;
+  const showNameFields = isSignUp;
   const showSubscribeActions = !authLoading && !profileLoading && !isAdmin && !isPremiumUser;
 
   const handleLogin = async (e: React.FormEvent) => {

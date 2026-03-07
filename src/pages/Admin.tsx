@@ -85,6 +85,8 @@ const Admin = () => {
   const [clickStats, setClickStats] = useState<ClickStat[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
+  const [premiumEmail, setPremiumEmail] = useState("");
+  const [addingPremium, setAddingPremium] = useState(false);
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
@@ -207,6 +209,48 @@ const Admin = () => {
     );
   };
 
+  const grantPremiumByEmail = async () => {
+    const emailTrimmed = premiumEmail.trim().toLowerCase();
+    if (!emailTrimmed) {
+      toast.error("Please enter an email address");
+      return;
+    }
+    setAddingPremium(true);
+    try {
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("email", emailTrimmed)
+        .maybeSingle();
+
+      if (error) {
+        toast.error("Error searching for user");
+        return;
+      }
+
+      if (!profile) {
+        toast.error("No user found with this email. They need to create an account first.");
+        return;
+      }
+
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ is_premium: true, premium_plan: "lifetime", premium_expires_at: null })
+        .eq("id", profile.id);
+
+      if (updateError) {
+        toast.error("Error granting premium");
+        return;
+      }
+
+      toast.success(`Premium granted to ${emailTrimmed}!`);
+      setPremiumEmail("");
+      fetchData();
+    } finally {
+      setAddingPremium(false);
+    }
+  };
+
   const chartConfig = {
     clicks: {
       label: "Clicks",
@@ -276,6 +320,38 @@ const Admin = () => {
                 No clicks recorded yet.
               </p>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Grant Premium by Email */}
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <Mail className="w-5 h-5 text-secondary" />
+              Grant Premium by Email
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-3 items-end">
+              <div className="flex-1 space-y-1.5">
+                <label className="text-xs text-muted-foreground">User email</label>
+                <Input
+                  type="email"
+                  placeholder="user@email.com"
+                  value={premiumEmail}
+                  onChange={(e) => setPremiumEmail(e.target.value)}
+                  className="bg-muted border-border"
+                />
+              </div>
+              <Button
+                onClick={grantPremiumByEmail}
+                disabled={addingPremium}
+                className="bg-secondary text-secondary-foreground hover:bg-secondary/90"
+              >
+                <Crown className="w-4 h-4 mr-1" />
+                {addingPremium ? "Granting..." : "Grant Premium"}
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
