@@ -220,7 +220,7 @@ const Admin = () => {
       const { data: profile, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("email", emailTrimmed)
+        .ilike("email", emailTrimmed)
         .maybeSingle();
 
       if (error) {
