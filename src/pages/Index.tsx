@@ -351,7 +351,7 @@ const Index = () => {
                       onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
                       className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple"
                     >
-                      SUBSCRIBE MONTHLY
+                      WATCH NOW
                     </Button>
                   )}
                 </CardContent>
