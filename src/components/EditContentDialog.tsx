@@ -135,7 +135,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         contentId = data.id;
       }
 
-      if (contentId && type === "serie") {
+      if (contentId && (type === "serie" || type === "novela" || type === "anime")) {
         for (const ep of episodes) {
           if (ep.id.startsWith("new-")) {
             await supabase.from("episodes").insert({
