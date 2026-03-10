@@ -131,7 +131,7 @@ const Index = () => {
               className="text-base sm:text-lg px-8 sm:px-10 py-5 sm:py-6 rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-blue gap-2"
             >
               <Play className="w-5 h-5" />
-              ACCESS QUEER SCENES
+              WATCH NOW
             </Button>
           </motion.div>
         </div>
