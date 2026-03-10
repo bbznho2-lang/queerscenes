@@ -197,7 +197,7 @@ const Player = () => {
           <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{(content as any).synopsis}</p>
         )}
 
-        {content?.type === "serie" && episodes.length > 0 && (
+        {(content?.type === "serie" || content?.type === "novela" || content?.type === "anime") && episodes.length > 0 && (
           <div className="mt-6 sm:mt-8 space-y-2">
             <h3 className="text-lg font-semibold mb-3">Episodes</h3>
             {episodes.map((ep) => (
