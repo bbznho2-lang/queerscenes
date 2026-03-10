@@ -379,7 +379,7 @@ const Index = () => {
                       onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
                       className="w-full rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-blue"
                     >
-                      SUBSCRIBE YEARLY
+                      WATCH NOW
                     </Button>
                   )}
                 </CardContent>
