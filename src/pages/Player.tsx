@@ -69,7 +69,7 @@ const Player = () => {
         setPremiumBlocked(false);
       }
 
-      if (data.type === "serie") {
+      if (data.type === "serie" || data.type === "novela" || data.type === "anime") {
         const { data: eps } = await supabase.from("episodes").select("*").eq("content_id", id).order("episode_number");
         const normalizedEpisodes = eps || [];
         setEpisodes(normalizedEpisodes);
