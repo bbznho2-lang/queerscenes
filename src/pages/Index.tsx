@@ -351,7 +351,7 @@ const Index = () => {
                       onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
                       className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple"
                     >
-                      SUBSCRIBE MONTHLY
+                      WATCH NOW
                     </Button>
                   )}
                 </CardContent>
@@ -379,7 +379,7 @@ const Index = () => {
                       onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
                       className="w-full rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-blue"
                     >
-                      SUBSCRIBE YEARLY
+                      WATCH NOW
                     </Button>
                   )}
                 </CardContent>
