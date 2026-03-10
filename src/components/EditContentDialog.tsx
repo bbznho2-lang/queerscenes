@@ -135,7 +135,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         contentId = data.id;
       }
 
-      if (contentId && type === "serie") {
+      if (contentId && (type === "serie" || type === "novela" || type === "anime")) {
         for (const ep of episodes) {
           if (ep.id.startsWith("new-")) {
             await supabase.from("episodes").insert({
@@ -282,7 +282,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
             )}
           </div>
 
-          {type === "serie" && (
+          {(type === "serie" || type === "novela" || type === "anime") && (
             <div className="space-y-3 border-t border-border pt-4">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-semibold text-foreground">Episodes</label>
