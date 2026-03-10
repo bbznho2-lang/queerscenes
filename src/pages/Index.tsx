@@ -372,14 +372,12 @@ const Index = () => {
                     <span className="text-muted-foreground text-sm">/year</span>
                   </div>
                   <p className="text-muted-foreground text-sm">That's ~€13.33/month</p>
-                  {showSubscribeActions && (
-                    <Button
-                      onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
-                      className="w-full rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-blue"
-                    >
-                      WATCH NOW
-                    </Button>
-                  )}
+                  <Button
+                    onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
+                    className="w-full rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-blue"
+                  >
+                    WATCH NOW
+                  </Button>
                 </CardContent>
               </Card>
             </motion.div>
