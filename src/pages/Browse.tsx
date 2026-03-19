@@ -507,6 +507,7 @@ const Browse = () => {
       <ProfileDialog open={profileOpen} onOpenChange={setProfileOpen} />
       <SupportDialog open={supportOpen} onOpenChange={setSupportOpen} />
       <EditContentDialog open={editOpen} onOpenChange={setEditOpen} content={editingContent} onSaved={fetchContents} defaults={newDefaults} />
+      <AddExistingContentDialog open={addExistingOpen} onOpenChange={setAddExistingOpen} targetSection="exclusivos" onSaved={fetchContents} />
     </div>
   );
 };
