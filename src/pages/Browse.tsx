@@ -132,6 +132,7 @@ const Browse = () => {
   const [contents, setContents] = useState<ContentItem[]>([]);
   const [watchlistIds, setWatchlistIds] = useState<Set<string>>(new Set());
   const [userIsPremium, setUserIsPremium] = useState(false);
+  const [addExistingOpen, setAddExistingOpen] = useState(false);
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
 
