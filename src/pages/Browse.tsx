@@ -7,6 +7,7 @@ import ProfileDialog from "@/components/ProfileDialog";
 import SupportDialog from "@/components/SupportDialog";
 import TitlesTicker from "@/components/TitlesTicker";
 import EditContentDialog from "@/components/EditContentDialog";
+import AddExistingContentDialog from "@/components/AddExistingContentDialog";
 import AutoScrollRow from "@/components/AutoScrollRow";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -131,6 +132,7 @@ const Browse = () => {
   const [contents, setContents] = useState<ContentItem[]>([]);
   const [watchlistIds, setWatchlistIds] = useState<Set<string>>(new Set());
   const [userIsPremium, setUserIsPremium] = useState(false);
+  const [addExistingOpen, setAddExistingOpen] = useState(false);
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -451,9 +453,14 @@ const Browse = () => {
                 <span className="rainbow-text">Queer Scenes Exclusives</span>
               </h2>
               {isAdmin && (
-                <button onClick={() => handleNew("exclusivos", "filme")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add exclusive">
-                  <Plus className="w-5 h-5 text-primary" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setAddExistingOpen(true)} className="h-9 px-3 rounded-full bg-secondary/10 hover:bg-secondary/20 flex items-center gap-1.5 transition-colors text-xs font-medium text-secondary" title="Adicionar título existente">
+                    <Search className="w-3.5 h-3.5" /> Existente
+                  </button>
+                  <button onClick={() => handleNew("exclusivos", "filme")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Criar novo exclusivo">
+                    <Plus className="w-5 h-5 text-primary" />
+                  </button>
+                </div>
               )}
             </div>
             {exclusivos.length > 0 ? (
@@ -500,6 +507,7 @@ const Browse = () => {
       <ProfileDialog open={profileOpen} onOpenChange={setProfileOpen} />
       <SupportDialog open={supportOpen} onOpenChange={setSupportOpen} />
       <EditContentDialog open={editOpen} onOpenChange={setEditOpen} content={editingContent} onSaved={fetchContents} defaults={newDefaults} />
+      <AddExistingContentDialog open={addExistingOpen} onOpenChange={setAddExistingOpen} targetSection="exclusivos" onSaved={fetchContents} />
     </div>
   );
 };
