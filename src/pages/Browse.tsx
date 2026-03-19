@@ -7,6 +7,7 @@ import ProfileDialog from "@/components/ProfileDialog";
 import SupportDialog from "@/components/SupportDialog";
 import TitlesTicker from "@/components/TitlesTicker";
 import EditContentDialog from "@/components/EditContentDialog";
+import AddExistingContentDialog from "@/components/AddExistingContentDialog";
 import AutoScrollRow from "@/components/AutoScrollRow";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
