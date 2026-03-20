@@ -174,6 +174,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         title: `Episode ${episodes.length + 1}`,
         episode_number: episodes.length + 1,
         player_url: "",
+        season: Math.max(1, ...episodes.map(e => e.season || 1)),
       },
     ]);
   };
