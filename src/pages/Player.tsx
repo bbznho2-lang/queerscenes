@@ -72,10 +72,11 @@ const Player = () => {
       }
 
       if (data.type === "serie" || data.type === "novela" || data.type === "anime") {
-        const { data: eps } = await supabase.from("episodes").select("*").eq("content_id", id).order("episode_number");
-        const normalizedEpisodes = eps || [];
+        const { data: eps } = await supabase.from("episodes").select("*").eq("content_id", id).order("season").order("episode_number");
+        const normalizedEpisodes = (eps || []).map(e => ({ ...e, season: e.season || 1 }));
         setEpisodes(normalizedEpisodes);
         if (normalizedEpisodes.length > 0) {
+          setSelectedSeason(normalizedEpisodes[0].season);
           const firstPlayable = normalizedEpisodes.find((ep) => Boolean(ep.player_url?.trim()));
           setCurrentEp(firstPlayable || normalizedEpisodes[0]);
         } else {
