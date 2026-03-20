@@ -25,6 +25,7 @@ interface Episode {
   title: string;
   episode_number: number;
   player_url: string | null;
+  season: number;
 }
 
 const Player = () => {
