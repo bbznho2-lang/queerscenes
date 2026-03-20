@@ -35,10 +35,17 @@ const Index = () => {
   const { user, loading: authLoading, isAdmin, signIn, signUp } = useAuth();
 
   useEffect(() => {
-    supabase.from("contents").select("id, title, banner_url, tag").limit(30).then(({ data }) => {
+    supabase.from("contents").select("id, title, banner_url, tag").limit(50).then(({ data }) => {
       if (data) {
-        // Shuffle to avoid repetitive order
-        const shuffled = [...data].sort(() => Math.random() - 0.5);
+        // Deduplicate by title, keeping only unique titles
+        const seen = new Set<string>();
+        const unique = data.filter(item => {
+          if (seen.has(item.title)) return false;
+          seen.add(item.title);
+          return true;
+        });
+        // Shuffle for variety
+        const shuffled = [...unique].sort(() => Math.random() - 0.5);
         setCatalogTitles(shuffled);
       }
     });
