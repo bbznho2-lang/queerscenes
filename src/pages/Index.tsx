@@ -35,8 +35,12 @@ const Index = () => {
   const { user, loading: authLoading, isAdmin, signIn, signUp } = useAuth();
 
   useEffect(() => {
-    supabase.from("contents").select("id, title, banner_url, tag").limit(20).then(({ data }) => {
-      if (data) setCatalogTitles(data);
+    supabase.from("contents").select("id, title, banner_url, tag").limit(30).then(({ data }) => {
+      if (data) {
+        // Shuffle to avoid repetitive order
+        const shuffled = [...data].sort(() => Math.random() - 0.5);
+        setCatalogTitles(shuffled);
+      }
     });
   }, []);
 
