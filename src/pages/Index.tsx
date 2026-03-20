@@ -134,11 +134,11 @@ const Index = () => {
             QUEER SCENES
           </motion.h1>
 
-          <motion.p className="text-base sm:text-xl text-muted-foreground max-w-xl mx-auto mb-3 font-light" initial="hidden" animate="visible" variants={fade} custom={2}>
+          <motion.p className="text-sm sm:text-xl text-muted-foreground max-w-xl mx-auto mb-3 font-light px-2 break-words" initial="hidden" animate="visible" variants={fade} custom={2}>
             The streaming platform made for the LGBTQIA+ community.
           </motion.p>
 
-          <motion.p className="text-sm sm:text-base text-muted-foreground/70 max-w-md mx-auto mb-8" initial="hidden" animate="visible" variants={fade} custom={3}>
+          <motion.p className="text-xs sm:text-base text-muted-foreground/70 max-w-md mx-auto mb-8 px-2 break-words" initial="hidden" animate="visible" variants={fade} custom={3}>
             Watch free content now — series, movies and exclusive moments with real representation. Sign up and start watching! 🌈
           </motion.p>
 
