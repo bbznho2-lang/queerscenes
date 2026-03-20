@@ -254,6 +254,33 @@ const Admin = () => {
     }
   };
 
+  const deleteUser = async (profile: Profile) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("delete-user", {
+        body: { user_id: profile.user_id },
+      });
+      if (error) {
+        toast.error("Error deleting user");
+        return;
+      }
+      if (data?.error) {
+        toast.error(data.error);
+        return;
+      }
+      toast.success(`User ${profile.email || "unknown"} deleted`);
+      setProfiles(profiles.filter((p) => p.id !== profile.id));
+      setExpandedUser(null);
+    } catch {
+      toast.error("Error deleting user");
+    }
+  };
+
+  const totalPages = Math.max(1, Math.ceil(profiles.length / USERS_PER_PAGE));
+  const paginatedProfiles = useMemo(() => {
+    const start = (currentPage - 1) * USERS_PER_PAGE;
+    return profiles.slice(start, start + USERS_PER_PAGE);
+  }, [profiles, currentPage]);
+
   const chartConfig = {
     clicks: {
       label: "Clicks",
