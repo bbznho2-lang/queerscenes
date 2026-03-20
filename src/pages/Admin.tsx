@@ -524,11 +524,60 @@ const Admin = () => {
                               </div>
                             </div>
                           </div>
+                          <div className="sm:hidden">
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="destructive" size="sm" className="w-full">
+                                  <Trash2 className="w-3.5 h-3.5 mr-1" /> Delete User
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete user?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This will permanently delete <strong>{p.email || "this user"}</strong> and all their data.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => deleteUser(p)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
                         </motion.div>
                       )}
                     </div>
                   );
                 })}
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between pt-4 border-t border-border mt-2">
+                    <span className="text-xs text-muted-foreground">
+                      Page {currentPage} of {totalPages} ({profiles.length} users)
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={currentPage <= 1}
+                        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={currentPage >= totalPages}
+                        onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <p className="text-muted-foreground text-center py-8 text-sm">
