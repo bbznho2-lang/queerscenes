@@ -87,8 +87,22 @@ const Index = () => {
   const showNameFields = isSignUp;
   const showSubscribeActions = !authLoading && !profileLoading && !isAdmin && !isPremiumUser;
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) { toast.error("Please enter your email."); return; }
+    setLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setLoading(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Password reset link sent! Check your email.");
+    setIsForgot(false);
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isForgot) { await handleForgotPassword(e); return; }
     setLoading(true);
     try {
       if (isSignUp) {
