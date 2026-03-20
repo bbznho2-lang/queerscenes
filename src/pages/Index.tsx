@@ -373,7 +373,7 @@ const Index = () => {
                   </div>
                   <p className="text-muted-foreground text-sm">That's ~€13.33/month</p>
                   <Button
-                    onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
+                    onClick={() => window.open("https://t.me/L7kznr?text=Hi%20I%20came%20from%20your%20website%20and%20I%27m%20interested%20in%20the%20160%20EUR%20annual%20plan%20can%20you%20give%20me%20more%20details", "_blank")}
                     className="w-full rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-blue"
                   >
                     WATCH NOW
