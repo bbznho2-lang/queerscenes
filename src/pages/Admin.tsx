@@ -408,7 +408,7 @@ const Admin = () => {
                   return (
                     <div key={p.id} className="border-b border-border/50 last:border-0">
                       <div
-                        className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_120px_80px_80px] gap-3 sm:gap-4 items-center px-3 py-3 rounded-lg hover:bg-muted/30 transition-colors cursor-pointer"
+                        className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_120px_80px_80px_50px] gap-3 sm:gap-4 items-center px-3 py-3 rounded-lg hover:bg-muted/30 transition-colors cursor-pointer"
                         onClick={() => setExpandedUser(isExpanded ? null : p.id)}
                       >
                         <div className="min-w-0">
