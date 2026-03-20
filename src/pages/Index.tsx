@@ -30,8 +30,15 @@ const Index = () => {
   const [loading, setLoading] = useState(false);
   const [isPremiumUser, setIsPremiumUser] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
+  const [catalogTitles, setCatalogTitles] = useState<Array<{ id: string; title: string; banner_url: string | null; tag: string }>>([]);
   const navigate = useNavigate();
   const { user, loading: authLoading, isAdmin, signIn, signUp } = useAuth();
+
+  useEffect(() => {
+    supabase.from("contents").select("id, title, banner_url, tag").limit(20).then(({ data }) => {
+      if (data) setCatalogTitles(data);
+    });
+  }, []);
 
   useEffect(() => {
     let active = true;
