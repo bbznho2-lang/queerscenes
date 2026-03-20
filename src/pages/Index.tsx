@@ -30,8 +30,15 @@ const Index = () => {
   const [loading, setLoading] = useState(false);
   const [isPremiumUser, setIsPremiumUser] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
+  const [catalogTitles, setCatalogTitles] = useState<Array<{ id: string; title: string; banner_url: string | null; tag: string }>>([]);
   const navigate = useNavigate();
   const { user, loading: authLoading, isAdmin, signIn, signUp } = useAuth();
+
+  useEffect(() => {
+    supabase.from("contents").select("id, title, banner_url, tag").limit(20).then(({ data }) => {
+      if (data) setCatalogTitles(data);
+    });
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -134,6 +141,31 @@ const Index = () => {
               ACCESS QUEER SCENES
             </Button>
           </motion.div>
+
+          {catalogTitles.length > 0 && (
+            <motion.div initial="hidden" animate="visible" variants={fade} custom={5} className="mt-12 w-full overflow-hidden">
+              <p className="text-xs text-muted-foreground/60 uppercase tracking-widest mb-4">Available Now</p>
+              <div className="relative">
+                <div className="flex gap-3 animate-scroll-left">
+                  {[...catalogTitles, ...catalogTitles].map((item, i) => (
+                    <div key={`${item.id}-${i}`} className="flex-shrink-0 w-32 sm:w-40 group cursor-pointer">
+                      <div className="aspect-[2/3] rounded-lg overflow-hidden border border-border/30 bg-muted relative">
+                        {item.banner_url ? (
+                          <img src={item.banner_url} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-muted">
+                            <Film className="w-8 h-8 text-muted-foreground/40" />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1.5 truncate text-center">{item.title}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
         </div>
       </section>
 
