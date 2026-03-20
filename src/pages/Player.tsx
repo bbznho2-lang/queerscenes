@@ -223,6 +223,7 @@ const Player = () => {
                   ))}
                 </div>
               )}
+              <p className="text-sm font-semibold text-primary">Season {selectedSeason}</p>
               <div className="space-y-2">
                 {filteredEps.map((ep) => (
                   <button
