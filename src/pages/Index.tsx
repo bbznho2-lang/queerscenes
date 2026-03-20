@@ -159,7 +159,7 @@ const Index = () => {
               <div className="relative">
                 <div className="flex gap-2 sm:gap-3 animate-scroll-left" style={{ width: 'max-content' }}>
                   {catalogTitles.map((item, i) => (
-                    <div key={`${item.id}-${i}`} className="flex-shrink-0 w-24 sm:w-36 group cursor-pointer">
+                    <div key={`${item.id}-${i}`} className="flex-shrink-0 w-24 sm:w-44 md:w-52 group cursor-pointer">
                       <div className="aspect-[2/3] rounded-md sm:rounded-lg overflow-hidden border border-border/30 bg-muted relative">
                         {item.banner_url ? (
                           <img src={item.banner_url} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
