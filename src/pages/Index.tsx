@@ -121,7 +121,7 @@ const Index = () => {
           </motion.p>
 
           <motion.p className="text-sm sm:text-base text-muted-foreground/70 max-w-md mx-auto mb-8" initial="hidden" animate="visible" variants={fade} custom={3}>
-            Relive the most iconic, emotional, and unforgettable moments from cinema and TV with real representation. 🌈
+            Watch free content now — series, movies and exclusive moments with real representation. Sign up and start watching! 🌈
           </motion.p>
 
           <motion.div initial="hidden" animate="visible" variants={fade} custom={4}>
