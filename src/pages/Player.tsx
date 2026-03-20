@@ -25,6 +25,7 @@ interface Episode {
   title: string;
   episode_number: number;
   player_url: string | null;
+  season: number;
 }
 
 const Player = () => {
@@ -35,6 +36,7 @@ const Player = () => {
   const [content, setContent] = useState<ContentItem | null>(null);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [currentEp, setCurrentEp] = useState<Episode | null>(null);
+  const [selectedSeason, setSelectedSeason] = useState(1);
   const [editOpen, setEditOpen] = useState(false);
   const [premiumBlocked, setPremiumBlocked] = useState(false);
 
@@ -70,10 +72,11 @@ const Player = () => {
       }
 
       if (data.type === "serie" || data.type === "novela" || data.type === "anime") {
-        const { data: eps } = await supabase.from("episodes").select("*").eq("content_id", id).order("episode_number");
-        const normalizedEpisodes = eps || [];
+        const { data: eps } = await supabase.from("episodes").select("*").eq("content_id", id).order("season").order("episode_number");
+        const normalizedEpisodes = (eps || []).map(e => ({ ...e, season: e.season || 1 }));
         setEpisodes(normalizedEpisodes);
         if (normalizedEpisodes.length > 0) {
+          setSelectedSeason(normalizedEpisodes[0].season);
           const firstPlayable = normalizedEpisodes.find((ep) => Boolean(ep.player_url?.trim()));
           setCurrentEp(firstPlayable || normalizedEpisodes[0]);
         } else {
@@ -197,24 +200,47 @@ const Player = () => {
           <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{(content as any).synopsis}</p>
         )}
 
-        {(content?.type === "serie" || content?.type === "novela" || content?.type === "anime") && episodes.length > 0 && (
-          <div className="mt-6 sm:mt-8 space-y-2">
-            <h3 className="text-lg font-semibold mb-3">Episodes</h3>
-            {episodes.map((ep) => (
-              <button
-                key={ep.id}
-                onClick={() => setCurrentEp(ep)}
-                className={`w-full text-left rounded-xl flex items-center transition-colors ${isMobile ? "px-3 py-2.5 gap-2.5" : "px-4 py-3 gap-3"} ${
-                  currentEp?.id === ep.id ? "bg-primary/10 border border-primary/30" : "bg-card border border-border hover:border-primary/20"
-                }`}
-              >
-                <span className={isMobile ? "w-7 h-7 rounded-full bg-muted flex items-center justify-center text-[11px] font-bold text-foreground" : "w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-foreground"}>{ep.episode_number}</span>
-                <span className={isMobile ? "text-xs text-foreground" : "text-sm text-foreground"}>{ep.title}</span>
-                {currentEp?.id === ep.id && <Play className={isMobile ? "w-3 h-3 text-primary ml-auto" : "w-3 h-3 text-primary ml-auto"} />}
-              </button>
-            ))}
-          </div>
-        )}
+        {(content?.type === "serie" || content?.type === "novela" || content?.type === "anime") && episodes.length > 0 && (() => {
+          const seasons = [...new Set(episodes.map(e => e.season))].sort((a, b) => a - b);
+          const filteredEps = episodes.filter(e => e.season === selectedSeason);
+          return (
+            <div className="mt-6 sm:mt-8 space-y-3">
+              <h3 className="text-lg font-semibold">Episodes</h3>
+              {seasons.length > 1 && (
+                <div className="flex gap-2 flex-wrap">
+                  {seasons.map(s => (
+                    <button
+                      key={s}
+                      onClick={() => setSelectedSeason(s)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                        selectedSeason === s
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground hover:bg-muted/80"
+                      }`}
+                    >
+                      Season {s}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <div className="space-y-2">
+                {filteredEps.map((ep) => (
+                  <button
+                    key={ep.id}
+                    onClick={() => setCurrentEp(ep)}
+                    className={`w-full text-left rounded-xl flex items-center transition-colors ${isMobile ? "px-3 py-2.5 gap-2.5" : "px-4 py-3 gap-3"} ${
+                      currentEp?.id === ep.id ? "bg-primary/10 border border-primary/30" : "bg-card border border-border hover:border-primary/20"
+                    }`}
+                  >
+                    <span className={isMobile ? "w-7 h-7 rounded-full bg-muted flex items-center justify-center text-[11px] font-bold text-foreground" : "w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-foreground"}>{ep.episode_number}</span>
+                    <span className={isMobile ? "text-xs text-foreground" : "text-sm text-foreground"}>{ep.title}</span>
+                    {currentEp?.id === ep.id && <Play className={isMobile ? "w-3 h-3 text-primary ml-auto" : "w-3 h-3 text-primary ml-auto"} />}
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       {content && <EditContentDialog open={editOpen} onOpenChange={setEditOpen} content={content} onSaved={fetchContent} />}

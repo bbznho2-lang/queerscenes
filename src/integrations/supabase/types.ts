@@ -98,6 +98,7 @@ export type Database = {
           episode_number: number
           id: string
           player_url: string | null
+          season: number
           title: string
         }
         Insert: {
@@ -106,6 +107,7 @@ export type Database = {
           episode_number?: number
           id?: string
           player_url?: string | null
+          season?: number
           title?: string
         }
         Update: {
@@ -114,6 +116,7 @@ export type Database = {
           episode_number?: number
           id?: string
           player_url?: string | null
+          season?: number
           title?: string
         }
         Relationships: [

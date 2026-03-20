@@ -1,0 +1,1 @@
+ALTER TABLE public.episodes ADD COLUMN season integer NOT NULL DEFAULT 1;

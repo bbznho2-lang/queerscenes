@@ -27,6 +27,7 @@ interface Episode {
   title: string;
   episode_number: number;
   player_url: string | null;
+  season: number;
 }
 
 interface Props {
@@ -143,12 +144,14 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
               title: ep.title,
               episode_number: ep.episode_number,
               player_url: ep.player_url,
+              season: ep.season || 1,
             });
           } else {
             await supabase.from("episodes").update({
               title: ep.title,
               episode_number: ep.episode_number,
               player_url: ep.player_url,
+              season: ep.season || 1,
             }).eq("id", ep.id);
           }
         }
@@ -173,6 +176,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         title: `Episode ${episodes.length + 1}`,
         episode_number: episodes.length + 1,
         player_url: "",
+        season: Math.max(1, ...episodes.map(e => e.season || 1)),
       },
     ]);
   };
@@ -290,34 +294,50 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                   <Plus className="w-3 h-3" /> Add
                 </Button>
               </div>
-              {episodes.map((ep) => (
-                <div key={ep.id} className="bg-muted/50 rounded-lg p-3 space-y-2">
-                  <div className="flex gap-2">
-                    <Input
-                      value={ep.episode_number}
-                      onChange={(e) => updateEpisode(ep.id, "episode_number", +e.target.value)}
-                      type="number"
-                      className="w-16 bg-muted border-border"
-                      placeholder="No."
-                    />
-                    <Input
-                      value={ep.title}
-                      onChange={(e) => updateEpisode(ep.id, "title", e.target.value)}
-                      className="bg-muted border-border flex-1"
-                      placeholder="Episode name"
-                    />
-                    <Button size="icon" variant="ghost" onClick={() => removeEpisode(ep)} className="text-destructive">
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+              {(() => {
+                const seasons = [...new Set(episodes.map(e => e.season || 1))].sort((a, b) => a - b);
+                return seasons.map(s => (
+                  <div key={s} className="space-y-2">
+                    <p className="text-xs font-semibold text-primary">Season {s}</p>
+                    {episodes.filter(e => (e.season || 1) === s).map((ep) => (
+                      <div key={ep.id} className="bg-muted/50 rounded-lg p-3 space-y-2">
+                        <div className="flex gap-2">
+                          <Input
+                            value={ep.season || 1}
+                            onChange={(e) => updateEpisode(ep.id, "season", +e.target.value || 1)}
+                            type="number"
+                            className="w-14 bg-muted border-border"
+                            placeholder="S"
+                            title="Season"
+                          />
+                          <Input
+                            value={ep.episode_number}
+                            onChange={(e) => updateEpisode(ep.id, "episode_number", +e.target.value)}
+                            type="number"
+                            className="w-14 bg-muted border-border"
+                            placeholder="Ep"
+                          />
+                          <Input
+                            value={ep.title}
+                            onChange={(e) => updateEpisode(ep.id, "title", e.target.value)}
+                            className="bg-muted border-border flex-1"
+                            placeholder="Episode name"
+                          />
+                          <Button size="icon" variant="ghost" onClick={() => removeEpisode(ep)} className="text-destructive">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        <Input
+                          value={ep.player_url || ""}
+                          onChange={(e) => updateEpisode(ep.id, "player_url", e.target.value)}
+                          placeholder="Player URL (embed)"
+                          className="bg-muted border-border text-xs"
+                        />
+                      </div>
+                    ))}
                   </div>
-                  <Input
-                    value={ep.player_url || ""}
-                    onChange={(e) => updateEpisode(ep.id, "player_url", e.target.value)}
-                    placeholder="Player URL (embed)"
-                    className="bg-muted border-border text-xs"
-                  />
-                </div>
-              ))}
+                ));
+              })()}
             </div>
           )}
 
