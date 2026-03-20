@@ -27,6 +27,7 @@ const Index = () => {
   const [lastName, setLastName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isForgot, setIsForgot] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isPremiumUser, setIsPremiumUser] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
