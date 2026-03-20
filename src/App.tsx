@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import ResetPassword from "./pages/ResetPassword";
 import Browse from "./pages/Browse";
 import Player from "./pages/Player";
 import Admin from "./pages/Admin";
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/browse" element={<Browse />} />
           <Route path="/player/:id" element={<Player />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
