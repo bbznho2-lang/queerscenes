@@ -395,13 +395,14 @@ const Admin = () => {
           <CardContent>
             {profiles.length > 0 ? (
               <div className="space-y-1">
-                <div className="hidden sm:grid grid-cols-[1fr_120px_80px_80px] gap-4 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
+                <div className="hidden sm:grid grid-cols-[1fr_120px_80px_80px_50px] gap-4 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
                   <span>User</span>
                   <span>Plan</span>
                   <span>Premium</span>
                   <span>Date</span>
+                  <span></span>
                 </div>
-                {profiles.map((p) => {
+                {paginatedProfiles.map((p) => {
                   const expired = isExpired(p.premium_expires_at);
                   const isExpanded = expandedUser === p.id;
                   return (
