@@ -88,6 +88,8 @@ const Admin = () => {
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
   const [premiumEmail, setPremiumEmail] = useState("");
   const [addingPremium, setAddingPremium] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const USERS_PER_PAGE = 20;
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
