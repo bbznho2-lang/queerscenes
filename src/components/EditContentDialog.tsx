@@ -144,12 +144,14 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
               title: ep.title,
               episode_number: ep.episode_number,
               player_url: ep.player_url,
+              season: ep.season || 1,
             });
           } else {
             await supabase.from("episodes").update({
               title: ep.title,
               episode_number: ep.episode_number,
               player_url: ep.player_url,
+              season: ep.season || 1,
             }).eq("id", ep.id);
           }
         }
