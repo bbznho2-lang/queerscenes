@@ -36,6 +36,7 @@ const Player = () => {
   const [content, setContent] = useState<ContentItem | null>(null);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [currentEp, setCurrentEp] = useState<Episode | null>(null);
+  const [selectedSeason, setSelectedSeason] = useState(1);
   const [editOpen, setEditOpen] = useState(false);
   const [premiumBlocked, setPremiumBlocked] = useState(false);
 
