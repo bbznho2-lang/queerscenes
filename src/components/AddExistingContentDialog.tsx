@@ -38,12 +38,20 @@ const AddExistingContentDialog = ({ open, onOpenChange, targetSection, onSaved }
   }, [open]);
 
   const fetchContent = async () => {
+    // Get titles already in target section to exclude duplicates by title
+    const { data: existing } = await supabase
+      .from("contents")
+      .select("title")
+      .eq("section", targetSection);
+    const existingTitles = new Set((existing || []).map((e) => e.title.toLowerCase()));
+
     const { data } = await supabase
       .from("contents")
       .select("id, title, year, tag, type, banner_url, section")
       .neq("section", targetSection)
       .order("title");
-    setAllContent(data || []);
+    // Filter out titles that already exist in target section
+    setAllContent((data || []).filter((c) => !existingTitles.has(c.title.toLowerCase())));
   };
 
   const filtered = search.trim()
@@ -63,11 +71,17 @@ const AddExistingContentDialog = ({ open, onOpenChange, targetSection, onSaved }
     if (selected.size === 0) return;
     setSaving(true);
     try {
-      for (const id of selected) {
+      // Get full data of selected items to duplicate them
+      const { data: items, error: fetchErr } = await supabase
+        .from("contents")
+        .select("title, year, tag, type, banner_url, player_url, is_premium, synopsis, position")
+        .in("id", Array.from(selected));
+      if (fetchErr) throw fetchErr;
+
+      for (const item of items || []) {
         const { error } = await supabase
           .from("contents")
-          .update({ section: targetSection })
-          .eq("id", id);
+          .insert({ ...item, section: targetSection });
         if (error) throw error;
       }
       toast.success(`${selected.size} título(s) adicionado(s) aos Exclusivos!`);
