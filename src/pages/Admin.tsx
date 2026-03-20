@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Users, BarChart3, Crown, Mail, Eye, Calendar, CreditCard } from "lucide-react";
+import { ArrowLeft, Users, BarChart3, Crown, Mail, Eye, Calendar, CreditCard, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import {
   ChartContainer,
   ChartTooltip,
@@ -87,6 +88,8 @@ const Admin = () => {
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
   const [premiumEmail, setPremiumEmail] = useState("");
   const [addingPremium, setAddingPremium] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const USERS_PER_PAGE = 20;
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
@@ -251,6 +254,33 @@ const Admin = () => {
     }
   };
 
+  const deleteUser = async (profile: Profile) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("delete-user", {
+        body: { user_id: profile.user_id },
+      });
+      if (error) {
+        toast.error("Error deleting user");
+        return;
+      }
+      if (data?.error) {
+        toast.error(data.error);
+        return;
+      }
+      toast.success(`User ${profile.email || "unknown"} deleted`);
+      setProfiles(profiles.filter((p) => p.id !== profile.id));
+      setExpandedUser(null);
+    } catch {
+      toast.error("Error deleting user");
+    }
+  };
+
+  const totalPages = Math.max(1, Math.ceil(profiles.length / USERS_PER_PAGE));
+  const paginatedProfiles = useMemo(() => {
+    const start = (currentPage - 1) * USERS_PER_PAGE;
+    return profiles.slice(start, start + USERS_PER_PAGE);
+  }, [profiles, currentPage]);
+
   const chartConfig = {
     clicks: {
       label: "Clicks",
@@ -365,19 +395,20 @@ const Admin = () => {
           <CardContent>
             {profiles.length > 0 ? (
               <div className="space-y-1">
-                <div className="hidden sm:grid grid-cols-[1fr_120px_80px_80px] gap-4 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
+                <div className="hidden sm:grid grid-cols-[1fr_120px_80px_80px_50px] gap-4 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
                   <span>User</span>
                   <span>Plan</span>
                   <span>Premium</span>
                   <span>Date</span>
+                  <span></span>
                 </div>
-                {profiles.map((p) => {
+                {paginatedProfiles.map((p) => {
                   const expired = isExpired(p.premium_expires_at);
                   const isExpanded = expandedUser === p.id;
                   return (
                     <div key={p.id} className="border-b border-border/50 last:border-0">
                       <div
-                        className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_120px_80px_80px] gap-3 sm:gap-4 items-center px-3 py-3 rounded-lg hover:bg-muted/30 transition-colors cursor-pointer"
+                        className="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_120px_80px_80px_50px] gap-3 sm:gap-4 items-center px-3 py-3 rounded-lg hover:bg-muted/30 transition-colors cursor-pointer"
                         onClick={() => setExpandedUser(isExpanded ? null : p.id)}
                       >
                         <div className="min-w-0">
@@ -407,6 +438,32 @@ const Admin = () => {
                         <span className="text-xs text-muted-foreground hidden sm:block">
                           {new Date(p.created_at).toLocaleDateString("en-US")}
                         </span>
+                        <div className="hidden sm:flex justify-center">
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <button
+                                onClick={(e) => e.stopPropagation()}
+                                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete user?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This will permanently delete <strong>{p.email || "this user"}</strong> and all their data. This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => deleteUser(p)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
                         <div className="sm:hidden flex items-center gap-2">
                           <Switch
                             checked={p.is_premium}
@@ -467,11 +524,60 @@ const Admin = () => {
                               </div>
                             </div>
                           </div>
+                          <div className="sm:hidden">
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="destructive" size="sm" className="w-full">
+                                  <Trash2 className="w-3.5 h-3.5 mr-1" /> Delete User
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete user?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This will permanently delete <strong>{p.email || "this user"}</strong> and all their data.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => deleteUser(p)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
                         </motion.div>
                       )}
                     </div>
                   );
                 })}
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between pt-4 border-t border-border mt-2">
+                    <span className="text-xs text-muted-foreground">
+                      Page {currentPage} of {totalPages} ({profiles.length} users)
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={currentPage <= 1}
+                        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={currentPage >= totalPages}
+                        onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <p className="text-muted-foreground text-center py-8 text-sm">
