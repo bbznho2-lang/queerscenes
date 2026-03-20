@@ -204,12 +204,12 @@ const Index = () => {
                 <div className="mx-auto w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mb-3">
                   <Lock className="w-5 h-5 text-accent" />
                 </div>
-                <CardTitle className="text-xl sm:text-2xl neon-text-pink">LOGIN</CardTitle>
-                <p className="text-muted-foreground text-sm mt-1">Sign in to continue</p>
+                <CardTitle className="text-xl sm:text-2xl neon-text-pink">{isForgot ? "RESET PASSWORD" : "LOGIN"}</CardTitle>
+                <p className="text-muted-foreground text-sm mt-1">{isForgot ? "Enter your email to receive a reset link" : "Sign in to continue"}</p>
               </CardHeader>
               <CardContent className="pt-4">
                 <form onSubmit={handleLogin} className="space-y-4">
-                  {showNameFields && (
+                  {showNameFields && !isForgot && (
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-2">
                         <label className="text-sm text-muted-foreground">First Name</label>
@@ -246,34 +246,48 @@ const Index = () => {
                       required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm text-muted-foreground">Password</label>
-                    <div className="relative">
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="bg-muted border-border focus:border-primary pr-10"
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
+                  {!isForgot && (
+                    <div className="space-y-2">
+                      <label className="text-sm text-muted-foreground">Password</label>
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="bg-muted border-border focus:border-primary pr-10"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
                    <Button type="submit" disabled={loading} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full glow-purple">
-                     {loading ? "Signing in..." : isSignUp ? "CREATE ACCOUNT" : "SIGN IN"}
+                     {loading ? "Please wait..." : isForgot ? "SEND RESET LINK" : isSignUp ? "CREATE ACCOUNT" : "SIGN IN"}
                    </Button>
+                   {!isSignUp && !isForgot && (
+                     <p className="text-center">
+                       <button type="button" onClick={() => setIsForgot(true)} className="text-xs text-muted-foreground hover:text-secondary hover:underline">
+                         Forgot your password?
+                       </button>
+                     </p>
+                   )}
                    <p className="text-center text-sm text-muted-foreground">
-                     {isSignUp ? "Already have an account? " : "Don't have an account? "}
-                     <button type="button" onClick={() => setIsSignUp(!isSignUp)} className="text-secondary hover:underline font-medium">
-                       {isSignUp ? "Sign in" : "Create account"}
-                     </button>
+                     {isForgot ? (
+                       <button type="button" onClick={() => setIsForgot(false)} className="text-secondary hover:underline font-medium">
+                         Back to Sign in
+                       </button>
+                     ) : isSignUp ? (
+                       <>Already have an account? <button type="button" onClick={() => setIsSignUp(false)} className="text-secondary hover:underline font-medium">Sign in</button></>
+                     ) : (
+                       <>Don't have an account? <button type="button" onClick={() => setIsSignUp(true)} className="text-secondary hover:underline font-medium">Create account</button></>
+                     )}
                    </p>
                 </form>
               </CardContent>
