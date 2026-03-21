@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useAuth } from "@/hooks/useAuth";
+import { getResetPasswordRedirectUrl } from "@/lib/auth-urls";
 import { toast } from "sonner";
 
 const fade = {
@@ -92,7 +93,7 @@ const Index = () => {
     if (!email) { toast.error("Please enter your email."); return; }
     setLoading(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: getResetPasswordRedirectUrl(),
     });
     setLoading(false);
     if (error) { toast.error(error.message); return; }

@@ -65,20 +65,37 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Delete from auth (cascades to profiles via FK)
+    const cleanupTargets = [
+      adminClient.from("content_clicks").delete().eq("user_id", user_id),
+      adminClient.from("watchlist").delete().eq("user_id", user_id),
+      adminClient.from("user_roles").delete().eq("user_id", user_id),
+      adminClient.from("profiles").delete().eq("user_id", user_id),
+    ];
+
+    const cleanupResults = await Promise.all(cleanupTargets);
+    const cleanupError = cleanupResults.find((result) => result.error)?.error;
+
+    if (cleanupError) {
+      return new Response(JSON.stringify({ error: cleanupError.message }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { error } = await adminClient.auth.admin.deleteUser(user_id);
-    if (error) {
+    if (error && !error.message.toLowerCase().includes("not found")) {
       return new Response(JSON.stringify({ error: error.message }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    return new Response(JSON.stringify({ success: true }), {
+    return new Response(JSON.stringify({ success: true, can_sign_up_again: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
