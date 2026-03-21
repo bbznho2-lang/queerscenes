@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
+import { getEmailRedirectUrl } from '@/lib/auth-urls';
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -63,7 +64,7 @@ export const useAuth = () => {
     const { error, data } = await supabase.auth.signUp({
       email,
       password,
-      options: { emailRedirectTo: window.location.origin }
+      options: { emailRedirectTo: getEmailRedirectUrl() }
     });
     if (!error && data.user) {
       // Update profile with name

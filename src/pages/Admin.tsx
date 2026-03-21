@@ -89,6 +89,7 @@ const Admin = () => {
   const [premiumEmail, setPremiumEmail] = useState("");
   const [addingPremium, setAddingPremium] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const USERS_PER_PAGE = 20;
 
   useEffect(() => {
@@ -255,12 +256,13 @@ const Admin = () => {
   };
 
   const deleteUser = async (profile: Profile) => {
+    setDeletingUserId(profile.user_id);
     try {
       const { data, error } = await supabase.functions.invoke("delete-user", {
         body: { user_id: profile.user_id },
       });
       if (error) {
-        toast.error("Error deleting user");
+        toast.error(error.message || "Error deleting user");
         return;
       }
       if (data?.error) {
@@ -268,10 +270,13 @@ const Admin = () => {
         return;
       }
       toast.success(`User ${profile.email || "unknown"} deleted`);
-      setProfiles(profiles.filter((p) => p.id !== profile.id));
+      setProfiles((current) => current.filter((p) => p.user_id !== profile.user_id));
       setExpandedUser(null);
-    } catch {
-      toast.error("Error deleting user");
+      setCurrentPage((page) => Math.max(1, Math.min(page, Math.ceil((profiles.length - 1) / USERS_PER_PAGE) || 1)));
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Error deleting user");
+    } finally {
+      setDeletingUserId(null);
     }
   };
 
@@ -457,8 +462,12 @@ const Admin = () => {
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => deleteUser(p)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                  Delete
+                                <AlertDialogAction
+                                  onClick={() => deleteUser(p)}
+                                  disabled={deletingUserId === p.user_id}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                  {deletingUserId === p.user_id ? "Deleting..." : "Delete"}
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
@@ -540,8 +549,12 @@ const Admin = () => {
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
                                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => deleteUser(p)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                    Delete
+                                   <AlertDialogAction
+                                     onClick={() => deleteUser(p)}
+                                     disabled={deletingUserId === p.user_id}
+                                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                   >
+                                     {deletingUserId === p.user_id ? "Deleting..." : "Delete"}
                                   </AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>
