@@ -143,7 +143,7 @@ const Index = () => {
           </motion.div>
 
           <motion.h1
-            className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight mb-5 neon-text-purple"
+            className="text-3xl sm:text-6xl md:text-7xl font-bold tracking-tight mb-5 neon-text-purple"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             initial="hidden" animate="visible" variants={fade} custom={1}
           >
