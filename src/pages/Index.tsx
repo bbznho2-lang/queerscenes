@@ -143,18 +143,18 @@ const Index = () => {
           </motion.div>
 
           <motion.h1
-            className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight mb-5 neon-text-purple"
+            className="text-3xl sm:text-6xl md:text-7xl font-bold tracking-tight mb-5 neon-text-purple"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             initial="hidden" animate="visible" variants={fade} custom={1}
           >
             QUEER SCENES
           </motion.h1>
 
-          <motion.p className="text-sm sm:text-xl text-muted-foreground max-w-xl mx-auto mb-3 font-light px-2 break-words" initial="hidden" animate="visible" variants={fade} custom={2}>
+          <motion.p className="text-xs sm:text-xl text-muted-foreground max-w-xl mx-auto mb-3 font-light px-4 break-words" initial="hidden" animate="visible" variants={fade} custom={2}>
             The streaming platform made for the LGBTQIA+ community.
           </motion.p>
 
-          <motion.p className="text-xs sm:text-base text-muted-foreground/70 max-w-md mx-auto mb-8 px-2 break-words" initial="hidden" animate="visible" variants={fade} custom={3}>
+          <motion.p className="text-[11px] sm:text-base text-muted-foreground/70 max-w-md mx-auto mb-8 px-6 break-words" initial="hidden" animate="visible" variants={fade} custom={3}>
             Watch free content now — series, movies and exclusive moments with real representation. Sign up and start watching! 🌈
           </motion.p>
 
@@ -301,8 +301,8 @@ const Index = () => {
       <section className="py-16 sm:py-24 px-4">
         <div className="max-w-4xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
-            <h2 className="text-3xl sm:text-5xl font-bold">
-              <Film className="inline w-8 sm:w-10 h-8 sm:h-10 mr-2 text-primary" />
+            <h2 className="text-2xl sm:text-5xl font-bold">
+              <Film className="inline w-7 sm:w-10 h-7 sm:h-10 mr-2 text-primary" />
               ABOUT <span className="neon-text-purple">QUEER SCENES</span>
             </h2>
           </motion.div>
@@ -338,8 +338,8 @@ const Index = () => {
         <div className="absolute inset-0 bg-muted/20" />
         <div className="relative max-w-4xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
-            <h2 className="text-3xl sm:text-5xl font-bold">
-              <Diamond className="inline w-8 sm:w-10 h-8 sm:h-10 mr-2 text-secondary" />
+            <h2 className="text-2xl sm:text-5xl font-bold">
+              <Diamond className="inline w-7 sm:w-10 h-7 sm:h-10 mr-2 text-secondary" />
               WHY IS IT <span className="neon-text-blue">DIFFERENT</span>?
             </h2>
           </motion.div>
@@ -376,7 +376,7 @@ const Index = () => {
       <section id="planos" className="py-16 sm:py-24 px-4">
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
-            <h2 className="text-3xl sm:text-5xl font-bold">
+            <h2 className="text-2xl sm:text-5xl font-bold">
               🌈 <span className="rainbow-text">PREMIUM PLANS</span>
             </h2>
             <p className="text-muted-foreground mt-3 text-sm sm:text-base">Choose the ideal plan for you</p>
@@ -462,7 +462,7 @@ const Index = () => {
       <section className="py-16 sm:py-24 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0}>
-            <h2 className="text-3xl sm:text-5xl font-bold mb-6">
+            <h2 className="text-2xl sm:text-5xl font-bold mb-6">
               Watch <span className="neon-text-blue">anywhere</span>
             </h2>
             <div className="flex justify-center gap-8 sm:gap-12 mt-8">
@@ -489,8 +489,8 @@ const Index = () => {
       <section className="py-16 sm:py-24 px-4">
         <div className="max-w-2xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
-            <h2 className="text-3xl sm:text-5xl font-bold">
-              <HelpCircle className="inline w-8 sm:w-10 h-8 sm:h-10 mr-2 text-secondary" />
+            <h2 className="text-2xl sm:text-5xl font-bold">
+              <HelpCircle className="inline w-7 sm:w-10 h-7 sm:h-10 mr-2 text-secondary" />
               <span className="neon-text-blue">FAQ</span>
             </h2>
           </motion.div>
