@@ -338,8 +338,8 @@ const Index = () => {
         <div className="absolute inset-0 bg-muted/20" />
         <div className="relative max-w-4xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
-            <h2 className="text-3xl sm:text-5xl font-bold">
-              <Diamond className="inline w-8 sm:w-10 h-8 sm:h-10 mr-2 text-secondary" />
+            <h2 className="text-2xl sm:text-5xl font-bold">
+              <Diamond className="inline w-7 sm:w-10 h-7 sm:h-10 mr-2 text-secondary" />
               WHY IS IT <span className="neon-text-blue">DIFFERENT</span>?
             </h2>
           </motion.div>
