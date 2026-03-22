@@ -462,7 +462,7 @@ const Index = () => {
       <section className="py-16 sm:py-24 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0}>
-            <h2 className="text-3xl sm:text-5xl font-bold mb-6">
+            <h2 className="text-2xl sm:text-5xl font-bold mb-6">
               Watch <span className="neon-text-blue">anywhere</span>
             </h2>
             <div className="flex justify-center gap-8 sm:gap-12 mt-8">
