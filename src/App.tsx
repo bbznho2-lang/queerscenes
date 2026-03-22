@@ -23,7 +23,8 @@ const App = () => (
           <Route path="/browse" element={<Browse />} />
           <Route path="/player/:id" element={<Player />} />
           <Route path="/admin" element={<Admin />} />
-          
+          <Route path="/reset-password" element={<ResetPassword />} />
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
