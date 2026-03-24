@@ -18,17 +18,31 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [sending, setSending] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !email.trim() || !message.trim()) {
       toast.error("Please fill in all fields.");
       return;
     }
-    toast.success("Message sent! We'll respond soon.");
-    setName("");
-    setEmail("");
-    setMessage("");
-    onOpenChange(false);
+    setSending(true);
+    try {
+      const { error } = await supabase
+        .from("support_messages" as any)
+        .insert({ name: name.trim(), email: email.trim(), message: message.trim() } as any);
+      if (error) {
+        toast.error("Error sending message. Try again.");
+        return;
+      }
+      toast.success("Message sent! We'll respond soon.");
+      setName("");
+      setEmail("");
+      setMessage("");
+      onOpenChange(false);
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
