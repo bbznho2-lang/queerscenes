@@ -89,8 +89,8 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
             />
           </div>
 
-          <Button type="submit" className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-full glow-blue gap-2">
-            <Send className="w-4 h-4" /> Send Message
+          <Button type="submit" disabled={sending} className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-full glow-blue gap-2">
+            <Send className="w-4 h-4" /> {sending ? "Sending..." : "Send Message"}
           </Button>
         </form>
 
