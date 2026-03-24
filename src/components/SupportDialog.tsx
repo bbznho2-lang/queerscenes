@@ -99,7 +99,7 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
             For faster responses:
           </p>
           <a
-            href="https://t.me/queerscenes"
+            href="https://t.me/L7kznr"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full neon-border-purple text-primary hover:bg-primary/10 transition-colors text-sm font-medium"
