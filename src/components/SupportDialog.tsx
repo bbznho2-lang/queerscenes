@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Send, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SupportDialogProps {
   open: boolean;
@@ -17,17 +18,31 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [sending, setSending] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !email.trim() || !message.trim()) {
       toast.error("Please fill in all fields.");
       return;
     }
-    toast.success("Message sent! We'll respond soon.");
-    setName("");
-    setEmail("");
-    setMessage("");
-    onOpenChange(false);
+    setSending(true);
+    try {
+      const { error } = await supabase
+        .from("support_messages" as any)
+        .insert({ name: name.trim(), email: email.trim(), message: message.trim() } as any);
+      if (error) {
+        toast.error("Error sending message. Try again.");
+        return;
+      }
+      toast.success("Message sent! We'll respond soon.");
+      setName("");
+      setEmail("");
+      setMessage("");
+      onOpenChange(false);
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -74,8 +89,8 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
             />
           </div>
 
-          <Button type="submit" className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-full glow-blue gap-2">
-            <Send className="w-4 h-4" /> Send Message
+          <Button type="submit" disabled={sending} className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-full glow-blue gap-2">
+            <Send className="w-4 h-4" /> {sending ? "Sending..." : "Send Message"}
           </Button>
         </form>
 
@@ -84,7 +99,7 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
             For faster responses:
           </p>
           <a
-            href="https://t.me/queerscenes"
+            href="https://t.me/L7kznr"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full neon-border-purple text-primary hover:bg-primary/10 transition-colors text-sm font-medium"
