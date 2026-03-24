@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Users, BarChart3, Crown, Mail, Eye, Calendar, CreditCard, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, Users, BarChart3, Crown, Mail, Eye, Calendar, CreditCard, Trash2, ChevronLeft, ChevronRight, MessageCircle, MousePointerClick } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -33,6 +33,21 @@ interface Profile {
 interface ClickStat {
   title: string;
   clicks: number;
+}
+
+interface UserClickDetail {
+  user_email: string;
+  user_name: string;
+  content_title: string;
+  clicked_at: string;
+}
+
+interface SupportMessage {
+  id: string;
+  name: string;
+  email: string;
+  message: string;
+  created_at: string;
 }
 
 const AdminStatsCards = ({ totalUsers, premiumUsers, totalClicks }: { totalUsers: number; premiumUsers: number; totalClicks: number }) => (
@@ -84,13 +99,17 @@ const Admin = () => {
   const navigate = useNavigate();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [clickStats, setClickStats] = useState<ClickStat[]>([]);
+  const [userClicks, setUserClicks] = useState<UserClickDetail[]>([]);
+  const [supportMessages, setSupportMessages] = useState<SupportMessage[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
   const [premiumEmail, setPremiumEmail] = useState("");
   const [addingPremium, setAddingPremium] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
+  const [clicksPage, setClicksPage] = useState(1);
   const USERS_PER_PAGE = 20;
+  const CLICKS_PER_PAGE = 20;
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
@@ -108,22 +127,43 @@ const Admin = () => {
       .from("profiles")
       .select("*")
       .order("created_at", { ascending: false });
-    setProfiles((profilesData as Profile[]) || []);
+    const allProfiles = (profilesData as Profile[]) || [];
+    setProfiles(allProfiles);
 
     const { data: clicks } = await supabase
       .from("content_clicks")
-      .select("content_id");
+      .select("content_id, user_id, clicked_at")
+      .order("clicked_at", { ascending: false });
 
     if (clicks && clicks.length > 0) {
       const countMap: Record<string, number> = {};
       clicks.forEach((c: any) => {
         countMap[c.content_id] = (countMap[c.content_id] || 0) + 1;
       });
-      const contentIds = Object.keys(countMap);
+      const contentIds = [...new Set(clicks.map((c: any) => c.content_id))];
       const { data: contents } = await supabase
         .from("contents")
         .select("id, title")
         .in("id", contentIds);
+
+      const contentMap: Record<string, string> = {};
+      (contents || []).forEach((c: any) => { contentMap[c.id] = c.title; });
+
+      const profileMap: Record<string, { email: string; name: string }> = {};
+      allProfiles.forEach((p) => {
+        profileMap[p.user_id] = {
+          email: p.email || "No email",
+          name: [p.first_name, p.last_name].filter(Boolean).join(" ") || "No name",
+        };
+      });
+
+      const details: UserClickDetail[] = clicks.map((c: any) => ({
+        user_email: profileMap[c.user_id]?.email || "Unknown",
+        user_name: profileMap[c.user_id]?.name || "Unknown",
+        content_title: contentMap[c.content_id] || "Deleted content",
+        clicked_at: c.clicked_at,
+      }));
+      setUserClicks(details);
 
       const stats: ClickStat[] = (contents || [])
         .map((c: any) => ({
@@ -135,6 +175,14 @@ const Admin = () => {
 
       setClickStats(stats);
     }
+
+    // Fetch support messages
+    const { data: messages } = await supabase
+      .from("support_messages" as any)
+      .select("*")
+      .order("created_at", { ascending: false }) as any;
+    setSupportMessages((messages as SupportMessage[]) || []);
+
     setLoadingData(false);
   };
 
@@ -280,11 +328,30 @@ const Admin = () => {
     }
   };
 
+  const deleteSupportMessage = async (id: string) => {
+    const { error } = await supabase
+      .from("support_messages" as any)
+      .delete()
+      .eq("id", id) as any;
+    if (error) {
+      toast.error("Error deleting message");
+      return;
+    }
+    setSupportMessages((msgs) => msgs.filter((m) => m.id !== id));
+    toast.success("Message deleted");
+  };
+
   const totalPages = Math.max(1, Math.ceil(profiles.length / USERS_PER_PAGE));
   const paginatedProfiles = useMemo(() => {
     const start = (currentPage - 1) * USERS_PER_PAGE;
     return profiles.slice(start, start + USERS_PER_PAGE);
   }, [profiles, currentPage]);
+
+  const totalClickPages = Math.max(1, Math.ceil(userClicks.length / CLICKS_PER_PAGE));
+  const paginatedClicks = useMemo(() => {
+    const start = (clicksPage - 1) * CLICKS_PER_PAGE;
+    return userClicks.slice(start, start + CLICKS_PER_PAGE);
+  }, [userClicks, clicksPage]);
 
   const chartConfig = {
     clicks: {
@@ -354,6 +421,111 @@ const Admin = () => {
               <p className="text-muted-foreground text-center py-12 text-sm">
                 No clicks recorded yet.
               </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* User Click Details */}
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <MousePointerClick className="w-5 h-5 text-primary" />
+              User Click Details
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {userClicks.length > 0 ? (
+              <div className="space-y-1">
+                <div className="hidden sm:grid grid-cols-[1fr_1fr_1fr_120px] gap-4 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
+                  <span>User</span>
+                  <span>Email</span>
+                  <span>Content</span>
+                  <span>Date</span>
+                </div>
+                {paginatedClicks.map((click, i) => (
+                  <div key={i} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_1fr_120px] gap-1 sm:gap-4 px-3 py-2.5 rounded-lg hover:bg-muted/30 transition-colors border-b border-border/30 last:border-0">
+                    <span className="text-sm text-foreground font-medium truncate">{click.user_name}</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground truncate">{click.user_email}</span>
+                    <span className="text-xs sm:text-sm text-foreground truncate">{click.content_title}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(click.clicked_at).toLocaleDateString("pt-BR")} {new Date(click.clicked_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                  </div>
+                ))}
+                {totalClickPages > 1 && (
+                  <div className="flex items-center justify-between pt-4 border-t border-border mt-2">
+                    <span className="text-xs text-muted-foreground">
+                      Page {clicksPage} of {totalClickPages} ({userClicks.length} clicks)
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <Button variant="outline" size="sm" disabled={clicksPage <= 1} onClick={() => setClicksPage((p) => Math.max(1, p - 1))}>
+                        <ChevronLeft className="w-4 h-4" />
+                      </Button>
+                      <Button variant="outline" size="sm" disabled={clicksPage >= totalClickPages} onClick={() => setClicksPage((p) => Math.min(totalClickPages, p + 1))}>
+                        <ChevronRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-8 text-sm">No clicks recorded yet.</p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Support Messages */}
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <MessageCircle className="w-5 h-5 text-secondary" />
+              Support Messages
+              {supportMessages.length > 0 && (
+                <span className="ml-auto text-xs font-normal bg-secondary/20 text-secondary px-2 py-0.5 rounded-full">
+                  {supportMessages.length}
+                </span>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {supportMessages.length > 0 ? (
+              <div className="space-y-3">
+                {supportMessages.map((msg) => (
+                  <div key={msg.id} className="p-4 rounded-lg bg-muted/30 border border-border/50 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <span className="text-sm font-medium text-foreground">{msg.name}</span>
+                        <span className="text-xs text-muted-foreground ml-2">{msg.email}</span>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-[10px] text-muted-foreground">
+                          {new Date(msg.created_at).toLocaleDateString("pt-BR")} {new Date(msg.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                        </span>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <button className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete message?</AlertDialogTitle>
+                              <AlertDialogDescription>This will permanently delete this support message.</AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => deleteSupportMessage(msg.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </div>
+                    <p className="text-sm text-foreground/80 whitespace-pre-wrap">{msg.message}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-8 text-sm">No support messages yet.</p>
             )}
           </CardContent>
         </Card>
