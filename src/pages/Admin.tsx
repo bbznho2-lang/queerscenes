@@ -243,7 +243,7 @@ const Admin = () => {
       });
 
       // Aggregate clicks: group by user + content, count occurrences
-      const aggMap: Record<string, { user_name: string; user_email: string; content_title: string; click_count: number }> = {};
+      const aggMap: Record<string, AggregatedUserClick> = {};
       clicks.forEach((c: any) => {
         const key = `${c.user_id}__${c.content_id}`;
         if (!aggMap[key]) {
@@ -252,9 +252,13 @@ const Admin = () => {
             user_email: profileMap[c.user_id]?.email || "Unknown",
             content_title: contentMap[c.content_id] || "Deleted content",
             click_count: 0,
+            last_clicked_at: c.clicked_at,
           };
         }
         aggMap[key].click_count += 1;
+        if (c.clicked_at > aggMap[key].last_clicked_at) {
+          aggMap[key].last_clicked_at = c.clicked_at;
+        }
       });
       const aggregated = Object.values(aggMap).sort((a, b) => b.click_count - a.click_count);
       setAggregatedClicks(aggregated);
