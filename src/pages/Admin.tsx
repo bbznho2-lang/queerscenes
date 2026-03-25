@@ -167,6 +167,30 @@ const Admin = () => {
     };
   }, [activeChatId]);
 
+  // Realtime for new clicks
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    const clicksChannel = supabase
+      .channel("admin-clicks-realtime")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "content_clicks",
+        },
+        () => {
+          fetchData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(clicksChannel);
+    };
+  }, [isAdmin]);
+
   // Realtime for new chats
   useEffect(() => {
     if (!isAdmin) return;
