@@ -148,11 +148,20 @@ const Browse = () => {
         .maybeSingle();
       if (data) {
         const notExpired = !data.premium_expires_at || new Date(data.premium_expires_at) > new Date();
-        setUserIsPremium(data.is_premium && notExpired);
+        const isPrem = data.is_premium && notExpired;
+        setUserIsPremium(isPrem);
+        // Show premium popup once per session for non-premium, non-admin users
+        if (!isPrem && !isAdmin) {
+          const shown = sessionStorage.getItem("premium_popup_shown");
+          if (!shown) {
+            setPremiumPopupOpen(true);
+            sessionStorage.setItem("premium_popup_shown", "1");
+          }
+        }
       }
     };
     fetchPremium();
-  }, [user]);
+  }, [user, isAdmin]);
 
   const fetchContents = async () => {
     const { data } = await supabase
