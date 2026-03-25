@@ -124,9 +124,11 @@ const Admin = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [clicksPage, setClicksPage] = useState(1);
+  const [chatsPage, setChatsPage] = useState(1);
   const chatScrollRef = useRef<HTMLDivElement>(null);
   const USERS_PER_PAGE = 20;
   const CLICKS_PER_PAGE = 20;
+  const CHATS_PER_PAGE = 10;
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
