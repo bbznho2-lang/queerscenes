@@ -41,6 +41,7 @@ interface AggregatedUserClick {
   user_email: string;
   content_title: string;
   click_count: number;
+  last_clicked_at: string;
 }
 
 interface SupportChat {
@@ -166,6 +167,30 @@ const Admin = () => {
     };
   }, [activeChatId]);
 
+  // Realtime for new clicks
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    const clicksChannel = supabase
+      .channel("admin-clicks-realtime")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "content_clicks",
+        },
+        () => {
+          fetchData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(clicksChannel);
+    };
+  }, [isAdmin]);
+
   // Realtime for new chats
   useEffect(() => {
     if (!isAdmin) return;
@@ -242,7 +267,7 @@ const Admin = () => {
       });
 
       // Aggregate clicks: group by user + content, count occurrences
-      const aggMap: Record<string, { user_name: string; user_email: string; content_title: string; click_count: number }> = {};
+      const aggMap: Record<string, AggregatedUserClick> = {};
       clicks.forEach((c: any) => {
         const key = `${c.user_id}__${c.content_id}`;
         if (!aggMap[key]) {
@@ -251,11 +276,15 @@ const Admin = () => {
             user_email: profileMap[c.user_id]?.email || "Unknown",
             content_title: contentMap[c.content_id] || "Deleted content",
             click_count: 0,
+            last_clicked_at: c.clicked_at,
           };
         }
         aggMap[key].click_count += 1;
+        if (c.clicked_at > aggMap[key].last_clicked_at) {
+          aggMap[key].last_clicked_at = c.clicked_at;
+        }
       });
-      const aggregated = Object.values(aggMap).sort((a, b) => b.click_count - a.click_count);
+      const aggregated = Object.values(aggMap).sort((a, b) => new Date(b.last_clicked_at).getTime() - new Date(a.last_clicked_at).getTime());
       setAggregatedClicks(aggregated);
 
       const stats: ClickStat[] = (contents || [])
@@ -478,18 +507,20 @@ const Admin = () => {
           <CardContent>
             {aggregatedClicks.length > 0 ? (
               <div className="space-y-1">
-                <div className="hidden sm:grid grid-cols-[1fr_1fr_1fr_80px] gap-4 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
+                <div className="hidden sm:grid grid-cols-[1fr_1fr_1fr_80px_140px] gap-4 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
                   <span>User</span>
                   <span>Email</span>
                   <span>Content</span>
                   <span className="text-center">Clicks</span>
+                  <span className="text-right">Last Click</span>
                 </div>
                 {paginatedClicks.map((click, i) => (
-                  <div key={i} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_1fr_80px] gap-1 sm:gap-4 px-3 py-2.5 rounded-lg hover:bg-muted/30 transition-colors border-b border-border/30 last:border-0">
+                  <div key={i} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_1fr_80px_140px] gap-1 sm:gap-4 px-3 py-2.5 rounded-lg hover:bg-muted/30 transition-colors border-b border-border/30 last:border-0">
                     <span className="text-sm text-foreground font-medium truncate">{click.user_name}</span>
                     <span className="text-xs sm:text-sm text-muted-foreground truncate">{click.user_email}</span>
                     <span className="text-xs sm:text-sm text-foreground truncate">{click.content_title}</span>
                     <span className="text-sm font-semibold text-center text-primary">{click.click_count}×</span>
+                    <span className="text-xs text-muted-foreground text-right">{new Date(click.last_clicked_at).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>
                   </div>
                 ))}
                 {totalClickPages > 1 && (
