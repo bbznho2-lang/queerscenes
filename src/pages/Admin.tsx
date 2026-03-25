@@ -41,6 +41,7 @@ interface AggregatedUserClick {
   user_email: string;
   content_title: string;
   click_count: number;
+  last_clicked_at: string;
 }
 
 interface SupportChat {
