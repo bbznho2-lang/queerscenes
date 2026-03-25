@@ -124,9 +124,11 @@ const Admin = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [clicksPage, setClicksPage] = useState(1);
+  const [chatsPage, setChatsPage] = useState(1);
   const chatScrollRef = useRef<HTMLDivElement>(null);
   const USERS_PER_PAGE = 20;
   const CLICKS_PER_PAGE = 20;
+  const CHATS_PER_PAGE = 10;
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
@@ -565,45 +567,60 @@ const Admin = () => {
                 {supportChats.length === 0 ? (
                   <p className="text-muted-foreground text-center py-8 text-sm">No chats yet.</p>
                 ) : (
-                  supportChats.map((chat) => (
-                    <div
-                      key={chat.id}
-                      onClick={() => openChat(chat.id)}
-                      className={`p-3 rounded-lg cursor-pointer transition-colors border ${
-                        activeChatId === chat.id
-                          ? "bg-secondary/10 border-secondary/30"
-                          : "hover:bg-muted/30 border-border/30"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-foreground truncate">{chat.user_name}</span>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <button
-                              onClick={(e) => e.stopPropagation()}
-                              className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete chat?</AlertDialogTitle>
-                              <AlertDialogDescription>This will permanently delete this chat and all messages.</AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => deleteChat(chat.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                  <>
+                    {supportChats.slice((chatsPage - 1) * CHATS_PER_PAGE, chatsPage * CHATS_PER_PAGE).map((chat) => (
+                      <div
+                        key={chat.id}
+                        onClick={() => openChat(chat.id)}
+                        className={`p-3 rounded-lg cursor-pointer transition-colors border ${
+                          activeChatId === chat.id
+                            ? "bg-secondary/10 border-secondary/30"
+                            : "hover:bg-muted/30 border-border/30"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-foreground truncate">{chat.user_name}</span>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <button
+                                onClick={(e) => e.stopPropagation()}
+                                className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete chat?</AlertDialogTitle>
+                                <AlertDialogDescription>This will permanently delete this chat and all messages.</AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => deleteChat(chat.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                        <span className="text-[11px] text-muted-foreground truncate block">{chat.user_email}</span>
+                        <span className="text-[10px] text-muted-foreground">
+                          {new Date(chat.created_at).toLocaleDateString("pt-BR")} {new Date(chat.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                        </span>
                       </div>
-                      <span className="text-[11px] text-muted-foreground truncate block">{chat.user_email}</span>
-                      <span className="text-[10px] text-muted-foreground">
-                        {new Date(chat.created_at).toLocaleDateString("pt-BR")} {new Date(chat.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
-                      </span>
-                    </div>
-                  ))
+                    ))}
+                    {supportChats.length > CHATS_PER_PAGE && (
+                      <div className="flex items-center justify-between pt-2 border-t border-border">
+                        <span className="text-[10px] text-muted-foreground">{chatsPage}/{Math.ceil(supportChats.length / CHATS_PER_PAGE)}</span>
+                        <div className="flex gap-1">
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" disabled={chatsPage <= 1} onClick={() => setChatsPage(p => p - 1)}>
+                            <ChevronLeft className="w-3 h-3" />
+                          </Button>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" disabled={chatsPage >= Math.ceil(supportChats.length / CHATS_PER_PAGE)} onClick={() => setChatsPage(p => p + 1)}>
+                            <ChevronRight className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
 
