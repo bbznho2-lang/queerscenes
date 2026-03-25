@@ -284,7 +284,7 @@ const Admin = () => {
           aggMap[key].last_clicked_at = c.clicked_at;
         }
       });
-      const aggregated = Object.values(aggMap).sort((a, b) => b.click_count - a.click_count);
+      const aggregated = Object.values(aggMap).sort((a, b) => new Date(b.last_clicked_at).getTime() - new Date(a.last_clicked_at).getTime());
       setAggregatedClicks(aggregated);
 
       const stats: ClickStat[] = (contents || [])
