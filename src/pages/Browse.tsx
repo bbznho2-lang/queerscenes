@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Plus, Menu, X, Search, Bookmark, LogOut, Pencil, Trash2, Crown, Settings } from "lucide-react";
+import { Play, Plus, Menu, X, Search, Bookmark, LogOut, Pencil, Trash2, Crown, Settings, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import ProfileDialog from "@/components/ProfileDialog";
 import SupportDialog from "@/components/SupportDialog";
 import TitlesTicker from "@/components/TitlesTicker";
@@ -133,6 +134,7 @@ const Browse = () => {
   const [watchlistIds, setWatchlistIds] = useState<Set<string>>(new Set());
   const [userIsPremium, setUserIsPremium] = useState(false);
   const [addExistingOpen, setAddExistingOpen] = useState(false);
+  const [premiumPopupOpen, setPremiumPopupOpen] = useState(false);
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -146,11 +148,20 @@ const Browse = () => {
         .maybeSingle();
       if (data) {
         const notExpired = !data.premium_expires_at || new Date(data.premium_expires_at) > new Date();
-        setUserIsPremium(data.is_premium && notExpired);
+        const isPrem = data.is_premium && notExpired;
+        setUserIsPremium(isPrem);
+        // Show premium popup once per session for non-premium, non-admin users
+        if (!isPrem && !isAdmin) {
+          const shown = sessionStorage.getItem("premium_popup_shown");
+          if (!shown) {
+            setPremiumPopupOpen(true);
+            sessionStorage.setItem("premium_popup_shown", "1");
+          }
+        }
       }
     };
     fetchPremium();
-  }, [user]);
+  }, [user, isAdmin]);
 
   const fetchContents = async () => {
     const { data } = await supabase
@@ -508,6 +519,48 @@ const Browse = () => {
       <SupportDialog open={supportOpen} onOpenChange={setSupportOpen} />
       <EditContentDialog open={editOpen} onOpenChange={setEditOpen} content={editingContent} onSaved={fetchContents} defaults={newDefaults} />
       <AddExistingContentDialog open={addExistingOpen} onOpenChange={setAddExistingOpen} targetSection="exclusivos" onSaved={fetchContents} />
+
+      {/* Premium Upgrade Popup */}
+      <Dialog open={premiumPopupOpen} onOpenChange={setPremiumPopupOpen}>
+        <DialogContent className="sm:max-w-md bg-card border-primary/30">
+          <DialogHeader className="text-center items-center">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+              <Crown className="w-8 h-8 text-primary" />
+            </div>
+            <DialogTitle className="text-2xl neon-text-purple">Go Premium! 🌈</DialogTitle>
+            <DialogDescription className="text-muted-foreground text-sm mt-2">
+              Unlock all exclusive content, early releases, and much more with a Premium plan!
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 mt-2">
+            {[
+              { icon: Sparkles, text: "All Premium content unlocked" },
+              { icon: Play, text: "Early releases before everyone" },
+              { icon: Crown, text: "Request what you want to watch" },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-muted/50">
+                <item.icon className="w-4 h-4 text-primary shrink-0" />
+                <span className="text-sm text-foreground">{item.text}</span>
+              </div>
+            ))}
+          </div>
+          <div className="flex flex-col gap-2 mt-4">
+            <Button
+              onClick={() => { setPremiumPopupOpen(false); navigate("/"); setTimeout(() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" }), 300); }}
+              className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple"
+            >
+              <Crown className="w-4 h-4 mr-2" /> View Plans
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => setPremiumPopupOpen(false)}
+              className="w-full text-muted-foreground text-sm"
+            >
+              Maybe later
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

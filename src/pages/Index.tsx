@@ -407,7 +407,7 @@ const Index = () => {
           </motion.div>
 
           {/* Price Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2}>
               <Card className="bg-card neon-border-purple h-full">
                 <CardHeader className="text-center pb-2">
@@ -430,6 +430,32 @@ const Index = () => {
             </motion.div>
 
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={3}>
+              <Card className="bg-card neon-border-blue h-full overflow-hidden relative">
+                <div className="absolute top-0 right-0 left-0">
+                  <span className="block w-full text-center py-1.5 text-xs font-semibold bg-primary text-primary-foreground">
+                    💰 BEST VALUE
+                  </span>
+                </div>
+                <CardHeader className="text-center pb-2 pt-10">
+                  <CardTitle className="text-xl neon-text-blue">Quarterly</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center space-y-4">
+                  <div>
+                    <span className="text-4xl sm:text-5xl font-bold text-foreground">€42.99</span>
+                    <span className="text-muted-foreground text-sm">/3 months</span>
+                  </div>
+                  <p className="text-muted-foreground text-sm">That's ~€14.33/month</p>
+                  <Button
+                    onClick={() => window.open("https://t.me/L7kznr?text=Hi%20I%20came%20from%20your%20website%20and%20I'm%20interested%20in%20the%20€42.99%20quarterly%20plan%20Could%20you%20give%20me%20more%20details", "_blank")}
+                    className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple"
+                  >
+                    WATCH NOW
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={4}>
               <Card className="h-full neon-border-pink neon-pulse bg-card overflow-hidden relative">
                 <div className="absolute top-0 right-0 left-0">
                   <span className="block w-full text-center py-1.5 text-xs font-semibold bg-secondary text-secondary-foreground">
