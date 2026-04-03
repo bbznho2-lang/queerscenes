@@ -257,7 +257,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
               value={synopsis}
               onChange={(e) => setSynopsis(e.target.value)}
               placeholder="Write a synopsis for the content..."
-              className="w-full mt-1 rounded-md bg-muted border border-border px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 min-h-[80px] resize-y"
+              className="w-full mt-1 rounded-md bg-muted border border-border px-3 py-2 text-base md:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 min-h-[80px] resize-y"
             />
           </div>
 
