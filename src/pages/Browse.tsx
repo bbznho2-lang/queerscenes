@@ -240,7 +240,7 @@ const Browse = () => {
     { label: "Series", icon: "📺", action: () => { setMenuOpen(false); document.getElementById("séries")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Movies", icon: "🎬", action: () => { setMenuOpen(false); document.getElementById("filmes")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Soap Operas", icon: "💕", action: () => { setMenuOpen(false); document.getElementById("novelas")?.scrollIntoView({ behavior: "smooth" }); } },
-    { label: "Anime", icon: "🎌", action: () => { setMenuOpen(false); document.getElementById("animes")?.scrollIntoView({ behavior: "smooth" }); } },
+    
     { label: "Exclusives", icon: "⭐", action: () => { setMenuOpen(false); document.getElementById("exclusivos")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "My List", icon: "🔖", action: () => { setMenuOpen(false); document.getElementById("minha-lista")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Profile", icon: "👤", action: () => { setMenuOpen(false); setProfileOpen(true); } },
