@@ -202,7 +202,7 @@ const Browse = () => {
   const series = contents.filter((c) => c.section === "series");
   const filmes = contents.filter((c) => c.section === "filmes");
   const novelas = contents.filter((c) => c.section === "novelas");
-  const animes = contents.filter((c) => c.section === "animes");
+  
   
   const exclusivos = contents.filter((c) => c.section === "exclusivos");
   const watchlistItems = contents.filter((c) => watchlistIds.has(c.id));
