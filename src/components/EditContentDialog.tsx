@@ -227,7 +227,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                   <SelectItem value="serie">Series</SelectItem>
                   <SelectItem value="filme">Movie</SelectItem>
                   <SelectItem value="novela">Soap Opera</SelectItem>
-                  <SelectItem value="anime">Anime</SelectItem>
+                  
                 </SelectContent>
               </Select>
             </div>
@@ -239,7 +239,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                   <SelectItem value="series">Series</SelectItem>
                   <SelectItem value="filmes">Movies</SelectItem>
                   <SelectItem value="novelas">Soap Operas</SelectItem>
-                  <SelectItem value="animes">Anime</SelectItem>
+                  
                   <SelectItem value="exclusivos">Exclusives</SelectItem>
                 </SelectContent>
               </Select>

@@ -90,7 +90,7 @@ const ContentCard = ({
           {item.tag}
         </span>
         <h3 className="text-sm sm:text-base font-semibold text-foreground leading-tight">{item.title}</h3>
-        <p className="text-xs text-muted-foreground">{item.year} · {item.type === "serie" ? "Series" : item.type === "novela" ? "Soap Opera" : item.type === "anime" ? "Anime" : "Movie"}</p>
+        <p className="text-xs text-muted-foreground">{item.year} · {item.type === "serie" ? "Series" : item.type === "novela" ? "Soap Opera" : "Movie"}</p>
         <p className="text-[10px] sm:text-xs text-muted-foreground/80 mt-1 line-clamp-2 leading-snug">
           {item.synopsis?.trim() || "No synopsis available."}
         </p>
@@ -202,7 +202,7 @@ const Browse = () => {
   const series = contents.filter((c) => c.section === "series");
   const filmes = contents.filter((c) => c.section === "filmes");
   const novelas = contents.filter((c) => c.section === "novelas");
-  const animes = contents.filter((c) => c.section === "animes");
+  
   
   const exclusivos = contents.filter((c) => c.section === "exclusivos");
   const watchlistItems = contents.filter((c) => watchlistIds.has(c.id));
@@ -240,7 +240,7 @@ const Browse = () => {
     { label: "Series", icon: "📺", action: () => { setMenuOpen(false); document.getElementById("séries")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Movies", icon: "🎬", action: () => { setMenuOpen(false); document.getElementById("filmes")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Soap Operas", icon: "💕", action: () => { setMenuOpen(false); document.getElementById("novelas")?.scrollIntoView({ behavior: "smooth" }); } },
-    { label: "Anime", icon: "🎌", action: () => { setMenuOpen(false); document.getElementById("animes")?.scrollIntoView({ behavior: "smooth" }); } },
+    
     { label: "Exclusives", icon: "⭐", action: () => { setMenuOpen(false); document.getElementById("exclusivos")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "My List", icon: "🔖", action: () => { setMenuOpen(false); document.getElementById("minha-lista")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Profile", icon: "👤", action: () => { setMenuOpen(false); setProfileOpen(true); } },
@@ -429,32 +429,8 @@ const Browse = () => {
           </div>
         </section>
 
-        {/* ANIME */}
-        <section id="animes" className="py-10 sm:py-16 px-4">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl sm:text-3xl font-bold neon-text-blue">Queer Anime</h2>
-              {isAdmin && (
-                <button onClick={() => handleNew("animes", "anime")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add anime">
-                  <Plus className="w-5 h-5 text-primary" />
-                </button>
-              )}
-            </div>
-            {animes.length > 0 ? (
-              <AutoScrollRow>
-                {animes.map((a) => (
-                  <div key={a.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={a} isAdmin={isAdmin} onEdit={() => handleEdit(a)} onDelete={() => handleDelete(a.id)} onClickTrack={() => trackClick(a.id)} isInWatchlist={watchlistIds.has(a.id)} onToggleWatchlist={() => toggleWatchlist(a.id)} userIsPremium={userIsPremium} />
-                  </div>
-                ))}
-              </AutoScrollRow>
-            ) : (
-              <p className="text-muted-foreground text-center py-8">
-                {isAdmin ? "Click + to add anime" : "New content coming soon!"}
-              </p>
-            )}
-          </div>
-        </section>
+
+
 
         {/* EXCLUSIVES */}
         <section id="exclusivos" className="py-10 sm:py-16 px-4">
