@@ -131,7 +131,7 @@ const Player = () => {
   const iframeClassName = "absolute inset-0 w-full h-full border-0";
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col overflow-y-auto">
       <div className={isMobile ? "absolute top-0 left-0 right-0 z-20 flex items-center justify-between gap-3 p-2 pointer-events-none" : "flex items-center justify-between gap-3 p-3 sm:p-6 absolute top-0 left-0 right-0 z-10"}>
         <button
           onClick={() => navigate("/browse")}
@@ -146,7 +146,7 @@ const Player = () => {
         )}
       </div>
 
-      <div className={isMobile ? "w-full px-0" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-8"}>
+      <div className={isMobile ? "w-full flex-shrink-0" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-8"}>
         <div className={isMobile ? "w-full" : "w-full max-w-5xl"}>
           <div className={isMobile ? "relative w-full aspect-video bg-card overflow-hidden" : "relative aspect-video bg-card rounded-2xl overflow-hidden neon-border-purple"}>
             {premiumBlocked ? (
