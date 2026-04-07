@@ -409,9 +409,9 @@ const Index = () => {
           {/* Price Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2}>
-              <Card className="bg-card neon-border-purple h-full">
+              <Card className="bg-card neon-border-pink h-full">
                 <CardHeader className="text-center pb-2">
-                  <CardTitle className="text-xl neon-text-purple">Monthly</CardTitle>
+                  <CardTitle className="text-xl neon-text-pink">Monthly</CardTitle>
                 </CardHeader>
                 <CardContent className="text-center space-y-4">
                   <div>
@@ -421,7 +421,7 @@ const Index = () => {
                   <p className="text-muted-foreground text-sm">Cancel anytime</p>
                   <Button
                     onClick={() => window.open("https://t.me/L7kznr?text=Hi%20I%20came%20from%20your%20website%20and%20I%27m%20interested%20in%20the%2016%20EUR%20monthly%20plan%20can%20you%20give%20me%20more%20details", "_blank")}
-                    className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple"
+                    className="w-full rounded-full bg-accent text-accent-foreground hover:bg-accent/90 glow-pink"
                   >
                     WATCH NOW
                   </Button>
@@ -437,7 +437,7 @@ const Index = () => {
                   </span>
                 </div>
                 <CardHeader className="text-center pb-2 pt-10">
-                  <CardTitle className="text-xl neon-text-blue">Quarterly</CardTitle>
+                  <CardTitle className="text-xl neon-text-purple">Quarterly</CardTitle>
                 </CardHeader>
                 <CardContent className="text-center space-y-4">
                   <div>
