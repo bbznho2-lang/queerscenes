@@ -784,8 +784,8 @@ const Admin = () => {
                                 <SelectTrigger className="h-9 text-xs bg-background"><SelectValue placeholder="Select plan" /></SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="none">No plan</SelectItem>
-                                  <SelectItem value="monthly" className="text-[hsl(330,85%,55%)]">Monthly — €15.99</SelectItem>
-                                  <SelectItem value="quarterly" className="text-primary">Quarterly — €42.99</SelectItem>
+                                  <SelectItem value="monthly" style={{ color: 'hsl(330, 85%, 55%)' }}>Monthly — €15.99</SelectItem>
+                                  <SelectItem value="quarterly" style={{ color: 'hsl(280, 80%, 55%)' }}>Quarterly — €42.99</SelectItem>
                                   <SelectItem value="annual">Annual — €159.99</SelectItem>
                                 </SelectContent>
                               </Select>
