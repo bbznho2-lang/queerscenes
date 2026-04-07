@@ -430,7 +430,7 @@ const Index = () => {
             </motion.div>
 
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={3}>
-              <Card className="bg-card neon-border-blue h-full overflow-hidden relative">
+              <Card className="bg-card neon-border-purple h-full overflow-hidden relative">
                 <div className="absolute top-0 right-0 left-0">
                   <span className="block w-full text-center py-1.5 text-xs font-semibold bg-primary text-primary-foreground">
                     💰 BEST VALUE
