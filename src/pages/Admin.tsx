@@ -369,6 +369,8 @@ const Admin = () => {
     let expiresAt: Date;
     if (plan === "monthly") {
       expiresAt = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
+    } else if (plan === "quarterly") {
+      expiresAt = new Date(now.getFullYear(), now.getMonth() + 3, now.getDate());
     } else {
       expiresAt = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
     }
@@ -377,7 +379,8 @@ const Admin = () => {
       .update({ is_premium: true, premium_plan: plan, premium_expires_at: expiresAt.toISOString() })
       .eq("id", profile.id);
     if (error) { toast.error("Error updating plan"); return; }
-    toast.success(`Plan set to ${plan === "monthly" ? "Monthly €15.99" : "Annual €159.99"}`);
+    const planLabels: Record<string, string> = { monthly: "Monthly €15.99", quarterly: "Quarterly €42.99", annual: "Annual €159.99" };
+    toast.success(`Plan set to ${planLabels[plan] || plan}`);
     setProfiles(profiles.map((p) => p.id === profile.id ? { ...p, is_premium: true, premium_plan: plan, premium_expires_at: expiresAt.toISOString() } : p));
   };
 
@@ -781,7 +784,8 @@ const Admin = () => {
                                 <SelectTrigger className="h-9 text-xs bg-background"><SelectValue placeholder="Select plan" /></SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="none">No plan</SelectItem>
-                                  <SelectItem value="monthly">Monthly — €15.99</SelectItem>
+                                  <SelectItem value="monthly"><span className="text-accent">Monthly — €15.99</span></SelectItem>
+                                  <SelectItem value="quarterly"><span className="text-primary">Quarterly — €42.99</span></SelectItem>
                                   <SelectItem value="annual">Annual — €159.99</SelectItem>
                                 </SelectContent>
                               </Select>
