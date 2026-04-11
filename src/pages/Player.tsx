@@ -26,6 +26,7 @@ interface Episode {
   episode_number: number;
   player_url: string | null;
   season: number;
+  is_premium: boolean;
 }
 
 const Player = () => {
@@ -39,6 +40,7 @@ const Player = () => {
   const [selectedSeason, setSelectedSeason] = useState(1);
   const [editOpen, setEditOpen] = useState(false);
   const [premiumBlocked, setPremiumBlocked] = useState(false);
+  const [userIsPremium, setUserIsPremium] = useState(false);
 
   const fetchContent = async () => {
     if (!id) return;
@@ -50,10 +52,13 @@ const Player = () => {
       if (data.is_premium) {
         if (authLoading) {
           setPremiumBlocked(true);
+          setUserIsPremium(false);
         } else if (isAdmin) {
           setPremiumBlocked(false);
+          setUserIsPremium(true);
         } else if (!user) {
           setPremiumBlocked(true);
+          setUserIsPremium(false);
         } else {
           const { data: profile, error: profileError } = await supabase
             .from("profiles")
@@ -62,13 +67,30 @@ const Player = () => {
             .maybeSingle();
           if (profileError) {
             setPremiumBlocked(true);
+            setUserIsPremium(false);
           } else {
             const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
-            setPremiumBlocked(!(profile?.is_premium && notExpired));
+            const hasPremium = !!(profile?.is_premium && notExpired);
+            setPremiumBlocked(!hasPremium);
+            setUserIsPremium(hasPremium);
           }
         }
       } else {
         setPremiumBlocked(false);
+        // Still check user premium status for episode-level checks
+        if (isAdmin) {
+          setUserIsPremium(true);
+        } else if (user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("is_premium, premium_expires_at")
+            .eq("user_id", user.id)
+            .maybeSingle();
+          const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
+          setUserIsPremium(!!(profile?.is_premium && notExpired));
+        } else {
+          setUserIsPremium(false);
+        }
       }
 
       if (data.type === "serie" || data.type === "novela" || data.type === "anime") {
@@ -92,6 +114,10 @@ const Player = () => {
   useEffect(() => {
     fetchContent();
   }, [id, user?.id, isAdmin, authLoading]);
+
+  // Check if current episode is premium-blocked (episode-level)
+  const episodePremiumBlocked = currentEp?.is_premium && !userIsPremium && !isAdmin;
+  const isBlocked = premiumBlocked || episodePremiumBlocked;
 
   const rawPlayerUrl = currentEp?.player_url || content?.player_url;
 
@@ -149,7 +175,7 @@ const Player = () => {
       <div className={isMobile ? "w-full flex-shrink-0" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-8"}>
         <div className={isMobile ? "w-full" : "w-full max-w-5xl"}>
           <div className={isMobile ? "relative w-full aspect-video bg-card overflow-hidden" : "relative aspect-video bg-card rounded-2xl overflow-hidden neon-border-purple"}>
-            {premiumBlocked ? (
+            {isBlocked ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/90 backdrop-blur-sm px-6 text-center">
                 <Lock className="w-12 h-12 text-secondary mb-4" />
                 <h2 className="text-xl font-bold mb-2 flex items-center gap-2"><Crown className="w-5 h-5 text-secondary" /> Premium Content</h2>
@@ -235,6 +261,9 @@ const Player = () => {
                   >
                     <span className={isMobile ? "w-7 h-7 rounded-full bg-muted flex items-center justify-center text-[11px] font-bold text-foreground" : "w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-foreground"}>{ep.episode_number}</span>
                     <span className={isMobile ? "text-xs text-foreground" : "text-sm text-foreground"}>{ep.title}</span>
+                    {ep.is_premium && (
+                      <Crown className="w-3 h-3 text-secondary flex-shrink-0" />
+                    )}
                     {currentEp?.id === ep.id && <Play className={isMobile ? "w-3 h-3 text-primary ml-auto" : "w-3 h-3 text-primary ml-auto"} />}
                   </button>
                 ))}
