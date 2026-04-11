@@ -40,6 +40,7 @@ const Player = () => {
   const [selectedSeason, setSelectedSeason] = useState(1);
   const [editOpen, setEditOpen] = useState(false);
   const [premiumBlocked, setPremiumBlocked] = useState(false);
+  const [userIsPremium, setUserIsPremium] = useState(false);
 
   const fetchContent = async () => {
     if (!id) return;
@@ -51,10 +52,13 @@ const Player = () => {
       if (data.is_premium) {
         if (authLoading) {
           setPremiumBlocked(true);
+          setUserIsPremium(false);
         } else if (isAdmin) {
           setPremiumBlocked(false);
+          setUserIsPremium(true);
         } else if (!user) {
           setPremiumBlocked(true);
+          setUserIsPremium(false);
         } else {
           const { data: profile, error: profileError } = await supabase
             .from("profiles")
@@ -63,13 +67,30 @@ const Player = () => {
             .maybeSingle();
           if (profileError) {
             setPremiumBlocked(true);
+            setUserIsPremium(false);
           } else {
             const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
-            setPremiumBlocked(!(profile?.is_premium && notExpired));
+            const hasPremium = !!(profile?.is_premium && notExpired);
+            setPremiumBlocked(!hasPremium);
+            setUserIsPremium(hasPremium);
           }
         }
       } else {
         setPremiumBlocked(false);
+        // Still check user premium status for episode-level checks
+        if (isAdmin) {
+          setUserIsPremium(true);
+        } else if (user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("is_premium, premium_expires_at")
+            .eq("user_id", user.id)
+            .maybeSingle();
+          const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
+          setUserIsPremium(!!(profile?.is_premium && notExpired));
+        } else {
+          setUserIsPremium(false);
+        }
       }
 
       if (data.type === "serie" || data.type === "novela" || data.type === "anime") {
