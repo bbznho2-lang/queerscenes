@@ -26,6 +26,7 @@ interface Episode {
   episode_number: number;
   player_url: string | null;
   season: number;
+  is_premium: boolean;
 }
 
 const Player = () => {
