@@ -28,6 +28,7 @@ interface Episode {
   episode_number: number;
   player_url: string | null;
   season: number;
+  is_premium: boolean;
 }
 
 interface Props {
@@ -145,6 +146,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
               episode_number: ep.episode_number,
               player_url: ep.player_url,
               season: ep.season || 1,
+              is_premium: ep.is_premium || false,
             });
           } else {
             await supabase.from("episodes").update({
@@ -152,6 +154,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
               episode_number: ep.episode_number,
               player_url: ep.player_url,
               season: ep.season || 1,
+              is_premium: ep.is_premium || false,
             }).eq("id", ep.id);
           }
         }
@@ -177,6 +180,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         episode_number: episodes.length + 1,
         player_url: "",
         season: Math.max(1, ...episodes.map(e => e.season || 1)),
+        is_premium: false,
       },
     ]);
   };
@@ -333,6 +337,13 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                           placeholder="Player URL (embed)"
                           className="bg-muted border-border text-xs"
                         />
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={ep.is_premium || false}
+                            onCheckedChange={(v) => updateEpisode(ep.id, "is_premium", v)}
+                          />
+                          <span className="text-xs text-muted-foreground">Premium</span>
+                        </div>
                       </div>
                     ))}
                   </div>
