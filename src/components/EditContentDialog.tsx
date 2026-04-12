@@ -127,6 +127,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         player_url: playerUrl || null,
         banner_url: bannerUrl,
         is_premium: isPremium,
+        is_archived: isArchived,
         synopsis: synopsis || null,
       };
 
