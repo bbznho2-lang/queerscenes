@@ -364,6 +364,48 @@ const Index = () => {
         </div>
       </section>
 
+      {/* TOP 10 */}
+      {top10CatalogItems.length > 0 && (
+        <section className="py-16 sm:py-20 px-4">
+          <div className="max-w-5xl mx-auto">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-8">
+              <h2 className="text-2xl sm:text-5xl font-bold flex items-center justify-center gap-3">
+                <TrendingUp className="w-7 sm:w-10 h-7 sm:h-10 text-accent" />
+                <span className="rainbow-text">TOP 10</span>
+              </h2>
+              <p className="text-muted-foreground mt-2 text-sm">Most watched right now</p>
+            </motion.div>
+            <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 scrollbar-hide" style={{ scrollbarWidth: "none" }}>
+              {top10CatalogItems.map((item, index) => (
+                <motion.div
+                  key={item!.id}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fade}
+                  custom={index + 1}
+                  className="flex-shrink-0 w-28 sm:w-40 relative group cursor-pointer"
+                >
+                  <div className="absolute -left-1 -top-1 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-xs sm:text-sm shadow-lg">
+                    {index + 1}
+                  </div>
+                  <div className="aspect-[2/3] rounded-lg overflow-hidden border border-border/30 bg-muted">
+                    {item!.banner_url ? (
+                      <img src={item!.banner_url} alt={item!.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-muted">
+                        <Film className="w-6 h-6 text-muted-foreground/40" />
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1.5 truncate text-center">{item!.title}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ABOUT */}
       <section className="py-16 sm:py-24 px-4">
         <div className="max-w-4xl mx-auto">
