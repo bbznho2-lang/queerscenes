@@ -31,22 +31,37 @@ const Index = () => {
   const [isPremiumUser, setIsPremiumUser] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
   const [catalogTitles, setCatalogTitles] = useState<Array<{ id: string; title: string; banner_url: string | null; tag: string }>>([]);
+  const [heroBanners, setHeroBanners] = useState<Array<{ id: string; title: string; banner_url: string; synopsis: string | null }>>([]);
+  const [currentBanner, setCurrentBanner] = useState(0);
+  const [top10Ids, setTop10Ids] = useState<string[]>([]);
   const navigate = useNavigate();
   const { user, loading: authLoading, isAdmin, signIn, signUp } = useAuth();
 
   useEffect(() => {
-    supabase.from("contents").select("id, title, banner_url, tag").limit(50).then(({ data }) => {
+    supabase.from("contents").select("id, title, banner_url, tag, synopsis, is_archived").limit(50).then(({ data }) => {
       if (data) {
-        // Deduplicate by title, keeping only unique titles
+        const nonArchived = data.filter((item: any) => !item.is_archived);
         const seen = new Set<string>();
-        const unique = data.filter(item => {
+        const unique = nonArchived.filter(item => {
           if (seen.has(item.title)) return false;
           seen.add(item.title);
           return true;
         });
-        // Shuffle for variety
         const shuffled = [...unique].sort(() => Math.random() - 0.5);
         setCatalogTitles(shuffled);
+        // Banners for hero rotation
+        const withBanners = unique.filter(item => item.banner_url);
+        setHeroBanners(withBanners.slice(0, 8) as any);
+      }
+    });
+
+    // Fetch top 10
+    supabase.from("content_clicks").select("content_id").order("clicked_at", { ascending: false }).limit(1000).then(({ data }) => {
+      if (data) {
+        const counts: Record<string, number> = {};
+        data.forEach((r: any) => { counts[r.content_id] = (counts[r.content_id] || 0) + 1; });
+        const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([id]) => id);
+        setTop10Ids(sorted);
       }
     });
   }, []);
