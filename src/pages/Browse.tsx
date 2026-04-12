@@ -136,6 +136,7 @@ const Browse = () => {
   const [userIsPremium, setUserIsPremium] = useState(false);
   const [addExistingOpen, setAddExistingOpen] = useState(false);
   const [premiumPopupOpen, setPremiumPopupOpen] = useState(false);
+  const [top10Ids, setTop10Ids] = useState<string[]>([]);
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
 
