@@ -51,6 +51,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
   const [bannerPreview, setBannerPreview] = useState("");
   const [bannerUrlInput, setBannerUrlInput] = useState("");
   const [isPremium, setIsPremium] = useState(false);
+  const [isArchived, setIsArchived] = useState(false);
   const [synopsis, setSynopsis] = useState("");
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [saving, setSaving] = useState(false);
@@ -66,6 +67,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setBannerPreview(content.banner_url || "");
       setBannerUrlInput(content.banner_url || "");
       setIsPremium(content.is_premium || false);
+      setIsArchived(content.is_archived || false);
       setSynopsis((content as any).synopsis || "");
       supabase
         .from("episodes")
@@ -83,6 +85,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setBannerPreview("");
       setBannerUrlInput("");
       setIsPremium(false);
+      setIsArchived(false);
       setSynopsis("");
       setEpisodes([]);
     }
