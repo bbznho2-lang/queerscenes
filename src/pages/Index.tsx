@@ -1,9 +1,7 @@
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Play, Lock, Sparkles, Diamond, Star, Zap, Heart, Film, Crown, ArrowRight, HelpCircle, Tv, Smartphone, Tablet, Eye, EyeOff } from "lucide-react";
-import heroBg from "@/assets/hero-bg.jpg";
-import heroBgMobile from "@/assets/hero-bg-mobile.jpg";
+import { Play, Lock, Sparkles, Diamond, Star, Zap, Heart, Film, Crown, ArrowRight, HelpCircle, Tv, Smartphone, Tablet, Eye, EyeOff, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,22 +31,37 @@ const Index = () => {
   const [isPremiumUser, setIsPremiumUser] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
   const [catalogTitles, setCatalogTitles] = useState<Array<{ id: string; title: string; banner_url: string | null; tag: string }>>([]);
+  const [heroBanners, setHeroBanners] = useState<Array<{ id: string; title: string; banner_url: string; synopsis: string | null }>>([]);
+  const [currentBanner, setCurrentBanner] = useState(0);
+  const [top10Ids, setTop10Ids] = useState<string[]>([]);
   const navigate = useNavigate();
   const { user, loading: authLoading, isAdmin, signIn, signUp } = useAuth();
 
   useEffect(() => {
-    supabase.from("contents").select("id, title, banner_url, tag").limit(50).then(({ data }) => {
+    supabase.from("contents").select("id, title, banner_url, tag, synopsis, is_archived").limit(50).then(({ data }) => {
       if (data) {
-        // Deduplicate by title, keeping only unique titles
+        const nonArchived = data.filter((item: any) => !item.is_archived);
         const seen = new Set<string>();
-        const unique = data.filter(item => {
+        const unique = nonArchived.filter(item => {
           if (seen.has(item.title)) return false;
           seen.add(item.title);
           return true;
         });
-        // Shuffle for variety
         const shuffled = [...unique].sort(() => Math.random() - 0.5);
         setCatalogTitles(shuffled);
+        // Banners for hero rotation
+        const withBanners = unique.filter(item => item.banner_url);
+        setHeroBanners(withBanners.slice(0, 8) as any);
+      }
+    });
+
+    // Fetch top 10
+    supabase.from("content_clicks").select("content_id").order("clicked_at", { ascending: false }).limit(1000).then(({ data }) => {
+      if (data) {
+        const counts: Record<string, number> = {};
+        data.forEach((r: any) => { counts[r.content_id] = (counts[r.content_id] || 0) + 1; });
+        const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([id]) => id);
+        setTop10Ids(sorted);
       }
     });
   }, []);
@@ -84,6 +97,17 @@ const Index = () => {
       active = false;
     };
   }, [user]);
+
+  // Rotate hero banners
+  useEffect(() => {
+    if (heroBanners.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentBanner((prev) => (prev + 1) % heroBanners.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [heroBanners.length]);
+
+  const top10CatalogItems = top10Ids.map((id) => catalogTitles.find((c) => c.id === id)).filter(Boolean);
 
   const showNameFields = isSignUp;
   const showSubscribeActions = !authLoading && !profileLoading && !isAdmin && !isPremiumUser;
@@ -129,11 +153,24 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       {/* HERO */}
-      <section className="relative min-h-[100svh] flex items-center justify-center px-4 py-16">
-        <img src={heroBg} alt="" className="absolute inset-0 w-full h-full object-cover hidden sm:block" />
-        <img src={heroBgMobile} alt="" className="absolute inset-0 w-full h-full object-cover sm:hidden" />
-        <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background" />
+      <section className="relative min-h-[100svh] flex items-center justify-center px-4 py-16 overflow-hidden">
+        {/* Rotating background banners */}
+        <AnimatePresence mode="wait">
+          {heroBanners.length > 0 && (
+            <motion.img
+              key={heroBanners[currentBanner]?.id}
+              src={heroBanners[currentBanner]?.banner_url}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.2 }}
+            />
+          )}
+        </AnimatePresence>
+        <div className="absolute inset-0 bg-background/75 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-transparent to-background" />
 
         <div className="relative z-10 max-w-3xl mx-auto text-center">
           <motion.div initial="hidden" animate="visible" variants={fade} custom={0}>
@@ -150,27 +187,57 @@ const Index = () => {
             QUEER SCENES
           </motion.h1>
 
-          <motion.p className="text-xs sm:text-xl text-muted-foreground max-w-xl mx-auto mb-3 font-light px-4 break-words" initial="hidden" animate="visible" variants={fade} custom={2}>
-            The streaming platform made for the LGBTQIA+ community.
+          <motion.p
+            className="text-sm sm:text-2xl md:text-3xl font-semibold text-foreground max-w-2xl mx-auto mb-3 px-4 leading-snug"
+            initial="hidden" animate="visible" variants={fade} custom={2}
+          >
+            Stream free LGBTQIA+ content now.
           </motion.p>
 
-          <motion.p className="text-[11px] sm:text-base text-muted-foreground/70 max-w-md mx-auto mb-8 px-6 break-words" initial="hidden" animate="visible" variants={fade} custom={3}>
-            Watch free content now — series, movies and exclusive moments with real representation. Sign up and start watching! 🌈
+          <motion.p
+            className="text-xs sm:text-lg text-foreground/80 max-w-lg mx-auto mb-4 px-6 leading-relaxed font-medium"
+            initial="hidden" animate="visible" variants={fade} custom={3}
+          >
+            Series, movies & exclusive moments — <span className="neon-text-pink">100% free</span> to start.
+            <br className="hidden sm:block" />
+            Go Premium for the full experience. 🌈
           </motion.p>
 
-          <motion.div initial="hidden" animate="visible" variants={fade} custom={4}>
+          <motion.div initial="hidden" animate="visible" variants={fade} custom={4} className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Button
               size="lg"
               onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
-              className="text-base sm:text-lg px-8 sm:px-10 py-5 sm:py-6 rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-blue gap-2"
+              className="text-base sm:text-lg px-8 sm:px-10 py-5 sm:py-6 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple gap-2"
             >
               <Play className="w-5 h-5" />
-              ACCESS QUEER SCENES
+              START WATCHING FREE
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" })}
+              className="text-sm sm:text-base px-6 py-4 sm:py-5 rounded-full border-accent/40 text-accent hover:bg-accent/10 gap-2"
+            >
+              <Crown className="w-4 h-4" />
+              GO PREMIUM
             </Button>
           </motion.div>
 
+          {/* Banner indicators */}
+          {heroBanners.length > 1 && (
+            <motion.div initial="hidden" animate="visible" variants={fade} custom={5} className="flex justify-center gap-2 mt-8">
+              {heroBanners.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentBanner(i)}
+                  className={`w-2 h-2 rounded-full transition-all ${i === currentBanner ? 'bg-primary w-6' : 'bg-muted-foreground/40 hover:bg-muted-foreground/60'}`}
+                />
+              ))}
+            </motion.div>
+          )}
+
           {catalogTitles.length > 0 && (
-            <motion.div initial="hidden" animate="visible" variants={fade} custom={5} className="mt-10 sm:mt-12 w-full overflow-hidden">
+            <motion.div initial="hidden" animate="visible" variants={fade} custom={6} className="mt-8 sm:mt-10 w-full overflow-hidden">
               <p className="text-[10px] sm:text-xs text-muted-foreground/60 uppercase tracking-widest mb-3 sm:mb-4">Available Now</p>
               <div className="relative">
                 <div className="flex gap-2 sm:gap-3 animate-scroll-left" style={{ width: 'max-content' }}>
@@ -296,6 +363,48 @@ const Index = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* TOP 10 */}
+      {top10CatalogItems.length > 0 && (
+        <section className="py-16 sm:py-20 px-4">
+          <div className="max-w-5xl mx-auto">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-8">
+              <h2 className="text-2xl sm:text-5xl font-bold flex items-center justify-center gap-3">
+                <TrendingUp className="w-7 sm:w-10 h-7 sm:h-10 text-accent" />
+                <span className="rainbow-text">TOP 10</span>
+              </h2>
+              <p className="text-muted-foreground mt-2 text-sm">Most watched right now</p>
+            </motion.div>
+            <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 scrollbar-hide" style={{ scrollbarWidth: "none" }}>
+              {top10CatalogItems.map((item, index) => (
+                <motion.div
+                  key={item!.id}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fade}
+                  custom={index + 1}
+                  className="flex-shrink-0 w-28 sm:w-40 relative group cursor-pointer"
+                >
+                  <div className="absolute -left-1 -top-1 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-xs sm:text-sm shadow-lg">
+                    {index + 1}
+                  </div>
+                  <div className="aspect-[2/3] rounded-lg overflow-hidden border border-border/30 bg-muted">
+                    {item!.banner_url ? (
+                      <img src={item!.banner_url} alt={item!.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-muted">
+                        <Film className="w-6 h-6 text-muted-foreground/40" />
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1.5 truncate text-center">{item!.title}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ABOUT */}
       <section className="py-16 sm:py-24 px-4">

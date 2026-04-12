@@ -26,6 +26,7 @@ interface ContentItem {
   position: number;
   is_premium: boolean;
   synopsis: string | null;
+  is_archived?: boolean;
 }
 
 const ContentCard = ({
@@ -135,6 +136,7 @@ const Browse = () => {
   const [userIsPremium, setUserIsPremium] = useState(false);
   const [addExistingOpen, setAddExistingOpen] = useState(false);
   const [premiumPopupOpen, setPremiumPopupOpen] = useState(false);
+  const [top10Ids, setTop10Ids] = useState<string[]>([]);
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -191,24 +193,41 @@ const Browse = () => {
     }
   };
 
+  const fetchTop10 = async () => {
+    const { data } = await supabase
+      .from("content_clicks")
+      .select("content_id")
+      .order("clicked_at", { ascending: false })
+      .limit(1000);
+    if (data) {
+      const counts: Record<string, number> = {};
+      data.forEach((r: any) => { counts[r.content_id] = (counts[r.content_id] || 0) + 1; });
+      const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([id]) => id);
+      setTop10Ids(sorted);
+    }
+  };
+
   useEffect(() => {
     fetchContents();
+    fetchTop10();
   }, []);
 
   useEffect(() => {
     fetchWatchlist();
   }, [user]);
 
-  const series = contents.filter((c) => c.section === "series");
-  const filmes = contents.filter((c) => c.section === "filmes");
-  const novelas = contents.filter((c) => c.section === "novelas");
-  
-  
-  const exclusivos = contents.filter((c) => c.section === "exclusivos");
-  const watchlistItems = contents.filter((c) => watchlistIds.has(c.id));
+  // Filter out archived content for non-admin users
+  const visibleContents = isAdmin ? contents : contents.filter((c) => !c.is_archived);
+
+  const series = visibleContents.filter((c) => c.section === "series");
+  const filmes = visibleContents.filter((c) => c.section === "filmes");
+  const novelas = visibleContents.filter((c) => c.section === "novelas");
+  const exclusivos = visibleContents.filter((c) => c.section === "exclusivos");
+  const watchlistItems = visibleContents.filter((c) => watchlistIds.has(c.id));
+  const top10Items = top10Ids.map((id) => visibleContents.find((c) => c.id === id)).filter(Boolean) as ContentItem[];
 
   const filteredContent = searchQuery.trim()
-    ? contents.filter((c) => c.title.toLowerCase().includes(searchQuery.toLowerCase()))
+    ? visibleContents.filter((c) => c.title.toLowerCase().includes(searchQuery.toLowerCase()))
     : [];
 
   const handleDelete = async (id: string) => {
@@ -346,6 +365,27 @@ const Browse = () => {
             </motion.div>
           </div>
         </section>
+        )}
+
+        {/* TOP 10 */}
+        {top10Items.length > 0 && (
+          <section className="py-10 sm:py-16 px-4">
+            <div className="max-w-7xl mx-auto">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-6 flex items-center gap-2">
+                🔥 <span className="rainbow-text">Top 10</span>
+              </h2>
+              <AutoScrollRow>
+                {top10Items.map((item, index) => (
+                  <div key={item.id} className="flex-shrink-0 w-[45vw] sm:w-[200px] relative">
+                    <div className="absolute -left-1 -top-1 z-20 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm shadow-lg">
+                      {index + 1}
+                    </div>
+                    <ContentCard item={item} isAdmin={isAdmin} onEdit={() => handleEdit(item)} onDelete={() => handleDelete(item.id)} onClickTrack={() => trackClick(item.id)} isInWatchlist={watchlistIds.has(item.id)} onToggleWatchlist={() => toggleWatchlist(item.id)} userIsPremium={userIsPremium} />
+                  </div>
+                ))}
+              </AutoScrollRow>
+            </div>
+          </section>
         )}
 
         {/* SERIES */}

@@ -80,6 +80,7 @@ export type Database = {
           banner_url: string | null
           created_at: string
           id: string
+          is_archived: boolean
           is_premium: boolean
           player_url: string | null
           position: number
@@ -95,6 +96,7 @@ export type Database = {
           banner_url?: string | null
           created_at?: string
           id?: string
+          is_archived?: boolean
           is_premium?: boolean
           player_url?: string | null
           position?: number
@@ -110,6 +112,7 @@ export type Database = {
           banner_url?: string | null
           created_at?: string
           id?: string
+          is_archived?: boolean
           is_premium?: boolean
           player_url?: string | null
           position?: number

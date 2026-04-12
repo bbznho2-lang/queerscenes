@@ -19,6 +19,7 @@ interface ContentItem {
   section: string;
   position: number;
   is_premium: boolean;
+  is_archived?: boolean;
 }
 
 interface Episode {
@@ -50,6 +51,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
   const [bannerPreview, setBannerPreview] = useState("");
   const [bannerUrlInput, setBannerUrlInput] = useState("");
   const [isPremium, setIsPremium] = useState(false);
+  const [isArchived, setIsArchived] = useState(false);
   const [synopsis, setSynopsis] = useState("");
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [saving, setSaving] = useState(false);
@@ -65,6 +67,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setBannerPreview(content.banner_url || "");
       setBannerUrlInput(content.banner_url || "");
       setIsPremium(content.is_premium || false);
+      setIsArchived(content.is_archived || false);
       setSynopsis((content as any).synopsis || "");
       supabase
         .from("episodes")
@@ -82,6 +85,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setBannerPreview("");
       setBannerUrlInput("");
       setIsPremium(false);
+      setIsArchived(false);
       setSynopsis("");
       setEpisodes([]);
     }
@@ -123,6 +127,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         player_url: playerUrl || null,
         banner_url: bannerUrl,
         is_premium: isPremium,
+        is_archived: isArchived,
         synopsis: synopsis || null,
       };
 
@@ -253,6 +258,14 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
           <div className="flex items-center justify-between py-2">
             <label className="text-sm text-muted-foreground">Premium Content?</label>
             <Switch checked={isPremium} onCheckedChange={setIsPremium} />
+          </div>
+
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <label className="text-sm text-muted-foreground">Archived</label>
+              <p className="text-[10px] text-muted-foreground/60">Hidden from site when enabled</p>
+            </div>
+            <Switch checked={isArchived} onCheckedChange={setIsArchived} />
           </div>
 
           <div>
