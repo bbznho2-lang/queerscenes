@@ -19,6 +19,7 @@ interface ContentItem {
   section: string;
   position: number;
   is_premium: boolean;
+  is_archived?: boolean;
 }
 
 interface Episode {
