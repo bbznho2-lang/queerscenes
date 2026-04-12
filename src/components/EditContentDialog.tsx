@@ -260,6 +260,14 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
             <Switch checked={isPremium} onCheckedChange={setIsPremium} />
           </div>
 
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <label className="text-sm text-muted-foreground">Archived</label>
+              <p className="text-[10px] text-muted-foreground/60">Hidden from site when enabled</p>
+            </div>
+            <Switch checked={isArchived} onCheckedChange={setIsArchived} />
+          </div>
+
           <div>
             <label className="text-sm text-muted-foreground">Synopsis</label>
             <textarea
