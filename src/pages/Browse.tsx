@@ -26,6 +26,7 @@ interface ContentItem {
   position: number;
   is_premium: boolean;
   synopsis: string | null;
+  is_archived?: boolean;
 }
 
 const ContentCard = ({
