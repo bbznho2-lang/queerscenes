@@ -193,24 +193,41 @@ const Browse = () => {
     }
   };
 
+  const fetchTop10 = async () => {
+    const { data } = await supabase
+      .from("content_clicks")
+      .select("content_id")
+      .order("clicked_at", { ascending: false })
+      .limit(1000);
+    if (data) {
+      const counts: Record<string, number> = {};
+      data.forEach((r: any) => { counts[r.content_id] = (counts[r.content_id] || 0) + 1; });
+      const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([id]) => id);
+      setTop10Ids(sorted);
+    }
+  };
+
   useEffect(() => {
     fetchContents();
+    fetchTop10();
   }, []);
 
   useEffect(() => {
     fetchWatchlist();
   }, [user]);
 
-  const series = contents.filter((c) => c.section === "series");
-  const filmes = contents.filter((c) => c.section === "filmes");
-  const novelas = contents.filter((c) => c.section === "novelas");
-  
-  
-  const exclusivos = contents.filter((c) => c.section === "exclusivos");
-  const watchlistItems = contents.filter((c) => watchlistIds.has(c.id));
+  // Filter out archived content for non-admin users
+  const visibleContents = isAdmin ? contents : contents.filter((c) => !c.is_archived);
+
+  const series = visibleContents.filter((c) => c.section === "series");
+  const filmes = visibleContents.filter((c) => c.section === "filmes");
+  const novelas = visibleContents.filter((c) => c.section === "novelas");
+  const exclusivos = visibleContents.filter((c) => c.section === "exclusivos");
+  const watchlistItems = visibleContents.filter((c) => watchlistIds.has(c.id));
+  const top10Items = top10Ids.map((id) => visibleContents.find((c) => c.id === id)).filter(Boolean) as ContentItem[];
 
   const filteredContent = searchQuery.trim()
-    ? contents.filter((c) => c.title.toLowerCase().includes(searchQuery.toLowerCase()))
+    ? visibleContents.filter((c) => c.title.toLowerCase().includes(searchQuery.toLowerCase()))
     : [];
 
   const handleDelete = async (id: string) => {
