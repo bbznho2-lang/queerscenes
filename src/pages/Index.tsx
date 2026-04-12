@@ -98,7 +98,17 @@ const Index = () => {
     };
   }, [user]);
 
-  const showNameFields = isSignUp;
+  // Rotate hero banners
+  useEffect(() => {
+    if (heroBanners.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentBanner((prev) => (prev + 1) % heroBanners.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [heroBanners.length]);
+
+  const top10CatalogItems = top10Ids.map((id) => catalogTitles.find((c) => c.id === id)).filter(Boolean);
+
   const showSubscribeActions = !authLoading && !profileLoading && !isAdmin && !isPremiumUser;
 
   const handleForgotPassword = async (e: React.FormEvent) => {
