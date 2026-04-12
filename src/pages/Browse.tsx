@@ -367,6 +367,27 @@ const Browse = () => {
         </section>
         )}
 
+        {/* TOP 10 */}
+        {top10Items.length > 0 && (
+          <section className="py-10 sm:py-16 px-4">
+            <div className="max-w-7xl mx-auto">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-6 flex items-center gap-2">
+                🔥 <span className="rainbow-text">Top 10</span>
+              </h2>
+              <AutoScrollRow>
+                {top10Items.map((item, index) => (
+                  <div key={item.id} className="flex-shrink-0 w-[45vw] sm:w-[200px] relative">
+                    <div className="absolute -left-1 -top-1 z-20 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm shadow-lg">
+                      {index + 1}
+                    </div>
+                    <ContentCard item={item} isAdmin={isAdmin} onEdit={() => handleEdit(item)} onDelete={() => handleDelete(item.id)} onClickTrack={() => trackClick(item.id)} isInWatchlist={watchlistIds.has(item.id)} onToggleWatchlist={() => toggleWatchlist(item.id)} userIsPremium={userIsPremium} />
+                  </div>
+                ))}
+              </AutoScrollRow>
+            </div>
+          </section>
+        )}
+
         {/* SERIES */}
         <section id="séries" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
