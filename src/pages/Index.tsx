@@ -109,6 +109,7 @@ const Index = () => {
 
   const top10CatalogItems = top10Ids.map((id) => catalogTitles.find((c) => c.id === id)).filter(Boolean);
 
+  const showNameFields = isSignUp;
   const showSubscribeActions = !authLoading && !profileLoading && !isAdmin && !isPremiumUser;
 
   const handleForgotPassword = async (e: React.FormEvent) => {
