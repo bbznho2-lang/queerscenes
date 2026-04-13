@@ -224,7 +224,18 @@ const Browse = () => {
   const novelas = visibleContents.filter((c) => c.section === "novelas");
   const exclusivos = visibleContents.filter((c) => c.section === "exclusivos");
   const watchlistItems = visibleContents.filter((c) => watchlistIds.has(c.id));
-  const top10Items = top10Ids.map((id) => visibleContents.find((c) => c.id === id)).filter(Boolean) as ContentItem[];
+  const top10Items = (() => {
+    const seen = new Set<string>();
+    const items: ContentItem[] = [];
+    for (const id of top10Ids) {
+      const item = visibleContents.find((c) => c.id === id);
+      if (item && !seen.has(item.title)) {
+        seen.add(item.title);
+        items.push(item);
+      }
+    }
+    return items;
+  })();
 
   const filteredContent = searchQuery.trim()
     ? visibleContents.filter((c) => c.title.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -374,16 +385,18 @@ const Browse = () => {
               <h2 className="text-2xl sm:text-3xl font-bold mb-6 flex items-center gap-2">
                 🔥 <span className="rainbow-text">Top 10</span>
               </h2>
-              <AutoScrollRow>
-                {top10Items.map((item, index) => (
-                  <div key={item.id} className="flex-shrink-0 w-[45vw] sm:w-[200px] relative">
-                    <div className="absolute -left-1 -top-1 z-20 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm shadow-lg">
-                      {index + 1}
+              <div className="relative overflow-hidden">
+                <div className="flex gap-3 animate-scroll-left" style={{ width: 'max-content' }}>
+                  {[...top10Items, ...top10Items].map((item, index) => (
+                    <div key={`top10-${item.id}-${index}`} className="flex-shrink-0 w-[45vw] sm:w-[200px] relative">
+                      <div className="absolute -left-1 -top-1 z-20 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm shadow-lg">
+                        {(index % top10Items.length) + 1}
+                      </div>
+                      <ContentCard item={item} isAdmin={isAdmin} onEdit={() => handleEdit(item)} onDelete={() => handleDelete(item.id)} onClickTrack={() => trackClick(item.id)} isInWatchlist={watchlistIds.has(item.id)} onToggleWatchlist={() => toggleWatchlist(item.id)} userIsPremium={userIsPremium} />
                     </div>
-                    <ContentCard item={item} isAdmin={isAdmin} onEdit={() => handleEdit(item)} onDelete={() => handleDelete(item.id)} onClickTrack={() => trackClick(item.id)} isInWatchlist={watchlistIds.has(item.id)} onToggleWatchlist={() => toggleWatchlist(item.id)} userIsPremium={userIsPremium} />
-                  </div>
-                ))}
-              </AutoScrollRow>
+                  ))}
+                </div>
+              </div>
             </div>
           </section>
         )}

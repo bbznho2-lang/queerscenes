@@ -107,7 +107,19 @@ const Index = () => {
     return () => clearInterval(interval);
   }, [heroBanners.length]);
 
-  const top10CatalogItems = top10Ids.map((id) => catalogTitles.find((c) => c.id === id)).filter(Boolean);
+  // Deduplicate top 10 by title
+  const top10CatalogItems = (() => {
+    const seen = new Set<string>();
+    const items: typeof catalogTitles = [];
+    for (const id of top10Ids) {
+      const item = catalogTitles.find((c) => c.id === id);
+      if (item && !seen.has(item.title)) {
+        seen.add(item.title);
+        items.push(item);
+      }
+    }
+    return items;
+  })();
 
   const showNameFields = isSignUp;
   const showSubscribeActions = !authLoading && !profileLoading && !isAdmin && !isPremiumUser;
@@ -188,14 +200,14 @@ const Index = () => {
           </motion.h1>
 
           <motion.p
-            className="text-sm sm:text-2xl md:text-3xl font-semibold text-foreground max-w-2xl mx-auto mb-3 px-4 leading-snug"
+            className="text-[13px] sm:text-xl md:text-2xl font-semibold text-foreground max-w-[90vw] sm:max-w-2xl mx-auto mb-3 px-2 leading-snug"
             initial="hidden" animate="visible" variants={fade} custom={2}
           >
             Stream free LGBTQIA+ content now.
           </motion.p>
 
           <motion.p
-            className="text-xs sm:text-lg text-foreground/80 max-w-lg mx-auto mb-4 px-6 leading-relaxed font-medium"
+            className="text-[11px] sm:text-base text-foreground/80 max-w-[85vw] sm:max-w-lg mx-auto mb-4 px-2 leading-relaxed font-medium"
             initial="hidden" animate="visible" variants={fade} custom={3}
           >
             Series, movies & exclusive moments — <span className="neon-text-pink">100% free</span> to start.
@@ -236,13 +248,18 @@ const Index = () => {
             </motion.div>
           )}
 
-          {catalogTitles.length > 0 && (
+          {top10CatalogItems.length > 0 && (
             <motion.div initial="hidden" animate="visible" variants={fade} custom={6} className="mt-8 sm:mt-10 w-full overflow-hidden">
-              <p className="text-[10px] sm:text-xs text-muted-foreground/60 uppercase tracking-widest mb-3 sm:mb-4">Available Now</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground/60 uppercase tracking-widest mb-3 sm:mb-4 flex items-center justify-center gap-2">
+                <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" /> TOP 10
+              </p>
               <div className="relative">
                 <div className="flex gap-2 sm:gap-3 animate-scroll-left" style={{ width: 'max-content' }}>
-                  {catalogTitles.map((item, i) => (
-                    <div key={`${item.id}-${i}`} className="flex-shrink-0 w-24 sm:w-44 md:w-52 group cursor-pointer">
+                  {[...top10CatalogItems, ...top10CatalogItems].map((item, i) => (
+                    <div key={`top10-${item.id}-${i}`} className="flex-shrink-0 w-24 sm:w-44 md:w-52 group cursor-pointer relative">
+                      <div className="absolute -left-1 -top-1 z-20 w-5 h-5 sm:w-7 sm:h-7 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-[9px] sm:text-xs shadow-lg">
+                        {(i % top10CatalogItems.length) + 1}
+                      </div>
                       <div className="aspect-[2/3] rounded-md sm:rounded-lg overflow-hidden border border-border/30 bg-muted relative">
                         {item.banner_url ? (
                           <img src={item.banner_url} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
@@ -364,47 +381,8 @@ const Index = () => {
         </div>
       </section>
 
-      {/* TOP 10 */}
-      {top10CatalogItems.length > 0 && (
-        <section className="py-16 sm:py-20 px-4">
-          <div className="max-w-5xl mx-auto">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-8">
-              <h2 className="text-2xl sm:text-5xl font-bold flex items-center justify-center gap-3">
-                <TrendingUp className="w-7 sm:w-10 h-7 sm:h-10 text-accent" />
-                <span className="rainbow-text">TOP 10</span>
-              </h2>
-              <p className="text-muted-foreground mt-2 text-sm">Most watched right now</p>
-            </motion.div>
-            <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 scrollbar-hide" style={{ scrollbarWidth: "none" }}>
-              {top10CatalogItems.map((item, index) => (
-                <motion.div
-                  key={item!.id}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                  variants={fade}
-                  custom={index + 1}
-                  className="flex-shrink-0 w-28 sm:w-40 relative group cursor-pointer"
-                >
-                  <div className="absolute -left-1 -top-1 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-xs sm:text-sm shadow-lg">
-                    {index + 1}
-                  </div>
-                  <div className="aspect-[2/3] rounded-lg overflow-hidden border border-border/30 bg-muted">
-                    {item!.banner_url ? (
-                      <img src={item!.banner_url} alt={item!.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-muted">
-                        <Film className="w-6 h-6 text-muted-foreground/40" />
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1.5 truncate text-center">{item!.title}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+
+
 
       {/* ABOUT */}
       <section className="py-16 sm:py-24 px-4">
