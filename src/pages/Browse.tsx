@@ -483,18 +483,6 @@ const Browse = () => {
           </div>
         </section>
 
-  // Hero banners with rotation
-  const heroBanners = visibleContents.filter((c) => c.banner_url);
-
-  useEffect(() => {
-    if (heroBanners.length <= 1) return;
-    const interval = setInterval(() => {
-      setCurrentBanner((prev) => (prev + 1) % heroBanners.length);
-    }, 6000);
-    return () => clearInterval(interval);
-  }, [heroBanners.length]);
-
-
 
 
         {/* EXCLUSIVES */}
