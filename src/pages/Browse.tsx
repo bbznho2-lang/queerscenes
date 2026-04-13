@@ -238,6 +238,19 @@ const Browse = () => {
     return items;
   })();
 
+  // Hero banners with rotation
+  const heroBanners = visibleContents.filter((c) => c.banner_url);
+
+  useEffect(() => {
+    if (heroBanners.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentBanner((prev) => (prev + 1) % heroBanners.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [heroBanners.length]);
+
+  const currentHero = heroBanners[currentBanner % Math.max(heroBanners.length, 1)];
+
   const filteredContent = searchQuery.trim()
     ? visibleContents.filter((c) => c.title.toLowerCase().includes(searchQuery.toLowerCase()))
     : [];
