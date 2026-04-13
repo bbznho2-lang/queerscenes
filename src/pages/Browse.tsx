@@ -368,46 +368,75 @@ const Browse = () => {
       <main className="pt-14 sm:pt-16">
         <TitlesTicker />
 
-        {/* HERO BANNER */}
-        {contents.length > 0 && (
-        <section className="relative h-[60vh] sm:h-[70vh] flex items-end">
-          <img key={contents[0]?.id} src={contents[0]?.banner_url || "/placeholder.svg"} alt="Main banner" className="absolute inset-0 w-full h-full object-cover bg-muted" />
+        {/* HERO BANNER - Rotating */}
+        {heroBanners.length > 0 && (
+        <section className="relative h-[60vh] sm:h-[70vh] flex items-end overflow-hidden">
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={currentHero?.id}
+              src={currentHero?.banner_url || "/placeholder.svg"}
+              alt="Main banner"
+              className="absolute inset-0 w-full h-full object-cover bg-muted"
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.2 }}
+            />
+          </AnimatePresence>
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-r from-background/80 to-transparent" />
           <div className="relative z-10 p-6 sm:p-10 md:p-16 max-w-2xl">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-              <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-3 leading-tight">
-                {contents[0]?.title || "Featured Production Title"}
-              </h1>
-              <p className="text-sm sm:text-base text-muted-foreground mb-5 max-w-md line-clamp-3">
-                {contents[0]?.synopsis || "A story of love, courage, and freedom that will transform the way you see the world."}
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Button onClick={() => contents[0] && navigate(`/player/${contents[0].id}`)} className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full glow-purple gap-2">
-                  <Play className="w-4 h-4" /> Watch Now
-                </Button>
-              </div>
-            </motion.div>
+            <AnimatePresence mode="wait">
+              <motion.div key={currentHero?.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }}>
+                <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-3 leading-tight">
+                  {currentHero?.title || "Featured Production Title"}
+                </h1>
+                <p className="text-sm sm:text-base text-muted-foreground mb-5 max-w-md line-clamp-3">
+                  {currentHero?.synopsis || "A story of love, courage, and freedom."}
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Button onClick={() => currentHero && navigate(`/player/${currentHero.id}`)} className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full glow-purple gap-2">
+                    <Play className="w-4 h-4" /> Watch Now
+                  </Button>
+                </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
+          {/* Banner indicators */}
+          {heroBanners.length > 1 && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+              {heroBanners.slice(0, 8).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentBanner(i)}
+                  className={`w-2 h-2 rounded-full transition-all ${i === currentBanner % heroBanners.length ? 'bg-primary w-6' : 'bg-muted-foreground/40 hover:bg-muted-foreground/60'}`}
+                />
+              ))}
+            </div>
+          )}
         </section>
         )}
 
-        {/* TOP 10 */}
+        {/* TOP 10 - Manual scroll */}
         {top10Items.length > 0 && (
           <section className="py-10 sm:py-16 px-4">
             <div className="max-w-7xl mx-auto">
               <h2 className="text-2xl sm:text-3xl font-bold mb-6 flex items-center gap-2">
                 🔥 <span className="rainbow-text">Top 10</span>
               </h2>
-              <div className="relative overflow-hidden">
-                <div className="flex gap-3 animate-scroll-left" style={{ width: 'max-content' }}>
-                  {[...top10Items, ...top10Items].map((item, index) => (
-                    <div key={`top10-${item.id}-${index}`} className="flex-shrink-0 w-[45vw] sm:w-[200px] relative">
-                      <div className="absolute -left-1 -top-1 z-20 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm shadow-lg">
-                        {(index % top10Items.length) + 1}
-                      </div>
-                      <ContentCard item={item} isAdmin={isAdmin} onEdit={() => handleEdit(item)} onDelete={() => handleDelete(item.id)} onClickTrack={() => trackClick(item.id)} isInWatchlist={watchlistIds.has(item.id)} onToggleWatchlist={() => toggleWatchlist(item.id)} userIsPremium={userIsPremium} />
+              <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide" style={{ scrollbarWidth: "none" }}>
+                {top10Items.map((item, index) => (
+                  <div key={`top10-${item.id}`} className="flex-shrink-0 w-[45vw] sm:w-[200px] relative">
+                    <div className="absolute -left-1 -top-1 z-20 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm shadow-lg">
+                      {index + 1}
                     </div>
+                    <ContentCard item={item} isAdmin={isAdmin} onEdit={() => handleEdit(item)} onDelete={() => handleDelete(item.id)} onClickTrack={() => trackClick(item.id)} isInWatchlist={watchlistIds.has(item.id)} onToggleWatchlist={() => toggleWatchlist(item.id)} userIsPremium={userIsPremium} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
                   ))}
                 </div>
               </div>
