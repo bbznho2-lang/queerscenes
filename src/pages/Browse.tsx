@@ -437,12 +437,8 @@ const Browse = () => {
             </div>
           </section>
         )}
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
+
+
 
         {/* SERIES */}
         <section id="séries" className="py-10 sm:py-16 px-4">
