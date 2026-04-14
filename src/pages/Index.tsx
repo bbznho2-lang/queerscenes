@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useAuth } from "@/hooks/useAuth";
 import { getResetPasswordRedirectUrl } from "@/lib/auth-urls";
+import { buildUniqueTopContent, fetchTopContentRanking, getUniqueItemsByTitle } from "@/lib/top-content";
 import { toast } from "sonner";
 
 const fade = {
@@ -18,6 +19,16 @@ const fade = {
     transition: { delay: i * 0.08, duration: 0.5, ease: "easeOut" as const },
   }),
 };
+
+interface LandingContentItem {
+  id: string;
+  title: string;
+  banner_url: string | null;
+  tag: string;
+  synopsis: string | null;
+  is_archived?: boolean;
+  position: number;
+}
 
 const Index = () => {
   const [email, setEmail] = useState("");
@@ -30,40 +41,43 @@ const Index = () => {
   const [loading, setLoading] = useState(false);
   const [isPremiumUser, setIsPremiumUser] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
-  const [catalogTitles, setCatalogTitles] = useState<Array<{ id: string; title: string; banner_url: string | null; tag: string }>>([]);
-  const [heroBanners, setHeroBanners] = useState<Array<{ id: string; title: string; banner_url: string; synopsis: string | null }>>([]);
+  const [catalogTitles, setCatalogTitles] = useState<LandingContentItem[]>([]);
+  const [heroBanners, setHeroBanners] = useState<Array<{ id: string; title: string; banner_url: string | null; synopsis: string | null }>>([]);
   const [currentBanner, setCurrentBanner] = useState(0);
   const [top10Ids, setTop10Ids] = useState<string[]>([]);
   const navigate = useNavigate();
   const { user, loading: authLoading, isAdmin, signIn, signUp } = useAuth();
 
   useEffect(() => {
-    supabase.from("contents").select("id, title, banner_url, tag, synopsis, is_archived").limit(50).then(({ data }) => {
-      if (data) {
-        const nonArchived = data.filter((item: any) => !item.is_archived);
-        const seen = new Set<string>();
-        const unique = nonArchived.filter(item => {
-          if (seen.has(item.title)) return false;
-          seen.add(item.title);
-          return true;
-        });
-        const shuffled = [...unique].sort(() => Math.random() - 0.5);
-        setCatalogTitles(shuffled);
-        // Banners for hero rotation
-        const withBanners = unique.filter(item => item.banner_url);
-        setHeroBanners(withBanners.slice(0, 8) as any);
-      }
-    });
+    const loadCatalog = async () => {
+      const { data, error } = await supabase
+        .from("contents")
+        .select("id, title, banner_url, tag, synopsis, is_archived, position")
+        .order("position")
+        .order("created_at", { ascending: false });
 
-    // Fetch top 10
-    supabase.from("content_clicks").select("content_id").order("clicked_at", { ascending: false }).limit(1000).then(({ data }) => {
-      if (data) {
-        const counts: Record<string, number> = {};
-        data.forEach((r: any) => { counts[r.content_id] = (counts[r.content_id] || 0) + 1; });
-        const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([id]) => id);
-        setTop10Ids(sorted);
+      if (error) {
+        console.error("Failed to load catalog", error);
+        return;
       }
-    });
+
+      const visibleItems = (data ?? []).filter((item) => !item.is_archived) as LandingContentItem[];
+      const uniqueItems = getUniqueItemsByTitle(visibleItems);
+
+      setCatalogTitles(uniqueItems);
+      setHeroBanners(uniqueItems.filter((item) => item.banner_url).slice(0, 8));
+    };
+
+    const loadTop10 = async () => {
+      try {
+        const ranking = await fetchTopContentRanking(10);
+        setTop10Ids(ranking.map((item) => item.content_id));
+      } catch (error) {
+        console.error("Failed to load Top 10", error);
+      }
+    };
+
+    void Promise.all([loadCatalog(), loadTop10()]);
   }, []);
 
   useEffect(() => {
@@ -107,19 +121,7 @@ const Index = () => {
     return () => clearInterval(interval);
   }, [heroBanners.length]);
 
-  // Deduplicate top 10 by title
-  const top10CatalogItems = (() => {
-    const seen = new Set<string>();
-    const items: typeof catalogTitles = [];
-    for (const id of top10Ids) {
-      const item = catalogTitles.find((c) => c.id === id);
-      if (item && !seen.has(item.title)) {
-        seen.add(item.title);
-        items.push(item);
-      }
-    }
-    return items;
-  })();
+  const top10CatalogItems = buildUniqueTopContent(catalogTitles, top10Ids, 10);
 
   const showNameFields = isSignUp;
   const showSubscribeActions = !authLoading && !profileLoading && !isAdmin && !isPremiumUser;
@@ -169,16 +171,27 @@ const Index = () => {
         {/* Rotating background banners */}
         <AnimatePresence mode="wait">
           {heroBanners.length > 0 && (
-            <motion.img
+            <motion.div
               key={heroBanners[currentBanner]?.id}
-              src={heroBanners[currentBanner]?.banner_url}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0"
               initial={{ opacity: 0, scale: 1.05 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 1.2 }}
-            />
+            >
+              <img
+                src={heroBanners[currentBanner]?.banner_url || "/placeholder.svg"}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover opacity-35 blur-xl scale-110"
+              />
+              <div className="absolute inset-0 flex items-center justify-center px-4 sm:px-8">
+                <img
+                  src={heroBanners[currentBanner]?.banner_url || "/placeholder.svg"}
+                  alt=""
+                  className="h-full w-full max-h-[88svh] object-contain opacity-80"
+                />
+              </div>
+            </motion.div>
           )}
         </AnimatePresence>
         <div className="absolute inset-0 bg-background/75 backdrop-blur-[2px]" />
@@ -253,8 +266,8 @@ const Index = () => {
               <p className="text-[10px] sm:text-xs text-muted-foreground/60 uppercase tracking-widest mb-3 sm:mb-4 flex items-center justify-center gap-2">
                 <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" /> TOP 10
               </p>
-              <div className="relative">
-                <div className="flex gap-2 sm:gap-3 animate-scroll-left" style={{ width: 'max-content' }}>
+               <div className="relative">
+                 <div className="flex gap-2 sm:gap-3 animate-scroll-left" style={{ width: 'max-content' }}>
                   {[...top10CatalogItems, ...top10CatalogItems].map((item, i) => (
                     <div key={`top10-${item.id}-${i}`} className="flex-shrink-0 w-24 sm:w-44 md:w-52 group cursor-pointer relative">
                       <div className="absolute -left-1 -top-1 z-20 w-5 h-5 sm:w-7 sm:h-7 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-[9px] sm:text-xs shadow-lg">
