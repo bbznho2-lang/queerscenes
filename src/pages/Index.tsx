@@ -171,27 +171,16 @@ const Index = () => {
         {/* Rotating background banners */}
         <AnimatePresence mode="wait">
           {heroBanners.length > 0 && (
-            <motion.div
+            <motion.img
               key={heroBanners[currentBanner]?.id}
-              className="absolute inset-0"
+              src={heroBanners[currentBanner]?.banner_url || "/placeholder.svg"}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
               initial={{ opacity: 0, scale: 1.05 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 1.2 }}
-            >
-              <img
-                src={heroBanners[currentBanner]?.banner_url || "/placeholder.svg"}
-                alt=""
-                className="absolute inset-0 h-full w-full object-cover opacity-35 blur-xl scale-110"
-              />
-              <div className="absolute inset-0 flex items-center justify-center px-4 sm:px-8">
-                <img
-                  src={heroBanners[currentBanner]?.banner_url || "/placeholder.svg"}
-                  alt=""
-                  className="h-full w-full max-h-[88svh] object-contain opacity-80"
-                />
-              </div>
-            </motion.div>
+            />
           )}
         </AnimatePresence>
         <div className="absolute inset-0 bg-background/75 backdrop-blur-[2px]" />
