@@ -309,6 +309,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_top_content_ids: {
+        Args: { _limit?: number }
+        Returns: {
+          clicks: number
+          content_id: string
+          rank: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
