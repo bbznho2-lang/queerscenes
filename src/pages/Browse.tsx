@@ -354,38 +354,25 @@ const Browse = () => {
 
         {/* HERO BANNER - Rotating */}
         {heroBanners.length > 0 && (
-        <section className="relative min-h-[46svh] sm:min-h-[58svh] lg:min-h-[66svh] flex items-end overflow-hidden">
+        <section className="relative min-h-[70svh] sm:min-h-[80svh] flex items-end overflow-hidden">
           <AnimatePresence mode="wait">
-            <motion.div
+            <motion.img
               key={currentHero?.id}
-              className="absolute inset-0"
+              src={currentHero?.banner_url || "/placeholder.svg"}
+              alt={currentHero?.title || "Featured banner"}
+              className="absolute inset-0 w-full h-full object-cover bg-muted"
               initial={{ opacity: 0, scale: 1.05 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 1.2 }}
-            >
-              <img
-                src={currentHero?.banner_url || "/placeholder.svg"}
-                alt="Main banner"
-                className="absolute inset-0 h-full w-full object-cover bg-muted opacity-40 blur-xl scale-110"
-              />
-              <div className="absolute inset-x-3 bottom-24 top-4 sm:inset-x-6 sm:bottom-28 sm:top-6 md:inset-x-10 md:bottom-32 md:top-8">
-                <div className="h-full w-full overflow-hidden rounded-2xl border border-border/50 bg-card/35 shadow-2xl backdrop-blur-sm sm:rounded-[28px]">
-                  <img
-                    src={currentHero?.banner_url || "/placeholder.svg"}
-                    alt={currentHero?.title || "Featured banner"}
-                    className="h-full w-full object-contain"
-                  />
-                </div>
-              </div>
-            </motion.div>
+            />
           </AnimatePresence>
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-r from-background/80 to-transparent" />
-          <div className="relative z-10 w-full p-4 sm:p-8 md:p-12 lg:p-16">
+          <div className="relative z-10 p-6 sm:p-10 md:p-16 max-w-2xl">
             <AnimatePresence mode="wait">
-              <motion.div key={currentHero?.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }} className="max-w-xl rounded-2xl border border-border/40 bg-background/70 p-4 backdrop-blur-md sm:p-6 md:p-8">
-                <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-3 leading-tight">
+              <motion.div key={currentHero?.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }}>
+                <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-3 leading-tight">
                   {currentHero?.title || "Featured Production Title"}
                 </h1>
                 <p className="text-sm sm:text-base text-muted-foreground mb-5 max-w-md line-clamp-3">
