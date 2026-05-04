@@ -433,6 +433,8 @@ const Player = () => {
           )}
         </div>
       </div>
+      )}
+
 
       <div className="w-full max-w-5xl mx-auto px-4 sm:px-0 pb-8">
         <div className="mt-4 sm:mt-6">
