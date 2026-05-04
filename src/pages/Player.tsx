@@ -367,7 +367,7 @@ const Player = () => {
           );
         })()}
 
-        {content && <CommentsSection contentId={content.id} />}
+        {content && !premiumBlocked && <CommentsSection contentId={content.id} />}
       </div>
 
       {content && <EditContentDialog open={editOpen} onOpenChange={setEditOpen} content={content} onSaved={fetchContent} />}
