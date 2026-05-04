@@ -78,6 +78,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setBannerUrlInput(content.banner_url || "");
       setIsPremium(content.is_premium || false);
       setIsArchived(content.is_archived || false);
+      setSupporterPlayerEnabled((content as any).supporter_player_enabled || false);
       setSynopsis((content as any).synopsis || "");
       supabase
         .from("episodes")
