@@ -1,0 +1,1 @@
+ALTER TABLE public.contents ADD COLUMN IF NOT EXISTS supporter_player_enabled boolean NOT NULL DEFAULT false;
