@@ -213,7 +213,7 @@ const Player = () => {
                       : "This title is exclusive to Supporters. Support the project to unlock it."}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-2 items-center">
-                    <button onClick={() => navigate("/#planos")} className="px-5 py-2.5 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors flex items-center gap-2 glow-purple">
+                    <button onClick={() => navigate("/#planos")} className="shine-cta px-5 py-2.5 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors flex items-center gap-2 glow-purple">
                       <Crown className="w-4 h-4" /> Become a Supporter
                     </button>
                     {supporterPaywall && hasFreeOption && (
@@ -306,11 +306,17 @@ const Player = () => {
           </div>
         </div>
 
-        {(content as any)?.synopsis && (
+        {!premiumBlocked && (content as any)?.synopsis && (
           <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{(content as any).synopsis}</p>
         )}
 
-        {(content?.type === "serie" || content?.type === "novela" || content?.type === "anime") && episodes.length > 0 && (() => {
+        {premiumBlocked && (
+          <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+            This content is exclusive to Supporters. Subscribe to a plan to watch!
+          </p>
+        )}
+
+        {!premiumBlocked && (content?.type === "serie" || content?.type === "novela" || content?.type === "anime") && episodes.length > 0 && (() => {
           const seasons = [...new Set(episodes.map(e => e.season))].sort((a, b) => a - b);
           const filteredEps = episodes.filter(e => e.season === selectedSeason);
           return (
@@ -361,7 +367,7 @@ const Player = () => {
           );
         })()}
 
-        {content && <CommentsSection contentId={content.id} />}
+        {content && !premiumBlocked && <CommentsSection contentId={content.id} />}
       </div>
 
       {content && <EditContentDialog open={editOpen} onOpenChange={setEditOpen} content={content} onSaved={fetchContent} />}

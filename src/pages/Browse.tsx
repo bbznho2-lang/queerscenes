@@ -51,12 +51,8 @@ const ContentCard = ({
 }) => {
   const navigate = useNavigate();
   const handleClick = () => {
-    if (item.is_premium && !isAdmin && !userIsPremium) {
-      toast.error("This content is exclusive to Premium subscribers. Subscribe to a plan to watch!");
-      navigate("/#planos");
-
-      return;
-    }
+    // Even when locked, route to the player so the in-player Supporter paywall is shown
+    // (without revealing episodes/synopsis).
     onClickTrack();
     navigate(`/player/${item.id}`);
   };
@@ -598,7 +594,7 @@ const Browse = () => {
           <div className="flex flex-col gap-2 mt-4">
             <Button
               onClick={() => { setPremiumPopupOpen(false); navigate("/"); setTimeout(() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" }), 300); }}
-              className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple"
+              className="shine-cta w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple"
             >
               <Crown className="w-4 h-4 mr-2" /> Become a Supporter
             </Button>
