@@ -400,78 +400,41 @@ const Index = () => {
 
       {/* ABOUT */}
       <section className="py-16 sm:py-24 px-4">
-        <div className="max-w-4xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
-            <h2 className="text-2xl sm:text-5xl font-bold">
+        <div className="max-w-3xl mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-8">
+            <h2 className="text-2xl sm:text-5xl font-bold leading-tight">
               <Film className="inline w-7 sm:w-10 h-7 sm:h-10 mr-2 text-primary" />
               ABOUT <span className="neon-text-purple">QUEER SCENES</span>
             </h2>
           </motion.div>
 
-          <motion.p className="text-base sm:text-lg text-muted-foreground text-center max-w-2xl mx-auto mb-10" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
-            A streaming platform exclusively dedicated to stories and productions with LGBTQIA+ protagonism.
-          </motion.p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {[
-              { icon: Star, text: "Iconic moments from queer cinema" },
-              { icon: Heart, text: "Series with real representation" },
-              { icon: Sparkles, text: "Scenes that marked generations" },
-              { icon: Crown, text: "Exclusive content for members" },
-            ].map((item, i) => (
-              <motion.div key={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={i + 2}>
-                <Card className="bg-card border-border hover:border-primary/40 transition-all group">
-                  <CardContent className="flex items-center gap-3 p-4">
-                    <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
-                      <item.icon className="w-4 h-4 text-primary" />
-                    </div>
-                    <span className="text-foreground text-sm sm:text-base">{item.text}</span>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* WHY DIFFERENT */}
-      <section className="py-16 sm:py-24 px-4 relative">
-        <div className="absolute inset-0 bg-muted/20" />
-        <div className="relative max-w-4xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
-            <h2 className="text-2xl sm:text-5xl font-bold">
-              <Diamond className="inline w-7 sm:w-10 h-7 sm:h-10 mr-2 text-secondary" />
-              WHY IS IT <span className="neon-text-blue">DIFFERENT</span>?
-            </h2>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1} className="space-y-5 text-center">
+            <p className="text-base sm:text-xl text-foreground leading-relaxed font-medium">
+              Queer Scenes was created so people <span className="neon-text-pink">all over the world</span> can finally watch titles where they see themselves on screen.
+            </p>
+            <p className="text-sm sm:text-lg text-muted-foreground leading-relaxed">
+              Real LGBTQIA+ representation, in series, movies, soap operas and BL/GL — without filters, without limits.
+            </p>
+            <p className="text-base sm:text-xl text-foreground leading-relaxed font-medium">
+              And the best part? There's a <span className="neon-text-purple font-bold">whole world of exclusive content</span> waiting for those who decide to support the project. 💜
+            </p>
+            <p className="text-sm sm:text-base text-muted-foreground italic">
+              Watch for free → fall in love → become a Supporter and help us keep growing.
+            </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[
-              "100% LGBTQIA+ curated content",
-              "Modern and immersive interface",
-              "Free + exclusive content",
-              "Premium experience",
-              "Community and representation",
-              "Multi-platform and accessible",
-              "Constant updates",
-              "Security and privacy",
-              "Dedicated 24/7 support",
-            ].map((text, i) => (
-              <motion.div key={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={i + 1}
-                className="flex items-center gap-3 p-4 rounded-xl bg-card neon-border-purple"
-              >
-                <div className="w-2 h-2 rounded-full bg-secondary shrink-0" />
-                <span className="text-foreground text-sm sm:text-base">{text}</span>
-              </motion.div>
-            ))}
-          </div>
-
-          <motion.div className="text-center mt-12" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={7}>
-            <p className="text-lg text-muted-foreground">It's not just watching.</p>
-            <p className="text-2xl sm:text-3xl font-bold neon-text-purple mt-1">It's belonging.</p>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2} className="mt-8 flex justify-center">
+            <Button
+              size="lg"
+              onClick={() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" })}
+              className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple gap-2"
+            >
+              <Heart className="w-4 h-4" /> See how to support
+            </Button>
           </motion.div>
         </div>
       </section>
+
 
       {/* PLANS */}
       <section id="planos" className="py-16 sm:py-24 px-4">
