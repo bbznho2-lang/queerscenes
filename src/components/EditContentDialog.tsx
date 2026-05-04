@@ -316,15 +316,6 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                 className="bg-muted border-border mt-1"
               />
             </div>
-            <div>
-              <label className="text-[10px] text-muted-foreground/60">Legacy fallback URL</label>
-              <Input
-                value={playerUrl}
-                onChange={(e) => setPlayerUrl(e.target.value)}
-                placeholder="(optional, used if free is empty)"
-                className="bg-muted border-border mt-1 text-xs"
-              />
-            </div>
           </div>
 
           <div>
