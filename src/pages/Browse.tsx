@@ -594,7 +594,7 @@ const Browse = () => {
           <div className="flex flex-col gap-2 mt-4">
             <Button
               onClick={() => { setPremiumPopupOpen(false); navigate("/"); setTimeout(() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" }), 300); }}
-              className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple"
+              className="shine-cta w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple"
             >
               <Crown className="w-4 h-4 mr-2" /> Become a Supporter
             </Button>
