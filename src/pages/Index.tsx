@@ -176,6 +176,13 @@ const Index = () => {
       }
       const { error } = await signIn(email, password);
       if (error) { toast.error(error.message); return; }
+      if (rememberMe) {
+        localStorage.setItem("qs_remember_email", email);
+        localStorage.setItem("qs_remember_me", "true");
+      } else {
+        localStorage.removeItem("qs_remember_email");
+        localStorage.setItem("qs_remember_me", "false");
+      }
       navigate("/browse");
     } finally {
       setLoading(false);
