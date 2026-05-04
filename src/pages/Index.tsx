@@ -31,8 +31,15 @@ interface LandingContentItem {
 }
 
 const Index = () => {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem("qs_remember_email") || "";
+  });
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return localStorage.getItem("qs_remember_me") !== "false";
+  });
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -169,6 +176,13 @@ const Index = () => {
       }
       const { error } = await signIn(email, password);
       if (error) { toast.error(error.message); return; }
+      if (rememberMe) {
+        localStorage.setItem("qs_remember_email", email);
+        localStorage.setItem("qs_remember_me", "true");
+      } else {
+        localStorage.removeItem("qs_remember_email");
+        localStorage.setItem("qs_remember_me", "false");
+      }
       navigate("/browse");
     } finally {
       setLoading(false);
@@ -382,11 +396,20 @@ const Index = () => {
                      {loading ? "Please wait..." : isForgot ? "SEND RESET LINK" : isSignUp ? "CREATE ACCOUNT" : "SIGN IN"}
                    </Button>
                    {!isSignUp && !isForgot && (
-                     <p className="text-center">
+                     <div className="flex items-center justify-between">
+                       <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer select-none">
+                         <input
+                           type="checkbox"
+                           checked={rememberMe}
+                           onChange={(e) => setRememberMe(e.target.checked)}
+                           className="w-4 h-4 rounded border-border bg-muted accent-primary cursor-pointer"
+                         />
+                         Remember me
+                       </label>
                        <button type="button" onClick={() => setIsForgot(true)} className="text-xs text-muted-foreground hover:text-secondary hover:underline">
                          Forgot your password?
                        </button>
-                     </p>
+                     </div>
                    )}
                    <p className="text-center text-sm text-muted-foreground">
                      {isForgot ? (
