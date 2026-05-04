@@ -105,6 +105,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setBannerUrlInput("");
       setIsPremium(false);
       setIsArchived(false);
+      setSupporterPlayerEnabled(false);
       setSynopsis("");
       setEpisodes([]);
     }
