@@ -399,8 +399,33 @@ const Index = () => {
 
 
       {/* ABOUT */}
-      <section className="py-16 sm:py-24 px-4">
-        <div className="max-w-3xl mx-auto">
+      <section className="relative py-16 sm:py-24 px-4 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          {[
+            { e: "🌈", x: "8%", y: "12%", d: 0, dur: 7 },
+            { e: "💜", x: "85%", y: "18%", d: 1.2, dur: 8 },
+            { e: "🎬", x: "15%", y: "78%", d: 0.6, dur: 9 },
+            { e: "✨", x: "78%", y: "70%", d: 1.8, dur: 6 },
+            { e: "🏳️‍🌈", x: "50%", y: "5%", d: 0.4, dur: 10 },
+            { e: "💫", x: "92%", y: "45%", d: 2.2, dur: 7.5 },
+            { e: "🎥", x: "5%", y: "45%", d: 1.5, dur: 8.5 },
+            { e: "💖", x: "45%", y: "88%", d: 0.9, dur: 6.5 },
+          ].map((em, i) => (
+            <motion.span
+              key={i}
+              className="absolute text-2xl sm:text-3xl opacity-30 select-none"
+              style={{ left: em.x, top: em.y }}
+              animate={{ y: [0, -20, 0], rotate: [0, 8, -8, 0], opacity: [0.2, 0.5, 0.2] }}
+              transition={{ duration: em.dur, delay: em.d, repeat: Infinity, ease: "easeInOut" }}
+            >
+              {em.e}
+            </motion.span>
+          ))}
+          <div className="absolute -top-20 -left-20 w-72 h-72 bg-primary/20 rounded-full blur-3xl" />
+          <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-secondary/15 rounded-full blur-3xl" />
+        </div>
+
+        <div className="relative max-w-3xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-8">
             <h2 className="text-2xl sm:text-5xl font-bold leading-tight">
               <Film className="inline w-7 sm:w-10 h-7 sm:h-10 mr-2 text-primary" />
@@ -410,27 +435,40 @@ const Index = () => {
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1} className="space-y-5 text-center">
             <p className="text-base sm:text-xl text-foreground leading-relaxed font-medium">
+              <motion.span animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 2.5, repeat: Infinity }} className="inline-block mr-1">🌍</motion.span>
               Queer Scenes was created so people <span className="neon-text-pink">all over the world</span> can finally watch titles where they see themselves on screen.
             </p>
             <p className="text-sm sm:text-lg text-muted-foreground leading-relaxed">
-              Real LGBTQIA+ representation, in series, movies, soap operas and BL/GL — without filters, without limits.
+              <span className="mr-1">🎬</span>
+              Real LGBTQIA+ representation — in series, movies, soap operas and BL/GL. Without filters, without limits.
             </p>
             <p className="text-base sm:text-xl text-foreground leading-relaxed font-medium">
+              <motion.span animate={{ rotate: [0, 15, -15, 0] }} transition={{ duration: 3, repeat: Infinity }} className="inline-block mr-1">✨</motion.span>
               And the best part? There's a <span className="neon-text-purple font-bold">whole world of exclusive content</span> waiting for those who decide to support the project. 💜
             </p>
-            <p className="text-sm sm:text-base text-muted-foreground italic">
-              Watch for free → fall in love → become a Supporter and help us keep growing.
-            </p>
+            <motion.p
+              className="text-sm sm:text-base text-muted-foreground italic flex flex-wrap items-center justify-center gap-2"
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 3, repeat: Infinity }}
+            >
+              <span>🎥 Watch free</span>
+              <span className="text-primary">→</span>
+              <span>💖 Fall in love</span>
+              <span className="text-primary">→</span>
+              <span>👑 Become a Supporter</span>
+            </motion.p>
           </motion.div>
 
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2} className="mt-8 flex justify-center">
-            <Button
-              size="lg"
-              onClick={() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" })}
-              className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple gap-2"
-            >
-              <Heart className="w-4 h-4" /> See how to support
-            </Button>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2} className="mt-10 flex justify-center">
+            <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}>
+              <Button
+                size="lg"
+                onClick={() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" })}
+                className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple gap-2 shadow-lg shadow-primary/40"
+              >
+                <Heart className="w-4 h-4 animate-pulse" /> See how to support 💜
+              </Button>
+            </motion.div>
           </motion.div>
         </div>
       </section>
