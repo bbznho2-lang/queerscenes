@@ -1,11 +1,14 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { ArrowLeft, Play, Pencil, Crown, Lock, Sparkles } from "lucide-react";
+import { ArrowLeft, Play, Pencil, Crown, Lock, Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useToast } from "@/hooks/use-toast";
 import EditContentDialog from "@/components/EditContentDialog";
 import CommentsSection from "@/components/CommentsSection";
+import { trackSupporterEvent, type SupporterEventType } from "@/lib/supporter-tracking";
+
 
 interface ContentItem {
   id: string;
