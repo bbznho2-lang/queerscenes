@@ -23,6 +23,7 @@ interface ContentItem {
   section: string;
   position: number;
   is_premium: boolean;
+  supporter_player_enabled?: boolean;
 }
 
 interface Episode {
