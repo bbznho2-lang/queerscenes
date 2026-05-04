@@ -527,18 +527,20 @@ const Admin = () => {
           <CardContent>
             {aggregatedClicks.length > 0 ? (
               <div className="space-y-1">
-                <div className="hidden sm:grid grid-cols-[1fr_1fr_1fr_80px_140px] gap-4 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
+                <div className="hidden sm:grid grid-cols-[1fr_1fr_1.2fr_1.2fr_70px_120px] gap-3 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
                   <span>User</span>
                   <span>Email</span>
                   <span>Content</span>
+                  <span>Episode</span>
                   <span className="text-center">Clicks</span>
                   <span className="text-right">Last Click</span>
                 </div>
                 {paginatedClicks.map((click, i) => (
-                  <div key={i} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_1fr_80px_140px] gap-1 sm:gap-4 px-3 py-2.5 rounded-lg hover:bg-muted/30 transition-colors border-b border-border/30 last:border-0">
+                  <div key={i} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_1.2fr_1.2fr_70px_120px] gap-1 sm:gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/30 transition-colors border-b border-border/30 last:border-0">
                     <span className="text-sm text-foreground font-medium truncate">{click.user_name}</span>
                     <span className="text-xs sm:text-sm text-muted-foreground truncate">{click.user_email}</span>
                     <span className="text-xs sm:text-sm text-foreground truncate">{click.content_title}</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground truncate" title={click.episode_label}>{click.episode_label}</span>
                     <span className="text-sm font-semibold text-center text-primary">{click.click_count}×</span>
                     <span className="text-xs text-muted-foreground text-right">{new Date(click.last_clicked_at).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>
                   </div>
