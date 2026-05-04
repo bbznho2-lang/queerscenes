@@ -316,7 +316,7 @@ const Player = () => {
           </p>
         )}
 
-        {(content?.type === "serie" || content?.type === "novela" || content?.type === "anime") && episodes.length > 0 && (() => {
+        {!premiumBlocked && (content?.type === "serie" || content?.type === "novela" || content?.type === "anime") && episodes.length > 0 && (() => {
           const seasons = [...new Set(episodes.map(e => e.season))].sort((a, b) => a - b);
           const filteredEps = episodes.filter(e => e.season === selectedSeason);
           return (
