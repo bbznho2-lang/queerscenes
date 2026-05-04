@@ -60,7 +60,7 @@ const CommentsSection = ({ contentId }: Props) => {
       .in("comment_id", commentIds);
     const counts: Record<string, number> = {};
     const mine = new Set<string>();
-    ((data as Array<{ comment_id: string; user_id: string }> | null) || []).forEach((row) => {
+    ((data as unknown as Array<{ comment_id: string; user_id: string }> | null) || []).forEach((row) => {
       counts[row.comment_id] = (counts[row.comment_id] || 0) + 1;
       if (user && row.user_id === user.id) mine.add(row.comment_id);
     });
