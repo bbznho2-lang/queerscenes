@@ -181,17 +181,14 @@ const Player = () => {
   const hasPlayerUrl = Boolean(activePlayerUrl);
   const iframeClassName = "absolute inset-0 w-full h-full border-0";
 
-  const trackEvent = async (event_type: string, source: string, extra?: Record<string, unknown>) => {
-    try {
-      await supabase.from("supporter_events" as any).insert({
-        user_id: user?.id ?? null,
-        content_id: content?.id ?? null,
-        event_type,
-        source,
-        metadata: { tier, episode_id: currentEp?.id ?? null, ...(extra || {}) },
-      } as any);
-    } catch { /* non-blocking */ }
-  };
+  const trackEvent = (event_type: SupporterEventType, source: string, extra?: Record<string, unknown>) =>
+    trackSupporterEvent(supabase, {
+      event_type,
+      source,
+      user_id: user?.id ?? null,
+      content_id: content?.id ?? null,
+      metadata: { tier, episode_id: currentEp?.id ?? null, ...(extra || {}) },
+    });
 
   const handleSupporterClick = () => {
     setTier("supporter");
@@ -202,6 +199,29 @@ const Player = () => {
     void trackEvent("become_supporter_click", source);
     navigate("/#planos");
   };
+
+  const handleSupporterSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (signupSubmitting) return;
+    setSignupSubmitting(true);
+    void trackEvent("paywall_signup_submit", "paywall_inline_form");
+    const { error } = await supabase.auth.signUp({
+      email: signupEmail.trim(),
+      password: signupPassword,
+      options: {
+        emailRedirectTo: `${window.location.origin}/player/${id}`,
+        data: { first_name: signupFirstName.trim() },
+      },
+    });
+    setSignupSubmitting(false);
+    if (error) {
+      toast({ title: "Sign up failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    setSignupSuccess(true);
+    toast({ title: "Account created!", description: "Now choose a Supporter plan to unlock the content." });
+  };
+
 
   // Track when user lands on locked content / paywall
   useEffect(() => {
