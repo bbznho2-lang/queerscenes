@@ -75,6 +75,33 @@ export type Database = {
           },
         ]
       }
+      content_comments: {
+        Row: {
+          author_name: string
+          body: string
+          content_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          author_name?: string
+          body: string
+          content_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          author_name?: string
+          body?: string
+          content_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       contents: {
         Row: {
           banner_url: string | null
@@ -83,6 +110,8 @@ export type Database = {
           is_archived: boolean
           is_premium: boolean
           player_url: string | null
+          player_url_free: string | null
+          player_url_premium: string | null
           position: number
           section: string
           synopsis: string | null
@@ -99,6 +128,8 @@ export type Database = {
           is_archived?: boolean
           is_premium?: boolean
           player_url?: string | null
+          player_url_free?: string | null
+          player_url_premium?: string | null
           position?: number
           section?: string
           synopsis?: string | null
@@ -115,6 +146,8 @@ export type Database = {
           is_archived?: boolean
           is_premium?: boolean
           player_url?: string | null
+          player_url_free?: string | null
+          player_url_premium?: string | null
           position?: number
           section?: string
           synopsis?: string | null
@@ -134,6 +167,8 @@ export type Database = {
           id: string
           is_premium: boolean
           player_url: string | null
+          player_url_free: string | null
+          player_url_premium: string | null
           season: number
           title: string
         }
@@ -144,6 +179,8 @@ export type Database = {
           id?: string
           is_premium?: boolean
           player_url?: string | null
+          player_url_free?: string | null
+          player_url_premium?: string | null
           season?: number
           title?: string
         }
@@ -154,6 +191,8 @@ export type Database = {
           id?: string
           is_premium?: boolean
           player_url?: string | null
+          player_url_free?: string | null
+          player_url_premium?: string | null
           season?: number
           title?: string
         }
