@@ -40,6 +40,7 @@ interface AggregatedUserClick {
   user_name: string;
   user_email: string;
   content_title: string;
+  episode_label: string;
   click_count: number;
   last_clicked_at: string;
 }
