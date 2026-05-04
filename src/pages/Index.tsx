@@ -389,66 +389,124 @@ const Index = () => {
 
       {/* ABOUT */}
       <section className="relative py-16 sm:py-24 px-4 overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          {[
-            { e: "🌈", x: "8%", y: "12%", d: 0, dur: 7 },
-            { e: "💜", x: "85%", y: "18%", d: 1.2, dur: 8 },
-            { e: "🎬", x: "15%", y: "78%", d: 0.6, dur: 9 },
-            { e: "✨", x: "78%", y: "70%", d: 1.8, dur: 6 },
-            { e: "🏳️‍🌈", x: "50%", y: "5%", d: 0.4, dur: 10 },
-            { e: "💫", x: "92%", y: "45%", d: 2.2, dur: 7.5 },
-            { e: "🎥", x: "5%", y: "45%", d: 1.5, dur: 8.5 },
-            { e: "💖", x: "45%", y: "88%", d: 0.9, dur: 6.5 },
-          ].map((em, i) => (
-            <motion.span
-              key={i}
-              className="absolute text-2xl sm:text-3xl opacity-30 select-none"
-              style={{ left: em.x, top: em.y }}
-              animate={{ y: [0, -20, 0], rotate: [0, 8, -8, 0], opacity: [0.2, 0.5, 0.2] }}
-              transition={{ duration: em.dur, delay: em.d, repeat: Infinity, ease: "easeInOut" }}
-            >
-              {em.e}
-            </motion.span>
-          ))}
-          <div className="absolute -top-20 -left-20 w-72 h-72 bg-primary/20 rounded-full blur-3xl" />
-          <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-secondary/15 rounded-full blur-3xl" />
-        </div>
+        {/* Soft radial gradient background (no hard square) */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse at 20% 10%, hsl(var(--primary) / 0.18), transparent 55%), radial-gradient(ellipse at 85% 90%, hsl(var(--secondary) / 0.14), transparent 60%)",
+          }}
+        />
 
         <div className="relative max-w-3xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-8">
+          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.4 }} transition={{ duration: 0.6 }} className="text-center mb-10">
             <h2 className="text-2xl sm:text-5xl font-bold leading-tight">
               <Film className="inline w-7 sm:w-10 h-7 sm:h-10 mr-2 text-primary" />
               ABOUT <span className="neon-text-purple">QUEER SCENES</span>
             </h2>
           </motion.div>
 
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1} className="space-y-5 text-center">
-            <p className="text-base sm:text-xl text-foreground leading-relaxed font-medium">
-              <motion.span animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 2.5, repeat: Infinity }} className="inline-block mr-1">🌍</motion.span>
-              Queer Scenes was created so people <span className="neon-text-pink">all over the world</span> can finally watch titles where they see themselves on screen.
-            </p>
-            <p className="text-sm sm:text-lg text-muted-foreground leading-relaxed">
-              <span className="mr-1">🎬</span>
-              Real LGBTQIA+ representation — in series, movies, soap operas and GL. Without filters, without limits.
-            </p>
-            <p className="text-base sm:text-xl text-foreground leading-relaxed font-medium">
-              <motion.span animate={{ rotate: [0, 15, -15, 0] }} transition={{ duration: 3, repeat: Infinity }} className="inline-block mr-1">✨</motion.span>
-              And the best part? There's a <span className="neon-text-purple font-bold">whole world of exclusive content</span> waiting for those who decide to support the project. 💜
-            </p>
-            <motion.p
-              className="text-sm sm:text-base text-muted-foreground italic flex flex-wrap items-center justify-center gap-2"
-              animate={{ opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 3, repeat: Infinity }}
-            >
-              <span>🎥 Watch free</span>
-              <span className="text-primary">→</span>
-              <span>💖 Fall in love</span>
-              <span className="text-primary">→</span>
-              <span>👑 Become a Supporter</span>
-            </motion.p>
-          </motion.div>
+          {(() => {
+            const lines: { emoji: string; html: React.ReactNode; cls: string }[] = [
+              {
+                emoji: "🌍",
+                cls: "text-base sm:text-xl text-foreground leading-relaxed font-medium",
+                html: (
+                  <>Queer Scenes was created so people <span className="neon-text-pink">all over the world</span> can finally watch titles where they see themselves on screen.</>
+                ),
+              },
+              {
+                emoji: "🎬",
+                cls: "text-sm sm:text-lg text-muted-foreground leading-relaxed",
+                html: <>Real LGBTQIA+ representation — in series, movies, soap operas and GL. Without filters, without limits.</>,
+              },
+              {
+                emoji: "✨",
+                cls: "text-base sm:text-xl text-foreground leading-relaxed font-medium",
+                html: (
+                  <>And the best part? There's a <span className="neon-text-purple font-bold">whole world of exclusive content</span> waiting for those who decide to support the project. 💜</>
+                ),
+              },
+            ];
+            return (
+              <div className="space-y-6 text-center">
+                {lines.map((l, i) => (
+                  <motion.p
+                    key={i}
+                    initial={{ opacity: 0, y: 14 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.5 }}
+                    transition={{ duration: 0.6, delay: i * 0.6, ease: "easeOut" }}
+                    className={l.cls}
+                  >
+                    <motion.span
+                      initial={{ scale: 0, rotate: -45, opacity: 0 }}
+                      whileInView={{ scale: 1, rotate: 0, opacity: 1 }}
+                      viewport={{ once: true, amount: 0.5 }}
+                      transition={{ duration: 0.5, delay: i * 0.6 + 0.1, type: "spring", stiffness: 220 }}
+                      className="inline-block mr-1.5"
+                    >
+                      {l.emoji}
+                    </motion.span>
+                    {l.html}
+                  </motion.p>
+                ))}
 
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2} className="mt-10 flex justify-center">
+                {/* Journey: each step appears one by one with its emoji */}
+                <motion.p
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.6 }}
+                  className="text-sm sm:text-base text-muted-foreground italic flex flex-wrap items-center justify-center gap-2 pt-2"
+                >
+                  {[
+                    { emoji: "🎥", text: "Watch free" },
+                    { emoji: "💖", text: "Fall in love" },
+                    { emoji: "👑", text: "Become a Supporter" },
+                  ].map((s, idx, arr) => (
+                    <motion.span
+                      key={idx}
+                      variants={{
+                        hidden: { opacity: 0, y: 10 },
+                        visible: { opacity: 1, y: 0 },
+                      }}
+                      transition={{ delay: 1.8 + idx * 0.55, duration: 0.5 }}
+                      className="inline-flex items-center gap-1"
+                    >
+                      <motion.span
+                        initial={{ scale: 0 }}
+                        whileInView={{ scale: 1 }}
+                        viewport={{ once: true, amount: 0.6 }}
+                        transition={{ delay: 1.8 + idx * 0.55, type: "spring", stiffness: 240 }}
+                      >
+                        {s.emoji}
+                      </motion.span>
+                      <span>{s.text}</span>
+                      {idx < arr.length - 1 && (
+                        <motion.span
+                          initial={{ opacity: 0 }}
+                          whileInView={{ opacity: 1 }}
+                          viewport={{ once: true, amount: 0.6 }}
+                          transition={{ delay: 1.8 + idx * 0.55 + 0.3 }}
+                          className="text-primary mx-1"
+                        >
+                          →
+                        </motion.span>
+                      )}
+                    </motion.span>
+                  ))}
+                </motion.p>
+              </div>
+            );
+          })()}
+
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.6 }}
+            transition={{ duration: 0.6, delay: 3.6 }}
+            className="mt-10 flex justify-center"
+          >
             <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}>
               <Button
                 size="lg"
