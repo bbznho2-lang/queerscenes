@@ -274,7 +274,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
           </div>
 
           <div className="flex items-center justify-between py-2">
-            <label className="text-sm text-muted-foreground">Premium Content?</label>
+            <label className="text-sm text-muted-foreground">Supporter</label>
             <Switch checked={isPremium} onCheckedChange={setIsPremium} />
           </div>
 
