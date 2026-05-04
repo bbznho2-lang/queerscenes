@@ -86,7 +86,7 @@ const AdminStatsCards = ({ totalUsers, premiumUsers, totalClicks }: { totalUsers
           </div>
           <div>
             <p className="text-2xl font-bold text-foreground">{premiumUsers}</p>
-            <p className="text-xs text-muted-foreground">Premium users</p>
+            <p className="text-xs text-muted-foreground">Supporters</p>
           </div>
         </CardContent>
       </Card>
