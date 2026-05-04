@@ -442,10 +442,24 @@ const Admin = () => {
   };
 
   const totalPages = Math.max(1, Math.ceil(profiles.length / USERS_PER_PAGE));
+  const sortedProfiles = useMemo(() => {
+    const isActiveSupporter = (p: Profile) => {
+      if (!p.is_premium) return false;
+      if (!p.premium_expires_at) return true;
+      return new Date(p.premium_expires_at) > new Date();
+    };
+    return [...profiles].sort((a, b) => {
+      const aSup = isActiveSupporter(a) ? 1 : 0;
+      const bSup = isActiveSupporter(b) ? 1 : 0;
+      if (aSup !== bSup) return bSup - aSup;
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+  }, [profiles]);
+
   const paginatedProfiles = useMemo(() => {
     const start = (currentPage - 1) * USERS_PER_PAGE;
-    return profiles.slice(start, start + USERS_PER_PAGE);
-  }, [profiles, currentPage]);
+    return sortedProfiles.slice(start, start + USERS_PER_PAGE);
+  }, [sortedProfiles, currentPage]);
 
   const totalClickPages = Math.max(1, Math.ceil(aggregatedClicks.length / CLICKS_PER_PAGE));
   const paginatedClicks = useMemo(() => {
