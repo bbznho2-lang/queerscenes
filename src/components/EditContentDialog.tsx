@@ -57,6 +57,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
   const [bannerUrlInput, setBannerUrlInput] = useState("");
   const [isPremium, setIsPremium] = useState(false);
   const [isArchived, setIsArchived] = useState(false);
+  const [supporterPlayerEnabled, setSupporterPlayerEnabled] = useState(false);
   const [synopsis, setSynopsis] = useState("");
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [saving, setSaving] = useState(false);
