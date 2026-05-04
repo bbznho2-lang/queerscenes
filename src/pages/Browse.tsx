@@ -578,15 +578,15 @@ const Browse = () => {
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-2">
               <Crown className="w-8 h-8 text-primary" />
             </div>
-            <DialogTitle className="text-2xl neon-text-purple">Go Premium! 🌈</DialogTitle>
+            <DialogTitle className="text-2xl neon-text-purple">Become a Supporter! 💜</DialogTitle>
             <DialogDescription className="text-muted-foreground text-sm mt-2">
-              Unlock all exclusive content, early releases, and much more with a Premium plan!
+              Support the project and unlock exclusive content made for our community.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3 mt-2">
             {[
-              { icon: Sparkles, text: "All Premium content unlocked" },
-              { icon: Play, text: "Early releases before everyone" },
+              { icon: Sparkles, text: "All Supporter content unlocked" },
+              { icon: Play, text: "Ad-free, early releases" },
               { icon: Crown, text: "Request what you want to watch" },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-muted/50">
@@ -600,7 +600,7 @@ const Browse = () => {
               onClick={() => { setPremiumPopupOpen(false); navigate("/"); setTimeout(() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" }), 300); }}
               className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple"
             >
-              <Crown className="w-4 h-4 mr-2" /> View Plans
+              <Crown className="w-4 h-4 mr-2" /> Become a Supporter
             </Button>
             <Button
               variant="ghost"
