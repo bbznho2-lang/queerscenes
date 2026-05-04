@@ -52,6 +52,13 @@ const Player = () => {
   const [premiumBlocked, setPremiumBlocked] = useState(false);
   const [userIsPremium, setUserIsPremium] = useState(false);
   const [tier, setTier] = useState<PlayerTier>("free");
+  const { toast } = useToast();
+  const [signupEmail, setSignupEmail] = useState("");
+  const [signupPassword, setSignupPassword] = useState("");
+  const [signupFirstName, setSignupFirstName] = useState("");
+  const [signupSubmitting, setSignupSubmitting] = useState(false);
+  const [signupSuccess, setSignupSuccess] = useState(false);
+
 
   const fetchContent = async () => {
     if (!id) return;
