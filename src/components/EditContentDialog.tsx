@@ -382,17 +382,29 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                           </Button>
                         </div>
                         <Input
+                          value={ep.player_url_free || ""}
+                          onChange={(e) => updateEpisode(ep.id, "player_url_free", e.target.value)}
+                          placeholder="🌈 Free player (with ads)"
+                          className="bg-muted border-border text-xs"
+                        />
+                        <Input
+                          value={ep.player_url_premium || ""}
+                          onChange={(e) => updateEpisode(ep.id, "player_url_premium", e.target.value)}
+                          placeholder="👑 Supporter player (no ads)"
+                          className="bg-muted border-border text-xs"
+                        />
+                        <Input
                           value={ep.player_url || ""}
                           onChange={(e) => updateEpisode(ep.id, "player_url", e.target.value)}
-                          placeholder="Player URL (embed)"
-                          className="bg-muted border-border text-xs"
+                          placeholder="Legacy fallback URL (optional)"
+                          className="bg-muted border-border text-[11px] opacity-70"
                         />
                         <div className="flex items-center gap-2">
                           <Switch
                             checked={ep.is_premium || false}
                             onCheckedChange={(v) => updateEpisode(ep.id, "is_premium", v)}
                           />
-                          <span className="text-xs text-muted-foreground">Premium</span>
+                          <span className="text-xs text-muted-foreground">Episode locked to Supporters</span>
                         </div>
                       </div>
                     ))}
