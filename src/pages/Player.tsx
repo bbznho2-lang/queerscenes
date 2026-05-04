@@ -171,9 +171,40 @@ const Player = () => {
   const hasPlayerUrl = Boolean(activePlayerUrl);
   const iframeClassName = "absolute inset-0 w-full h-full border-0";
 
+  const trackEvent = async (event_type: string, source: string, extra?: Record<string, unknown>) => {
+    try {
+      await supabase.from("supporter_events" as any).insert({
+        user_id: user?.id ?? null,
+        content_id: content?.id ?? null,
+        event_type,
+        source,
+        metadata: { tier, episode_id: currentEp?.id ?? null, ...(extra || {}) },
+      } as any);
+    } catch { /* non-blocking */ }
+  };
+
   const handleSupporterClick = () => {
     setTier("supporter");
+    void trackEvent("supporter_player_click", "player_tier_selector");
   };
+
+  const goToPlans = (source: string) => {
+    void trackEvent("become_supporter_click", source);
+    navigate("/#planos");
+  };
+
+  // Track when user lands on locked content / paywall
+  useEffect(() => {
+    if (!content) return;
+    if (premiumBlocked) {
+      void trackEvent("locked_content_view", "premium_content");
+    } else if (supporterPaywall) {
+      void trackEvent("paywall_view", "supporter_player");
+    } else if (episodePremiumBlocked) {
+      void trackEvent("locked_content_view", "premium_episode");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [content?.id, premiumBlocked, supporterPaywall, episodePremiumBlocked, currentEp?.id]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col overflow-y-auto">
