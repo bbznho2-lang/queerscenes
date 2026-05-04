@@ -322,7 +322,16 @@ const Admin = () => {
     // Fetch support chats
     await fetchChats();
 
+    // Fetch supporter events (paywall analytics)
+    const { data: events } = await supabase
+      .from("supporter_events" as any)
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(500) as any;
+    setSupporterEvents((events as any) || []);
+
     setLoadingData(false);
+
   };
 
   const openChat = async (chatId: string) => {
