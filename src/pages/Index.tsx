@@ -440,111 +440,149 @@ const Index = () => {
       <section id="planos" className="py-16 sm:py-24 px-4">
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
-            <h2 className="text-2xl sm:text-5xl font-bold">
-              🌈 <span className="rainbow-text">PREMIUM PLANS</span>
+            <h2 className="text-2xl sm:text-5xl font-bold leading-tight">
+              Choose your <span className="rainbow-text">vibe</span>
             </h2>
-            <p className="text-muted-foreground mt-3 text-sm sm:text-base">Choose the ideal plan for you</p>
+            <p className="text-muted-foreground mt-3 text-sm sm:text-base max-w-xl mx-auto">
+              Start free or support the project and unlock everything.
+            </p>
             {!showSubscribeActions && !authLoading && !profileLoading && (
-              <p className="text-secondary mt-3 text-sm font-medium">Your account already has premium access.</p>
+              <p className="text-secondary mt-3 text-sm font-medium">Your account already has Supporter access. 💜</p>
             )}
           </motion.div>
 
-          {/* Premium Benefits */}
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1} className="mb-10">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl mx-auto">
-              {[
-                { icon: Crown, text: "All Premium content unlocked" },
-                { icon: Zap, text: "Early releases before everyone" },
-                { icon: Heart, text: "Request what you want to watch" },
-                { icon: Star, text: "Complete and unlimited access" },
-                { icon: Film, text: "Exclusive collection of scenes and series" },
-                { icon: Sparkles, text: "Priority 24/7 support" },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border">
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                    <item.icon className="w-4 h-4 text-primary" />
-                  </div>
-                  <span className="text-foreground text-sm">{item.text}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Price Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2}>
-              <Card className="bg-card neon-border-pink h-full">
+          {/* Free vs Supporter cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {/* FREE */}
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
+              <Card className="bg-card neon-border-pink h-full flex flex-col">
                 <CardHeader className="text-center pb-2">
-                  <CardTitle className="text-xl neon-text-pink">Monthly</CardTitle>
+                  <div className="text-4xl mb-1">🌈</div>
+                  <CardTitle className="text-2xl neon-text-pink">Free</CardTitle>
+                  <div className="mt-2">
+                    <span className="text-4xl sm:text-5xl font-bold text-foreground">€0</span>
+                  </div>
+                  <p className="text-muted-foreground text-sm mt-1">
+                    Join the community and explore general content for free.
+                  </p>
                 </CardHeader>
-                <CardContent className="text-center space-y-4">
-                  <div>
+                <CardContent className="flex-1 flex flex-col">
+                  <ul className="space-y-2.5 text-sm flex-1">
+                    <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span><span className="text-foreground">Access to general site content</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span><span className="text-foreground">Site with ads</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span><span className="text-foreground">Comments on the site</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span><span className="text-foreground">Telegram community</span></li>
+                    <li className="flex items-start gap-2 opacity-60"><span className="text-destructive mt-0.5">✗</span><span className="text-muted-foreground line-through">International subtitled series & movies</span></li>
+                    <li className="flex items-start gap-2 opacity-60"><span className="text-destructive mt-0.5">✗</span><span className="text-muted-foreground line-through">Brazilian soap operas subtitled weekly</span></li>
+                    <li className="flex items-start gap-2 opacity-60"><span className="text-destructive mt-0.5">✗</span><span className="text-muted-foreground line-through">Thai BL & GL subtitled</span></li>
+                    <li className="flex items-start gap-2 opacity-60"><span className="text-destructive mt-0.5">✗</span><span className="text-muted-foreground line-through">Early access content</span></li>
+                  </ul>
+                  <Button
+                    onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
+                    className="w-full mt-5 rounded-full bg-accent text-accent-foreground hover:bg-accent/90 glow-pink gap-2"
+                  >
+                    <Play className="w-4 h-4" /> Join free
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* SUPPORTER */}
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2}>
+              <Card className="bg-card neon-border-purple neon-pulse h-full overflow-hidden relative flex flex-col">
+                <div className="absolute top-0 right-0 left-0">
+                  <span className="block w-full text-center py-1.5 text-xs font-semibold bg-primary text-primary-foreground">
+                    💜 MOST POPULAR
+                  </span>
+                </div>
+                <CardHeader className="text-center pb-2 pt-10">
+                  <div className="text-4xl mb-1">💜</div>
+                  <CardTitle className="text-2xl neon-text-purple">Supporter</CardTitle>
+                  <div className="mt-2">
                     <span className="text-4xl sm:text-5xl font-bold text-foreground">€15.99</span>
                     <span className="text-muted-foreground text-sm">/month</span>
                   </div>
-                  <p className="text-muted-foreground text-sm">Cancel anytime</p>
-                  <Button
-                    onClick={() => window.open("https://t.me/L7kznr?text=Hi%20I%20came%20from%20your%20website%20and%20I%27m%20interested%20in%20the%2016%20EUR%20monthly%20plan%20can%20you%20give%20me%20more%20details", "_blank")}
-                    className="w-full rounded-full bg-accent text-accent-foreground hover:bg-accent/90 glow-pink"
-                  >
-                    WATCH NOW
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={3}>
-              <Card className="bg-card neon-border-purple h-full overflow-hidden relative">
-                <div className="absolute top-0 right-0 left-0">
-                  <span className="block w-full text-center py-1.5 text-xs font-semibold bg-primary text-primary-foreground">
-                    💰 BEST VALUE
-                  </span>
-                </div>
-                <CardHeader className="text-center pb-2 pt-10">
-                  <CardTitle className="text-xl neon-text-purple">Quarterly</CardTitle>
+                  <p className="text-muted-foreground text-sm mt-1">
+                    Support the project and unlock the full experience.
+                  </p>
                 </CardHeader>
-                <CardContent className="text-center space-y-4">
-                  <div>
-                    <span className="text-4xl sm:text-5xl font-bold text-foreground">€42.99</span>
-                    <span className="text-muted-foreground text-sm">/3 months</span>
-                  </div>
-                  <p className="text-muted-foreground text-sm">That's ~€14.33/month</p>
+                <CardContent className="flex-1 flex flex-col">
+                  <ul className="space-y-2.5 text-sm flex-1">
+                    <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">Everything in the Free plan</span></li>
+                    <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">No ads on the site</span></li>
+                    <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">Brazilian soap operas subtitled in English — every week</span></li>
+                    <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">LGBT series & movies from other countries, subtitled</span></li>
+                    <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">Thai BL & GL subtitled</span></li>
+                    <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">Early access content</span></li>
+                    <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">VIP Telegram channel with exclusive news & updates</span></li>
+                  </ul>
                   <Button
-                    onClick={() => window.open("https://t.me/L7kznr?text=Hi%20I%20came%20from%20your%20website%20and%20I'm%20interested%20in%20the%20€42.99%20quarterly%20plan%20Could%20you%20give%20me%20more%20details", "_blank")}
-                    className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple"
+                    onClick={() => window.open("https://t.me/L7kznr?text=Hi%20I%20came%20from%20your%20website%20and%20I%27m%20interested%20in%20becoming%20a%20Supporter%20can%20you%20give%20me%20more%20details", "_blank")}
+                    className="w-full mt-5 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple gap-2"
                   >
-                    WATCH NOW
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={4}>
-              <Card className="h-full neon-border-pink neon-pulse bg-card overflow-hidden relative">
-                <div className="absolute top-0 right-0 left-0">
-                  <span className="block w-full text-center py-1.5 text-xs font-semibold bg-secondary text-secondary-foreground">
-                    🔥 2 MONTHS FREE
-                  </span>
-                </div>
-                <CardHeader className="text-center pb-2 pt-10">
-                  <CardTitle className="text-xl neon-text-pink">Yearly</CardTitle>
-                </CardHeader>
-                <CardContent className="text-center space-y-4">
-                  <div>
-                    <span className="text-4xl sm:text-5xl font-bold text-foreground">€159.99</span>
-                    <span className="text-muted-foreground text-sm">/year</span>
-                  </div>
-                  <p className="text-muted-foreground text-sm">That's ~€13.33/month</p>
-                  <Button
-                    onClick={() => window.open("https://t.me/L7kznr?text=Hi%20I%20came%20from%20your%20website%20and%20I%27m%20interested%20in%20the%20160%20EUR%20annual%20plan%20can%20you%20give%20me%20more%20details", "_blank")}
-                    className="w-full rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-blue"
-                  >
-                    WATCH NOW
+                    <Crown className="w-4 h-4" /> Become a Supporter
                   </Button>
                 </CardContent>
               </Card>
             </motion.div>
           </div>
+
+          {/* Supporter subscription options */}
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={3} className="mt-10 max-w-4xl mx-auto">
+            <p className="text-center text-sm sm:text-base text-muted-foreground mb-4">
+              Supporter subscription options
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {[
+                {
+                  label: "Monthly",
+                  price: "€15.99",
+                  period: "/month",
+                  note: "",
+                  color: "neon-text-pink",
+                  border: "neon-border-pink",
+                  btn: "bg-accent text-accent-foreground hover:bg-accent/90 glow-pink",
+                  msg: "Hi%20I%20want%20the%20Monthly%20Supporter%20plan%20%E2%82%AC15.99",
+                },
+                {
+                  label: "Quarterly",
+                  price: "€42.99",
+                  period: "/3 months",
+                  note: "save €4.98",
+                  color: "neon-text-purple",
+                  border: "neon-border-purple",
+                  btn: "bg-primary text-primary-foreground hover:bg-primary/90 glow-purple",
+                  msg: "Hi%20I%20want%20the%20Quarterly%20Supporter%20plan%20%E2%82%AC42.99",
+                },
+                {
+                  label: "Yearly",
+                  price: "€159.99",
+                  period: "/year",
+                  note: "save €31.89",
+                  color: "neon-text-blue",
+                  border: "border-secondary/40",
+                  btn: "bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-blue",
+                  msg: "Hi%20I%20want%20the%20Yearly%20Supporter%20plan%20%E2%82%AC159.99",
+                },
+              ].map((opt) => (
+                <button
+                  key={opt.label}
+                  onClick={() => window.open(`https://t.me/L7kznr?text=${opt.msg}`, "_blank")}
+                  className={`text-left rounded-xl bg-card border p-4 transition-all hover:scale-[1.02] ${opt.border}`}
+                >
+                  <p className={`text-sm font-semibold ${opt.color}`}>{opt.label}</p>
+                  <div className="mt-1">
+                    <span className="text-2xl font-bold text-foreground">{opt.price}</span>
+                    <span className="text-xs text-muted-foreground ml-1">{opt.period}</span>
+                  </div>
+                  {opt.note && <p className="text-[11px] text-secondary mt-0.5">{opt.note}</p>}
+                  <div className={`mt-3 inline-flex items-center justify-center w-full rounded-full px-3 py-1.5 text-xs font-semibold ${opt.btn}`}>
+                    <Crown className="w-3 h-3 mr-1" /> Choose
+                  </div>
+                </button>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </section>
 
