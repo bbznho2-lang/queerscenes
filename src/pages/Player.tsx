@@ -436,6 +436,7 @@ const Player = () => {
       )}
 
 
+      {!isBlocked && (
       <div className="w-full max-w-5xl mx-auto px-4 sm:px-0 pb-8">
         <div className="mt-4 sm:mt-6">
           <h1 className="text-lg sm:text-2xl font-bold">{content?.title || "Loading..."}</h1>
@@ -446,15 +447,10 @@ const Player = () => {
           </div>
         </div>
 
-        {!premiumBlocked && (content as any)?.synopsis && (
+        {(content as any)?.synopsis && (
           <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{(content as any).synopsis}</p>
         )}
 
-        {premiumBlocked && (
-          <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-            This content is exclusive to Supporters. Subscribe to a plan to watch!
-          </p>
-        )}
 
         {!premiumBlocked && (content?.type === "serie" || content?.type === "novela" || content?.type === "anime") && episodes.length > 0 && (() => {
           const seasons = [...new Set(episodes.map(e => e.season))].sort((a, b) => a - b);
