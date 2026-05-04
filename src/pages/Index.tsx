@@ -251,43 +251,32 @@ const Index = () => {
           )}
 
           {top10CatalogItems.length > 0 && (
-            <motion.div initial="hidden" animate="visible" variants={fade} custom={6} className="mt-10 sm:mt-12 w-full overflow-hidden">
-              <p className="text-xs sm:text-sm text-muted-foreground/80 uppercase tracking-widest mb-4 sm:mb-5 flex items-center justify-center gap-2">
-                <TrendingUp className="w-4 h-4" /> <span className="rainbow-text font-bold">TOP 10</span> THIS WEEK
-              </p>
-              <div className="relative">
-                <div className="flex gap-3 sm:gap-5 animate-scroll-left" style={{ width: 'max-content' }}>
-                  {[...top10CatalogItems, ...top10CatalogItems].map((item, i) => {
-                    const rank = (i % top10CatalogItems.length) + 1;
-                    return (
-                      <div key={`top10-${item.id}-${i}`} className="flex-shrink-0 flex items-end gap-1 sm:gap-2">
-                        <span
-                          className="leading-none font-black select-none text-transparent"
-                          style={{
-                            fontFamily: "'Space Grotesk', sans-serif",
-                            fontSize: 'clamp(60px, 14vw, 140px)',
-                            WebkitTextStroke: '2px hsl(var(--primary))',
-                          }}
-                        >
-                          {rank}
-                        </span>
-                        <div className="w-24 sm:w-40 md:w-48 aspect-[2/3] rounded-md sm:rounded-lg overflow-hidden border border-border/40 bg-muted relative shadow-lg">
-                          {item.banner_url ? (
-                            <img src={item.banner_url} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-muted">
-                              <Film className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground/40" />
-                            </div>
-                          )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
-                          <div className="absolute bottom-1 left-1 right-1">
-                            <p className="text-[9px] sm:text-xs text-foreground font-medium truncate">{item.title}</p>
-                          </div>
-                        </div>
+            <motion.div initial="hidden" animate="visible" variants={fade} custom={6} className="mt-10 sm:mt-12 w-full">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-5 sm:mb-6 flex items-center gap-2">
+                🔥 <span className="rainbow-text">Top 10</span>
+              </h2>
+              <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide" style={{ scrollbarWidth: "none" }}>
+                {top10CatalogItems.map((item, index) => (
+                  <div key={`top10-${item.id}`} className="flex-shrink-0 w-[45vw] sm:w-[200px] relative">
+                    <div className="absolute -left-1 -top-1 z-20 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm shadow-lg">
+                      {index + 1}
+                    </div>
+                    <div
+                      onClick={() => navigate("/browse")}
+                      className="group relative rounded-xl overflow-hidden cursor-pointer aspect-[2/3] bg-muted"
+                    >
+                      {item.banner_url ? (
+                        <img src={item.banner_url} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center"><Film className="w-8 h-8 text-muted-foreground/40" /></div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent opacity-80" />
+                      <div className="absolute bottom-0 left-0 right-0 p-3">
+                        <p className="text-sm font-semibold text-foreground truncate">{item.title}</p>
                       </div>
-                    );
-                  })}
-                </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </motion.div>
           )}

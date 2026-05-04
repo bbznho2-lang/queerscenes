@@ -324,7 +324,12 @@ const Player = () => {
                 {filteredEps.map((ep) => (
                   <button
                     key={ep.id}
-                    onClick={() => setCurrentEp(ep)}
+                    onClick={async () => {
+                      setCurrentEp(ep);
+                      if (user && content) {
+                        await supabase.from("content_clicks").insert({ content_id: content.id, user_id: user.id, episode_id: ep.id } as any);
+                      }
+                    }}
                     className={`w-full text-left rounded-xl flex items-center transition-colors ${isMobile ? "px-3 py-2.5 gap-2.5" : "px-4 py-3 gap-3"} ${
                       currentEp?.id === ep.id ? "bg-primary/10 border border-primary/30" : "bg-card border border-border hover:border-primary/20"
                     }`}

@@ -40,6 +40,7 @@ interface AggregatedUserClick {
   user_name: string;
   user_email: string;
   content_title: string;
+  episode_label: string;
   click_count: number;
   last_clicked_at: string;
 }
@@ -85,7 +86,7 @@ const AdminStatsCards = ({ totalUsers, premiumUsers, totalClicks }: { totalUsers
           </div>
           <div>
             <p className="text-2xl font-bold text-foreground">{premiumUsers}</p>
-            <p className="text-xs text-muted-foreground">Premium users</p>
+            <p className="text-xs text-muted-foreground">Supporters</p>
           </div>
         </CardContent>
       </Card>
@@ -243,7 +244,7 @@ const Admin = () => {
 
     const { data: clicks } = await supabase
       .from("content_clicks")
-      .select("content_id, user_id, clicked_at")
+      .select("content_id, user_id, clicked_at, episode_id")
       .order("clicked_at", { ascending: false });
 
     if (clicks && clicks.length > 0) {
@@ -252,6 +253,7 @@ const Admin = () => {
         countMap[c.content_id] = (countMap[c.content_id] || 0) + 1;
       });
       const contentIds = [...new Set(clicks.map((c: any) => c.content_id))];
+      const episodeIds = [...new Set(clicks.map((c: any) => c.episode_id).filter(Boolean))];
       const { data: contents } = await supabase
         .from("contents")
         .select("id, title")
@@ -259,6 +261,15 @@ const Admin = () => {
 
       const contentMap: Record<string, string> = {};
       (contents || []).forEach((c: any) => { contentMap[c.id] = c.title; });
+
+      let episodeMap: Record<string, { title: string; episode_number: number; season: number }> = {};
+      if (episodeIds.length > 0) {
+        const { data: eps } = await supabase
+          .from("episodes")
+          .select("id, title, episode_number, season")
+          .in("id", episodeIds as string[]);
+        (eps || []).forEach((e: any) => { episodeMap[e.id] = { title: e.title, episode_number: e.episode_number, season: e.season || 1 }; });
+      }
 
       const profileMap: Record<string, { email: string; name: string }> = {};
       allProfiles.forEach((p) => {
@@ -268,15 +279,19 @@ const Admin = () => {
         };
       });
 
-      // Aggregate clicks: group by user + content, count occurrences
+      // Aggregate clicks: group by user + content + episode, count occurrences
       const aggMap: Record<string, AggregatedUserClick> = {};
       clicks.forEach((c: any) => {
-        const key = `${c.user_id}__${c.content_id}`;
+        const epKey = c.episode_id || "main";
+        const key = `${c.user_id}__${c.content_id}__${epKey}`;
+        const ep = c.episode_id ? episodeMap[c.episode_id] : null;
+        const epLabel = ep ? `S${ep.season} · E${ep.episode_number} — ${ep.title}` : "—";
         if (!aggMap[key]) {
           aggMap[key] = {
             user_name: profileMap[c.user_id]?.name || "Unknown",
             user_email: profileMap[c.user_id]?.email || "Unknown",
             content_title: contentMap[c.content_id] || "Deleted content",
+            episode_label: epLabel,
             click_count: 0,
             last_clicked_at: c.clicked_at,
           };
@@ -360,7 +375,7 @@ const Admin = () => {
     }
     const { error } = await supabase.from("profiles").update(updateData).eq("id", profile.id);
     if (error) { toast.error("Error updating"); return; }
-    toast.success(newPremium ? "Premium activated" : "Premium removed");
+    toast.success(newPremium ? "Supporter activated" : "Supporter removed");
     setProfiles(profiles.map((p) => p.id === profile.id ? { ...p, ...updateData } : p));
   };
 
@@ -402,7 +417,7 @@ const Admin = () => {
       if (!profile) { toast.error("No user found with this email."); return; }
       const { error: updateError } = await supabase.from("profiles").update({ is_premium: true, premium_plan: "lifetime", premium_expires_at: null }).eq("id", profile.id);
       if (updateError) { toast.error("Error granting premium"); return; }
-      toast.success(`Premium granted to ${emailTrimmed}!`);
+      toast.success(`Supporter access granted to ${emailTrimmed}!`);
       setPremiumEmail("");
       fetchData();
     } finally {
@@ -427,10 +442,24 @@ const Admin = () => {
   };
 
   const totalPages = Math.max(1, Math.ceil(profiles.length / USERS_PER_PAGE));
+  const sortedProfiles = useMemo(() => {
+    const isActiveSupporter = (p: Profile) => {
+      if (!p.is_premium) return false;
+      if (!p.premium_expires_at) return true;
+      return new Date(p.premium_expires_at) > new Date();
+    };
+    return [...profiles].sort((a, b) => {
+      const aSup = isActiveSupporter(a) ? 1 : 0;
+      const bSup = isActiveSupporter(b) ? 1 : 0;
+      if (aSup !== bSup) return bSup - aSup;
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+  }, [profiles]);
+
   const paginatedProfiles = useMemo(() => {
     const start = (currentPage - 1) * USERS_PER_PAGE;
-    return profiles.slice(start, start + USERS_PER_PAGE);
-  }, [profiles, currentPage]);
+    return sortedProfiles.slice(start, start + USERS_PER_PAGE);
+  }, [sortedProfiles, currentPage]);
 
   const totalClickPages = Math.max(1, Math.ceil(aggregatedClicks.length / CLICKS_PER_PAGE));
   const paginatedClicks = useMemo(() => {
@@ -512,18 +541,20 @@ const Admin = () => {
           <CardContent>
             {aggregatedClicks.length > 0 ? (
               <div className="space-y-1">
-                <div className="hidden sm:grid grid-cols-[1fr_1fr_1fr_80px_140px] gap-4 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
+                <div className="hidden sm:grid grid-cols-[1fr_1fr_1.2fr_1.2fr_70px_120px] gap-3 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
                   <span>User</span>
                   <span>Email</span>
                   <span>Content</span>
+                  <span>Episode</span>
                   <span className="text-center">Clicks</span>
                   <span className="text-right">Last Click</span>
                 </div>
                 {paginatedClicks.map((click, i) => (
-                  <div key={i} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_1fr_80px_140px] gap-1 sm:gap-4 px-3 py-2.5 rounded-lg hover:bg-muted/30 transition-colors border-b border-border/30 last:border-0">
+                  <div key={i} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_1.2fr_1.2fr_70px_120px] gap-1 sm:gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/30 transition-colors border-b border-border/30 last:border-0">
                     <span className="text-sm text-foreground font-medium truncate">{click.user_name}</span>
                     <span className="text-xs sm:text-sm text-muted-foreground truncate">{click.user_email}</span>
                     <span className="text-xs sm:text-sm text-foreground truncate">{click.content_title}</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground truncate" title={click.episode_label}>{click.episode_label}</span>
                     <span className="text-sm font-semibold text-center text-primary">{click.click_count}×</span>
                     <span className="text-xs text-muted-foreground text-right">{new Date(click.last_clicked_at).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>
                   </div>
@@ -681,12 +712,12 @@ const Admin = () => {
           </CardContent>
         </Card>
 
-        {/* Grant Premium by Email */}
+        {/* Grant Supporter Access by Email */}
         <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <Mail className="w-5 h-5 text-secondary" />
-              Grant Premium by Email
+              Grant Supporter Access by Email
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -697,7 +728,7 @@ const Admin = () => {
               </div>
               <Button onClick={grantPremiumByEmail} disabled={addingPremium} className="bg-secondary text-secondary-foreground hover:bg-secondary/90">
                 <Crown className="w-4 h-4 mr-1" />
-                {addingPremium ? "Granting..." : "Grant Premium"}
+                {addingPremium ? "Granting..." : "Grant Supporter"}
               </Button>
             </div>
           </CardContent>
@@ -707,7 +738,7 @@ const Admin = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <CreditCard className="w-5 h-5 text-secondary" />
-              Manage Users & Premium
+              Manage Users & Supporters
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -716,7 +747,7 @@ const Admin = () => {
                 <div className="hidden sm:grid grid-cols-[1fr_120px_80px_80px_50px] gap-4 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
                   <span>User</span>
                   <span>Plan</span>
-                  <span>Premium</span>
+                  <span>Supporter</span>
                   <span>Date</span>
                   <span></span>
                 </div>
@@ -735,9 +766,9 @@ const Admin = () => {
                               {p.first_name || p.last_name ? `${p.first_name || ""} ${p.last_name || ""}`.trim() : "No name"}
                             </span>
                             {p.is_premium && (
-                              <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold ${expired ? 'bg-destructive/20 text-destructive' : 'bg-secondary/20 text-secondary'}`}>
+                              <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold ${expired ? 'bg-destructive/20 text-destructive' : 'bg-primary/20 text-primary'}`}>
                                 <Crown className="w-2.5 h-2.5" />
-                                {expired ? "EXPIRED" : "PREMIUM"}
+                                {expired ? "EXPIRED" : "SUPPORTER"}
                               </span>
                             )}
                           </div>
