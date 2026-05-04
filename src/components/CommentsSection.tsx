@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { MessageCircle, Send, Trash2, Reply, Crown } from "lucide-react";
+import { MessageCircle, Send, Trash2, Reply, Crown, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -19,9 +19,6 @@ interface Comment {
 
 interface ProfileLite {
   user_id: string;
-  first_name: string | null;
-  last_name: string | null;
-  email: string | null;
   is_premium: boolean | null;
   premium_expires_at: string | null;
 }
@@ -52,6 +49,24 @@ const CommentsSection = ({ contentId }: Props) => {
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [authorName, setAuthorName] = useState<string>("");
+  const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
+  const [likedByMe, setLikedByMe] = useState<Set<string>>(new Set());
+
+  const loadLikes = async (commentIds: string[]) => {
+    if (!commentIds.length) { setLikeCounts({}); setLikedByMe(new Set()); return; }
+    const { data } = await supabase
+      .from("comment_likes" as any)
+      .select("comment_id, user_id")
+      .in("comment_id", commentIds);
+    const counts: Record<string, number> = {};
+    const mine = new Set<string>();
+    ((data as unknown as Array<{ comment_id: string; user_id: string }> | null) || []).forEach((row) => {
+      counts[row.comment_id] = (counts[row.comment_id] || 0) + 1;
+      if (user && row.user_id === user.id) mine.add(row.comment_id);
+    });
+    setLikeCounts(counts);
+    setLikedByMe(mine);
+  };
 
   const load = async () => {
     const { data } = await supabase
@@ -69,15 +84,17 @@ const CommentsSection = ({ contentId }: Props) => {
       const supSet = new Set(((sup as Array<{ user_id: string }> | null) || []).map((s) => s.user_id));
       const map: Record<string, ProfileLite> = {};
       ids.forEach((uid) => {
-        map[uid] = { user_id: uid, first_name: null, last_name: null, email: null, is_premium: supSet.has(uid), premium_expires_at: null };
+        map[uid] = { user_id: uid, is_premium: supSet.has(uid), premium_expires_at: null };
       });
       setProfiles(map);
     } else {
       setProfiles({});
     }
+
+    await loadLikes(list.map((c) => c.id));
   };
 
-  useEffect(() => { if (contentId) void load(); }, [contentId]);
+  useEffect(() => { if (contentId) void load(); }, [contentId, user?.id]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -135,6 +152,26 @@ const CommentsSection = ({ contentId }: Props) => {
     void load();
   };
 
+  const toggleLike = async (commentId: string) => {
+    if (!user) { toast.error("Sign in to like"); return; }
+    const liked = likedByMe.has(commentId);
+    // optimistic
+    setLikedByMe((prev) => {
+      const n = new Set(prev);
+      liked ? n.delete(commentId) : n.add(commentId);
+      return n;
+    });
+    setLikeCounts((prev) => ({ ...prev, [commentId]: Math.max(0, (prev[commentId] || 0) + (liked ? -1 : 1)) }));
+
+    if (liked) {
+      const { error } = await supabase.from("comment_likes" as any).delete().eq("comment_id", commentId).eq("user_id", user.id);
+      if (error) { toast.error(error.message); void load(); }
+    } else {
+      const { error } = await supabase.from("comment_likes" as any).insert({ comment_id: commentId, user_id: user.id } as any);
+      if (error) { toast.error(error.message); void load(); }
+    }
+  };
+
   const { roots, repliesByParent } = useMemo(() => {
     const roots: Comment[] = [];
     const repliesByParent: Record<string, Comment[]> = {};
@@ -149,17 +186,24 @@ const CommentsSection = ({ contentId }: Props) => {
     return { roots, repliesByParent };
   }, [comments]);
 
-  const Avatar = ({ uid, name }: { uid: string; name: string }) => {
-    const supporter = isSupporter(uid);
+  const Avatar = ({ name }: { name: string }) => (
+    <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold bg-primary/15 text-primary flex-shrink-0">
+      {initialOf(name)}
+    </div>
+  );
+
+  const LikeButton = ({ id }: { id: string }) => {
+    const liked = likedByMe.has(id);
+    const count = likeCounts[id] || 0;
     return (
-      <div className="relative flex-shrink-0">
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${supporter ? "bg-primary text-primary-foreground ring-2 ring-primary/40" : "bg-primary/15 text-primary"}`}>
-          {initialOf(name)}
-        </div>
-        {supporter && (
-          <Crown className="absolute -top-1 -right-1 w-3 h-3 text-primary fill-primary drop-shadow" />
-        )}
-      </div>
+      <button
+        onClick={() => toggleLike(id)}
+        className={`text-[11px] inline-flex items-center gap-1 transition-colors ${liked ? "text-pink-500" : "text-muted-foreground hover:text-pink-500"}`}
+        title={liked ? "Unlike" : "Like"}
+      >
+        <Heart className={`w-3 h-3 ${liked ? "fill-pink-500" : ""}`} /> {count > 0 ? count : ""}
+        {count === 0 && <span>Like</span>}
+      </button>
     );
   };
 
@@ -170,11 +214,15 @@ const CommentsSection = ({ contentId }: Props) => {
       <div className={`rounded-xl bg-card border border-border p-3 sm:p-4 ${isReply ? "ml-6 sm:ml-10" : ""}`}>
         <div className="flex items-start justify-between gap-2 mb-1.5">
           <div className="flex items-center gap-2 min-w-0">
-            <Avatar uid={c.user_id} name={c.author_name} />
+            <Avatar name={c.author_name} />
             <div className="min-w-0">
-              <p className="text-sm font-medium text-foreground truncate flex items-center gap-1">
-                {c.author_name || "User"}
-                {supporter && <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-primary/20 text-primary font-bold">SUPPORTER</span>}
+              <p className="text-sm font-medium text-foreground truncate flex items-center gap-1.5 flex-wrap">
+                <span className="truncate">{c.author_name || "User"}</span>
+                {supporter && (
+                  <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-primary/20 text-primary font-bold">
+                    <Crown className="w-2.5 h-2.5 fill-primary" /> SUPPORTER
+                  </span>
+                )}
               </p>
               <p className="text-[10px] text-muted-foreground">{formatDate(c.created_at)}</p>
             </div>
@@ -187,30 +235,32 @@ const CommentsSection = ({ contentId }: Props) => {
         </div>
         <p className="text-sm text-foreground/90 whitespace-pre-wrap break-words leading-relaxed">{c.body}</p>
 
-        {!isReply && user && (
-          <div className="mt-2">
+        <div className="mt-2 flex items-center gap-4">
+          <LikeButton id={c.id} />
+          {!isReply && user && (
             <button
               onClick={() => { setReplyTo(replyTo === c.id ? null : c.id); setReplyBody(""); }}
               className="text-[11px] text-muted-foreground hover:text-primary inline-flex items-center gap-1"
             >
               <Reply className="w-3 h-3" /> {replyTo === c.id ? "Cancel" : "Reply"}
             </button>
-            {replyTo === c.id && (
-              <div className="mt-2 space-y-2">
-                <Textarea
-                  value={replyBody}
-                  onChange={(e) => setReplyBody(e.target.value)}
-                  placeholder={`Reply to ${c.author_name}…`}
-                  maxLength={1000}
-                  className="bg-muted border-border resize-y min-h-[60px] text-sm"
-                />
-                <div className="flex justify-end">
-                  <Button onClick={() => handleReply(c.id)} disabled={loading} size="sm" className="rounded-full bg-primary text-primary-foreground gap-1">
-                    <Send className="w-3 h-3" /> Reply
-                  </Button>
-                </div>
-              </div>
-            )}
+          )}
+        </div>
+
+        {!isReply && replyTo === c.id && (
+          <div className="mt-2 space-y-2">
+            <Textarea
+              value={replyBody}
+              onChange={(e) => setReplyBody(e.target.value)}
+              placeholder={`Reply to ${c.author_name}…`}
+              maxLength={1000}
+              className="bg-muted border-border resize-y min-h-[60px] text-sm"
+            />
+            <div className="flex justify-end">
+              <Button onClick={() => handleReply(c.id)} disabled={loading} size="sm" className="rounded-full bg-primary text-primary-foreground gap-1">
+                <Send className="w-3 h-3" /> Reply
+              </Button>
+            </div>
           </div>
         )}
 
