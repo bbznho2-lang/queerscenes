@@ -82,7 +82,13 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         .select("*")
         .eq("content_id", content.id)
         .order("episode_number")
-        .then(({ data }) => setEpisodes(data || []));
+        .then(({ data }) => {
+          const list = (data || []).map((ep: any) => ({
+            ...ep,
+            player_url_free: ep.player_url_free || ep.player_url || "",
+          }));
+          setEpisodes(list);
+        });
     } else {
       setTitle("");
       setYear(2025);
