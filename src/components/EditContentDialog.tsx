@@ -285,8 +285,19 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
           </div>
 
           <div className="flex items-center justify-between py-2">
-            <label className="text-sm text-muted-foreground">Supporter</label>
+            <div>
+              <label className="text-sm text-muted-foreground">Supporters only</label>
+              <p className="text-[10px] text-muted-foreground/60">Locks the entire title — only Supporters can watch</p>
+            </div>
             <Switch checked={isPremium} onCheckedChange={setIsPremium} />
+          </div>
+
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <label className="text-sm text-muted-foreground">Enable Supporter player</label>
+              <p className="text-[10px] text-muted-foreground/60">Shows the Supporter player tab and triggers the paywall for non-Supporters</p>
+            </div>
+            <Switch checked={supporterPlayerEnabled} onCheckedChange={setSupporterPlayerEnabled} />
           </div>
 
           <div className="flex items-center justify-between py-2">
