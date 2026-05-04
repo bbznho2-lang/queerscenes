@@ -396,11 +396,20 @@ const Index = () => {
                      {loading ? "Please wait..." : isForgot ? "SEND RESET LINK" : isSignUp ? "CREATE ACCOUNT" : "SIGN IN"}
                    </Button>
                    {!isSignUp && !isForgot && (
-                     <p className="text-center">
+                     <div className="flex items-center justify-between">
+                       <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer select-none">
+                         <input
+                           type="checkbox"
+                           checked={rememberMe}
+                           onChange={(e) => setRememberMe(e.target.checked)}
+                           className="w-4 h-4 rounded border-border bg-muted accent-primary cursor-pointer"
+                         />
+                         Remember me
+                       </label>
                        <button type="button" onClick={() => setIsForgot(true)} className="text-xs text-muted-foreground hover:text-secondary hover:underline">
                          Forgot your password?
                        </button>
-                     </p>
+                     </div>
                    )}
                    <p className="text-center text-sm text-muted-foreground">
                      {isForgot ? (
