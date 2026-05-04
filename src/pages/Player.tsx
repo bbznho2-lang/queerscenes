@@ -263,7 +263,7 @@ const Player = () => {
                       <Crown className="w-4 h-4" /> Choose a plan
                     </button>
                     {!user && (
-                      <button onClick={() => { void trackEvent("paywall_signup_click", "paywall"); navigate("/auth"); }} className="text-xs text-foreground/90 hover:text-foreground underline underline-offset-2">
+                      <button onClick={() => { void trackEvent("paywall_signup_click", "paywall"); navigate("/?signup=1#planos"); }} className="text-xs text-foreground/90 hover:text-foreground underline underline-offset-2">
                         Sign up to become a Supporter
                       </button>
                     )}
