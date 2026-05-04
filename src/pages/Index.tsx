@@ -64,7 +64,7 @@ const Index = () => {
       const visibleItems = (data ?? []).filter((item) => !item.is_archived) as LandingContentItem[];
       const uniqueItems = getUniqueItemsByTitle(visibleItems);
 
-      setCatalogTitles(uniqueItems);
+      setCatalogTitles(visibleItems);
       setHeroBanners(uniqueItems.filter((item) => item.banner_url).slice(0, 8));
     };
 
