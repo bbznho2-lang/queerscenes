@@ -614,7 +614,7 @@ const Index = () => {
                   </ul>
                   <Button
                     onClick={() => window.open("https://t.me/L7kznr?text=Hi%20I%20came%20from%20your%20website%20and%20I%27m%20interested%20in%20becoming%20a%20Supporter%20can%20you%20give%20me%20more%20details", "_blank")}
-                    className="w-full mt-5 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple gap-2"
+                    className="shine-cta w-full mt-5 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple gap-2"
                   >
                     <Crown className="w-4 h-4" /> Become a Supporter
                   </Button>
