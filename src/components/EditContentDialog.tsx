@@ -67,8 +67,10 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setTag(content.tag);
       setType(content.type);
       setSection(content.section);
-      setPlayerUrl(content.player_url || "");
-      setPlayerUrlFree((content as any).player_url_free || "");
+      const legacy = content.player_url || "";
+      const free = (content as any).player_url_free || "";
+      setPlayerUrl(legacy);
+      setPlayerUrlFree(free || legacy);
       setPlayerUrlPremium((content as any).player_url_premium || "");
       setBannerPreview(content.banner_url || "");
       setBannerUrlInput(content.banner_url || "");
