@@ -244,7 +244,7 @@ const Admin = () => {
 
     const { data: clicks } = await supabase
       .from("content_clicks")
-      .select("content_id, user_id, clicked_at")
+      .select("content_id, user_id, clicked_at, episode_id")
       .order("clicked_at", { ascending: false });
 
     if (clicks && clicks.length > 0) {
@@ -253,6 +253,7 @@ const Admin = () => {
         countMap[c.content_id] = (countMap[c.content_id] || 0) + 1;
       });
       const contentIds = [...new Set(clicks.map((c: any) => c.content_id))];
+      const episodeIds = [...new Set(clicks.map((c: any) => c.episode_id).filter(Boolean))];
       const { data: contents } = await supabase
         .from("contents")
         .select("id, title")
@@ -260,6 +261,15 @@ const Admin = () => {
 
       const contentMap: Record<string, string> = {};
       (contents || []).forEach((c: any) => { contentMap[c.id] = c.title; });
+
+      let episodeMap: Record<string, { title: string; episode_number: number; season: number }> = {};
+      if (episodeIds.length > 0) {
+        const { data: eps } = await supabase
+          .from("episodes")
+          .select("id, title, episode_number, season")
+          .in("id", episodeIds as string[]);
+        (eps || []).forEach((e: any) => { episodeMap[e.id] = { title: e.title, episode_number: e.episode_number, season: e.season || 1 }; });
+      }
 
       const profileMap: Record<string, { email: string; name: string }> = {};
       allProfiles.forEach((p) => {
@@ -269,15 +279,19 @@ const Admin = () => {
         };
       });
 
-      // Aggregate clicks: group by user + content, count occurrences
+      // Aggregate clicks: group by user + content + episode, count occurrences
       const aggMap: Record<string, AggregatedUserClick> = {};
       clicks.forEach((c: any) => {
-        const key = `${c.user_id}__${c.content_id}`;
+        const epKey = c.episode_id || "main";
+        const key = `${c.user_id}__${c.content_id}__${epKey}`;
+        const ep = c.episode_id ? episodeMap[c.episode_id] : null;
+        const epLabel = ep ? `S${ep.season} · E${ep.episode_number} — ${ep.title}` : "—";
         if (!aggMap[key]) {
           aggMap[key] = {
             user_name: profileMap[c.user_id]?.name || "Unknown",
             user_email: profileMap[c.user_id]?.email || "Unknown",
             content_title: contentMap[c.content_id] || "Deleted content",
+            episode_label: epLabel,
             click_count: 0,
             last_clicked_at: c.clicked_at,
           };
