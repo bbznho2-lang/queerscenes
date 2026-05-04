@@ -65,12 +65,12 @@ const CommentsSection = ({ contentId }: Props) => {
 
     const ids = Array.from(new Set(list.map((c) => c.user_id)));
     if (ids.length) {
-      const { data: profs } = await supabase
-        .from("profiles")
-        .select("user_id, first_name, last_name, email, is_premium, premium_expires_at")
-        .in("user_id", ids);
+      const { data: sup } = await supabase.rpc("get_supporter_user_ids", { _user_ids: ids } as any);
+      const supSet = new Set(((sup as Array<{ user_id: string }> | null) || []).map((s) => s.user_id));
       const map: Record<string, ProfileLite> = {};
-      (profs as ProfileLite[] | null)?.forEach((p) => { map[p.user_id] = p; });
+      ids.forEach((uid) => {
+        map[uid] = { user_id: uid, first_name: null, last_name: null, email: null, is_premium: supSet.has(uid), premium_expires_at: null };
+      });
       setProfiles(map);
     } else {
       setProfiles({});
