@@ -126,6 +126,10 @@ const Admin = () => {
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [clicksPage, setClicksPage] = useState(1);
   const [chatsPage, setChatsPage] = useState(1);
+  const [supporterEvents, setSupporterEvents] = useState<Array<{ id: string; event_type: string; source: string | null; user_id: string | null; content_id: string | null; created_at: string; metadata: any }>>([]);
+  const [eventsPage, setEventsPage] = useState(1);
+  const EVENTS_PER_PAGE = 15;
+
   const chatScrollRef = useRef<HTMLDivElement>(null);
   const USERS_PER_PAGE = 20;
   const CLICKS_PER_PAGE = 20;
