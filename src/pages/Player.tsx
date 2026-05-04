@@ -23,6 +23,7 @@ interface ContentItem {
   section: string;
   position: number;
   is_premium: boolean;
+  supporter_player_enabled?: boolean;
 }
 
 interface Episode {
@@ -134,16 +135,17 @@ const Player = () => {
   // Note: previously auto-switched supporter→free for non-supporters; now we
   // keep the tier and show an in-player paywall so the user can convert.
 
+  const supporterPlayerEnabled = Boolean(content?.supporter_player_enabled);
   const episodePremiumBlocked = currentEp?.is_premium && !userIsPremium && !isAdmin;
-  const supporterPaywall = tier === "supporter" && !userIsPremium && !isAdmin;
+  const supporterPaywall = supporterPlayerEnabled && tier === "supporter" && !userIsPremium && !isAdmin;
   const isBlocked = premiumBlocked || episodePremiumBlocked || supporterPaywall;
 
   // Resolve URL based on tier with fallback chain
   const sourceFree = currentEp?.player_url_free || content?.player_url_free || currentEp?.player_url || content?.player_url || "";
   const sourcePremium = currentEp?.player_url_premium || content?.player_url_premium || sourceFree;
-  const rawPlayerUrl = tier === "supporter" ? sourcePremium : sourceFree;
+  const rawPlayerUrl = tier === "supporter" && supporterPlayerEnabled ? sourcePremium : sourceFree;
 
-  const hasPremiumOption = Boolean((currentEp?.player_url_premium || content?.player_url_premium || "").trim());
+  const hasPremiumOption = supporterPlayerEnabled && Boolean((currentEp?.player_url_premium || content?.player_url_premium || "").trim());
   const hasFreeOption = Boolean((currentEp?.player_url_free || content?.player_url_free || currentEp?.player_url || content?.player_url || "").trim());
 
   const getEmbedUrl = (url: string) => {

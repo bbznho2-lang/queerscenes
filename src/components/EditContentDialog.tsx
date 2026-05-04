@@ -20,6 +20,7 @@ interface ContentItem {
   position: number;
   is_premium: boolean;
   is_archived?: boolean;
+  supporter_player_enabled?: boolean;
 }
 
 interface Episode {
@@ -56,6 +57,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
   const [bannerUrlInput, setBannerUrlInput] = useState("");
   const [isPremium, setIsPremium] = useState(false);
   const [isArchived, setIsArchived] = useState(false);
+  const [supporterPlayerEnabled, setSupporterPlayerEnabled] = useState(false);
   const [synopsis, setSynopsis] = useState("");
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [saving, setSaving] = useState(false);
@@ -76,6 +78,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setBannerUrlInput(content.banner_url || "");
       setIsPremium(content.is_premium || false);
       setIsArchived(content.is_archived || false);
+      setSupporterPlayerEnabled((content as any).supporter_player_enabled || false);
       setSynopsis((content as any).synopsis || "");
       supabase
         .from("episodes")
@@ -102,6 +105,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setBannerUrlInput("");
       setIsPremium(false);
       setIsArchived(false);
+      setSupporterPlayerEnabled(false);
       setSynopsis("");
       setEpisodes([]);
     }
@@ -146,6 +150,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         banner_url: bannerUrl,
         is_premium: isPremium,
         is_archived: isArchived,
+        supporter_player_enabled: supporterPlayerEnabled,
         synopsis: synopsis || null,
       };
 
@@ -280,8 +285,19 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
           </div>
 
           <div className="flex items-center justify-between py-2">
-            <label className="text-sm text-muted-foreground">Supporter</label>
+            <div>
+              <label className="text-sm text-muted-foreground">Supporters only</label>
+              <p className="text-[10px] text-muted-foreground/60">Locks the entire title — only Supporters can watch</p>
+            </div>
             <Switch checked={isPremium} onCheckedChange={setIsPremium} />
+          </div>
+
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <label className="text-sm text-muted-foreground">Enable Supporter player</label>
+              <p className="text-[10px] text-muted-foreground/60">Shows the Supporter player tab and triggers the paywall for non-Supporters</p>
+            </div>
+            <Switch checked={supporterPlayerEnabled} onCheckedChange={setSupporterPlayerEnabled} />
           </div>
 
           <div className="flex items-center justify-between py-2">

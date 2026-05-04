@@ -149,6 +149,7 @@ export type Database = {
           player_url_premium: string | null
           position: number
           section: string
+          supporter_player_enabled: boolean
           synopsis: string | null
           tag: string
           title: string
@@ -167,6 +168,7 @@ export type Database = {
           player_url_premium?: string | null
           position?: number
           section?: string
+          supporter_player_enabled?: boolean
           synopsis?: string | null
           tag?: string
           title?: string
@@ -185,6 +187,7 @@ export type Database = {
           player_url_premium?: string | null
           position?: number
           section?: string
+          supporter_player_enabled?: boolean
           synopsis?: string | null
           tag?: string
           title?: string
