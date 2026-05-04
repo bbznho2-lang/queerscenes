@@ -359,6 +359,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_supporter_user_ids: {
+        Args: { _user_ids: string[] }
+        Returns: {
+          user_id: string
+        }[]
+      }
       get_top_content_ids: {
         Args: { _limit?: number }
         Returns: {
