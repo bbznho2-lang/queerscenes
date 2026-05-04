@@ -74,8 +74,8 @@ const ContentCard = ({
       />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent opacity-80" />
       {item.is_premium && (
-        <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-secondary/90 text-secondary-foreground text-[10px] font-bold flex items-center gap-1">
-          <Crown className="w-3 h-3" /> PREMIUM
+        <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-primary/90 text-primary-foreground text-[10px] font-bold flex items-center gap-1">
+          <Crown className="w-3 h-3" /> SUPPORTERS
         </div>
       )}
       <button
