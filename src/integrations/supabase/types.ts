@@ -82,6 +82,7 @@ export type Database = {
           content_id: string
           created_at: string
           id: string
+          parent_id: string | null
           user_id: string
         }
         Insert: {
@@ -90,6 +91,7 @@ export type Database = {
           content_id: string
           created_at?: string
           id?: string
+          parent_id?: string | null
           user_id: string
         }
         Update: {
@@ -98,9 +100,18 @@ export type Database = {
           content_id?: string
           created_at?: string
           id?: string
+          parent_id?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "content_comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "content_comments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       contents: {
         Row: {
