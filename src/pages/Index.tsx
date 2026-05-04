@@ -112,6 +112,17 @@ const Index = () => {
     };
   }, [user]);
 
+  // Scroll to plans section if URL hash is #planos
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.location.hash !== "#planos") return;
+    // Wait a tick for the section to mount
+    const timeout = setTimeout(() => {
+      document.getElementById("planos")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+    return () => clearTimeout(timeout);
+  }, []);
+
   // Rotate hero banners
   useEffect(() => {
     if (heroBanners.length <= 1) return;
