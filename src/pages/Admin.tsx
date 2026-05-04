@@ -375,7 +375,7 @@ const Admin = () => {
     }
     const { error } = await supabase.from("profiles").update(updateData).eq("id", profile.id);
     if (error) { toast.error("Error updating"); return; }
-    toast.success(newPremium ? "Premium activated" : "Premium removed");
+    toast.success(newPremium ? "Supporter activated" : "Supporter removed");
     setProfiles(profiles.map((p) => p.id === profile.id ? { ...p, ...updateData } : p));
   };
 
@@ -417,7 +417,7 @@ const Admin = () => {
       if (!profile) { toast.error("No user found with this email."); return; }
       const { error: updateError } = await supabase.from("profiles").update({ is_premium: true, premium_plan: "lifetime", premium_expires_at: null }).eq("id", profile.id);
       if (updateError) { toast.error("Error granting premium"); return; }
-      toast.success(`Premium granted to ${emailTrimmed}!`);
+      toast.success(`Supporter access granted to ${emailTrimmed}!`);
       setPremiumEmail("");
       fetchData();
     } finally {
@@ -712,12 +712,12 @@ const Admin = () => {
           </CardContent>
         </Card>
 
-        {/* Grant Premium by Email */}
+        {/* Grant Supporter Access by Email */}
         <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <Mail className="w-5 h-5 text-secondary" />
-              Grant Premium by Email
+              Grant Supporter Access by Email
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -728,7 +728,7 @@ const Admin = () => {
               </div>
               <Button onClick={grantPremiumByEmail} disabled={addingPremium} className="bg-secondary text-secondary-foreground hover:bg-secondary/90">
                 <Crown className="w-4 h-4 mr-1" />
-                {addingPremium ? "Granting..." : "Grant Premium"}
+                {addingPremium ? "Granting..." : "Grant Supporter"}
               </Button>
             </div>
           </CardContent>
@@ -738,7 +738,7 @@ const Admin = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <CreditCard className="w-5 h-5 text-secondary" />
-              Manage Users & Premium
+              Manage Users & Supporters
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -747,7 +747,7 @@ const Admin = () => {
                 <div className="hidden sm:grid grid-cols-[1fr_120px_80px_80px_50px] gap-4 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
                   <span>User</span>
                   <span>Plan</span>
-                  <span>Premium</span>
+                  <span>Supporter</span>
                   <span>Date</span>
                   <span></span>
                 </div>
@@ -768,7 +768,7 @@ const Admin = () => {
                             {p.is_premium && (
                               <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold ${expired ? 'bg-destructive/20 text-destructive' : 'bg-secondary/20 text-secondary'}`}>
                                 <Crown className="w-2.5 h-2.5" />
-                                {expired ? "EXPIRED" : "PREMIUM"}
+                                {expired ? "EXPIRED" : "SUPPORTER"}
                               </span>
                             )}
                           </div>
