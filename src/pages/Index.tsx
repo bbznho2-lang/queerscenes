@@ -501,7 +501,7 @@ const Index = () => {
                     <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span><span className="text-foreground">Telegram community</span></li>
                     <li className="flex items-start gap-2 opacity-60"><span className="text-destructive mt-0.5">✗</span><span className="text-muted-foreground line-through">International subtitled series & movies</span></li>
                     <li className="flex items-start gap-2 opacity-60"><span className="text-destructive mt-0.5">✗</span><span className="text-muted-foreground line-through">Soap operas subtitled weekly</span></li>
-                    <li className="flex items-start gap-2 opacity-60"><span className="text-destructive mt-0.5">✗</span><span className="text-muted-foreground line-through">Thai BL & GL subtitled</span></li>
+                    <li className="flex items-start gap-2 opacity-60"><span className="text-destructive mt-0.5">✗</span><span className="text-muted-foreground line-through">Thai GL subtitled</span></li>
                     <li className="flex items-start gap-2 opacity-60"><span className="text-destructive mt-0.5">✗</span><span className="text-muted-foreground line-through">Early access content</span></li>
                   </ul>
                   <Button
@@ -539,7 +539,7 @@ const Index = () => {
                     <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">No ads on the site</span></li>
                     <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">Soap operas subtitled in English — every week</span></li>
                     <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">LGBT series & movies from other countries, subtitled</span></li>
-                    <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">Thai BL & GL subtitled</span></li>
+                    <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">Thai GL subtitled</span></li>
                     <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">Early access content</span></li>
                     <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">VIP Telegram channel with exclusive news & updates</span></li>
                   </ul>
