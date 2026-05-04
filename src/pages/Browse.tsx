@@ -51,12 +51,8 @@ const ContentCard = ({
 }) => {
   const navigate = useNavigate();
   const handleClick = () => {
-    if (item.is_premium && !isAdmin && !userIsPremium) {
-      toast.error("This content is exclusive to Premium subscribers. Subscribe to a plan to watch!");
-      navigate("/#planos");
-
-      return;
-    }
+    // Even when locked, route to the player so the in-player Supporter paywall is shown
+    // (without revealing episodes/synopsis).
     onClickTrack();
     navigate(`/player/${item.id}`);
   };
