@@ -67,8 +67,10 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setTag(content.tag);
       setType(content.type);
       setSection(content.section);
-      setPlayerUrl(content.player_url || "");
-      setPlayerUrlFree((content as any).player_url_free || "");
+      const legacy = content.player_url || "";
+      const free = (content as any).player_url_free || "";
+      setPlayerUrl(legacy);
+      setPlayerUrlFree(free || legacy);
       setPlayerUrlPremium((content as any).player_url_premium || "");
       setBannerPreview(content.banner_url || "");
       setBannerUrlInput(content.banner_url || "");
@@ -80,7 +82,13 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         .select("*")
         .eq("content_id", content.id)
         .order("episode_number")
-        .then(({ data }) => setEpisodes(data || []));
+        .then(({ data }) => {
+          const list = (data || []).map((ep: any) => ({
+            ...ep,
+            player_url_free: ep.player_url_free || ep.player_url || "",
+          }));
+          setEpisodes(list);
+        });
     } else {
       setTitle("");
       setYear(2025);
@@ -272,7 +280,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
           </div>
 
           <div className="flex items-center justify-between py-2">
-            <label className="text-sm text-muted-foreground">Premium Content?</label>
+            <label className="text-sm text-muted-foreground">Supporter</label>
             <Switch checked={isPremium} onCheckedChange={setIsPremium} />
           </div>
 
@@ -312,15 +320,6 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                 onChange={(e) => setPlayerUrlPremium(e.target.value)}
                 placeholder="https://... (ad-free, supporters only)"
                 className="bg-muted border-border mt-1"
-              />
-            </div>
-            <div>
-              <label className="text-[10px] text-muted-foreground/60">Legacy fallback URL</label>
-              <Input
-                value={playerUrl}
-                onChange={(e) => setPlayerUrl(e.target.value)}
-                placeholder="(optional, used if free is empty)"
-                className="bg-muted border-border mt-1 text-xs"
               />
             </div>
           </div>
@@ -393,18 +392,12 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                           placeholder="👑 Supporter player (no ads)"
                           className="bg-muted border-border text-xs"
                         />
-                        <Input
-                          value={ep.player_url || ""}
-                          onChange={(e) => updateEpisode(ep.id, "player_url", e.target.value)}
-                          placeholder="Legacy fallback URL (optional)"
-                          className="bg-muted border-border text-[11px] opacity-70"
-                        />
                         <div className="flex items-center gap-2">
                           <Switch
                             checked={ep.is_premium || false}
                             onCheckedChange={(v) => updateEpisode(ep.id, "is_premium", v)}
                           />
-                          <span className="text-xs text-muted-foreground">Episode locked to Supporters</span>
+                          <span className="text-xs text-muted-foreground">Supporter</span>
                         </div>
                       </div>
                     ))}
