@@ -121,15 +121,12 @@ const Player = () => {
     fetchContent();
   }, [id, user?.id, isAdmin, authLoading]);
 
-  // Auto switch to free if not allowed on supporter
-  useEffect(() => {
-    if (tier === "supporter" && !userIsPremium && !isAdmin) {
-      setTier("free");
-    }
-  }, [tier, userIsPremium, isAdmin]);
+  // Note: previously auto-switched supporter→free for non-supporters; now we
+  // keep the tier and show an in-player paywall so the user can convert.
 
   const episodePremiumBlocked = currentEp?.is_premium && !userIsPremium && !isAdmin;
-  const isBlocked = premiumBlocked || episodePremiumBlocked;
+  const supporterPaywall = tier === "supporter" && !userIsPremium && !isAdmin;
+  const isBlocked = premiumBlocked || episodePremiumBlocked || supporterPaywall;
 
   // Resolve URL based on tier with fallback chain
   const sourceFree = currentEp?.player_url_free || content?.player_url_free || currentEp?.player_url || content?.player_url || "";
@@ -175,11 +172,7 @@ const Player = () => {
   const iframeClassName = "absolute inset-0 w-full h-full border-0";
 
   const handleSupporterClick = () => {
-    if (userIsPremium || isAdmin) {
-      setTier("supporter");
-    } else {
-      navigate("/#planos");
-    }
+    setTier("supporter");
   };
 
   return (
@@ -202,13 +195,34 @@ const Player = () => {
         <div className={isMobile ? "w-full" : "w-full max-w-5xl"}>
           <div className={isMobile ? "relative w-full aspect-video bg-card overflow-hidden" : "relative aspect-video bg-card rounded-2xl overflow-hidden neon-border-purple"}>
             {isBlocked ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/90 backdrop-blur-sm px-6 text-center">
-                <Lock className="w-12 h-12 text-secondary mb-4" />
-                <h2 className="text-xl font-bold mb-2 flex items-center gap-2"><Crown className="w-5 h-5 text-secondary" /> Supporter Content</h2>
-                <p className="text-muted-foreground text-sm mb-4">This title is exclusive to Supporters.</p>
-                <button onClick={() => navigate("/#planos")} className="px-6 py-2.5 rounded-full bg-secondary text-secondary-foreground font-semibold hover:bg-secondary/90 transition-colors">
-                  Become a Supporter
-                </button>
+              <div className="absolute inset-0">
+                {content?.banner_url && (
+                  <img src={content.banner_url} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40" />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/40 backdrop-blur-sm" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+                  <div className="w-14 h-14 rounded-full bg-primary/15 flex items-center justify-center mb-3">
+                    <Crown className="w-7 h-7 text-primary" />
+                  </div>
+                  <h2 className="text-lg sm:text-xl font-bold mb-1.5">
+                    {supporterPaywall ? "Supporter-only Player" : "Supporter Content"}
+                  </h2>
+                  <p className="text-muted-foreground text-xs sm:text-sm mb-4 max-w-sm">
+                    {supporterPaywall
+                      ? "This player is ad-free and exclusive to Supporters. Support the project to unlock it."
+                      : "This title is exclusive to Supporters. Support the project to unlock it."}
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-2 items-center">
+                    <button onClick={() => navigate("/#planos")} className="px-5 py-2.5 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors flex items-center gap-2 glow-purple">
+                      <Crown className="w-4 h-4" /> Become a Supporter
+                    </button>
+                    {supporterPaywall && hasFreeOption && (
+                      <button onClick={() => setTier("free")} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">
+                        Watch the free version
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
             ) : hasPlayerUrl ? (
               <iframe
@@ -237,7 +251,7 @@ const Player = () => {
           </div>
 
           {/* Player tier selector */}
-          {!isBlocked && (hasFreeOption || hasPremiumOption) && (
+          {(!isBlocked || supporterPaywall) && (hasFreeOption || hasPremiumOption) && (
             <div className="mt-3 sm:mt-4 px-3 sm:px-0">
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <button
