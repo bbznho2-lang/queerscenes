@@ -150,6 +150,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         banner_url: bannerUrl,
         is_premium: isPremium,
         is_archived: isArchived,
+        supporter_player_enabled: supporterPlayerEnabled,
         synopsis: synopsis || null,
       };
 
