@@ -213,7 +213,7 @@ const Player = () => {
                       : "This title is exclusive to Supporters. Support the project to unlock it."}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-2 items-center">
-                    <button onClick={() => navigate("/#planos")} className="px-5 py-2.5 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors flex items-center gap-2 glow-purple">
+                    <button onClick={() => navigate("/#planos")} className="shine-cta px-5 py-2.5 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors flex items-center gap-2 glow-purple">
                       <Crown className="w-4 h-4" /> Become a Supporter
                     </button>
                     {supporterPaywall && hasFreeOption && (
