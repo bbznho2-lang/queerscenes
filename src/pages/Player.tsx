@@ -258,12 +258,12 @@ const Player = () => {
                   onClick={handleSupporterClick}
                   className={`flex-1 rounded-xl border px-3 py-2.5 text-left transition-all relative ${
                     tier === "supporter"
-                      ? "border-secondary bg-secondary/10 text-foreground"
-                      : "border-border bg-card text-muted-foreground hover:border-secondary/40"
+                      ? "border-primary bg-primary/15 text-foreground"
+                      : "border-border bg-card text-muted-foreground hover:border-primary/40"
                   }`}
                 >
                   <div className="flex items-center gap-2 text-sm font-semibold">
-                    <Crown className="w-3.5 h-3.5 text-secondary" />
+                    <Crown className="w-3.5 h-3.5 text-primary" />
                     Supporter Player
                     {!(userIsPremium || isAdmin) && <Lock className="w-3 h-3 text-muted-foreground ml-auto" />}
                   </div>
