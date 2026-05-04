@@ -214,7 +214,7 @@ const Index = () => {
           >
             Series, movies & exclusive moments — <span className="neon-text-pink">100% free</span> to start.
             <br className="hidden sm:block" />
-            Go Premium for the full experience. 🌈
+            Become a Supporter for the full experience. 🌈
           </motion.p>
 
           <motion.div initial="hidden" animate="visible" variants={fade} custom={4} className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -233,7 +233,7 @@ const Index = () => {
               className="text-sm sm:text-base px-6 py-4 sm:py-5 rounded-full border-accent/40 text-accent hover:bg-accent/10 gap-2"
             >
               <Crown className="w-4 h-4" />
-              GO PREMIUM
+              BECOME A SUPPORTER
             </Button>
           </motion.div>
 
