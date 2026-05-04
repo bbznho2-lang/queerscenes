@@ -306,8 +306,14 @@ const Player = () => {
           </div>
         </div>
 
-        {(content as any)?.synopsis && (
+        {!premiumBlocked && (content as any)?.synopsis && (
           <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{(content as any).synopsis}</p>
+        )}
+
+        {premiumBlocked && (
+          <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+            This content is exclusive to Supporters. Subscribe to a plan to watch!
+          </p>
         )}
 
         {(content?.type === "serie" || content?.type === "novela" || content?.type === "anime") && episodes.length > 0 && (() => {
