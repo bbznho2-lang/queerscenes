@@ -125,7 +125,8 @@ const Player = () => {
   // keep the tier and show an in-player paywall so the user can convert.
 
   const episodePremiumBlocked = currentEp?.is_premium && !userIsPremium && !isAdmin;
-  const isBlocked = premiumBlocked || episodePremiumBlocked;
+  const supporterPaywall = tier === "supporter" && !userIsPremium && !isAdmin;
+  const isBlocked = premiumBlocked || episodePremiumBlocked || supporterPaywall;
 
   // Resolve URL based on tier with fallback chain
   const sourceFree = currentEp?.player_url_free || content?.player_url_free || currentEp?.player_url || content?.player_url || "";
