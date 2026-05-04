@@ -28,6 +28,8 @@ interface Episode {
   title: string;
   episode_number: number;
   player_url: string | null;
+  player_url_free: string | null;
+  player_url_premium: string | null;
   season: number;
   is_premium: boolean;
 }
@@ -47,6 +49,8 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
   const [type, setType] = useState("filme");
   const [section, setSection] = useState("filmes");
   const [playerUrl, setPlayerUrl] = useState("");
+  const [playerUrlFree, setPlayerUrlFree] = useState("");
+  const [playerUrlPremium, setPlayerUrlPremium] = useState("");
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [bannerPreview, setBannerPreview] = useState("");
   const [bannerUrlInput, setBannerUrlInput] = useState("");
@@ -64,6 +68,8 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setType(content.type);
       setSection(content.section);
       setPlayerUrl(content.player_url || "");
+      setPlayerUrlFree((content as any).player_url_free || "");
+      setPlayerUrlPremium((content as any).player_url_premium || "");
       setBannerPreview(content.banner_url || "");
       setBannerUrlInput(content.banner_url || "");
       setIsPremium(content.is_premium || false);
@@ -82,6 +88,8 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setType(defaults?.type || "filme");
       setSection(defaults?.section || "series");
       setPlayerUrl("");
+      setPlayerUrlFree("");
+      setPlayerUrlPremium("");
       setBannerPreview("");
       setBannerUrlInput("");
       setIsPremium(false);
@@ -125,6 +133,8 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         type,
         section,
         player_url: playerUrl || null,
+        player_url_free: playerUrlFree || null,
+        player_url_premium: playerUrlPremium || null,
         banner_url: bannerUrl,
         is_premium: isPremium,
         is_archived: isArchived,
