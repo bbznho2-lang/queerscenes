@@ -251,30 +251,42 @@ const Index = () => {
           )}
 
           {top10CatalogItems.length > 0 && (
-            <motion.div initial="hidden" animate="visible" variants={fade} custom={6} className="mt-8 sm:mt-10 w-full overflow-hidden">
-              <p className="text-[10px] sm:text-xs text-muted-foreground/60 uppercase tracking-widest mb-3 sm:mb-4 flex items-center justify-center gap-2">
-                <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" /> TOP 10
+            <motion.div initial="hidden" animate="visible" variants={fade} custom={6} className="mt-10 sm:mt-12 w-full overflow-hidden">
+              <p className="text-xs sm:text-sm text-muted-foreground/80 uppercase tracking-widest mb-4 sm:mb-5 flex items-center justify-center gap-2">
+                <TrendingUp className="w-4 h-4" /> <span className="rainbow-text font-bold">TOP 10</span> THIS WEEK
               </p>
-               <div className="relative">
-                 <div className="flex gap-2 sm:gap-3 animate-scroll-left" style={{ width: 'max-content' }}>
-                  {[...top10CatalogItems, ...top10CatalogItems].map((item, i) => (
-                    <div key={`top10-${item.id}-${i}`} className="flex-shrink-0 w-24 sm:w-44 md:w-52 group cursor-pointer relative">
-                      <div className="absolute -left-1 -top-1 z-20 w-5 h-5 sm:w-7 sm:h-7 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-[9px] sm:text-xs shadow-lg">
-                        {(i % top10CatalogItems.length) + 1}
-                      </div>
-                      <div className="aspect-[2/3] rounded-md sm:rounded-lg overflow-hidden border border-border/30 bg-muted relative">
-                        {item.banner_url ? (
-                          <img src={item.banner_url} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-muted">
-                            <Film className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground/40" />
+              <div className="relative">
+                <div className="flex gap-3 sm:gap-5 animate-scroll-left" style={{ width: 'max-content' }}>
+                  {[...top10CatalogItems, ...top10CatalogItems].map((item, i) => {
+                    const rank = (i % top10CatalogItems.length) + 1;
+                    return (
+                      <div key={`top10-${item.id}-${i}`} className="flex-shrink-0 flex items-end gap-1 sm:gap-2">
+                        <span
+                          className="leading-none font-black select-none text-transparent"
+                          style={{
+                            fontFamily: "'Space Grotesk', sans-serif",
+                            fontSize: 'clamp(60px, 14vw, 140px)',
+                            WebkitTextStroke: '2px hsl(var(--primary))',
+                          }}
+                        >
+                          {rank}
+                        </span>
+                        <div className="w-24 sm:w-40 md:w-48 aspect-[2/3] rounded-md sm:rounded-lg overflow-hidden border border-border/40 bg-muted relative shadow-lg">
+                          {item.banner_url ? (
+                            <img src={item.banner_url} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-muted">
+                              <Film className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground/40" />
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+                          <div className="absolute bottom-1 left-1 right-1">
+                            <p className="text-[9px] sm:text-xs text-foreground font-medium truncate">{item.title}</p>
                           </div>
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
                       </div>
-                      <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 sm:mt-1.5 truncate text-center">{item.title}</p>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </motion.div>
