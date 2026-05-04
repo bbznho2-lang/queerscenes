@@ -172,11 +172,7 @@ const Player = () => {
   const iframeClassName = "absolute inset-0 w-full h-full border-0";
 
   const handleSupporterClick = () => {
-    if (userIsPremium || isAdmin) {
-      setTier("supporter");
-    } else {
-      navigate("/#planos");
-    }
+    setTier("supporter");
   };
 
   return (
