@@ -226,29 +226,49 @@ const Player = () => {
         <div className={isMobile ? "w-full" : "w-full max-w-5xl"}>
           <div className={isMobile ? "relative w-full aspect-video bg-card overflow-hidden" : "relative aspect-video bg-card rounded-2xl overflow-hidden neon-border-purple"}>
             {isBlocked ? (
-              <div className="absolute inset-0">
+              <div className="absolute inset-0 overflow-y-auto">
                 {content?.banner_url && (
-                  <img src={content.banner_url} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40" />
+                  <img src={content.banner_url} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30" />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/40 backdrop-blur-sm" />
-                <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
-                  <div className="w-14 h-14 rounded-full bg-primary/15 flex items-center justify-center mb-3">
-                    <Crown className="w-7 h-7 text-primary" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/90 to-background/60 backdrop-blur-sm" />
+                <div className="relative z-10 min-h-full flex flex-col items-center justify-center px-4 sm:px-6 py-6 text-center">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-primary/15 flex items-center justify-center mb-2">
+                    <Crown className="w-6 h-6 sm:w-7 sm:h-7 text-primary" />
                   </div>
-                  <h2 className="text-lg sm:text-xl font-bold mb-1.5">
+                  <h2 className="text-base sm:text-xl font-bold mb-1">
                     {supporterPaywall ? "Supporter-only Player" : "Supporter Content"}
                   </h2>
-                  <p className="text-muted-foreground text-xs sm:text-sm mb-4 max-w-sm">
+                  <p className="text-muted-foreground text-[11px] sm:text-sm mb-3 max-w-md">
                     {supporterPaywall
-                      ? "This player is ad-free and exclusive to Supporters. Support the project to unlock it."
-                      : "This title is exclusive to Supporters. Support the project to unlock it."}
+                      ? "This player is ad-free and exclusive to Supporters."
+                      : "This title is exclusive to Supporters."}
                   </p>
+
+                  <div className="grid grid-cols-3 gap-1.5 sm:gap-3 max-w-md w-full mb-3 sm:mb-4">
+                    {[
+                      { icon: "⚡", title: "Early access", desc: "New episodes first" },
+                      { icon: "🔓", title: "Exclusives", desc: "Members-only titles" },
+                      { icon: "♾️", title: "Unlimited", desc: "Ad-free viewing" },
+                    ].map((perk) => (
+                      <div key={perk.title} className="rounded-lg bg-card/60 border border-border/60 px-1.5 py-2 sm:px-3 sm:py-3 text-left backdrop-blur-sm">
+                        <div className="text-base sm:text-lg leading-none mb-0.5 sm:mb-1">{perk.icon}</div>
+                        <div className="text-[10px] sm:text-xs font-semibold text-foreground leading-tight">{perk.title}</div>
+                        <div className="text-[9px] sm:text-[11px] text-muted-foreground leading-tight hidden sm:block">{perk.desc}</div>
+                      </div>
+                    ))}
+                  </div>
+
                   <div className="flex flex-col sm:flex-row gap-2 items-center">
-                    <button onClick={() => navigate("/#planos")} className="shine-cta px-5 py-2.5 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors flex items-center gap-2 glow-purple">
-                      <Crown className="w-4 h-4" /> Become a Supporter
+                    <button onClick={() => goToPlans(supporterPaywall ? "paywall_supporter_player" : "paywall_premium_content")} className="shine-cta px-5 py-2.5 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors flex items-center gap-2 glow-purple text-sm">
+                      <Crown className="w-4 h-4" /> Choose a plan
                     </button>
+                    {!user && (
+                      <button onClick={() => { void trackEvent("paywall_signup_click", "paywall"); navigate("/auth"); }} className="text-xs text-foreground/90 hover:text-foreground underline underline-offset-2">
+                        Sign up to become a Supporter
+                      </button>
+                    )}
                     {supporterPaywall && hasFreeOption && (
-                      <button onClick={() => setTier("free")} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">
+                      <button onClick={() => { void trackEvent("watch_free_fallback_click", "paywall"); setTier("free"); }} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">
                         Watch the free version
                       </button>
                     )}
