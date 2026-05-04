@@ -251,7 +251,7 @@ const Player = () => {
           </div>
 
           {/* Player tier selector */}
-          {!isBlocked && (hasFreeOption || hasPremiumOption) && (
+          {(!isBlocked || supporterPaywall) && (hasFreeOption || hasPremiumOption) && (
             <div className="mt-3 sm:mt-4 px-3 sm:px-0">
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <button
