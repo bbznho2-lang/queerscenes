@@ -121,12 +121,8 @@ const Player = () => {
     fetchContent();
   }, [id, user?.id, isAdmin, authLoading]);
 
-  // Auto switch to free if not allowed on supporter
-  useEffect(() => {
-    if (tier === "supporter" && !userIsPremium && !isAdmin) {
-      setTier("free");
-    }
-  }, [tier, userIsPremium, isAdmin]);
+  // Note: previously auto-switched supporter→free for non-supporters; now we
+  // keep the tier and show an in-player paywall so the user can convert.
 
   const episodePremiumBlocked = currentEp?.is_premium && !userIsPremium && !isAdmin;
   const isBlocked = premiumBlocked || episodePremiumBlocked;
