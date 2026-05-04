@@ -1,11 +1,14 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { ArrowLeft, Play, Pencil, Crown, Lock, Sparkles } from "lucide-react";
+import { ArrowLeft, Play, Pencil, Crown, Lock, Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useToast } from "@/hooks/use-toast";
 import EditContentDialog from "@/components/EditContentDialog";
 import CommentsSection from "@/components/CommentsSection";
+import { trackSupporterEvent, type SupporterEventType } from "@/lib/supporter-tracking";
+
 
 interface ContentItem {
   id: string;
@@ -49,6 +52,13 @@ const Player = () => {
   const [premiumBlocked, setPremiumBlocked] = useState(false);
   const [userIsPremium, setUserIsPremium] = useState(false);
   const [tier, setTier] = useState<PlayerTier>("free");
+  const { toast } = useToast();
+  const [signupEmail, setSignupEmail] = useState("");
+  const [signupPassword, setSignupPassword] = useState("");
+  const [signupFirstName, setSignupFirstName] = useState("");
+  const [signupSubmitting, setSignupSubmitting] = useState(false);
+  const [signupSuccess, setSignupSuccess] = useState(false);
+
 
   const fetchContent = async () => {
     if (!id) return;
@@ -171,17 +181,14 @@ const Player = () => {
   const hasPlayerUrl = Boolean(activePlayerUrl);
   const iframeClassName = "absolute inset-0 w-full h-full border-0";
 
-  const trackEvent = async (event_type: string, source: string, extra?: Record<string, unknown>) => {
-    try {
-      await supabase.from("supporter_events" as any).insert({
-        user_id: user?.id ?? null,
-        content_id: content?.id ?? null,
-        event_type,
-        source,
-        metadata: { tier, episode_id: currentEp?.id ?? null, ...(extra || {}) },
-      } as any);
-    } catch { /* non-blocking */ }
-  };
+  const trackEvent = (event_type: SupporterEventType, source: string, extra?: Record<string, unknown>) =>
+    trackSupporterEvent(supabase, {
+      event_type,
+      source,
+      user_id: user?.id ?? null,
+      content_id: content?.id ?? null,
+      metadata: { tier, episode_id: currentEp?.id ?? null, ...(extra || {}) },
+    });
 
   const handleSupporterClick = () => {
     setTier("supporter");
@@ -192,6 +199,29 @@ const Player = () => {
     void trackEvent("become_supporter_click", source);
     navigate("/#planos");
   };
+
+  const handleSupporterSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (signupSubmitting) return;
+    setSignupSubmitting(true);
+    void trackEvent("paywall_signup_submit", "paywall_inline_form");
+    const { error } = await supabase.auth.signUp({
+      email: signupEmail.trim(),
+      password: signupPassword,
+      options: {
+        emailRedirectTo: `${window.location.origin}/player/${id}`,
+        data: { first_name: signupFirstName.trim() },
+      },
+    });
+    setSignupSubmitting(false);
+    if (error) {
+      toast({ title: "Sign up failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    setSignupSuccess(true);
+    toast({ title: "Account created!", description: "Now choose a Supporter plan to unlock the content." });
+  };
+
 
   // Track when user lands on locked content / paywall
   useEffect(() => {
@@ -222,60 +252,116 @@ const Player = () => {
         )}
       </div>
 
+      {isBlocked ? (
+        <div className="w-full">
+          <div className="relative w-full overflow-hidden sm:max-w-3xl sm:mx-auto sm:mt-16 sm:rounded-2xl sm:neon-border-purple bg-card">
+            {content?.banner_url && (
+              <img src={content.banner_url} alt="" className="absolute inset-0 w-full h-full object-cover opacity-25" />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/95 to-background" />
+            <div className="relative z-10 flex flex-col items-center px-5 py-8 sm:py-10 text-center">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 text-primary px-3 py-1 text-[11px] font-bold uppercase tracking-wider mb-3">
+                <Crown className="w-3.5 h-3.5" /> Supporter
+              </div>
+              <h2 className="text-xl sm:text-2xl font-extrabold mb-1.5">
+                {supporterPaywall ? "Unlock the Supporter player" : "Become a Supporter to watch"}
+              </h2>
+              <p className="text-muted-foreground text-xs sm:text-sm mb-5 max-w-md">
+                Support the project and get instant access to ad-free playback, exclusive titles and early releases.
+              </p>
+
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 max-w-md w-full mb-5">
+                {[
+                  { icon: "⚡", title: "Early access" },
+                  { icon: "🔓", title: "Exclusives" },
+                  { icon: "♾️", title: "Unlimited" },
+                ].map((perk) => (
+                  <div key={perk.title} className="rounded-lg bg-card/70 border border-border px-2 py-3 text-center backdrop-blur-sm">
+                    <div className="text-lg leading-none mb-1">{perk.icon}</div>
+                    <div className="text-[11px] sm:text-xs font-semibold text-foreground leading-tight">{perk.title}</div>
+                  </div>
+                ))}
+              </div>
+
+              {!user && !signupSuccess && (
+                <form onSubmit={handleSupporterSignup} className="w-full max-w-sm space-y-2 mb-3 text-left" aria-label="Supporter signup">
+                  <input
+                    type="text"
+                    placeholder="Your first name"
+                    value={signupFirstName}
+                    onChange={(e) => setSignupFirstName(e.target.value)}
+                    className="w-full rounded-lg bg-card border border-border px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                    required
+                    maxLength={50}
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    value={signupEmail}
+                    onChange={(e) => setSignupEmail(e.target.value)}
+                    className="w-full rounded-lg bg-card border border-border px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                    required
+                    maxLength={255}
+                  />
+                  <input
+                    type="password"
+                    placeholder="Password (min 6 chars)"
+                    value={signupPassword}
+                    onChange={(e) => setSignupPassword(e.target.value)}
+                    className="w-full rounded-lg bg-card border border-border px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                    required
+                    minLength={6}
+                    maxLength={72}
+                  />
+                  <button
+                    type="submit"
+                    onClick={() => void trackEvent("paywall_signup_click", "paywall_inline_form")}
+                    disabled={signupSubmitting}
+                    className="shine-cta w-full rounded-full bg-primary text-primary-foreground font-semibold py-2.5 text-sm flex items-center justify-center gap-2 hover:bg-primary/90 disabled:opacity-60 glow-purple"
+                  >
+                    {signupSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Crown className="w-4 h-4" />}
+                    Become a Supporter
+                  </button>
+                </form>
+              )}
+
+              {!user && signupSuccess && (
+                <div className="w-full max-w-sm rounded-lg bg-primary/10 border border-primary/30 px-3 py-3 mb-3 text-xs text-foreground">
+                  Check your email to confirm, then choose a Supporter plan to unlock this content.
+                </div>
+              )}
+
+              {user && (
+                <button
+                  onClick={() => goToPlans(supporterPaywall ? "paywall_supporter_player" : "paywall_premium_content")}
+                  className="shine-cta w-full max-w-sm rounded-full bg-primary text-primary-foreground font-semibold py-2.5 text-sm flex items-center justify-center gap-2 hover:bg-primary/90 mb-3 glow-purple"
+                >
+                  <Crown className="w-4 h-4" /> Choose your Supporter plan
+                </button>
+              )}
+
+              {!user && (
+                <button
+                  onClick={() => goToPlans(supporterPaywall ? "paywall_supporter_player" : "paywall_premium_content")}
+                  className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2"
+                >
+                  Already have an account? Choose a plan
+                </button>
+              )}
+
+              {supporterPaywall && hasFreeOption && (
+                <button onClick={() => { void trackEvent("watch_free_fallback_click", "paywall"); setTier("free"); }} className="mt-2 text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">
+                  Watch the free version
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : (
       <div className={isMobile ? "w-full flex-shrink-0" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-4"}>
         <div className={isMobile ? "w-full" : "w-full max-w-5xl"}>
           <div className={isMobile ? "relative w-full aspect-video bg-card overflow-hidden" : "relative aspect-video bg-card rounded-2xl overflow-hidden neon-border-purple"}>
-            {isBlocked ? (
-              <div className="absolute inset-0 overflow-y-auto">
-                {content?.banner_url && (
-                  <img src={content.banner_url} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30" />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/90 to-background/60 backdrop-blur-sm" />
-                <div className="relative z-10 min-h-full flex flex-col items-center justify-center px-4 sm:px-6 py-6 text-center">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-primary/15 flex items-center justify-center mb-2">
-                    <Crown className="w-6 h-6 sm:w-7 sm:h-7 text-primary" />
-                  </div>
-                  <h2 className="text-base sm:text-xl font-bold mb-1">
-                    {supporterPaywall ? "Supporter-only Player" : "Supporter Content"}
-                  </h2>
-                  <p className="text-muted-foreground text-[11px] sm:text-sm mb-3 max-w-md">
-                    {supporterPaywall
-                      ? "This player is ad-free and exclusive to Supporters."
-                      : "This title is exclusive to Supporters."}
-                  </p>
-
-                  <div className="grid grid-cols-3 gap-1.5 sm:gap-3 max-w-md w-full mb-3 sm:mb-4">
-                    {[
-                      { icon: "⚡", title: "Early access", desc: "New episodes first" },
-                      { icon: "🔓", title: "Exclusives", desc: "Members-only titles" },
-                      { icon: "♾️", title: "Unlimited", desc: "Ad-free viewing" },
-                    ].map((perk) => (
-                      <div key={perk.title} className="rounded-lg bg-card/60 border border-border/60 px-1.5 py-2 sm:px-3 sm:py-3 text-left backdrop-blur-sm">
-                        <div className="text-base sm:text-lg leading-none mb-0.5 sm:mb-1">{perk.icon}</div>
-                        <div className="text-[10px] sm:text-xs font-semibold text-foreground leading-tight">{perk.title}</div>
-                        <div className="text-[9px] sm:text-[11px] text-muted-foreground leading-tight hidden sm:block">{perk.desc}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row gap-2 items-center">
-                    <button onClick={() => goToPlans(supporterPaywall ? "paywall_supporter_player" : "paywall_premium_content")} className="shine-cta px-5 py-2.5 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors flex items-center gap-2 glow-purple text-sm">
-                      <Crown className="w-4 h-4" /> Choose a plan
-                    </button>
-                    {!user && (
-                      <button onClick={() => { void trackEvent("paywall_signup_click", "paywall"); navigate("/?signup=1#planos"); }} className="text-xs text-foreground/90 hover:text-foreground underline underline-offset-2">
-                        Sign up to become a Supporter
-                      </button>
-                    )}
-                    {supporterPaywall && hasFreeOption && (
-                      <button onClick={() => { void trackEvent("watch_free_fallback_click", "paywall"); setTier("free"); }} className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">
-                        Watch the free version
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ) : hasPlayerUrl ? (
+            {hasPlayerUrl ? (
               <iframe
                 key={`${tier}-${activePlayerUrl}`}
                 src={activePlayerUrl}
@@ -298,6 +384,7 @@ const Player = () => {
                   <p className="text-sm text-foreground">Video unavailable for this {tier === "supporter" ? "Supporter" : "Free"} player.</p>
                 </div>
               </div>
+
             )}
           </div>
 
@@ -346,7 +433,10 @@ const Player = () => {
           )}
         </div>
       </div>
+      )}
 
+
+      {!isBlocked && (
       <div className="w-full max-w-5xl mx-auto px-4 sm:px-0 pb-8">
         <div className="mt-4 sm:mt-6">
           <h1 className="text-lg sm:text-2xl font-bold">{content?.title || "Loading..."}</h1>
@@ -357,15 +447,10 @@ const Player = () => {
           </div>
         </div>
 
-        {!premiumBlocked && (content as any)?.synopsis && (
+        {(content as any)?.synopsis && (
           <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{(content as any).synopsis}</p>
         )}
 
-        {premiumBlocked && (
-          <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-            This content is exclusive to Supporters. Subscribe to a plan to watch!
-          </p>
-        )}
 
         {!premiumBlocked && (content?.type === "serie" || content?.type === "novela" || content?.type === "anime") && episodes.length > 0 && (() => {
           const seasons = [...new Set(episodes.map(e => e.season))].sort((a, b) => a - b);
@@ -420,6 +505,8 @@ const Player = () => {
 
         {content && !premiumBlocked && <CommentsSection contentId={content.id} />}
       </div>
+      )}
+
 
       {content && <EditContentDialog open={editOpen} onOpenChange={setEditOpen} content={content} onSaved={fetchContent} />}
     </div>

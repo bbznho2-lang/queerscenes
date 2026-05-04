@@ -126,6 +126,10 @@ const Admin = () => {
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [clicksPage, setClicksPage] = useState(1);
   const [chatsPage, setChatsPage] = useState(1);
+  const [supporterEvents, setSupporterEvents] = useState<Array<{ id: string; event_type: string; source: string | null; user_id: string | null; content_id: string | null; created_at: string; metadata: any }>>([]);
+  const [eventsPage, setEventsPage] = useState(1);
+  const EVENTS_PER_PAGE = 15;
+
   const chatScrollRef = useRef<HTMLDivElement>(null);
   const USERS_PER_PAGE = 20;
   const CLICKS_PER_PAGE = 20;
@@ -318,7 +322,16 @@ const Admin = () => {
     // Fetch support chats
     await fetchChats();
 
+    // Fetch supporter events (paywall analytics)
+    const { data: events } = await supabase
+      .from("supporter_events" as any)
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(500) as any;
+    setSupporterEvents((events as any) || []);
+
     setLoadingData(false);
+
   };
 
   const openChat = async (chatId: string) => {
@@ -530,7 +543,86 @@ const Admin = () => {
           </CardContent>
         </Card>
 
+        {/* Supporter Conversion Events */}
+        {(() => {
+          const totals = supporterEvents.reduce<Record<string, number>>((acc, e) => {
+            acc[e.event_type] = (acc[e.event_type] || 0) + 1;
+            return acc;
+          }, {});
+          const totalEventPages = Math.max(1, Math.ceil(supporterEvents.length / EVENTS_PER_PAGE));
+          const start = (eventsPage - 1) * EVENTS_PER_PAGE;
+          const pageEvents = supporterEvents.slice(start, start + EVENTS_PER_PAGE);
+          const profileById: Record<string, Profile> = {};
+          profiles.forEach((p) => { profileById[p.user_id] = p; });
+          return (
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-foreground">
+                  <Crown className="w-5 h-5 text-primary" />
+                  Supporter Paywall Analytics
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+                  {[
+                    { key: "paywall_view", label: "Paywall views" },
+                    { key: "locked_content_view", label: "Locked content" },
+                    { key: "become_supporter_click", label: "Plan clicks" },
+                    { key: "paywall_signup_submit", label: "Signups" },
+                  ].map((item) => (
+                    <div key={item.key} className="rounded-lg border border-border bg-muted/30 px-3 py-2">
+                      <p className="text-xs text-muted-foreground">{item.label}</p>
+                      <p className="text-lg font-bold text-foreground">{totals[item.key] || 0}</p>
+                    </div>
+                  ))}
+                </div>
+                {supporterEvents.length > 0 ? (
+                  <div className="space-y-1">
+                    <div className="hidden sm:grid grid-cols-[1.2fr_1fr_1fr_1.2fr_140px] gap-3 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
+                      <span>Event</span>
+                      <span>Source</span>
+                      <span>User</span>
+                      <span>Content ID</span>
+                      <span className="text-right">When</span>
+                    </div>
+                    {pageEvents.map((ev) => {
+                      const prof = ev.user_id ? profileById[ev.user_id] : null;
+                      return (
+                        <div key={ev.id} className="grid grid-cols-1 sm:grid-cols-[1.2fr_1fr_1fr_1.2fr_140px] gap-1 sm:gap-3 px-3 py-2 rounded-lg hover:bg-muted/30 border-b border-border/30 last:border-0">
+                          <span className="text-xs sm:text-sm font-semibold text-primary">{ev.event_type}</span>
+                          <span className="text-xs sm:text-sm text-foreground truncate">{ev.source || "—"}</span>
+                          <span className="text-xs sm:text-sm text-muted-foreground truncate">{prof?.email || (ev.user_id ? ev.user_id.slice(0, 8) : "anon")}</span>
+                          <span className="text-[11px] sm:text-xs text-muted-foreground truncate">{ev.content_id?.slice(0, 8) || "—"}</span>
+                          <span className="text-xs text-muted-foreground text-right">{new Date(ev.created_at).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>
+                        </div>
+                      );
+                    })}
+                    {totalEventPages > 1 && (
+                      <div className="flex items-center justify-between pt-4 border-t border-border mt-2">
+                        <span className="text-xs text-muted-foreground">
+                          Page {eventsPage} of {totalEventPages} ({supporterEvents.length} events)
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <Button variant="outline" size="sm" disabled={eventsPage <= 1} onClick={() => setEventsPage((p) => Math.max(1, p - 1))}>
+                            <ChevronLeft className="w-4 h-4" />
+                          </Button>
+                          <Button variant="outline" size="sm" disabled={eventsPage >= totalEventPages} onClick={() => setEventsPage((p) => Math.min(totalEventPages, p + 1))}>
+                            <ChevronRight className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-center py-6 text-sm">No paywall events yet.</p>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })()}
+
         {/* User Click Details - Aggregated */}
+
         <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
