@@ -20,6 +20,7 @@ interface ContentItem {
   position: number;
   is_premium: boolean;
   is_archived?: boolean;
+  supporter_player_enabled?: boolean;
 }
 
 interface Episode {
