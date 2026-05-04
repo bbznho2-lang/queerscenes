@@ -50,18 +50,21 @@ export type Database = {
         Row: {
           clicked_at: string
           content_id: string
+          episode_id: string | null
           id: string
           user_id: string
         }
         Insert: {
           clicked_at?: string
           content_id: string
+          episode_id?: string | null
           id?: string
           user_id: string
         }
         Update: {
           clicked_at?: string
           content_id?: string
+          episode_id?: string | null
           id?: string
           user_id?: string
         }
