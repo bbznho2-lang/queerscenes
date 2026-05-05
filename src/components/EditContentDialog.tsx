@@ -277,6 +277,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                   <SelectItem value="series">Series</SelectItem>
                   <SelectItem value="filmes">Movies</SelectItem>
                   <SelectItem value="novelas">Soap Operas</SelectItem>
+                  <SelectItem value="gl">GL Dramas</SelectItem>
                   
                   <SelectItem value="exclusivos">Exclusives</SelectItem>
                 </SelectContent>

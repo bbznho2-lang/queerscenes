@@ -416,7 +416,7 @@ const Player = () => {
                     🌈 Free Player
                     {tier === "free" && <Play className="w-3 h-3 text-primary" />}
                   </div>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">Watch for free with ads</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">May contain ads</p>
                 </button>
                 <button
                   onClick={handleSupporterClick}
