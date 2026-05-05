@@ -377,7 +377,7 @@ const Player = () => {
                 allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
                 loading="eager"
                 referrerPolicy="strict-origin-when-cross-origin"
-                style={{ border: 0, backgroundColor: "transparent" }}
+                style={iframeStyle}
               />
             ) : (
               <div className="absolute inset-0">
