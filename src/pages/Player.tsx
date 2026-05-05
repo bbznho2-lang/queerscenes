@@ -164,7 +164,7 @@ const Player = () => {
         const fileFromPath = parsed.pathname.match(/\/file\/d\/([^/]+)/)?.[1];
         const fileFromQuery = parsed.searchParams.get("id");
         const driveFileId = fileFromPath || fileFromQuery;
-        if (driveFileId) return `https://drive.google.com/file/d/${driveFileId}/${isMobile ? "view" : "preview"}`;
+        if (driveFileId) return `https://drive.google.com/file/d/${driveFileId}/preview`;
       }
       if (parsed.hostname.includes("dailymotion.com")) {
         const videoId = parsed.pathname.match(/\/video\/([a-zA-Z0-9]+)/)?.[1];
