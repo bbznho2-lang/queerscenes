@@ -362,7 +362,7 @@ const Player = () => {
       ) : (
       <div className={isMobile ? "w-full flex-shrink-0" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-4"}>
         <div className={isMobile ? "w-full" : "w-full max-w-5xl"}>
-          <div className={isMobile ? "relative w-full aspect-video bg-card overflow-hidden" : "relative aspect-video bg-card rounded-2xl overflow-hidden neon-border-purple"}>
+          <div className={isMobile ? "relative w-full aspect-video bg-black overflow-hidden" : "relative aspect-video bg-black rounded-2xl overflow-hidden neon-border-purple"}>
             {hasPlayerUrl ? (
               <iframe
                 key={`${tier}-${activePlayerUrl}`}
@@ -372,7 +372,8 @@ const Player = () => {
                 allowFullScreen
                 allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
                 loading="eager"
-                style={{ border: 0 }}
+                scrolling="no"
+                style={{ border: 0, display: "block" }}
               />
             ) : (
               <div className="absolute inset-0">
