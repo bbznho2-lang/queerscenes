@@ -164,7 +164,7 @@ const Player = () => {
         const fileFromPath = parsed.pathname.match(/\/file\/d\/([^/]+)/)?.[1];
         const fileFromQuery = parsed.searchParams.get("id");
         const driveFileId = fileFromPath || fileFromQuery;
-        if (driveFileId) return `https://drive.google.com/file/d/${driveFileId}/${isMobile ? "view" : "preview"}`;
+        if (driveFileId) return `https://drive.google.com/file/d/${driveFileId}/preview`;
       }
       if (parsed.hostname.includes("dailymotion.com")) {
         const videoId = parsed.pathname.match(/\/video\/([a-zA-Z0-9]+)/)?.[1];
@@ -181,7 +181,7 @@ const Player = () => {
       }
     } catch { /* fallback */ }
     const driveMatch = trimmedUrl.match(/drive\.google\.com\/file\/d\/([^/]+)/);
-    if (driveMatch?.[1]) return `https://drive.google.com/file/d/${driveMatch[1]}/${isMobile ? "view" : "preview"}`;
+    if (driveMatch?.[1]) return `https://drive.google.com/file/d/${driveMatch[1]}/preview`;
     const dailymotionMatch = trimmedUrl.match(/dailymotion\.com\/video\/([a-zA-Z0-9]+)/);
     if (dailymotionMatch?.[1]) return `https://www.dailymotion.com/embed/video/${dailymotionMatch[1]}`;
     return trimmedUrl;
