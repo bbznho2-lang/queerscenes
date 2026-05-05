@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { ArrowLeft, Play, Pencil, Crown, Lock, Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -59,6 +59,7 @@ const Player = () => {
   const [signupFirstName, setSignupFirstName] = useState("");
   const [signupSubmitting, setSignupSubmitting] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
+  const [viewportWidth, setViewportWidth] = useState<number>(typeof window !== "undefined" ? window.innerWidth : 1440);
 
 
   const fetchContent = async () => {
@@ -132,6 +133,13 @@ const Player = () => {
     fetchContent();
   }, [id, user?.id, isAdmin, authLoading]);
 
+  useEffect(() => {
+    const handleResize = () => setViewportWidth(window.innerWidth);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // Note: previously auto-switched supporter→free for non-supporters; now we
   // keep the tier and show an in-player paywall so the user can convert.
 
@@ -182,11 +190,16 @@ const Player = () => {
   const activePlayerUrl = rawPlayerUrl ? getEmbedUrl(rawPlayerUrl) : "";
   const hasPlayerUrl = Boolean(activePlayerUrl);
   const isGoogleDriveEmbed = activePlayerUrl.includes("drive.google.com");
+  const googleDriveClipPath = useMemo(() => {
+    if (viewportWidth < 768) return "inset(2px 0 2px 0)";
+    if (viewportWidth < 1024) return "inset(1px 0 1px 0)";
+    return "inset(0 0 0 0)";
+  }, [viewportWidth]);
   const iframeClassName = isGoogleDriveEmbed
-    ? "absolute left-0 block w-full border-0 top-[-8%] h-[116%] sm:top-[-6%] sm:h-[112%] md:top-[-3%] md:h-[106%] lg:top-0 lg:h-full"
+    ? "absolute inset-0 block h-full w-full border-0"
     : "absolute inset-0 block h-full w-full border-0";
   const iframeStyle: React.CSSProperties = isGoogleDriveEmbed
-    ? { border: 0, backgroundColor: "#000", display: "block" }
+    ? { border: 0, backgroundColor: "#000", display: "block", clipPath: googleDriveClipPath }
     : { border: 0, backgroundColor: "transparent", display: "block" };
 
   const trackEvent = (event_type: SupporterEventType, source: string, extra?: Record<string, unknown>) =>
