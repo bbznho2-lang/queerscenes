@@ -181,7 +181,10 @@ const Player = () => {
 
   const activePlayerUrl = rawPlayerUrl ? getEmbedUrl(rawPlayerUrl) : "";
   const hasPlayerUrl = Boolean(activePlayerUrl);
-  const iframeClassName = "absolute inset-0 w-full h-full border-0";
+  const isGoogleDriveEmbed = activePlayerUrl.includes("drive.google.com");
+  const iframeClassName = isGoogleDriveEmbed
+    ? "absolute -inset-[2px] h-[calc(100%+4px)] w-[calc(100%+4px)] border-0"
+    : "absolute inset-0 w-full h-full border-0";
 
   const trackEvent = (event_type: SupporterEventType, source: string, extra?: Record<string, unknown>) =>
     trackSupporterEvent(supabase, {
@@ -362,7 +365,7 @@ const Player = () => {
       ) : (
       <div className={isMobile ? "w-full flex-shrink-0" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-4"}>
         <div className={isMobile ? "w-full" : "w-full max-w-5xl"}>
-          <div className={isMobile ? "relative w-full aspect-video bg-card overflow-hidden" : "relative aspect-video bg-card rounded-2xl overflow-hidden neon-border-purple"}>
+          <div className={isMobile ? "relative w-full aspect-video overflow-hidden bg-black" : "relative aspect-video overflow-hidden rounded-2xl bg-black neon-border-purple"}>
             {hasPlayerUrl ? (
               <iframe
                 key={`${tier}-${activePlayerUrl}`}
@@ -372,7 +375,8 @@ const Player = () => {
                 allowFullScreen
                 allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
                 loading="eager"
-                style={{ border: 0 }}
+                referrerPolicy="strict-origin-when-cross-origin"
+                style={{ border: 0, backgroundColor: "transparent" }}
               />
             ) : (
               <div className="absolute inset-0">
