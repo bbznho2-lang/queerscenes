@@ -190,16 +190,16 @@ const Player = () => {
   const activePlayerUrl = rawPlayerUrl ? getEmbedUrl(rawPlayerUrl) : "";
   const hasPlayerUrl = Boolean(activePlayerUrl);
   const isGoogleDriveEmbed = activePlayerUrl.includes("drive.google.com");
-  const googleDriveClipPath = useMemo(() => {
-    if (viewportWidth < 768) return "inset(2px 0 2px 0)";
-    if (viewportWidth < 1024) return "inset(1px 0 1px 0)";
-    return "inset(0 0 0 0)";
+  const googleDriveScale = useMemo(() => {
+    if (viewportWidth < 768) return 1.018;
+    if (viewportWidth < 1024) return 1.01;
+    return 1.004;
   }, [viewportWidth]);
   const iframeClassName = isGoogleDriveEmbed
     ? "absolute inset-0 block h-full w-full border-0"
     : "absolute inset-0 block h-full w-full border-0";
   const iframeStyle: React.CSSProperties = isGoogleDriveEmbed
-    ? { border: 0, backgroundColor: "#000", display: "block", clipPath: googleDriveClipPath }
+    ? { border: 0, backgroundColor: "#000", display: "block", transform: `scale(${googleDriveScale})`, transformOrigin: "center center" }
     : { border: 0, backgroundColor: "transparent", display: "block" };
 
   const trackEvent = (event_type: SupporterEventType, source: string, extra?: Record<string, unknown>) =>
