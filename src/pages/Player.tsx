@@ -182,9 +182,10 @@ const Player = () => {
   const activePlayerUrl = rawPlayerUrl ? getEmbedUrl(rawPlayerUrl) : "";
   const hasPlayerUrl = Boolean(activePlayerUrl);
   const isGoogleDriveEmbed = activePlayerUrl.includes("drive.google.com");
-  const iframeClassName = isGoogleDriveEmbed
-    ? "absolute -inset-[2px] h-[calc(100%+4px)] w-[calc(100%+4px)] border-0"
-    : "absolute inset-0 w-full h-full border-0";
+  const iframeClassName = "absolute inset-0 w-full h-full border-0 block";
+  const iframeStyle: React.CSSProperties = isGoogleDriveEmbed
+    ? { border: 0, backgroundColor: "#000", display: "block" }
+    : { border: 0, backgroundColor: "transparent", display: "block" };
 
   const trackEvent = (event_type: SupporterEventType, source: string, extra?: Record<string, unknown>) =>
     trackSupporterEvent(supabase, {
@@ -376,7 +377,7 @@ const Player = () => {
                 allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
                 loading="eager"
                 referrerPolicy="strict-origin-when-cross-origin"
-                style={{ border: 0, backgroundColor: "transparent" }}
+                style={iframeStyle}
               />
             ) : (
               <div className="absolute inset-0">
