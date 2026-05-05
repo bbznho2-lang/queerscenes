@@ -503,6 +503,33 @@ const Browse = () => {
         </section>
 
 
+        {/* GL DRAMAS */}
+        <section id="gl" className="py-10 sm:py-16 px-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl sm:text-3xl font-bold neon-text-pink">GL Dramas</h2>
+              {isAdmin && (
+                <button onClick={() => handleNew("gl", "serie")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add GL Drama">
+                  <Plus className="w-5 h-5 text-primary" />
+                </button>
+              )}
+            </div>
+            {gl.length > 0 ? (
+              <AutoScrollRow>
+                {gl.map((g) => (
+                  <div key={g.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
+                    <ContentCard item={g} isAdmin={isAdmin} onEdit={() => handleEdit(g)} onDelete={() => handleDelete(g.id)} onClickTrack={() => trackClick(g.id)} isInWatchlist={watchlistIds.has(g.id)} onToggleWatchlist={() => toggleWatchlist(g.id)} userIsPremium={userIsPremium} />
+                  </div>
+                ))}
+              </AutoScrollRow>
+            ) : (
+              <p className="text-muted-foreground text-center py-8">
+                {isAdmin ? "Click + to add GL Dramas" : "New content coming soon!"}
+              </p>
+            )}
+          </div>
+        </section>
+
 
         {/* EXCLUSIVES */}
         <section id="exclusivos" className="py-10 sm:py-16 px-4">
