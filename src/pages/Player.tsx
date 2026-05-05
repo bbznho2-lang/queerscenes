@@ -164,7 +164,7 @@ const Player = () => {
         const fileFromPath = parsed.pathname.match(/\/file\/d\/([^/]+)/)?.[1];
         const fileFromQuery = parsed.searchParams.get("id");
         const driveFileId = fileFromPath || fileFromQuery;
-        if (driveFileId) return `https://drive.google.com/file/d/${driveFileId}/preview`;
+        if (driveFileId) return `https://drive.google.com/file/d/${driveFileId}/${isMobile ? "view" : "preview"}`;
       }
       if (parsed.hostname.includes("dailymotion.com")) {
         const videoId = parsed.pathname.match(/\/video\/([a-zA-Z0-9]+)/)?.[1];
@@ -181,7 +181,7 @@ const Player = () => {
       }
     } catch { /* fallback */ }
     const driveMatch = trimmedUrl.match(/drive\.google\.com\/file\/d\/([^/]+)/);
-    if (driveMatch?.[1]) return `https://drive.google.com/file/d/${driveMatch[1]}/preview`;
+    if (driveMatch?.[1]) return `https://drive.google.com/file/d/${driveMatch[1]}/${isMobile ? "view" : "preview"}`;
     const dailymotionMatch = trimmedUrl.match(/dailymotion\.com\/video\/([a-zA-Z0-9]+)/);
     if (dailymotionMatch?.[1]) return `https://www.dailymotion.com/embed/video/${dailymotionMatch[1]}`;
     return trimmedUrl;
@@ -199,7 +199,7 @@ const Player = () => {
     ? "absolute inset-0 block h-full w-full border-0"
     : "absolute inset-0 block h-full w-full border-0";
   const iframeStyle: React.CSSProperties = isGoogleDriveEmbed
-    ? { border: 0, backgroundColor: "#000", display: "block", transform: `scale(${googleDriveScale})`, transformOrigin: "center center" }
+    ? { border: 0, backgroundColor: "#000", display: "block", transform: isMobile ? undefined : `scale(${googleDriveScale})`, transformOrigin: "center center" }
     : { border: 0, backgroundColor: "transparent", display: "block" };
 
   const trackEvent = (event_type: SupporterEventType, source: string, extra?: Record<string, unknown>) =>
