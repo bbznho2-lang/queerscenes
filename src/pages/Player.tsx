@@ -245,7 +245,7 @@ const Player = () => {
   }, [content?.id, premiumBlocked, supporterPaywall, episodePremiumBlocked, currentEp?.id]);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col overflow-y-auto">
+    <div className="min-h-screen bg-background flex flex-col min-h-0 overflow-y-auto">
       <div className={isMobile ? "absolute top-0 left-0 right-0 z-20 flex items-center justify-between gap-3 p-2 pointer-events-none" : "flex items-center justify-between gap-3 p-3 sm:p-6 absolute top-0 left-0 right-0 z-10"}>
         <button
           onClick={() => navigate("/browse")}
@@ -366,11 +366,11 @@ const Player = () => {
           </div>
         </div>
       ) : (
-      <div className={isMobile ? "w-full flex-shrink-0" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-4"}>
-        <div className={isMobile ? "w-full" : "w-full max-w-5xl"}>
+      <div className={isMobile ? "w-full flex-shrink-0 min-h-0" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-4 min-h-0"}>
+        <div className={isMobile ? "w-full min-h-0" : "w-full max-w-5xl min-h-0"}>
           <div
             className={isMobile ? "relative w-full overflow-hidden bg-black" : "relative w-full overflow-hidden rounded-2xl bg-black neon-border-purple"}
-            style={{ paddingBottom: "56.25%", height: 0 }}
+            style={{ position: "relative", width: "100%", paddingBottom: "56.25%", height: 0, minHeight: 0, overflow: "hidden" }}
           >
             {hasPlayerUrl ? (
               <iframe
