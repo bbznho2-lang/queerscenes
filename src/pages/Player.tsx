@@ -368,19 +368,21 @@ const Player = () => {
       ) : (
       <div className={isMobile ? "w-full flex-shrink-0" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-4"}>
         <div className={isMobile ? "w-full" : "w-full max-w-5xl"}>
-          <div className={isMobile ? "relative w-full aspect-video overflow-hidden bg-black" : "relative aspect-video overflow-hidden rounded-2xl bg-black neon-border-purple"}>
+          <div
+            className={isMobile ? "relative w-full overflow-hidden bg-black" : "relative w-full overflow-hidden rounded-2xl bg-black neon-border-purple"}
+            style={{ paddingBottom: "56.25%", height: 0 }}
+          >
             {hasPlayerUrl ? (
               <iframe
                 key={`${tier}-${activePlayerUrl}`}
                 src={activePlayerUrl}
                 title={content?.title ? `Player - ${content.title}` : "Player"}
                 className={iframeClassName}
-                scrolling="no"
                 allowFullScreen
                 allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
                 loading="eager"
                 referrerPolicy="strict-origin-when-cross-origin"
-                style={iframeStyle}
+                style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none", backgroundColor: "transparent", display: "block" }}
               />
             ) : (
               <div className="absolute inset-0">
