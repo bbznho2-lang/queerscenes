@@ -264,13 +264,13 @@ const Browse = () => {
     { label: "Series", icon: "📺", action: () => { setMenuOpen(false); document.getElementById("séries")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Movies", icon: "🎬", action: () => { setMenuOpen(false); document.getElementById("filmes")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Soap Operas", icon: "💕", action: () => { setMenuOpen(false); document.getElementById("novelas")?.scrollIntoView({ behavior: "smooth" }); } },
-    
+    { label: "Thai GL", icon: "🇹🇭", action: () => { setMenuOpen(false); setSearchOpen(true); setSearchQuery("Thai"); } },
     { label: "Exclusives", icon: "⭐", action: () => { setMenuOpen(false); document.getElementById("exclusivos")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "My List", icon: "🔖", action: () => { setMenuOpen(false); document.getElementById("minha-lista")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Profile", icon: "👤", action: () => { setMenuOpen(false); setProfileOpen(true); } },
     { label: "Support", icon: "💬", action: () => { setMenuOpen(false); setSupportOpen(true); } },
     ...(isAdmin ? [{ label: "Admin Panel", icon: "⚙️", action: () => { setMenuOpen(false); navigate("/admin"); } }] : []),
-    ...(!isAdmin && !userIsPremium ? [{ label: "Go Premium", icon: "💎", action: () => { setMenuOpen(false); navigate("/"); setTimeout(() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" }), 300); }, premium: true }] : []),
+    ...(!isAdmin && !userIsPremium ? [{ label: "Become a Supporter", icon: "👑", action: () => { setMenuOpen(false); navigate("/#planos"); }, premium: true }] : []),
   ];
 
   return (
