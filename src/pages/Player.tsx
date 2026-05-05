@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { ArrowLeft, Play, Pencil, Crown, Lock, Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -59,6 +59,7 @@ const Player = () => {
   const [signupFirstName, setSignupFirstName] = useState("");
   const [signupSubmitting, setSignupSubmitting] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
+  const [viewportWidth, setViewportWidth] = useState<number>(typeof window !== "undefined" ? window.innerWidth : 1440);
 
 
   const fetchContent = async () => {
@@ -132,6 +133,13 @@ const Player = () => {
     fetchContent();
   }, [id, user?.id, isAdmin, authLoading]);
 
+  useEffect(() => {
+    const handleResize = () => setViewportWidth(window.innerWidth);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // Note: previously auto-switched supporter→free for non-supporters; now we
   // keep the tier and show an in-player paywall so the user can convert.
 
@@ -182,11 +190,16 @@ const Player = () => {
   const activePlayerUrl = rawPlayerUrl ? getEmbedUrl(rawPlayerUrl) : "";
   const hasPlayerUrl = Boolean(activePlayerUrl);
   const isGoogleDriveEmbed = activePlayerUrl.includes("drive.google.com");
-  const iframeClassName = isGoogleDriveEmbed && isMobile
-    ? "absolute left-0 -top-[8%] block h-[116%] w-full border-0"
+  const googleDriveScale = useMemo(() => {
+    if (viewportWidth < 768) return 1.018;
+    if (viewportWidth < 1024) return 1.01;
+    return 1.004;
+  }, [viewportWidth]);
+  const iframeClassName = isGoogleDriveEmbed
+    ? "absolute inset-0 block h-full w-full border-0"
     : "absolute inset-0 block h-full w-full border-0";
   const iframeStyle: React.CSSProperties = isGoogleDriveEmbed
-    ? { border: 0, backgroundColor: "#000", display: "block" }
+    ? { border: 0, backgroundColor: "#000", display: "block", transform: `scale(${googleDriveScale})`, transformOrigin: "center center" }
     : { border: 0, backgroundColor: "transparent", display: "block" };
 
   const trackEvent = (event_type: SupporterEventType, source: string, extra?: Record<string, unknown>) =>
