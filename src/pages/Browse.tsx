@@ -214,6 +214,7 @@ const Browse = () => {
   const series = visibleContents.filter((c) => c.section === "series");
   const filmes = visibleContents.filter((c) => c.section === "filmes");
   const novelas = visibleContents.filter((c) => c.section === "novelas");
+  const gl = visibleContents.filter((c) => c.section === "gl");
   const exclusivos = visibleContents.filter((c) => c.section === "exclusivos");
   const watchlistItems = visibleContents.filter((c) => watchlistIds.has(c.id));
   const top10Items = buildUniqueTopContent(visibleContents, top10Ids, 10);
@@ -264,7 +265,7 @@ const Browse = () => {
     { label: "Series", icon: "📺", action: () => { setMenuOpen(false); document.getElementById("séries")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Movies", icon: "🎬", action: () => { setMenuOpen(false); document.getElementById("filmes")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Soap Operas", icon: "💕", action: () => { setMenuOpen(false); document.getElementById("novelas")?.scrollIntoView({ behavior: "smooth" }); } },
-    { label: "Thai GL", icon: "🇹🇭", action: () => { setMenuOpen(false); setSearchOpen(true); setSearchQuery("Thai"); } },
+    { label: "GL Dramas", icon: "🌸", action: () => { setMenuOpen(false); document.getElementById("gl")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Exclusives", icon: "⭐", action: () => { setMenuOpen(false); document.getElementById("exclusivos")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "My List", icon: "🔖", action: () => { setMenuOpen(false); document.getElementById("minha-lista")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Profile", icon: "👤", action: () => { setMenuOpen(false); setProfileOpen(true); } },
