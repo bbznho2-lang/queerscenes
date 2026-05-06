@@ -565,10 +565,10 @@ const Admin = () => {
               <CardContent>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
                   {[
-                    { key: "paywall_view", label: "Paywall views" },
-                    { key: "locked_content_view", label: "Locked content" },
-                    { key: "become_supporter_click", label: "Plan clicks" },
-                    { key: "paywall_signup_submit", label: "Signups" },
+                    { key: "paywall_view", label: "Paywall opened" },
+                    { key: "locked_content_view", label: "Locked title viewed" },
+                    { key: "become_supporter_click", label: "Supporter plan clicked" },
+                    { key: "paywall_signup_submit", label: "New signups" },
                   ].map((item) => (
                     <div key={item.key} className="rounded-lg border border-border bg-muted/30 px-3 py-2">
                       <p className="text-xs text-muted-foreground">{item.label}</p>
@@ -589,7 +589,15 @@ const Admin = () => {
                       const prof = ev.user_id ? profileById[ev.user_id] : null;
                       return (
                         <div key={ev.id} className="grid grid-cols-1 sm:grid-cols-[1.2fr_1fr_1fr_1.2fr_140px] gap-1 sm:gap-3 px-3 py-2 rounded-lg hover:bg-muted/30 border-b border-border/30 last:border-0">
-                          <span className="text-xs sm:text-sm font-semibold text-primary">{ev.event_type}</span>
+                          <span className="text-xs sm:text-sm font-semibold text-primary">{({
+                            paywall_view: "Paywall opened",
+                            locked_content_view: "Locked title viewed",
+                            become_supporter_click: "Supporter plan clicked",
+                            supporter_player_click: "Supporter player clicked",
+                            paywall_signup_click: "Signup button clicked",
+                            paywall_signup_submit: "Signup submitted",
+                            watch_free_fallback_click: "Watch free fallback",
+                          } as Record<string, string>)[ev.event_type] || ev.event_type}</span>
                           <span className="text-xs sm:text-sm text-foreground truncate">{ev.source || "—"}</span>
                           <span className="text-xs sm:text-sm text-muted-foreground truncate">{prof?.email || (ev.user_id ? ev.user_id.slice(0, 8) : "anon")}</span>
                           <span className="text-[11px] sm:text-xs text-muted-foreground truncate">{ev.content_id?.slice(0, 8) || "—"}</span>
