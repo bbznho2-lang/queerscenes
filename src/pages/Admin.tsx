@@ -565,10 +565,10 @@ const Admin = () => {
               <CardContent>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
                   {[
-                    { key: "paywall_view", label: "Paywall views" },
-                    { key: "locked_content_view", label: "Locked content" },
-                    { key: "become_supporter_click", label: "Plan clicks" },
-                    { key: "paywall_signup_submit", label: "Signups" },
+                    { key: "paywall_view", label: "Paywall opened" },
+                    { key: "locked_content_view", label: "Locked title viewed" },
+                    { key: "become_supporter_click", label: "Supporter plan clicked" },
+                    { key: "paywall_signup_submit", label: "New signups" },
                   ].map((item) => (
                     <div key={item.key} className="rounded-lg border border-border bg-muted/30 px-3 py-2">
                       <p className="text-xs text-muted-foreground">{item.label}</p>
