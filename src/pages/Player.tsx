@@ -260,7 +260,7 @@ const Player = () => {
         )}
       </div>
 
-      {isBlocked ? (
+      {isBlocked && !userIsPremium && !isAdmin ? (
         <div className="w-full">
           <div className="relative w-full overflow-hidden sm:max-w-3xl sm:mx-auto sm:mt-16 sm:rounded-2xl sm:neon-border-purple bg-card">
             {content?.banner_url && (
