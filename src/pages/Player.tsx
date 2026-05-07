@@ -436,11 +436,6 @@ const Player = () => {
                   </p>
                 </button>
               </div>
-              {!hasPremiumOption && (userIsPremium || isAdmin) && (
-                <p className="text-[11px] text-muted-foreground/70 mt-2 flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" /> No Supporter version yet — playing the Free version.
-                </p>
-              )}
             </div>
           )}
         </div>
