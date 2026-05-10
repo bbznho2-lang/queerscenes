@@ -281,15 +281,40 @@ const Player = () => {
             )}
             <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/95 to-background" />
             <div className="relative z-10 flex flex-col items-center px-5 py-8 sm:py-10 text-center">
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 text-primary px-3 py-1 text-[11px] font-bold uppercase tracking-wider mb-3">
-                <Crown className="w-3.5 h-3.5" /> Supporter
-              </div>
-              <h2 className="text-xl sm:text-2xl font-extrabold mb-1.5">
-                {supporterPaywall ? "Unlock the Supporter player" : "Become a Supporter to watch"}
-              </h2>
-              <p className="text-muted-foreground text-xs sm:text-sm mb-5 max-w-md">
-                Support the project and get instant access to ad-free playback, exclusive titles and early releases.
-              </p>
+              {userExpired ? (
+                <>
+                  <div className="text-5xl sm:text-6xl mb-2 leading-none" aria-hidden>😢</div>
+                  <div className="inline-flex items-center gap-1.5 rounded-full bg-destructive/15 text-destructive px-3 py-1 text-[11px] font-bold uppercase tracking-wider mb-3">
+                    <Crown className="w-3.5 h-3.5" /> Supporter expired
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-extrabold mb-1.5">
+                    Your Supporter plan has expired
+                  </h2>
+                  {userExpiredAt && (
+                    <p className="text-[11px] text-muted-foreground mb-2">
+                      Expired on {new Date(userExpiredAt).toLocaleDateString("en-US")}
+                    </p>
+                  )}
+                  <div className="flex items-start gap-2 max-w-md mx-auto mb-5 rounded-lg bg-primary/10 border border-primary/30 px-3 py-2.5 text-left">
+                    <span className="text-xl leading-none" aria-hidden>😊</span>
+                    <p className="text-xs sm:text-sm text-foreground">
+                      Don't worry! Renew your plan to keep watching from where you stopped and unlock all the new updates.
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 text-primary px-3 py-1 text-[11px] font-bold uppercase tracking-wider mb-3">
+                    <Crown className="w-3.5 h-3.5" /> Supporter
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-extrabold mb-1.5">
+                    {supporterPaywall ? "Unlock the Supporter player" : "Become a Supporter to watch"}
+                  </h2>
+                  <p className="text-muted-foreground text-xs sm:text-sm mb-5 max-w-md">
+                    Support the project and get instant access to ad-free playback, exclusive titles and early releases.
+                  </p>
+                </>
+              )}
 
               <div className="grid grid-cols-3 gap-2 sm:gap-3 max-w-md w-full mb-5">
                 {[
