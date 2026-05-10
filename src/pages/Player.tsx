@@ -195,7 +195,7 @@ const Player = () => {
   const activePlayerUrl = rawPlayerUrl ? getEmbedUrl(rawPlayerUrl) : "";
   const hasPlayerUrl = Boolean(activePlayerUrl);
   const isGoogleDriveEmbed = activePlayerUrl.includes("drive.google.com");
-  const playerPaddingBottom = "56.25%";
+  const playerPaddingBottom = "75%";
   const iframeClassName = isGoogleDriveEmbed
     ? "absolute inset-0 block h-full w-full border-0"
     : "absolute inset-0 block h-full w-full border-0";
