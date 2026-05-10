@@ -443,11 +443,12 @@ const Player = () => {
           </div>
         </div>
       ) : (
-      <div className={isMobile ? "w-full flex-shrink-0 min-h-0" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-4 min-h-0"}>
+      <div className={isMobile ? "w-full flex-shrink-0 min-h-0 pt-[calc(env(safe-area-inset-top)+20px)]" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-4 min-h-0"}>
         <div className={isMobile ? "w-full min-h-0" : "w-full max-w-5xl min-h-0"}>
+          {isMobile && playerTierSelector}
           <div
             className={isMobile ? "relative w-full overflow-hidden bg-black" : "relative w-full overflow-hidden rounded-2xl bg-black neon-border-purple"}
-            style={{ position: "relative", width: "100%", paddingBottom: "56.25%", height: 0, minHeight: 0, overflow: "hidden" }}
+            style={{ position: "relative", width: "100%", paddingBottom: playerPaddingBottom, height: 0, minHeight: 0, overflow: "hidden" }}
           >
             {hasPlayerUrl ? (
               <iframe
@@ -478,43 +479,7 @@ const Player = () => {
           </div>
 
           {/* Player tier selector */}
-          {(!isBlocked || supporterPaywall) && (hasFreeOption || hasPremiumOption) && (
-            <div className="mt-6 sm:mt-8 px-3 sm:px-0">
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                <button
-                  onClick={() => setTier("free")}
-                  className={`flex-1 rounded-xl border px-3 py-2.5 text-left transition-all ${
-                    tier === "free"
-                      ? "border-primary bg-primary/10 text-foreground"
-                      : "border-border bg-card text-muted-foreground hover:border-primary/40"
-                  }`}
-                >
-                  <div className="flex items-center gap-2 text-sm font-semibold">
-                    🌈 Free Player
-                    {tier === "free" && <Play className="w-3 h-3 text-primary" />}
-                  </div>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">May contain ads</p>
-                </button>
-                <button
-                  onClick={handleSupporterClick}
-                  className={`flex-1 rounded-xl border px-3 py-2.5 text-left transition-all relative ${
-                    tier === "supporter"
-                      ? "border-primary bg-primary/15 text-foreground"
-                      : "border-border bg-card text-muted-foreground hover:border-primary/40"
-                  }`}
-                >
-                  <div className="flex items-center gap-2 text-sm font-semibold">
-                    <Crown className="w-3.5 h-3.5 text-primary" />
-                    Supporter Player
-                    {!(userIsPremium || isAdmin) && <Lock className="w-3 h-3 text-muted-foreground ml-auto" />}
-                  </div>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">
-                    {userIsPremium || isAdmin ? "Ad-free, exclusive for Supporters" : "Become a Supporter to unlock"}
-                  </p>
-                </button>
-              </div>
-            </div>
-          )}
+          {!isMobile && playerTierSelector}
         </div>
       </div>
       )}
