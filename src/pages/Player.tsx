@@ -273,7 +273,7 @@ const Player = () => {
         )}
       </div>
 
-      {(isBlocked && !userIsPremium && !isAdmin) || _previewExpired ? (
+      {isBlocked && !userIsPremium && !isAdmin ? (
         <div className="w-full">
           <div className="relative w-full overflow-hidden sm:max-w-3xl sm:mx-auto sm:mt-16 sm:rounded-2xl sm:neon-border-purple bg-card">
             {content?.banner_url && (
@@ -281,7 +281,7 @@ const Player = () => {
             )}
             <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/95 to-background" />
             <div className="relative z-10 flex flex-col items-center px-5 py-8 sm:py-10 text-center">
-              {_expiredOverride ? (
+              {userExpired ? (
                 <>
                   <div className="text-5xl sm:text-6xl mb-2 leading-none" aria-hidden>😢</div>
                   <div className="inline-flex items-center gap-1.5 rounded-full bg-destructive/15 text-destructive px-3 py-1 text-[11px] font-bold uppercase tracking-wider mb-3">
@@ -290,9 +290,9 @@ const Player = () => {
                   <h2 className="text-xl sm:text-2xl font-extrabold mb-1.5">
                     Your Supporter plan has expired
                   </h2>
-                  {_expiredAtOverride && (
+                  {userExpiredAt && (
                     <p className="text-[11px] text-muted-foreground mb-2">
-                      Expired on {new Date(_expiredAtOverride!).toLocaleDateString("en-US")}
+                      Expired on {new Date(userExpiredAt!).toLocaleDateString("en-US")}
                     </p>
                   )}
                   <div className="flex items-start gap-2 max-w-md mx-auto mb-5 rounded-lg bg-primary/10 border border-primary/30 px-3 py-2.5 text-left">
@@ -382,7 +382,7 @@ const Player = () => {
                   onClick={() => goToPlans(supporterPaywall ? "paywall_supporter_player" : "paywall_premium_content")}
                   className="shine-cta w-full max-w-sm rounded-full bg-primary text-primary-foreground font-semibold py-2.5 text-sm flex items-center justify-center gap-2 hover:bg-primary/90 mb-3 glow-purple"
                 >
-                  <Crown className="w-4 h-4" /> {_expiredOverride ? "Renew your Supporter plan" : "Choose your Supporter plan"}
+                  <Crown className="w-4 h-4" /> {userExpired ? "Renew your Supporter plan" : "Choose your Supporter plan"}
                 </button>
               )}
 
