@@ -52,6 +52,8 @@ const Player = () => {
   const [editOpen, setEditOpen] = useState(false);
   const [premiumBlocked, setPremiumBlocked] = useState(false);
   const [userIsPremium, setUserIsPremium] = useState(false);
+  const [userExpired, setUserExpired] = useState(false);
+  const [userExpiredAt, setUserExpiredAt] = useState<string | null>(null);
   const [tier, setTier] = useState<PlayerTier>("free");
   const { toast } = useToast();
   const [signupEmail, setSignupEmail] = useState("");
