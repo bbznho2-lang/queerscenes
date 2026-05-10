@@ -440,7 +440,7 @@ const Player = () => {
 
           {/* Player tier selector */}
           {(!isBlocked || supporterPaywall) && (hasFreeOption || hasPremiumOption) && (
-            <div className="mt-3 sm:mt-4 px-3 sm:px-0">
+            <div className="mt-6 sm:mt-8 px-3 sm:px-0">
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <button
                   onClick={() => setTier("free")}
