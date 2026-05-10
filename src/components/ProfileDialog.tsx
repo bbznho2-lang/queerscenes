@@ -19,6 +19,9 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [saving, setSaving] = useState(false);
+  const [isPremium, setIsPremium] = useState(false);
+  const [premiumPlan, setPremiumPlan] = useState<string | null>(null);
+  const [premiumExpiresAt, setPremiumExpiresAt] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -28,12 +31,15 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
       setEmail(user.email || "");
       const { data } = await supabase
         .from("profiles")
-        .select("first_name, last_name")
+        .select("first_name, last_name, is_premium, premium_plan, premium_expires_at")
         .eq("user_id", user.id)
         .maybeSingle();
       if (data) {
         setFirstName(data.first_name || "");
         setLastName(data.last_name || "");
+        setIsPremium(!!data.is_premium);
+        setPremiumPlan(data.premium_plan || null);
+        setPremiumExpiresAt(data.premium_expires_at || null);
       }
     };
     load();
