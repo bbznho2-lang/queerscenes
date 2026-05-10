@@ -195,7 +195,7 @@ const Player = () => {
   const activePlayerUrl = rawPlayerUrl ? getEmbedUrl(rawPlayerUrl) : "";
   const hasPlayerUrl = Boolean(activePlayerUrl);
   const isGoogleDriveEmbed = activePlayerUrl.includes("drive.google.com");
-  const playerPaddingBottom = isMobile && isGoogleDriveEmbed ? "50%" : "56.25%";
+  const playerPaddingBottom = "56.25%";
   const iframeClassName = isGoogleDriveEmbed
     ? "absolute inset-0 block h-full w-full border-0"
     : "absolute inset-0 block h-full w-full border-0";
@@ -445,7 +445,6 @@ const Player = () => {
       ) : (
       <div className={isMobile ? "w-full flex-shrink-0 min-h-0 pt-[calc(env(safe-area-inset-top)+20px)]" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-4 min-h-0"}>
         <div className={isMobile ? "w-full min-h-0" : "w-full max-w-5xl min-h-0"}>
-          {isMobile && playerTierSelector}
           <div
             className={isMobile ? "relative w-full overflow-hidden bg-black" : "relative w-full overflow-hidden rounded-2xl bg-black neon-border-purple"}
             style={{ position: "relative", width: "100%", paddingBottom: playerPaddingBottom, height: 0, minHeight: 0, overflow: "hidden" }}
@@ -479,7 +478,7 @@ const Player = () => {
           </div>
 
           {/* Player tier selector */}
-          {!isMobile && playerTierSelector}
+          {playerTierSelector}
         </div>
       </div>
       )}
