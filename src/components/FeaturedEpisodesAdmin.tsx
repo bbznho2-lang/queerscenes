@@ -52,16 +52,43 @@ const FeaturedEpisodesAdmin = () => {
   const featuredIds = useMemo(() => new Set(featured.map((f) => f.episode_id)), [featured]);
 
   const results = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return [];
+    const raw = search.trim();
+    if (!raw) return [];
+    const q = raw.toLowerCase();
+
+    // Parse patterns like "S1", "S1E2", "S01E02", or "Title S1E2"
+    const seasonEpRe = /s(\d{1,3})(?:\s*[ex]\s*(\d{1,3}))?/i;
+    const m = raw.match(seasonEpRe);
+    const wantedSeason = m ? parseInt(m[1], 10) : null;
+    const wantedEpisode = m && m[2] ? parseInt(m[2], 10) : null;
+    // Text portion with the SxxExx removed
+    const textQ = (m ? raw.replace(m[0], "") : raw).trim().toLowerCase();
+
     return allEpisodes
       .filter((e) => !featuredIds.has(e.id))
-      .filter(
-        (e) =>
-          e.title.toLowerCase().includes(q) ||
-          (e.content_title || "").toLowerCase().includes(q),
-      )
-      .slice(0, 10);
+      .filter((e) => {
+        const showTitle = (e.content_title || "").toLowerCase();
+        const epTitle = e.title.toLowerCase();
+        // Text must match show or episode title (when provided)
+        const textOk =
+          !textQ || showTitle.includes(textQ) || epTitle.includes(textQ);
+        const seasonOk = wantedSeason === null || e.season === wantedSeason;
+        const episodeOk =
+          wantedEpisode === null || e.episode_number === wantedEpisode;
+        // If no text and no season/episode pattern, fall back to plain contains
+        const fallback =
+          !textQ && wantedSeason === null
+            ? showTitle.includes(q) || epTitle.includes(q)
+            : true;
+        return textOk && seasonOk && episodeOk && fallback;
+      })
+      .sort((a, b) => {
+        const at = (a.content_title || "").localeCompare(b.content_title || "");
+        if (at !== 0) return at;
+        if (a.season !== b.season) return a.season - b.season;
+        return a.episode_number - b.episode_number;
+      })
+      .slice(0, 50);
   }, [search, allEpisodes, featuredIds]);
 
   const addEpisode = async (ep: EpisodeRow) => {
