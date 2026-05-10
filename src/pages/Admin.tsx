@@ -18,6 +18,8 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import SiteNoteAdmin from "@/components/SiteNoteAdmin";
+import FeaturedEpisodesAdmin from "@/components/FeaturedEpisodesAdmin";
 
 interface Profile {
   id: string;
