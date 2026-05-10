@@ -244,6 +244,27 @@ export type Database = {
           },
         ]
       }
+      featured_episodes: {
+        Row: {
+          created_at: string
+          episode_id: string
+          id: string
+          position: number
+        }
+        Insert: {
+          created_at?: string
+          episode_id: string
+          id?: string
+          position?: number
+        }
+        Update: {
+          created_at?: string
+          episode_id?: string
+          id?: string
+          position?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -280,6 +301,36 @@ export type Database = {
           premium_plan?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      site_notes: {
+        Row: {
+          body: string
+          color: string
+          created_at: string
+          id: string
+          is_active: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string
+          color?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          color?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
