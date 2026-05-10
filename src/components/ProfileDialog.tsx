@@ -112,6 +112,36 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
               {email}
             </div>
           </div>
+
+          {(() => {
+            const expired = !!(isPremium && premiumExpiresAt && new Date(premiumExpiresAt) <= new Date());
+            const active = isPremium && !expired;
+            const planLabel = premiumPlan === "monthly" ? "Monthly" : premiumPlan === "annual" ? "Annual" : premiumPlan === "lifetime" ? "Lifetime" : "Supporter";
+            return (
+              <div className="space-y-2">
+                <Label className="text-muted-foreground text-xs">Supporter Plan</Label>
+                <div className={`px-3 py-2.5 rounded-md border text-sm ${active ? 'bg-primary/10 border-primary/30 text-foreground' : expired ? 'bg-destructive/10 border-destructive/30 text-foreground' : 'bg-muted/50 border-border text-muted-foreground'}`}>
+                  {active ? (
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-semibold">👑 {planLabel}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {premiumExpiresAt ? `Active until ${new Date(premiumExpiresAt).toLocaleDateString("en-US")}` : "Lifetime"}
+                      </span>
+                    </div>
+                  ) : expired ? (
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-semibold">😢 Expired</span>
+                      <span className="text-xs">
+                        Expired on {new Date(premiumExpiresAt!).toLocaleDateString("en-US")}
+                      </span>
+                    </div>
+                  ) : (
+                    <span>No active plan — Free user</span>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </DialogContent>
     </Dialog>
