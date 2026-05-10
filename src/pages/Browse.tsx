@@ -400,6 +400,8 @@ const Browse = () => {
         </section>
         )}
 
+        <SiteNoteBanner />
+
         {/* TOP 10 - Manual scroll */}
         {top10Items.length > 0 && (
           <section className="py-10 sm:py-16 px-4">
@@ -420,6 +422,9 @@ const Browse = () => {
             </div>
           </section>
         )}
+
+        <RecentUpdatesSection />
+
 
 
 
