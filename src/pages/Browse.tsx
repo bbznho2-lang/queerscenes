@@ -10,6 +10,8 @@ import TitlesTicker from "@/components/TitlesTicker";
 import EditContentDialog from "@/components/EditContentDialog";
 import AddExistingContentDialog from "@/components/AddExistingContentDialog";
 import AutoScrollRow from "@/components/AutoScrollRow";
+import SiteNoteBanner from "@/components/SiteNoteBanner";
+import RecentUpdatesSection from "@/components/RecentUpdatesSection";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { buildUniqueTopContent, fetchTopContentRanking, getUniqueItemsByTitle } from "@/lib/top-content";
