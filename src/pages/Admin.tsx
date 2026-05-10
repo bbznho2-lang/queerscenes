@@ -458,15 +458,20 @@ const Admin = () => {
 
   const totalPages = Math.max(1, Math.ceil(profiles.length / USERS_PER_PAGE));
   const sortedProfiles = useMemo(() => {
-    const isActiveSupporter = (p: Profile) => {
-      if (!p.is_premium) return false;
-      if (!p.premium_expires_at) return true;
-      return new Date(p.premium_expires_at) > new Date();
+    // Priority: 2 = expired supporter (top), 1 = active supporter, 0 = free
+    const supporterPriority = (p: Profile) => {
+      if (!p.is_premium) return 0;
+      if (!p.premium_expires_at) return 1; // lifetime active
+      return new Date(p.premium_expires_at) > new Date() ? 1 : 2;
     };
     return [...profiles].sort((a, b) => {
-      const aSup = isActiveSupporter(a) ? 1 : 0;
-      const bSup = isActiveSupporter(b) ? 1 : 0;
-      if (aSup !== bSup) return bSup - aSup;
+      const aP = supporterPriority(a);
+      const bP = supporterPriority(b);
+      if (aP !== bP) return bP - aP;
+      // Within expired group: most recently expired first
+      if (aP === 2 && a.premium_expires_at && b.premium_expires_at) {
+        return new Date(b.premium_expires_at).getTime() - new Date(a.premium_expires_at).getTime();
+      }
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
   }, [profiles]);
