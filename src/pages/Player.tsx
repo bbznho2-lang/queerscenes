@@ -292,7 +292,7 @@ const Player = () => {
                   </h2>
                   {userExpiredAt && (
                     <p className="text-[11px] text-muted-foreground mb-2">
-                      Expired on {new Date(userExpiredAt).toLocaleDateString("en-US")}
+                      Expired on {new Date(userExpiredAt!).toLocaleDateString("en-US")}
                     </p>
                   )}
                   <div className="flex items-start gap-2 max-w-md mx-auto mb-5 rounded-lg bg-primary/10 border border-primary/30 px-3 py-2.5 text-left">
