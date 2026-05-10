@@ -408,7 +408,7 @@ const Player = () => {
         <div className={isMobile ? "w-full min-h-0" : "w-full max-w-5xl min-h-0"}>
           <div
             className={isMobile ? "relative w-full overflow-hidden bg-black" : "relative w-full overflow-hidden rounded-2xl bg-black neon-border-purple"}
-            style={{ position: "relative", width: "100%", paddingBottom: "75%", height: 0, minHeight: 0, overflow: "hidden" }}
+            style={{ position: "relative", width: "100%", paddingBottom: "56.25%", height: 0, minHeight: 0, overflow: "hidden" }}
           >
             {hasPlayerUrl ? (
               <iframe
@@ -440,7 +440,7 @@ const Player = () => {
 
           {/* Player tier selector */}
           {(!isBlocked || supporterPaywall) && (hasFreeOption || hasPremiumOption) && (
-            <div className="mt-3 sm:mt-4 px-3 sm:px-0">
+            <div className="mt-6 sm:mt-8 px-3 sm:px-0">
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <button
                   onClick={() => setTier("free")}
