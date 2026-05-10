@@ -151,10 +151,7 @@ const Player = () => {
   const supporterPlayerEnabled = Boolean(content?.supporter_player_enabled);
   const episodePremiumBlocked = currentEp?.is_premium && !userIsPremium && !isAdmin;
   const supporterPaywall = supporterPlayerEnabled && tier === "supporter" && !userIsPremium && !isAdmin;
-  const _previewExpired = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("previewExpired") === "1";
-  const _expiredOverride = _previewExpired || userExpired;
-  const _expiredAtOverride = _previewExpired ? "2025-04-15T00:00:00Z" : userExpiredAt;
-  const isBlocked = premiumBlocked || episodePremiumBlocked || supporterPaywall || _previewExpired;
+  const isBlocked = premiumBlocked || episodePremiumBlocked || supporterPaywall;
 
   // Resolve URL based on tier with fallback chain
   const sourceFree = currentEp?.player_url_free || content?.player_url_free || currentEp?.player_url || content?.player_url || "";
