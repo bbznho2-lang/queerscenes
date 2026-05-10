@@ -52,6 +52,8 @@ const Player = () => {
   const [editOpen, setEditOpen] = useState(false);
   const [premiumBlocked, setPremiumBlocked] = useState(false);
   const [userIsPremium, setUserIsPremium] = useState(false);
+  const [userExpired, setUserExpired] = useState(false);
+  const [userExpiredAt, setUserExpiredAt] = useState<string | null>(null);
   const [tier, setTier] = useState<PlayerTier>("free");
   const { toast } = useToast();
   const [signupEmail, setSignupEmail] = useState("");
@@ -86,17 +88,23 @@ const Player = () => {
           if (profileError) {
             setPremiumBlocked(true);
             setUserIsPremium(false);
+            setUserExpired(false);
+            setUserExpiredAt(null);
           } else {
             const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
             const hasPremium = !!(profile?.is_premium && notExpired);
+            const expired = !!(profile?.is_premium && profile?.premium_expires_at && new Date(profile.premium_expires_at) <= new Date());
             setPremiumBlocked(!hasPremium);
             setUserIsPremium(hasPremium);
+            setUserExpired(expired);
+            setUserExpiredAt(expired ? profile.premium_expires_at : null);
           }
         }
       } else {
         setPremiumBlocked(false);
         if (isAdmin) {
           setUserIsPremium(true);
+          setUserExpired(false);
         } else if (user) {
           const { data: profile } = await supabase
             .from("profiles")
@@ -104,9 +112,14 @@ const Player = () => {
             .eq("user_id", user.id)
             .maybeSingle();
           const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
+          const expired = !!(profile?.is_premium && profile?.premium_expires_at && new Date(profile.premium_expires_at) <= new Date());
           setUserIsPremium(!!(profile?.is_premium && notExpired));
+          setUserExpired(expired);
+          setUserExpiredAt(expired ? profile!.premium_expires_at : null);
         } else {
           setUserIsPremium(false);
+          setUserExpired(false);
+          setUserExpiredAt(null);
         }
       }
 
@@ -268,15 +281,40 @@ const Player = () => {
             )}
             <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/95 to-background" />
             <div className="relative z-10 flex flex-col items-center px-5 py-8 sm:py-10 text-center">
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 text-primary px-3 py-1 text-[11px] font-bold uppercase tracking-wider mb-3">
-                <Crown className="w-3.5 h-3.5" /> Supporter
-              </div>
-              <h2 className="text-xl sm:text-2xl font-extrabold mb-1.5">
-                {supporterPaywall ? "Unlock the Supporter player" : "Become a Supporter to watch"}
-              </h2>
-              <p className="text-muted-foreground text-xs sm:text-sm mb-5 max-w-md">
-                Support the project and get instant access to ad-free playback, exclusive titles and early releases.
-              </p>
+              {userExpired ? (
+                <>
+                  <div className="text-5xl sm:text-6xl mb-2 leading-none" aria-hidden>😢</div>
+                  <div className="inline-flex items-center gap-1.5 rounded-full bg-destructive/15 text-destructive px-3 py-1 text-[11px] font-bold uppercase tracking-wider mb-3">
+                    <Crown className="w-3.5 h-3.5" /> Supporter expired
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-extrabold mb-1.5">
+                    Your Supporter plan has expired
+                  </h2>
+                  {userExpiredAt && (
+                    <p className="text-[11px] text-muted-foreground mb-2">
+                      Expired on {new Date(userExpiredAt).toLocaleDateString("en-US")}
+                    </p>
+                  )}
+                  <div className="flex items-start gap-2 max-w-md mx-auto mb-5 rounded-lg bg-primary/10 border border-primary/30 px-3 py-2.5 text-left">
+                    <span className="text-xl leading-none" aria-hidden>😊</span>
+                    <p className="text-xs sm:text-sm text-foreground">
+                      Don't worry! Renew your plan to keep watching from where you stopped and unlock all the new updates.
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 text-primary px-3 py-1 text-[11px] font-bold uppercase tracking-wider mb-3">
+                    <Crown className="w-3.5 h-3.5" /> Supporter
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-extrabold mb-1.5">
+                    {supporterPaywall ? "Unlock the Supporter player" : "Become a Supporter to watch"}
+                  </h2>
+                  <p className="text-muted-foreground text-xs sm:text-sm mb-5 max-w-md">
+                    Support the project and get instant access to ad-free playback, exclusive titles and early releases.
+                  </p>
+                </>
+              )}
 
               <div className="grid grid-cols-3 gap-2 sm:gap-3 max-w-md w-full mb-5">
                 {[
@@ -344,7 +382,7 @@ const Player = () => {
                   onClick={() => goToPlans(supporterPaywall ? "paywall_supporter_player" : "paywall_premium_content")}
                   className="shine-cta w-full max-w-sm rounded-full bg-primary text-primary-foreground font-semibold py-2.5 text-sm flex items-center justify-center gap-2 hover:bg-primary/90 mb-3 glow-purple"
                 >
-                  <Crown className="w-4 h-4" /> Choose your Supporter plan
+                  <Crown className="w-4 h-4" /> {userExpired ? "Renew your Supporter plan" : "Choose your Supporter plan"}
                 </button>
               )}
 
