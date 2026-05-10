@@ -88,17 +88,23 @@ const Player = () => {
           if (profileError) {
             setPremiumBlocked(true);
             setUserIsPremium(false);
+            setUserExpired(false);
+            setUserExpiredAt(null);
           } else {
             const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
             const hasPremium = !!(profile?.is_premium && notExpired);
+            const expired = !!(profile?.is_premium && profile?.premium_expires_at && new Date(profile.premium_expires_at) <= new Date());
             setPremiumBlocked(!hasPremium);
             setUserIsPremium(hasPremium);
+            setUserExpired(expired);
+            setUserExpiredAt(expired ? profile.premium_expires_at : null);
           }
         }
       } else {
         setPremiumBlocked(false);
         if (isAdmin) {
           setUserIsPremium(true);
+          setUserExpired(false);
         } else if (user) {
           const { data: profile } = await supabase
             .from("profiles")
@@ -106,9 +112,14 @@ const Player = () => {
             .eq("user_id", user.id)
             .maybeSingle();
           const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
+          const expired = !!(profile?.is_premium && profile?.premium_expires_at && new Date(profile.premium_expires_at) <= new Date());
           setUserIsPremium(!!(profile?.is_premium && notExpired));
+          setUserExpired(expired);
+          setUserExpiredAt(expired ? profile!.premium_expires_at : null);
         } else {
           setUserIsPremium(false);
+          setUserExpired(false);
+          setUserExpiredAt(null);
         }
       }
 
