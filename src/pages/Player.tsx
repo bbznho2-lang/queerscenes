@@ -192,8 +192,9 @@ const Player = () => {
     return trimmedUrl;
   };
 
-  const activePlayerUrl = rawPlayerUrl ? getEmbedUrl(rawPlayerUrl) : "";
-  const hasPlayerUrl = Boolean(activePlayerUrl);
+  const isIframeHtml = rawPlayerUrl.trim().toLowerCase().startsWith("<iframe");
+  const activePlayerUrl = rawPlayerUrl && !isIframeHtml ? getEmbedUrl(rawPlayerUrl) : "";
+  const hasPlayerUrl = Boolean(activePlayerUrl) || isIframeHtml;
   const isGoogleDriveEmbed = activePlayerUrl.includes("drive.google.com");
   const playerPaddingBottom = "75%";
   const iframeClassName = isGoogleDriveEmbed
