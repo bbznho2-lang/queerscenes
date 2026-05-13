@@ -479,6 +479,7 @@ const Player = () => {
               ) : (
               <iframe
                 key={`${tier}-${activePlayerUrl}`}
+                ref={iframeRef}
                 src={activePlayerUrl}
                 title={content?.title ? `Player - ${content.title}` : "Player"}
                 className={iframeClassName}
