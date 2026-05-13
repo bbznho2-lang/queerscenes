@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { ArrowLeft, Play, Pencil, Crown, Lock, Sparkles, Loader2 } from "lucide-react";
+import { ArrowLeft, Play, Pencil, Crown, Lock, Sparkles, Loader2, Maximize } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
