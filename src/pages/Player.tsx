@@ -505,7 +505,7 @@ const Player = () => {
               </div>
 
             )}
-            {isMobile && hasPlayerUrl && (
+            {isOdyseePlayer && hasPlayerUrl && (
               <button
                 type="button"
                 onClick={handleRequestFullscreen}
