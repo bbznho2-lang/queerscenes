@@ -457,8 +457,9 @@ const Player = () => {
                   className="absolute inset-0 [&>iframe]:absolute [&>iframe]:inset-0 [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0"
                   dangerouslySetInnerHTML={{
                     __html: rawPlayerUrl
-                      .replace(/<iframe\b(?![^>]*\sallowfullscreen)/i, '<iframe allowfullscreen')
-                      .replace(/<iframe\b(?![^>]*\sallow=)/i, '<iframe allow="fullscreen; accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"'),
+                      .replace(/<iframe\b(?![^>]*\sallowfullscreen)/i, '<iframe allowfullscreen webkitallowfullscreen mozallowfullscreen webkit-playsinline')
+                      .replace(/<iframe\b(?=[^>]*\sallowfullscreen)(?![^>]*\swebkitallowfullscreen)/i, '<iframe webkitallowfullscreen mozallowfullscreen webkit-playsinline')
+                      .replace(/<iframe\b(?![^>]*\sallow=)/i, '<iframe allow="fullscreen; accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"'),
                   }}
                 />
               ) : (
@@ -468,7 +469,8 @@ const Player = () => {
                 title={content?.title ? `Player - ${content.title}` : "Player"}
                 className={iframeClassName}
                 allowFullScreen
-                allow="fullscreen; accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                {...({ webkitallowfullscreen: "true", mozallowfullscreen: "true", "webkit-playsinline": "true" } as any)}
+                allow="fullscreen; accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
                 loading="eager"
                 referrerPolicy="strict-origin-when-cross-origin"
                 style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none", backgroundColor: "transparent", display: "block" }}
