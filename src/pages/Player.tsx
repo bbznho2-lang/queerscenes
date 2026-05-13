@@ -451,17 +451,29 @@ const Player = () => {
             style={{ position: "relative", width: "100%", paddingBottom: playerPaddingBottom, height: 0, minHeight: 0, overflow: "hidden" }}
           >
             {hasPlayerUrl ? (
+              isIframeHtml ? (
+                <div
+                  key={`${tier}-iframe-html`}
+                  className="absolute inset-0 [&>iframe]:absolute [&>iframe]:inset-0 [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0"
+                  dangerouslySetInnerHTML={{
+                    __html: rawPlayerUrl
+                      .replace(/<iframe\b(?![^>]*\sallowfullscreen)/i, '<iframe allowfullscreen')
+                      .replace(/<iframe\b(?![^>]*\sallow=)/i, '<iframe allow="fullscreen; accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"'),
+                  }}
+                />
+              ) : (
               <iframe
                 key={`${tier}-${activePlayerUrl}`}
                 src={activePlayerUrl}
                 title={content?.title ? `Player - ${content.title}` : "Player"}
                 className={iframeClassName}
                 allowFullScreen
-                allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                allow="fullscreen; accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                 loading="eager"
                 referrerPolicy="strict-origin-when-cross-origin"
                 style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none", backgroundColor: "transparent", display: "block" }}
               />
+              )
             ) : (
               <div className="absolute inset-0">
                 <img
