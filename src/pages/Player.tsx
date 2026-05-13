@@ -473,7 +473,7 @@ const Player = () => {
                 allow="fullscreen; accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
                 loading="eager"
                 referrerPolicy="strict-origin-when-cross-origin"
-                style={{ position: "relative", top: 0, left: 0, width: "100%", height: "100%", border: "none", backgroundColor: "transparent", display: "block" }}
+                style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none", backgroundColor: "transparent", display: "block" }}
               />
               )
             ) : (
