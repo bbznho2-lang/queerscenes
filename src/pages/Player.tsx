@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { ArrowLeft, Play, Pencil, Crown, Lock, Sparkles, Loader2 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { ArrowLeft, Play, Pencil, Crown, Lock, Sparkles, Loader2, Maximize } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -449,6 +449,7 @@ const Player = () => {
           <div
             className={isMobile ? "relative w-full overflow-hidden bg-black" : "relative w-full overflow-hidden rounded-2xl bg-black neon-border-purple"}
             style={{ position: "relative", width: "100%", paddingBottom: playerPaddingBottom, height: 0, minHeight: 0, overflow: "hidden" }}
+            ref={playerWrapperRef}
           >
             {hasPlayerUrl ? (
               isIframeHtml ? (
@@ -489,6 +490,16 @@ const Player = () => {
                 </div>
               </div>
 
+            )}
+            {isMobile && hasPlayerUrl && (
+              <button
+                type="button"
+                onClick={handleRequestFullscreen}
+                aria-label="Enter fullscreen"
+                className="absolute bottom-2 right-2 z-10 rounded-full bg-black/60 hover:bg-black/80 text-white p-2 backdrop-blur-sm border border-white/20"
+              >
+                <Maximize className="w-4 h-4" />
+              </button>
             )}
           </div>
 
