@@ -195,6 +195,19 @@ const Player = () => {
   const isIframeHtml = rawPlayerUrl.trim().toLowerCase().startsWith("<iframe");
   const activePlayerUrl = rawPlayerUrl && !isIframeHtml ? getEmbedUrl(rawPlayerUrl) : "";
   const hasPlayerUrl = Boolean(activePlayerUrl) || isIframeHtml;
+  const isOdyseePlayer = rawPlayerUrl.toLowerCase().includes("odysee.com");
+  const playerWrapperRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const handleRequestFullscreen = () => {
+    const target =
+      iframeRef.current ||
+      (playerWrapperRef.current?.querySelector("iframe") as HTMLIFrameElement | null);
+    if (!target) return;
+    const anyTarget = target as any;
+    if (target.requestFullscreen) target.requestFullscreen().catch(() => {});
+    else if (anyTarget.webkitRequestFullscreen) anyTarget.webkitRequestFullscreen();
+    else if (anyTarget.webkitEnterFullscreen) anyTarget.webkitEnterFullscreen();
+  };
   const isGoogleDriveEmbed = activePlayerUrl.includes("drive.google.com");
   const playerPaddingBottom = "75%";
   const iframeClassName = isGoogleDriveEmbed
@@ -466,6 +479,7 @@ const Player = () => {
               ) : (
               <iframe
                 key={`${tier}-${activePlayerUrl}`}
+                ref={iframeRef}
                 src={activePlayerUrl}
                 title={content?.title ? `Player - ${content.title}` : "Player"}
                 className={iframeClassName}
@@ -491,7 +505,7 @@ const Player = () => {
               </div>
 
             )}
-            {isMobile && hasPlayerUrl && (
+            {isOdyseePlayer && hasPlayerUrl && (
               <button
                 type="button"
                 onClick={handleRequestFullscreen}
