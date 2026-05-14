@@ -50,14 +50,11 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
   const [type, setType] = useState("filme");
   const [section, setSection] = useState("filmes");
   const [playerUrl, setPlayerUrl] = useState("");
-  const [playerUrlFree, setPlayerUrlFree] = useState("");
-  const [playerUrlPremium, setPlayerUrlPremium] = useState("");
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [bannerPreview, setBannerPreview] = useState("");
   const [bannerUrlInput, setBannerUrlInput] = useState("");
   const [isPremium, setIsPremium] = useState(false);
   const [isArchived, setIsArchived] = useState(false);
-  const [supporterPlayerEnabled, setSupporterPlayerEnabled] = useState(false);
   const [synopsis, setSynopsis] = useState("");
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [saving, setSaving] = useState(false);
@@ -69,16 +66,12 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setTag(content.tag);
       setType(content.type);
       setSection(content.section);
-      const legacy = content.player_url || "";
-      const free = (content as any).player_url_free || "";
+      const legacy = content.player_url || (content as any).player_url_free || "";
       setPlayerUrl(legacy);
-      setPlayerUrlFree(free || legacy);
-      setPlayerUrlPremium((content as any).player_url_premium || "");
       setBannerPreview(content.banner_url || "");
       setBannerUrlInput(content.banner_url || "");
       setIsPremium(content.is_premium || false);
       setIsArchived(content.is_archived || false);
-      setSupporterPlayerEnabled((content as any).supporter_player_enabled || false);
       setSynopsis((content as any).synopsis || "");
       supabase
         .from("episodes")
@@ -88,7 +81,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         .then(({ data }) => {
           const list = (data || []).map((ep: any) => ({
             ...ep,
-            player_url_free: ep.player_url_free || ep.player_url || "",
+            player_url: ep.player_url || ep.player_url_free || "",
           }));
           setEpisodes(list);
         });
@@ -99,13 +92,10 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setType(defaults?.type || "filme");
       setSection(defaults?.section || "series");
       setPlayerUrl("");
-      setPlayerUrlFree("");
-      setPlayerUrlPremium("");
       setBannerPreview("");
       setBannerUrlInput("");
       setIsPremium(false);
       setIsArchived(false);
-      setSupporterPlayerEnabled(false);
       setSynopsis("");
       setEpisodes([]);
     }
@@ -145,12 +135,12 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         type,
         section,
         player_url: playerUrl || null,
-        player_url_free: playerUrlFree || null,
-        player_url_premium: playerUrlPremium || null,
+        player_url_free: null,
+        player_url_premium: null,
         banner_url: bannerUrl,
         is_premium: isPremium,
         is_archived: isArchived,
-        supporter_player_enabled: supporterPlayerEnabled,
+        supporter_player_enabled: false,
         synopsis: synopsis || null,
       };
 
@@ -173,8 +163,8 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
               title: ep.title,
               episode_number: ep.episode_number,
               player_url: ep.player_url,
-              player_url_free: ep.player_url_free || null,
-              player_url_premium: ep.player_url_premium || null,
+              player_url_free: null,
+              player_url_premium: null,
               season: ep.season || 1,
               is_premium: ep.is_premium || false,
             });
@@ -183,8 +173,8 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
               title: ep.title,
               episode_number: ep.episode_number,
               player_url: ep.player_url,
-              player_url_free: ep.player_url_free || null,
-              player_url_premium: ep.player_url_premium || null,
+              player_url_free: null,
+              player_url_premium: null,
               season: ep.season || 1,
               is_premium: ep.is_premium || false,
             }).eq("id", ep.id);
@@ -295,14 +285,6 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
 
           <div className="flex items-center justify-between py-2">
             <div>
-              <label className="text-sm text-muted-foreground">Enable Supporter player</label>
-              <p className="text-[10px] text-muted-foreground/60">Shows the Supporter player tab and triggers the paywall for non-Supporters</p>
-            </div>
-            <Switch checked={supporterPlayerEnabled} onCheckedChange={setSupporterPlayerEnabled} />
-          </div>
-
-          <div className="flex items-center justify-between py-2">
-            <div>
               <label className="text-sm text-muted-foreground">Archived</label>
               <p className="text-[10px] text-muted-foreground/60">Hidden from site when enabled</p>
             </div>
@@ -320,22 +302,13 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
           </div>
 
           <div className="space-y-3 border border-border rounded-lg p-3 bg-muted/20">
-            <p className="text-xs font-semibold text-foreground">Players (Movies / Single titles)</p>
+            <p className="text-xs font-semibold text-foreground">Player (Movies / Single titles)</p>
             <div>
-              <label className="text-xs text-muted-foreground flex items-center gap-1">🌈 Free player (with ads)</label>
+              <label className="text-xs text-muted-foreground">Player URL or iframe code</label>
               <Input
-                value={playerUrlFree}
-                onChange={(e) => setPlayerUrlFree(e.target.value)}
-                placeholder="https://... (free, ad-supported embed)"
-                className="bg-muted border-border mt-1"
-              />
-            </div>
-            <div>
-              <label className="text-xs text-muted-foreground flex items-center gap-1">👑 Supporter player (no ads)</label>
-              <Input
-                value={playerUrlPremium}
-                onChange={(e) => setPlayerUrlPremium(e.target.value)}
-                placeholder="https://... (ad-free, supporters only)"
+                value={playerUrl}
+                onChange={(e) => setPlayerUrl(e.target.value)}
+                placeholder="https://... or <iframe ...></iframe>"
                 className="bg-muted border-border mt-1"
               />
             </div>
@@ -398,15 +371,9 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                           </Button>
                         </div>
                         <Input
-                          value={ep.player_url_free || ""}
-                          onChange={(e) => updateEpisode(ep.id, "player_url_free", e.target.value)}
-                          placeholder="🌈 Free player (with ads)"
-                          className="bg-muted border-border text-xs"
-                        />
-                        <Input
-                          value={ep.player_url_premium || ""}
-                          onChange={(e) => updateEpisode(ep.id, "player_url_premium", e.target.value)}
-                          placeholder="👑 Supporter player (no ads)"
+                          value={ep.player_url || ""}
+                          onChange={(e) => updateEpisode(ep.id, "player_url", e.target.value)}
+                          placeholder="Player URL or <iframe ...></iframe>"
                           className="bg-muted border-border text-xs"
                         />
                         <div className="flex items-center gap-2">
@@ -414,7 +381,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                             checked={ep.is_premium || false}
                             onCheckedChange={(v) => updateEpisode(ep.id, "is_premium", v)}
                           />
-                          <span className="text-xs text-muted-foreground">Supporter</span>
+                          <span className="text-xs text-muted-foreground flex items-center gap-1">👑 Supporter only</span>
                         </div>
                       </div>
                     ))}

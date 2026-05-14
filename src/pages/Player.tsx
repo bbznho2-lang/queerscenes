@@ -129,7 +129,7 @@ const Player = () => {
         setEpisodes(normalizedEpisodes);
         if (normalizedEpisodes.length > 0) {
           setSelectedSeason(normalizedEpisodes[0].season);
-          const firstPlayable = normalizedEpisodes.find((ep) => Boolean((ep.player_url_free || ep.player_url_premium || ep.player_url || "").trim()));
+          const firstPlayable = normalizedEpisodes.find((ep) => Boolean((ep.player_url || ep.player_url_free || ep.player_url_premium || "").trim()));
           setCurrentEp(firstPlayable || normalizedEpisodes[0]);
         } else {
           setCurrentEp(null);
@@ -145,21 +145,10 @@ const Player = () => {
     fetchContent();
   }, [id, user?.id, isAdmin, authLoading]);
 
-  // Note: previously auto-switched supporter→free for non-supporters; now we
-  // keep the tier and show an in-player paywall so the user can convert.
-
-  const supporterPlayerEnabled = Boolean(content?.supporter_player_enabled);
   const episodePremiumBlocked = currentEp?.is_premium && !userIsPremium && !isAdmin;
-  const supporterPaywall = supporterPlayerEnabled && tier === "supporter" && !userIsPremium && !isAdmin;
-  const isBlocked = premiumBlocked || episodePremiumBlocked || supporterPaywall;
+  const isBlocked = premiumBlocked || episodePremiumBlocked;
 
-  // Resolve URL based on tier with fallback chain
-  const sourceFree = currentEp?.player_url_free || content?.player_url_free || currentEp?.player_url || content?.player_url || "";
-  const sourcePremium = currentEp?.player_url_premium || content?.player_url_premium || sourceFree;
-  const rawPlayerUrl = tier === "supporter" && supporterPlayerEnabled ? sourcePremium : sourceFree;
-
-  const hasPremiumOption = supporterPlayerEnabled && Boolean((currentEp?.player_url_premium || content?.player_url_premium || "").trim());
-  const hasFreeOption = Boolean((currentEp?.player_url_free || content?.player_url_free || currentEp?.player_url || content?.player_url || "").trim());
+  const rawPlayerUrl = currentEp?.player_url || currentEp?.player_url_free || currentEp?.player_url_premium || content?.player_url || content?.player_url_free || content?.player_url_premium || "";
 
   const getEmbedUrl = (url: string) => {
     const trimmedUrl = url.trim();
@@ -264,51 +253,13 @@ const Player = () => {
     if (!content) return;
     if (premiumBlocked) {
       void trackEvent("locked_content_view", "premium_content");
-    } else if (supporterPaywall) {
-      void trackEvent("paywall_view", "supporter_player");
     } else if (episodePremiumBlocked) {
       void trackEvent("locked_content_view", "premium_episode");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [content?.id, premiumBlocked, supporterPaywall, episodePremiumBlocked, currentEp?.id]);
+  }, [content?.id, premiumBlocked, episodePremiumBlocked, currentEp?.id]);
 
-  const playerTierSelector = (!isBlocked || supporterPaywall) && (hasFreeOption || hasPremiumOption) ? (
-    <div className={isMobile ? "px-3 mb-4" : "mt-6 sm:mt-8 px-3 sm:px-0"}>
-      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-        <button
-          onClick={() => setTier("free")}
-          className={`flex-1 rounded-xl border px-3 py-2.5 text-left transition-all ${
-            tier === "free"
-              ? "border-primary bg-primary/10 text-foreground"
-              : "border-border bg-card text-muted-foreground hover:border-primary/40"
-          }`}
-        >
-          <div className="flex items-center gap-2 text-sm font-semibold">
-            🌈 Free Player
-            {tier === "free" && <Play className="w-3 h-3 text-primary" />}
-          </div>
-          <p className="text-[11px] text-muted-foreground mt-0.5">May contain ads</p>
-        </button>
-        <button
-          onClick={handleSupporterClick}
-          className={`flex-1 rounded-xl border px-3 py-2.5 text-left transition-all relative ${
-            tier === "supporter"
-              ? "border-primary bg-primary/15 text-foreground"
-              : "border-border bg-card text-muted-foreground hover:border-primary/40"
-          }`}
-        >
-          <div className="flex items-center gap-2 text-sm font-semibold">
-            <Crown className="w-3.5 h-3.5 text-primary" />
-            Supporter Player
-            {!(userIsPremium || isAdmin) && <Lock className="w-3 h-3 text-muted-foreground ml-auto" />}
-          </div>
-          <p className="text-[11px] text-muted-foreground mt-0.5">
-            {userIsPremium || isAdmin ? "Ad-free, exclusive for Supporters" : "Become a Supporter to unlock"}
-          </p>
-        </button>
-      </div>
-    </div>
-  ) : null;
+  const playerTierSelector = null;
 
   return (
     <div className="min-h-screen bg-background flex flex-col min-h-0 overflow-y-auto">
@@ -361,7 +312,7 @@ const Player = () => {
                     <Crown className="w-3.5 h-3.5" /> Supporter
                   </div>
                   <h2 className="text-xl sm:text-2xl font-extrabold mb-1.5">
-                    {supporterPaywall ? "Unlock the Supporter player" : "Become a Supporter to watch"}
+                    Become a Supporter to watch
                   </h2>
                   <p className="text-muted-foreground text-xs sm:text-sm mb-5 max-w-md">
                     Support the project and get instant access to ad-free playback, exclusive titles and early releases.
@@ -432,7 +383,7 @@ const Player = () => {
 
               {user && (
                 <button
-                  onClick={() => goToPlans(supporterPaywall ? "paywall_supporter_player" : "paywall_premium_content")}
+                  onClick={() => goToPlans("paywall_premium_content")}
                   className="shine-cta w-full max-w-sm rounded-full bg-primary text-primary-foreground font-semibold py-2.5 text-sm flex items-center justify-center gap-2 hover:bg-primary/90 mb-3 glow-purple"
                 >
                   <Crown className="w-4 h-4" /> {userExpired ? "Renew your Supporter plan" : "Choose your Supporter plan"}
@@ -441,16 +392,10 @@ const Player = () => {
 
               {!user && (
                 <button
-                  onClick={() => goToPlans(supporterPaywall ? "paywall_supporter_player" : "paywall_premium_content")}
+                  onClick={() => goToPlans("paywall_premium_content")}
                   className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2"
                 >
                   Already have an account? Choose a plan
-                </button>
-              )}
-
-              {supporterPaywall && hasFreeOption && (
-                <button onClick={() => { void trackEvent("watch_free_fallback_click", "paywall"); setTier("free"); }} className="mt-2 text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">
-                  Watch the free version
                 </button>
               )}
             </div>
@@ -500,7 +445,7 @@ const Player = () => {
                 />
                 <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]" />
                 <div className="absolute inset-0 flex items-center justify-center px-4 text-center">
-                  <p className="text-sm text-foreground">Video unavailable for this {tier === "supporter" ? "Supporter" : "Free"} player.</p>
+                  <p className="text-sm text-foreground">Video unavailable for this content.</p>
                 </div>
               </div>
 
