@@ -315,7 +315,7 @@ const Player = () => {
                     Become a Supporter to watch
                   </h2>
                   <p className="text-muted-foreground text-xs sm:text-sm mb-5 max-w-md">
-                    Support the project and get instant access to ad-free playback, exclusive titles and early releases.
+                    Help keep QueerScenes alive and unlock exclusive titles, early releases and behind-the-scenes perks reserved for our Supporters.
                   </p>
                 </>
               )}
