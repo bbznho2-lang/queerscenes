@@ -383,7 +383,7 @@ const Player = () => {
 
               {user && (
                 <button
-                  onClick={() => goToPlans(supporterPaywall ? "paywall_supporter_player" : "paywall_premium_content")}
+                  onClick={() => goToPlans("paywall_premium_content")}
                   className="shine-cta w-full max-w-sm rounded-full bg-primary text-primary-foreground font-semibold py-2.5 text-sm flex items-center justify-center gap-2 hover:bg-primary/90 mb-3 glow-purple"
                 >
                   <Crown className="w-4 h-4" /> {userExpired ? "Renew your Supporter plan" : "Choose your Supporter plan"}
@@ -392,16 +392,10 @@ const Player = () => {
 
               {!user && (
                 <button
-                  onClick={() => goToPlans(supporterPaywall ? "paywall_supporter_player" : "paywall_premium_content")}
+                  onClick={() => goToPlans("paywall_premium_content")}
                   className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2"
                 >
                   Already have an account? Choose a plan
-                </button>
-              )}
-
-              {supporterPaywall && hasFreeOption && (
-                <button onClick={() => { void trackEvent("watch_free_fallback_click", "paywall"); setTier("free"); }} className="mt-2 text-xs text-muted-foreground hover:text-foreground underline underline-offset-2">
-                  Watch the free version
                 </button>
               )}
             </div>
