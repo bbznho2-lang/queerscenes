@@ -639,7 +639,7 @@ const Index = () => {
                 <CardContent className="flex-1 flex flex-col">
                   <ul className="space-y-2.5 text-sm flex-1">
                     <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">Everything in the Free plan</span></li>
-                    <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">No ads on the site</span></li>
+                    <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">Smooth, uninterrupted experience</span></li>
                     <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">Soap operas subtitled in English — every week</span></li>
                     <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">LGBT series & movies from other countries, subtitled</span></li>
                     <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">GL Dramas subtitled</span></li>
