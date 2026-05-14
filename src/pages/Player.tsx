@@ -389,7 +389,7 @@ const Player = () => {
                   onClick={() => goToPlans("paywall_premium_content")}
                   className="shine-cta w-full max-w-sm rounded-full bg-primary text-primary-foreground font-semibold py-2.5 text-sm flex items-center justify-center gap-2 hover:bg-primary/90 mb-3 glow-purple"
                 >
-                  <Crown className="w-4 h-4" /> {userExpired ? "Renew your Supporter plan" : "Choose your Supporter plan"}
+                  <Crown className="w-4 h-4" /> {userExpired ? "Renew my Supporter plan" : "Yes, I want to become a Supporter"}
                 </button>
               )}
 
