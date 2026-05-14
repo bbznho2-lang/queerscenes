@@ -253,51 +253,13 @@ const Player = () => {
     if (!content) return;
     if (premiumBlocked) {
       void trackEvent("locked_content_view", "premium_content");
-    } else if (supporterPaywall) {
-      void trackEvent("paywall_view", "supporter_player");
     } else if (episodePremiumBlocked) {
       void trackEvent("locked_content_view", "premium_episode");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [content?.id, premiumBlocked, supporterPaywall, episodePremiumBlocked, currentEp?.id]);
+  }, [content?.id, premiumBlocked, episodePremiumBlocked, currentEp?.id]);
 
-  const playerTierSelector = (!isBlocked || supporterPaywall) && (hasFreeOption || hasPremiumOption) ? (
-    <div className={isMobile ? "px-3 mb-4" : "mt-6 sm:mt-8 px-3 sm:px-0"}>
-      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-        <button
-          onClick={() => setTier("free")}
-          className={`flex-1 rounded-xl border px-3 py-2.5 text-left transition-all ${
-            tier === "free"
-              ? "border-primary bg-primary/10 text-foreground"
-              : "border-border bg-card text-muted-foreground hover:border-primary/40"
-          }`}
-        >
-          <div className="flex items-center gap-2 text-sm font-semibold">
-            🌈 Free Player
-            {tier === "free" && <Play className="w-3 h-3 text-primary" />}
-          </div>
-          <p className="text-[11px] text-muted-foreground mt-0.5">May contain ads</p>
-        </button>
-        <button
-          onClick={handleSupporterClick}
-          className={`flex-1 rounded-xl border px-3 py-2.5 text-left transition-all relative ${
-            tier === "supporter"
-              ? "border-primary bg-primary/15 text-foreground"
-              : "border-border bg-card text-muted-foreground hover:border-primary/40"
-          }`}
-        >
-          <div className="flex items-center gap-2 text-sm font-semibold">
-            <Crown className="w-3.5 h-3.5 text-primary" />
-            Supporter Player
-            {!(userIsPremium || isAdmin) && <Lock className="w-3 h-3 text-muted-foreground ml-auto" />}
-          </div>
-          <p className="text-[11px] text-muted-foreground mt-0.5">
-            {userIsPremium || isAdmin ? "Ad-free, exclusive for Supporters" : "Become a Supporter to unlock"}
-          </p>
-        </button>
-      </div>
-    </div>
-  ) : null;
+  const playerTierSelector = null;
 
   return (
     <div className="min-h-screen bg-background flex flex-col min-h-0 overflow-y-auto">
