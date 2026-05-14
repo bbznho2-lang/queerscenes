@@ -312,7 +312,7 @@ const Player = () => {
                     <Crown className="w-3.5 h-3.5" /> Supporter
                   </div>
                   <h2 className="text-xl sm:text-2xl font-extrabold mb-1.5">
-                    {supporterPaywall ? "Unlock the Supporter player" : "Become a Supporter to watch"}
+                    Become a Supporter to watch
                   </h2>
                   <p className="text-muted-foreground text-xs sm:text-sm mb-5 max-w-md">
                     Support the project and get instant access to ad-free playback, exclusive titles and early releases.
