@@ -321,15 +321,12 @@ const Player = () => {
                     const viewers = 80 + ((seed + bucket) % 240);
                     return (
                       <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-destructive/15 border border-destructive/40 text-destructive px-2.5 py-1 text-[11px] font-semibold">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-green-500/15 border border-green-500/40 text-green-400 px-2.5 py-1 text-[11px] font-semibold">
                           <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75"></span>
-                            <span className="relative inline-flex h-2 w-2 rounded-full bg-destructive"></span>
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+                            <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
                           </span>
                           {viewers} watching right now
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 border border-primary/40 text-primary px-2.5 py-1 text-[11px] font-semibold">
-                          ⏳ Last hours in the catalog
                         </span>
                       </div>
                     );
