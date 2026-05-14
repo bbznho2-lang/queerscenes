@@ -66,16 +66,12 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setTag(content.tag);
       setType(content.type);
       setSection(content.section);
-      const legacy = content.player_url || "";
-      const free = (content as any).player_url_free || "";
+      const legacy = content.player_url || (content as any).player_url_free || "";
       setPlayerUrl(legacy);
-      setPlayerUrlFree(free || legacy);
-      setPlayerUrlPremium((content as any).player_url_premium || "");
       setBannerPreview(content.banner_url || "");
       setBannerUrlInput(content.banner_url || "");
       setIsPremium(content.is_premium || false);
       setIsArchived(content.is_archived || false);
-      setSupporterPlayerEnabled((content as any).supporter_player_enabled || false);
       setSynopsis((content as any).synopsis || "");
       supabase
         .from("episodes")
@@ -85,7 +81,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         .then(({ data }) => {
           const list = (data || []).map((ep: any) => ({
             ...ep,
-            player_url_free: ep.player_url_free || ep.player_url || "",
+            player_url: ep.player_url || ep.player_url_free || "",
           }));
           setEpisodes(list);
         });
@@ -96,13 +92,10 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setType(defaults?.type || "filme");
       setSection(defaults?.section || "series");
       setPlayerUrl("");
-      setPlayerUrlFree("");
-      setPlayerUrlPremium("");
       setBannerPreview("");
       setBannerUrlInput("");
       setIsPremium(false);
       setIsArchived(false);
-      setSupporterPlayerEnabled(false);
       setSynopsis("");
       setEpisodes([]);
     }
