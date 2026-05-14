@@ -371,15 +371,9 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                           </Button>
                         </div>
                         <Input
-                          value={ep.player_url_free || ""}
-                          onChange={(e) => updateEpisode(ep.id, "player_url_free", e.target.value)}
-                          placeholder="🌈 Free player (with ads)"
-                          className="bg-muted border-border text-xs"
-                        />
-                        <Input
-                          value={ep.player_url_premium || ""}
-                          onChange={(e) => updateEpisode(ep.id, "player_url_premium", e.target.value)}
-                          placeholder="👑 Supporter player (no ads)"
+                          value={ep.player_url || ""}
+                          onChange={(e) => updateEpisode(ep.id, "player_url", e.target.value)}
+                          placeholder="Player URL or <iframe ...></iframe>"
                           className="bg-muted border-border text-xs"
                         />
                         <div className="flex items-center gap-2">
@@ -387,7 +381,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                             checked={ep.is_premium || false}
                             onCheckedChange={(v) => updateEpisode(ep.id, "is_premium", v)}
                           />
-                          <span className="text-xs text-muted-foreground">Supporter</span>
+                          <span className="text-xs text-muted-foreground flex items-center gap-1">👑 Supporter only</span>
                         </div>
                       </div>
                     ))}
