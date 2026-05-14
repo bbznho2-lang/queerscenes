@@ -309,22 +309,25 @@ const Player = () => {
               ) : (
                 <>
                   <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 text-primary px-3 py-1 text-[11px] font-bold uppercase tracking-wider mb-3">
-                    <Crown className="w-3.5 h-3.5" /> Supporter
+                    <Crown className="w-3.5 h-3.5" /> Supporters only
                   </div>
                   <h2 className="text-xl sm:text-2xl font-extrabold mb-1.5">
-                    Become a Supporter to watch
+                    {currentEp ? `“${currentEp.title}” is waiting for you` : `“${content?.title ?? "This title"}” is waiting for you`}
                   </h2>
-                  <p className="text-muted-foreground text-xs sm:text-sm mb-5 max-w-md">
-                    Help keep QueerScenes alive and unlock exclusive titles, early releases and behind-the-scenes perks reserved for our Supporters.
+                  <p className="text-foreground/90 text-xs sm:text-sm mb-2 max-w-md">
+                    Don't stop now — the next scene is just one click away. Join our Supporters and pick up exactly where you left off.
+                  </p>
+                  <p className="text-muted-foreground text-[11px] sm:text-xs mb-5 max-w-md">
+                    Hundreds of fans are already binge-watching the full catalog tonight. Will you really close this tab right at the best part?
                   </p>
                 </>
               )}
 
               <div className="grid grid-cols-3 gap-2 sm:gap-3 max-w-md w-full mb-5">
                 {[
-                  { icon: "⚡", title: "Early access" },
-                  { icon: "🔓", title: "Exclusives" },
-                  { icon: "♾️", title: "Unlimited" },
+                  { icon: "▶️", title: "Keep watching" },
+                  { icon: "🔥", title: "Full catalog" },
+                  { icon: "⚡", title: "Instant access" },
                 ].map((perk) => (
                   <div key={perk.title} className="rounded-lg bg-card/70 border border-border px-2 py-3 text-center backdrop-blur-sm">
                     <div className="text-lg leading-none mb-1">{perk.icon}</div>
