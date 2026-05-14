@@ -129,7 +129,7 @@ const Player = () => {
         setEpisodes(normalizedEpisodes);
         if (normalizedEpisodes.length > 0) {
           setSelectedSeason(normalizedEpisodes[0].season);
-          const firstPlayable = normalizedEpisodes.find((ep) => Boolean((ep.player_url_free || ep.player_url_premium || ep.player_url || "").trim()));
+          const firstPlayable = normalizedEpisodes.find((ep) => Boolean((ep.player_url || ep.player_url_free || ep.player_url_premium || "").trim()));
           setCurrentEp(firstPlayable || normalizedEpisodes[0]);
         } else {
           setCurrentEp(null);
@@ -145,21 +145,10 @@ const Player = () => {
     fetchContent();
   }, [id, user?.id, isAdmin, authLoading]);
 
-  // Note: previously auto-switched supporter→free for non-supporters; now we
-  // keep the tier and show an in-player paywall so the user can convert.
-
-  const supporterPlayerEnabled = Boolean(content?.supporter_player_enabled);
   const episodePremiumBlocked = currentEp?.is_premium && !userIsPremium && !isAdmin;
-  const supporterPaywall = supporterPlayerEnabled && tier === "supporter" && !userIsPremium && !isAdmin;
-  const isBlocked = premiumBlocked || episodePremiumBlocked || supporterPaywall;
+  const isBlocked = premiumBlocked || episodePremiumBlocked;
 
-  // Resolve URL based on tier with fallback chain
-  const sourceFree = currentEp?.player_url_free || content?.player_url_free || currentEp?.player_url || content?.player_url || "";
-  const sourcePremium = currentEp?.player_url_premium || content?.player_url_premium || sourceFree;
-  const rawPlayerUrl = tier === "supporter" && supporterPlayerEnabled ? sourcePremium : sourceFree;
-
-  const hasPremiumOption = supporterPlayerEnabled && Boolean((currentEp?.player_url_premium || content?.player_url_premium || "").trim());
-  const hasFreeOption = Boolean((currentEp?.player_url_free || content?.player_url_free || currentEp?.player_url || content?.player_url || "").trim());
+  const rawPlayerUrl = currentEp?.player_url || currentEp?.player_url_free || currentEp?.player_url_premium || content?.player_url || content?.player_url_free || content?.player_url_premium || "";
 
   const getEmbedUrl = (url: string) => {
     const trimmedUrl = url.trim();
