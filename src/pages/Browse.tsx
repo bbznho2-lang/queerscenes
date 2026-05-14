@@ -617,7 +617,7 @@ const Browse = () => {
           <div className="space-y-3 mt-2">
             {[
               { icon: Sparkles, text: "All Supporter content unlocked" },
-              { icon: Play, text: "Ad-free, early releases" },
+              { icon: Play, text: "Early releases & exclusives" },
               { icon: Crown, text: "Request what you want to watch" },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-muted/50">
