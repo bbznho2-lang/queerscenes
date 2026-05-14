@@ -445,7 +445,7 @@ const Player = () => {
                 />
                 <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]" />
                 <div className="absolute inset-0 flex items-center justify-center px-4 text-center">
-                  <p className="text-sm text-foreground">Video unavailable for this {tier === "supporter" ? "Supporter" : "Free"} player.</p>
+                  <p className="text-sm text-foreground">Video unavailable for this content.</p>
                 </div>
               </div>
 
