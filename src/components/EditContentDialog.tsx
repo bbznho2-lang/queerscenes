@@ -302,22 +302,13 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
           </div>
 
           <div className="space-y-3 border border-border rounded-lg p-3 bg-muted/20">
-            <p className="text-xs font-semibold text-foreground">Players (Movies / Single titles)</p>
+            <p className="text-xs font-semibold text-foreground">Player (Movies / Single titles)</p>
             <div>
-              <label className="text-xs text-muted-foreground flex items-center gap-1">🌈 Free player (with ads)</label>
+              <label className="text-xs text-muted-foreground">Player URL or iframe code</label>
               <Input
-                value={playerUrlFree}
-                onChange={(e) => setPlayerUrlFree(e.target.value)}
-                placeholder="https://... (free, ad-supported embed)"
-                className="bg-muted border-border mt-1"
-              />
-            </div>
-            <div>
-              <label className="text-xs text-muted-foreground flex items-center gap-1">👑 Supporter player (no ads)</label>
-              <Input
-                value={playerUrlPremium}
-                onChange={(e) => setPlayerUrlPremium(e.target.value)}
-                placeholder="https://... (ad-free, supporters only)"
+                value={playerUrl}
+                onChange={(e) => setPlayerUrl(e.target.value)}
+                placeholder="https://... or <iframe ...></iframe>"
                 className="bg-muted border-border mt-1"
               />
             </div>
