@@ -599,7 +599,7 @@ const Index = () => {
                 <CardContent className="flex-1 flex flex-col">
                   <ul className="space-y-2.5 text-sm flex-1">
                     <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span><span className="text-foreground">Access to general site content</span></li>
-                    <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span><span className="text-foreground">Site with ads</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span><span className="text-foreground">Free forever</span></li>
                     <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span><span className="text-foreground">Comments on the site</span></li>
                     <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span><span className="text-foreground">Telegram community</span></li>
                     <li className="flex items-start gap-2 opacity-60"><span className="text-destructive mt-0.5">✗</span><span className="text-muted-foreground line-through">International subtitled series & movies</span></li>
