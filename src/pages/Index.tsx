@@ -660,30 +660,6 @@ const Index = () => {
                     Manual activation by the project creator on Telegram
                   </p>
 
-                  <div className="mt-4 rounded-lg bg-card/60 border border-border p-3 text-left space-y-2.5">
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-primary">How activation works</p>
-                    <div className="space-y-2 text-[11px] sm:text-xs text-foreground/90">
-                      <div className="flex gap-2">
-                        <span className="font-bold text-primary shrink-0">1.</span>
-                        <span>You click the button and open a chat with the project creator on Telegram.</span>
-                      </div>
-                      <div className="flex gap-2">
-                        <span className="font-bold text-primary shrink-0">2.</span>
-                        <span>The creator replies personally with the payment methods available in your country (PayPal, Pix, bank transfer, etc.).</span>
-                      </div>
-                      <div className="flex gap-2">
-                        <span className="font-bold text-primary shrink-0">3.</span>
-                        <span>After payment is confirmed, your account is upgraded manually and you get the VIP Telegram invite link.</span>
-                      </div>
-                      <div className="flex gap-2">
-                        <span className="font-bold text-primary shrink-0">4.</span>
-                        <span>Activation usually takes a few minutes — never more than a few hours.</span>
-                      </div>
-                    </div>
-                    <p className="text-[10px] text-muted-foreground italic pt-1">
-                      Yes, it's a real person on the other side — not a bot.
-                    </p>
-                  </div>
                 </CardContent>
               </Card>
             </motion.div>
