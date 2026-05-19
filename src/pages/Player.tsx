@@ -316,9 +316,12 @@ const Player = () => {
                   </h2>
 
                   {(() => {
+                    const names = ["Makayla", "Eva", "Liam", "Noah", "Sofia", "Ava", "Mateo", "Luna", "Ethan", "Mia", "Owen", "Zoe", "Leo", "Iris", "Theo", "Nora"];
                     const seed = (content?.id || "x").split("").reduce((a, c) => a + c.charCodeAt(0), 0);
                     const bucket = Math.floor(Date.now() / (90 * 1000));
-                    const joined = 3 + ((seed + bucket) % 14);
+                    const a = names[(seed + bucket) % names.length];
+                    const b = names[(seed + bucket + 5) % names.length];
+                    const others = 8 + ((seed + bucket) % 18);
                     return (
                       <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
                         <span className="inline-flex items-center gap-1.5 rounded-full bg-green-500/15 border border-green-500/40 text-green-400 px-2.5 py-1 text-[11px] font-semibold">
@@ -326,17 +329,14 @@ const Player = () => {
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
                             <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
                           </span>
-                          {joined} people just became Supporters
+                          {a}, {b} and {others} others became Supporters this month
                         </span>
                       </div>
                     );
                   })()}
 
-                  <p className="text-foreground/90 text-xs sm:text-sm mb-2 max-w-md">
+                  <p className="text-foreground/90 text-xs sm:text-sm mb-5 max-w-md">
                     Don't stop now — the next scene is just one click away. Join our Supporters and pick up exactly where you left off.
-                  </p>
-                  <p className="text-muted-foreground text-[11px] sm:text-xs mb-5 max-w-md">
-                    Hundreds of fans are already binge-watching the full catalog tonight. Will you really close this tab right at the best part?
                   </p>
                 </>
               )}
