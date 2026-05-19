@@ -317,8 +317,8 @@ const Player = () => {
 
                   {(() => {
                     const seed = (content?.id || "x").split("").reduce((a, c) => a + c.charCodeAt(0), 0);
-                    const bucket = Math.floor(Date.now() / (5 * 60 * 1000));
-                    const viewers = 80 + ((seed + bucket) % 240);
+                    const bucket = Math.floor(Date.now() / (90 * 1000));
+                    const joined = 3 + ((seed + bucket) % 14);
                     return (
                       <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
                         <span className="inline-flex items-center gap-1.5 rounded-full bg-green-500/15 border border-green-500/40 text-green-400 px-2.5 py-1 text-[11px] font-semibold">
@@ -326,7 +326,7 @@ const Player = () => {
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
                             <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
                           </span>
-                          {viewers} watching right now
+                          {joined} people just became Supporters
                         </span>
                       </div>
                     );
