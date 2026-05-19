@@ -646,12 +646,19 @@ const Index = () => {
                     <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">Early access content</span></li>
                     <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">VIP Telegram channel with exclusive news & updates</span></li>
                   </ul>
+                  <div className="mt-5 mb-2 flex items-center justify-center gap-2 rounded-full bg-primary/10 border border-primary/30 px-3 py-1.5 text-xs font-semibold text-foreground">
+                    <span aria-hidden>💜</span>
+                    <span>More than 50 people already support the project</span>
+                  </div>
                   <Button
                     onClick={() => window.open("https://t.me/L7kznr?text=Hi%20I%20came%20from%20your%20website%20and%20I%27m%20interested%20in%20becoming%20a%20Supporter%20can%20you%20give%20me%20more%20details", "_blank")}
-                    className="shine-cta w-full mt-5 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple gap-2"
+                    className="shine-cta w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple gap-2"
                   >
                     <Crown className="w-4 h-4" /> Become a Supporter
                   </Button>
+                  <p className="text-center text-[11px] text-muted-foreground mt-2">
+                    Manual activation by the project creator on Telegram
+                  </p>
                 </CardContent>
               </Card>
             </motion.div>
