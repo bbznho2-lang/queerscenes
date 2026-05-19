@@ -316,7 +316,7 @@ const Player = () => {
                   </h2>
 
                   {(() => {
-                    const names = ["Makayla", "Eva", "Liam", "Noah", "Sofia", "Ava", "Mateo", "Luna", "Ethan", "Mia", "Owen", "Zoe", "Leo", "Iris", "Theo", "Nora"];
+                    const names = ["Jackson", "Omar", "Ethan", "Yousef", "Mason", "Khalid", "Logan", "Tariq", "Caleb", "Bilal", "Hunter", "Karim", "Tyler", "Rami", "Brandon", "Hassan", "Austin", "Faisal", "Cody", "Zayd"];
                     const seed = (content?.id || "x").split("").reduce((a, c) => a + c.charCodeAt(0), 0);
                     const bucket = Math.floor(Date.now() / (90 * 1000));
                     const a = names[(seed + bucket) % names.length];
