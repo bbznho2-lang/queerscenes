@@ -316,12 +316,30 @@ const Player = () => {
                   </h2>
 
                   {(() => {
-                    const names = ["Ashley", "Layla", "Madison", "Fatima", "Brittany", "Yasmin", "Hannah", "Aisha", "Megan", "Noor", "Taylor", "Salma", "Jessica", "Mariam", "Courtney", "Zahra", "Kayla", "Amira", "Rachel", "Huda", "Emily", "Lina", "Jackson", "Omar", "Tyler", "Khalid"];
+                    const names = [
+                      // US (female)
+                      "Ashley", "Madison", "Brittany", "Hannah", "Megan", "Taylor", "Jessica", "Courtney", "Kayla", "Rachel", "Emily",
+                      // Arab (female)
+                      "Layla", "Fatima", "Yasmin", "Aisha", "Noor", "Salma", "Mariam", "Zahra", "Amira", "Huda", "Lina",
+                      // French (female)
+                      "Camille", "Léa", "Manon", "Chloé", "Inès", "Juliette",
+                      // German (female)
+                      "Lena", "Hanna", "Lara", "Greta", "Mila",
+                      // Swiss (female)
+                      "Elin", "Anouk", "Noemi", "Alina",
+                      // Male sprinkle (US / Arab / FR / DE / CH)
+                      "Jackson", "Tyler", "Omar", "Khalid", "Lucas", "Felix", "Matthias",
+                    ];
                     const seed = (content?.id || "x").split("").reduce((a, c) => a + c.charCodeAt(0), 0);
                     const bucket = Math.floor(Date.now() / (90 * 1000));
-                    const a = names[(seed + bucket) % names.length];
-                    const b = names[(seed + bucket + 5) % names.length];
-                    const others = 8 + ((seed + bucket) % 18);
+                    // Use a step coprime with names.length so the sequence cycles through every name before repeating
+                    const step = 17;
+                    const idxA = ((seed + bucket * step) % names.length + names.length) % names.length;
+                    let idxB = ((seed + bucket * step + 13) % names.length + names.length) % names.length;
+                    if (idxB === idxA) idxB = (idxB + 1) % names.length;
+                    const a = names[idxA];
+                    const b = names[idxB];
+                    const others = 8 + ((seed + bucket * 7) % 22);
                     return (
                       <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
                         <span className="inline-flex items-center gap-1.5 rounded-full bg-green-500/15 border border-green-500/40 text-green-400 px-2.5 py-1 text-[11px] font-semibold">
