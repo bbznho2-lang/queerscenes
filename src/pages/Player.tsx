@@ -339,7 +339,7 @@ const Player = () => {
                     if (idxB === idxA) idxB = (idxB + 1) % names.length;
                     const a = names[idxA];
                     const b = names[idxB];
-                    const others = 8 + ((seed + bucket * 7) % 22);
+                    const others = 29;
                     return (
                       <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
                         <span className="inline-flex items-center gap-1.5 rounded-full bg-green-500/15 border border-green-500/40 text-green-400 px-2.5 py-1 text-[11px] font-semibold">
