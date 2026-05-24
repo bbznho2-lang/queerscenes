@@ -145,8 +145,6 @@ export type Database = {
           is_archived: boolean
           is_premium: boolean
           player_url: string | null
-          player_url_free: string | null
-          player_url_premium: string | null
           position: number
           section: string
           supporter_player_enabled: boolean
@@ -164,8 +162,6 @@ export type Database = {
           is_archived?: boolean
           is_premium?: boolean
           player_url?: string | null
-          player_url_free?: string | null
-          player_url_premium?: string | null
           position?: number
           section?: string
           supporter_player_enabled?: boolean
@@ -183,8 +179,6 @@ export type Database = {
           is_archived?: boolean
           is_premium?: boolean
           player_url?: string | null
-          player_url_free?: string | null
-          player_url_premium?: string | null
           position?: number
           section?: string
           supporter_player_enabled?: boolean
@@ -205,8 +199,6 @@ export type Database = {
           id: string
           is_premium: boolean
           player_url: string | null
-          player_url_free: string | null
-          player_url_premium: string | null
           season: number
           title: string
         }
@@ -217,8 +209,6 @@ export type Database = {
           id?: string
           is_premium?: boolean
           player_url?: string | null
-          player_url_free?: string | null
-          player_url_premium?: string | null
           season?: number
           title?: string
         }
@@ -229,8 +219,6 @@ export type Database = {
           id?: string
           is_premium?: boolean
           player_url?: string | null
-          player_url_free?: string | null
-          player_url_premium?: string | null
           season?: number
           title?: string
         }
@@ -487,6 +475,24 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      list_support_chat_messages: {
+        Args: { _chat_id: string }
+        Returns: {
+          chat_id: string
+          created_at: string
+          id: string
+          message: string
+          sender_role: string
+        }[]
+      }
+      send_support_chat_message: {
+        Args: { _chat_id: string; _message: string }
+        Returns: string
+      }
+      start_support_chat: {
+        Args: { _email: string; _name: string }
+        Returns: string
       }
     }
     Enums: {

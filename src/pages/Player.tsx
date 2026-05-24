@@ -18,8 +18,6 @@ interface ContentItem {
   type: string;
   banner_url: string | null;
   player_url: string | null;
-  player_url_free: string | null;
-  player_url_premium: string | null;
   section: string;
   position: number;
   is_premium: boolean;
@@ -32,8 +30,6 @@ interface Episode {
   title: string;
   episode_number: number;
   player_url: string | null;
-  player_url_free: string | null;
-  player_url_premium: string | null;
   season: number;
   is_premium: boolean;
 }
@@ -129,7 +125,7 @@ const Player = () => {
         setEpisodes(normalizedEpisodes);
         if (normalizedEpisodes.length > 0) {
           setSelectedSeason(normalizedEpisodes[0].season);
-          const firstPlayable = normalizedEpisodes.find((ep) => Boolean((ep.player_url || ep.player_url_free || ep.player_url_premium || "").trim()));
+          const firstPlayable = normalizedEpisodes.find((ep) => Boolean((ep.player_url || "").trim()));
           setCurrentEp(firstPlayable || normalizedEpisodes[0]);
         } else {
           setCurrentEp(null);
@@ -148,7 +144,7 @@ const Player = () => {
   const episodePremiumBlocked = currentEp?.is_premium && !userIsPremium && !isAdmin;
   const isBlocked = premiumBlocked || episodePremiumBlocked;
 
-  const rawPlayerUrl = currentEp?.player_url || currentEp?.player_url_free || currentEp?.player_url_premium || content?.player_url || content?.player_url_free || content?.player_url_premium || "";
+  const rawPlayerUrl = currentEp?.player_url || content?.player_url || "";
 
   const getEmbedUrl = (url: string) => {
     const trimmedUrl = url.trim();

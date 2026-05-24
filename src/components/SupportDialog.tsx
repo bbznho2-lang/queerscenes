@@ -42,33 +42,12 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
     }
   }, [open]);
 
-  // Realtime subscription
+  // Poll for new messages every 2.5s while chat is open
   useEffect(() => {
     if (!chatId) return;
-
-    const channel = supabase
-      .channel(`chat-${chatId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "chat_messages",
-          filter: `chat_id=eq.${chatId}`,
-        },
-        (payload) => {
-          const msg = payload.new as ChatMessage;
-          setMessages((prev) => {
-            if (prev.some((m) => m.id === msg.id)) return prev;
-            return [...prev, msg];
-          });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    loadMessages(chatId);
+    const interval = setInterval(() => loadMessages(chatId), 2500);
+    return () => clearInterval(interval);
   }, [chatId]);
 
   // Auto-scroll on new messages
@@ -79,12 +58,10 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
   }, [messages]);
 
   const loadMessages = async (id: string) => {
-    const { data } = await supabase
-      .from("chat_messages" as any)
-      .select("*")
-      .eq("chat_id", id)
-      .order("created_at", { ascending: true }) as any;
-    setMessages((data as ChatMessage[]) || []);
+    const { data, error } = await supabase.rpc("list_support_chat_messages" as any, { _chat_id: id });
+    if (!error && data) {
+      setMessages(data as ChatMessage[]);
+    }
   };
 
   const startChat = async (e: React.FormEvent) => {
@@ -95,16 +72,15 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
     }
     setStarting(true);
     try {
-      const { data, error } = await supabase
-        .from("support_chats" as any)
-        .insert({ user_name: name.trim(), user_email: email.trim() } as any)
-        .select()
-        .single() as any;
-      if (error) {
+      const { data, error } = await supabase.rpc("start_support_chat" as any, {
+        _name: name.trim(),
+        _email: email.trim(),
+      });
+      if (error || !data) {
         toast.error("Error starting chat.");
         return;
       }
-      const id = (data as any).id;
+      const id = data as string;
       setChatId(id);
       localStorage.setItem("support_chat_id", id);
       setMessages([]);
@@ -118,14 +94,16 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
     if (!newMessage.trim() || !chatId) return;
     setSending(true);
     try {
-      const { error } = await supabase
-        .from("chat_messages" as any)
-        .insert({ chat_id: chatId, sender_role: "user", message: newMessage.trim() } as any);
+      const { error } = await supabase.rpc("send_support_chat_message" as any, {
+        _chat_id: chatId,
+        _message: newMessage.trim(),
+      });
       if (error) {
         toast.error("Error sending message.");
         return;
       }
       setNewMessage("");
+      loadMessages(chatId);
     } finally {
       setSending(false);
     }
