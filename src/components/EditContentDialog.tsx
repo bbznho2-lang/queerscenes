@@ -159,8 +159,6 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
               title: ep.title,
               episode_number: ep.episode_number,
               player_url: ep.player_url,
-              player_url_free: null,
-              player_url_premium: null,
               season: ep.season || 1,
               is_premium: ep.is_premium || false,
             });
@@ -169,8 +167,6 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
               title: ep.title,
               episode_number: ep.episode_number,
               player_url: ep.player_url,
-              player_url_free: null,
-              player_url_premium: null,
               season: ep.season || 1,
               is_premium: ep.is_premium || false,
             }).eq("id", ep.id);
