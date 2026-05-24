@@ -117,15 +117,30 @@ const CommentsSection = ({ contentId }: Props) => {
     return Boolean(p.is_premium && notExpired);
   };
 
+  const resolveAuthorName = async (): Promise<string> => {
+    if (authorName) return authorName;
+    if (!user) return "User";
+    const { data } = await supabase
+      .from("profiles")
+      .select("first_name, last_name, email")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    const name = [data?.first_name, data?.last_name].filter(Boolean).join(" ").trim();
+    const resolved = name || data?.email?.split("@")[0] || user.email?.split("@")[0] || "User";
+    setAuthorName(resolved);
+    return resolved;
+  };
+
   const submitComment = async (text: string, parent: string | null) => {
     if (!user) { toast.error("Sign in to comment"); return false; }
     const parsed = commentSchema.safeParse({ body: text });
     if (!parsed.success) { toast.error(parsed.error.issues[0].message); return false; }
     setLoading(true);
+    const name = await resolveAuthorName();
     const { error } = await supabase.from("content_comments").insert({
       content_id: contentId,
       user_id: user.id,
-      author_name: authorName || "User",
+      author_name: name,
       body: parsed.data.body,
       parent_id: parent,
     } as any);
@@ -147,8 +162,20 @@ const CommentsSection = ({ contentId }: Props) => {
   };
 
   const handleDelete = async (id: string) => {
-    const { error } = await supabase.from("content_comments").delete().eq("id", id);
+    if (!user) { toast.error("Sign in to delete"); return; }
+    // Remove likes first to avoid orphan rows
+    await supabase.from("comment_likes" as any).delete().eq("comment_id", id);
+    const { data, error } = await supabase
+      .from("content_comments")
+      .delete()
+      .eq("id", id)
+      .select("id");
     if (error) { toast.error(error.message); return; }
+    if (!data || data.length === 0) {
+      toast.error("You don't have permission to delete this comment");
+      return;
+    }
+    toast.success("Comment deleted");
     void load();
   };
 
