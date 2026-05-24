@@ -125,7 +125,7 @@ const Player = () => {
         setEpisodes(normalizedEpisodes);
         if (normalizedEpisodes.length > 0) {
           setSelectedSeason(normalizedEpisodes[0].season);
-          const firstPlayable = normalizedEpisodes.find((ep) => Boolean((ep.player_url || ep.player_url_free || ep.player_url_premium || "").trim()));
+          const firstPlayable = normalizedEpisodes.find((ep) => Boolean((ep.player_url || "").trim()));
           setCurrentEp(firstPlayable || normalizedEpisodes[0]);
         } else {
           setCurrentEp(null);
