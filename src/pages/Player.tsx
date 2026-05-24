@@ -144,7 +144,7 @@ const Player = () => {
   const episodePremiumBlocked = currentEp?.is_premium && !userIsPremium && !isAdmin;
   const isBlocked = premiumBlocked || episodePremiumBlocked;
 
-  const rawPlayerUrl = currentEp?.player_url || currentEp?.player_url_free || currentEp?.player_url_premium || content?.player_url || content?.player_url_free || content?.player_url_premium || "";
+  const rawPlayerUrl = currentEp?.player_url || content?.player_url || "";
 
   const getEmbedUrl = (url: string) => {
     const trimmedUrl = url.trim();
