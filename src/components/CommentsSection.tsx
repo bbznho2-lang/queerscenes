@@ -165,16 +165,11 @@ const CommentsSection = ({ contentId }: Props) => {
     if (!user) { toast.error("Sign in to delete"); return; }
     // Remove likes first to avoid orphan rows
     await supabase.from("comment_likes" as any).delete().eq("comment_id", id);
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("content_comments")
       .delete()
-      .eq("id", id)
-      .select("id");
+      .eq("id", id);
     if (error) { toast.error(error.message); return; }
-    if (!data || data.length === 0) {
-      toast.error("You don't have permission to delete this comment");
-      return;
-    }
     toast.success("Comment deleted");
     void load();
   };
