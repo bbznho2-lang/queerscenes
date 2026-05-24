@@ -29,8 +29,6 @@ interface Episode {
   title: string;
   episode_number: number;
   player_url: string | null;
-  player_url_free: string | null;
-  player_url_premium: string | null;
   season: number;
   is_premium: boolean;
 }
