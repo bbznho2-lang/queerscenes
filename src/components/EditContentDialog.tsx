@@ -79,7 +79,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         .then(({ data }) => {
           const list = (data || []).map((ep: any) => ({
             ...ep,
-            player_url: ep.player_url || ep.player_url_free || "",
+            player_url: ep.player_url || "",
           }));
           setEpisodes(list);
         });
