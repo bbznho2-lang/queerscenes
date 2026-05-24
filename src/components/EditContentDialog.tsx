@@ -193,8 +193,6 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         title: `Episode ${episodes.length + 1}`,
         episode_number: episodes.length + 1,
         player_url: "",
-        player_url_free: "",
-        player_url_premium: "",
         season: Math.max(1, ...episodes.map(e => e.season || 1)),
         is_premium: false,
       },
