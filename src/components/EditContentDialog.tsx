@@ -15,7 +15,7 @@ interface ContentItem {
   tag: string;
   type: string;
   banner_url: string | null;
-  player_url: string | null;
+  player_url?: string | null;
   section: string;
   position: number;
   is_premium: boolean;
