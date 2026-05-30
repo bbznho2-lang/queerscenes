@@ -253,6 +253,45 @@ export type Database = {
         }
         Relationships: []
       }
+      pending_supporters: {
+        Row: {
+          claimed_at: string | null
+          created_at: string
+          email: string
+          id: string
+          plan: string
+          premium_expires_at: string
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          claimed_at?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          plan: string
+          premium_expires_at: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          claimed_at?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          plan?: string
+          premium_expires_at?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -484,6 +523,7 @@ export type Database = {
           title: string
         }[]
       }
+      claim_supporter_for_current_user: { Args: never; Returns: Json }
       current_user_can_play_premium: { Args: never; Returns: boolean }
       get_content_player_url: { Args: { _content_id: string }; Returns: string }
       get_episode_player_url: { Args: { _episode_id: string }; Returns: string }
