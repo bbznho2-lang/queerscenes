@@ -15,7 +15,7 @@ interface ContentItem {
   tag: string;
   type: string;
   banner_url: string | null;
-  player_url: string | null;
+  player_url?: string | null;
   section: string;
   position: number;
   is_premium: boolean;
@@ -66,18 +66,20 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setSection(content.section);
       const legacy = content.player_url || (content as any).player_url_free || "";
       setPlayerUrl(legacy);
+      if (!legacy) {
+        supabase.rpc("get_content_player_url", { _content_id: content.id }).then(({ data }) => {
+          if (data) setPlayerUrl(data as string);
+        });
+      }
       setBannerPreview(content.banner_url || "");
       setBannerUrlInput(content.banner_url || "");
       setIsPremium(content.is_premium || false);
       setIsArchived(content.is_archived || false);
       setSynopsis((content as any).synopsis || "");
       supabase
-        .from("episodes")
-        .select("*")
-        .eq("content_id", content.id)
-        .order("episode_number")
+        .rpc("admin_get_episodes", { _content_id: content.id })
         .then(({ data }) => {
-          const list = (data || []).map((ep: any) => ({
+          const list = ((data as any[]) || []).map((ep: any) => ({
             ...ep,
             player_url: ep.player_url || "",
           }));

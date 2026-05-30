@@ -71,17 +71,16 @@ const AddExistingContentDialog = ({ open, onOpenChange, targetSection, onSaved }
     if (selected.size === 0) return;
     setSaving(true);
     try {
-      // Get full data of selected items to duplicate them
+      // Get full data (incl. player_url) via admin RPC to duplicate items
       const { data: items, error: fetchErr } = await supabase
-        .from("contents")
-        .select("title, year, tag, type, banner_url, player_url, is_premium, synopsis, position")
-        .in("id", Array.from(selected));
+        .rpc("admin_get_contents", { _ids: Array.from(selected) });
       if (fetchErr) throw fetchErr;
 
-      for (const item of items || []) {
+      for (const item of (items as any[]) || []) {
+        const { id: _id, ...rest } = item;
         const { error } = await supabase
           .from("contents")
-          .insert({ ...item, section: targetSection });
+          .insert({ ...rest, section: targetSection });
         if (error) throw error;
       }
       toast.success(`${selected.size} título(s) adicionado(s) aos Exclusivos!`);

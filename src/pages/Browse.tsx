@@ -24,7 +24,7 @@ interface ContentItem {
   tag: string;
   type: string;
   banner_url: string | null;
-  player_url: string | null;
+  player_url?: string | null;
   section: string;
   position: number;
   is_premium: boolean;
@@ -168,7 +168,7 @@ const Browse = () => {
   const fetchContents = async () => {
     const { data } = await supabase
       .from("contents")
-      .select("*")
+      .select("id, title, year, tag, type, banner_url, section, position, is_premium, synopsis, is_archived, supporter_player_enabled, created_at, updated_at")
       .order("position")
       .order("created_at", { ascending: false });
     setContents(data || []);

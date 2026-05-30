@@ -455,6 +455,38 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_get_contents: {
+        Args: { _ids: string[] }
+        Returns: {
+          banner_url: string
+          id: string
+          is_premium: boolean
+          player_url: string
+          position: number
+          section: string
+          synopsis: string
+          tag: string
+          title: string
+          type: string
+          year: number
+        }[]
+      }
+      admin_get_episodes: {
+        Args: { _content_id: string }
+        Returns: {
+          content_id: string
+          created_at: string
+          episode_number: number
+          id: string
+          is_premium: boolean
+          player_url: string
+          season: number
+          title: string
+        }[]
+      }
+      current_user_can_play_premium: { Args: never; Returns: boolean }
+      get_content_player_url: { Args: { _content_id: string }; Returns: string }
+      get_episode_player_url: { Args: { _episode_id: string }; Returns: string }
       get_supporter_user_ids: {
         Args: { _user_ids: string[] }
         Returns: {

@@ -17,7 +17,7 @@ interface ContentItem {
   tag: string;
   type: string;
   banner_url: string | null;
-  player_url: string | null;
+  player_url?: string | null;
   section: string;
   position: number;
   is_premium: boolean;
@@ -29,7 +29,7 @@ interface Episode {
   content_id: string;
   title: string;
   episode_number: number;
-  player_url: string | null;
+  player_url?: string | null;
   season: number;
   is_premium: boolean;
 }
@@ -61,7 +61,11 @@ const Player = () => {
 
   const fetchContent = async () => {
     if (!id) return;
-    const { data } = await supabase.from("contents").select("*").eq("id", id).single();
+    const { data } = await supabase
+      .from("contents")
+      .select("id, title, year, tag, type, banner_url, section, position, is_premium, supporter_player_enabled, synopsis")
+      .eq("id", id)
+      .single();
     if (data) {
       setContent(data as ContentItem);
 
@@ -120,13 +124,17 @@ const Player = () => {
       }
 
       if (data.type === "serie" || data.type === "novela" || data.type === "anime") {
-        const { data: eps } = await supabase.from("episodes").select("*").eq("content_id", id).order("season").order("episode_number");
+        const { data: eps } = await supabase
+          .from("episodes")
+          .select("id, content_id, title, episode_number, season, is_premium, created_at")
+          .eq("content_id", id)
+          .order("season")
+          .order("episode_number");
         const normalizedEpisodes = ((eps || []) as Episode[]).map(e => ({ ...e, season: e.season || 1 }));
         setEpisodes(normalizedEpisodes);
         if (normalizedEpisodes.length > 0) {
           setSelectedSeason(normalizedEpisodes[0].season);
-          const firstPlayable = normalizedEpisodes.find((ep) => Boolean((ep.player_url || "").trim()));
-          setCurrentEp(firstPlayable || normalizedEpisodes[0]);
+          setCurrentEp(normalizedEpisodes[0]);
         } else {
           setCurrentEp(null);
         }
@@ -144,7 +152,24 @@ const Player = () => {
   const episodePremiumBlocked = currentEp?.is_premium && !userIsPremium && !isAdmin;
   const isBlocked = premiumBlocked || episodePremiumBlocked;
 
-  const rawPlayerUrl = currentEp?.player_url || content?.player_url || "";
+  const [rawPlayerUrl, setRawPlayerUrl] = useState("");
+  useEffect(() => {
+    let cancelled = false;
+    const resolve = async () => {
+      if (isBlocked) { setRawPlayerUrl(""); return; }
+      if (currentEp?.id) {
+        const { data } = await supabase.rpc("get_episode_player_url", { _episode_id: currentEp.id });
+        if (!cancelled) setRawPlayerUrl((data as string | null) || "");
+      } else if (content?.id) {
+        const { data } = await supabase.rpc("get_content_player_url", { _content_id: content.id });
+        if (!cancelled) setRawPlayerUrl((data as string | null) || "");
+      } else {
+        setRawPlayerUrl("");
+      }
+    };
+    void resolve();
+    return () => { cancelled = true; };
+  }, [currentEp?.id, content?.id, isBlocked, userIsPremium, isAdmin]);
 
   const getEmbedUrl = (url: string) => {
     const trimmedUrl = url.trim();
