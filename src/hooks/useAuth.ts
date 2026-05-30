@@ -42,10 +42,17 @@ export const useAuth = () => {
     void bootstrapAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
         const nextUser = session?.user ?? null;
         setUser(nextUser);
         void loadAdminStatus(nextUser?.id ?? null);
+        // Auto-claim any pending Stripe Supporter payment tied to this email.
+        if (event === 'SIGNED_IN' && nextUser) {
+          // Defer to avoid running inside the auth callback's transaction
+          setTimeout(() => {
+            void supabase.rpc('claim_supporter_for_current_user' as any);
+          }, 0);
+        }
       }
     );
 

@@ -116,7 +116,12 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
           {(() => {
             const expired = !!(isPremium && premiumExpiresAt && new Date(premiumExpiresAt) <= new Date());
             const active = isPremium && !expired;
-            const planLabel = premiumPlan === "monthly" ? "Monthly" : premiumPlan === "annual" ? "Annual" : premiumPlan === "lifetime" ? "Lifetime" : "Supporter";
+            const planLabel =
+              premiumPlan === "monthly" ? "Monthly"
+              : premiumPlan === "quarterly" ? "Quarterly"
+              : premiumPlan === "yearly" || premiumPlan === "annual" ? "Yearly"
+              : premiumPlan === "lifetime" ? "Lifetime"
+              : "Supporter";
             return (
               <div className="space-y-2">
                 <Label className="text-muted-foreground text-xs">Supporter Plan</Label>
