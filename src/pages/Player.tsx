@@ -17,7 +17,7 @@ interface ContentItem {
   tag: string;
   type: string;
   banner_url: string | null;
-  player_url: string | null;
+  player_url?: string | null;
   section: string;
   position: number;
   is_premium: boolean;
@@ -29,7 +29,7 @@ interface Episode {
   content_id: string;
   title: string;
   episode_number: number;
-  player_url: string | null;
+  player_url?: string | null;
   season: number;
   is_premium: boolean;
 }
