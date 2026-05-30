@@ -76,10 +76,11 @@ const AddExistingContentDialog = ({ open, onOpenChange, targetSection, onSaved }
         .rpc("admin_get_contents", { _ids: Array.from(selected) });
       if (fetchErr) throw fetchErr;
 
-      for (const item of items || []) {
+      for (const item of (items as any[]) || []) {
+        const { id: _id, ...rest } = item;
         const { error } = await supabase
           .from("contents")
-          .insert({ ...item, section: targetSection });
+          .insert({ ...rest, section: targetSection });
         if (error) throw error;
       }
       toast.success(`${selected.size} título(s) adicionado(s) aos Exclusivos!`);
