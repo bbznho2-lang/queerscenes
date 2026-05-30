@@ -177,6 +177,28 @@ const Index = () => {
   const showNameFields = isSignUp;
   const showSubscribeActions = !authLoading && !profileLoading && !isAdmin && !isPremiumUser;
 
+  const startCheckout = async (priceId: string) => {
+    const value = checkoutEmail.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      toast.error("Enter a valid email to continue.");
+      document.getElementById("supporter-email")?.focus();
+      return;
+    }
+    setCheckoutLoading(priceId);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: { email: value, priceId },
+      });
+      if (error) throw error;
+      const url = (data as any)?.url;
+      if (!url) throw new Error("Missing checkout URL");
+      window.location.href = url;
+    } catch (err: any) {
+      toast.error(err.message || "Could not start checkout. Please try again.");
+      setCheckoutLoading(null);
+    }
+  };
+
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) { toast.error("Please enter your email."); return; }
