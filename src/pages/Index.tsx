@@ -683,11 +683,7 @@ const Index = () => {
                 <CardHeader className="text-center pb-2 pt-10">
                   <div className="text-4xl mb-1">💜</div>
                   <CardTitle className="text-2xl neon-text-purple">Supporter</CardTitle>
-                  <div className="mt-2">
-                    <span className="text-4xl sm:text-5xl font-bold text-foreground">€15.99</span>
-                    <span className="text-muted-foreground text-sm">/month</span>
-                  </div>
-                  <p className="text-muted-foreground text-sm mt-1">
+                  <p className="text-muted-foreground text-sm mt-2">
                     Support the project and unlock the full experience.
                   </p>
                 </CardHeader>
@@ -705,79 +701,91 @@ const Index = () => {
                     <span aria-hidden>💜</span>
                     <span>More than 50 people already support the project</span>
                   </div>
-                  <Button
-                    onClick={() => window.open("https://t.me/L7kznr?text=Hi%20I%20came%20from%20your%20website%20and%20I%27m%20interested%20in%20becoming%20a%20Supporter%20can%20you%20give%20me%20more%20details", "_blank")}
-                    className="shine-cta w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple gap-2"
-                  >
-                    <Crown className="w-4 h-4" /> Become a Supporter
-                  </Button>
-                  <p className="text-center text-[11px] text-muted-foreground mt-2">
-                    Manual activation by the project creator on Telegram
-                  </p>
 
+                  {/* Email + plan picker */}
+                  <div className="mt-5 space-y-3">
+                    <div>
+                      <label htmlFor="supporter-email" className="text-xs text-muted-foreground block mb-1">
+                        Your email (we'll send your access here)
+                      </label>
+                      <Input
+                        id="supporter-email"
+                        type="email"
+                        inputMode="email"
+                        autoComplete="email"
+                        placeholder="you@example.com"
+                        value={checkoutEmail}
+                        onChange={(e) => setCheckoutEmail(e.target.value)}
+                        className="bg-muted/50 border-border"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      {[
+                        {
+                          label: "Monthly",
+                          price: "€15.99",
+                          period: "/month",
+                          note: "",
+                          color: "neon-text-pink",
+                          border: "neon-border-pink",
+                          btn: "bg-accent text-accent-foreground hover:bg-accent/90 glow-pink",
+                          priceId: "price_1TcrpkJ5xR4MDdjr0jHKThue",
+                        },
+                        {
+                          label: "Quarterly",
+                          price: "€42.99",
+                          period: "/3 months",
+                          note: "save €4.98",
+                          color: "neon-text-purple",
+                          border: "neon-border-purple",
+                          btn: "bg-primary text-primary-foreground hover:bg-primary/90 glow-purple",
+                          priceId: "price_1TcrrpJ5xR4MDdjrEx4LeBub",
+                        },
+                        {
+                          label: "Yearly",
+                          price: "€159.99",
+                          period: "/year",
+                          note: "save €31.89",
+                          color: "neon-text-blue",
+                          border: "border-secondary/40",
+                          btn: "bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-blue",
+                          priceId: "price_1TcrtPJ5xR4MDdjrM2sTnTPr",
+                        },
+                      ].map((opt) => {
+                        const loading = checkoutLoading === opt.priceId;
+                        return (
+                          <button
+                            type="button"
+                            key={opt.label}
+                            disabled={checkoutLoading !== null}
+                            onClick={() => startCheckout(opt.priceId)}
+                            className={`text-left rounded-xl bg-card border p-3 transition-all hover:scale-[1.02] disabled:opacity-60 disabled:cursor-wait ${opt.border}`}
+                          >
+                            <p className={`text-xs font-semibold ${opt.color}`}>{opt.label}</p>
+                            <div className="mt-0.5">
+                              <span className="text-xl font-bold text-foreground">{opt.price}</span>
+                              <span className="text-[11px] text-muted-foreground ml-1">{opt.period}</span>
+                            </div>
+                            {opt.note && <p className="text-[10px] text-secondary mt-0.5">{opt.note}</p>}
+                            <div className={`mt-2 inline-flex items-center justify-center w-full rounded-full px-3 py-1.5 text-xs font-semibold ${opt.btn}`}>
+                              <Crown className="w-3 h-3 mr-1" /> {loading ? "Loading..." : "Subscribe"}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <p className="text-center text-[11px] text-muted-foreground mt-1">
+                      Secure checkout by Stripe • Cancel anytime
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
           </div>
-
-          {/* Supporter subscription options */}
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={3} className="mt-10 max-w-4xl mx-auto">
-            <p className="text-center text-sm sm:text-base text-muted-foreground mb-4">
-              Supporter subscription options
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {[
-                {
-                  label: "Monthly",
-                  price: "€15.99",
-                  period: "/month",
-                  note: "",
-                  color: "neon-text-pink",
-                  border: "neon-border-pink",
-                  btn: "bg-accent text-accent-foreground hover:bg-accent/90 glow-pink",
-                  msg: "Hi%20I%20want%20the%20Monthly%20Supporter%20plan%20%E2%82%AC15.99",
-                },
-                {
-                  label: "Quarterly",
-                  price: "€42.99",
-                  period: "/3 months",
-                  note: "save €4.98",
-                  color: "neon-text-purple",
-                  border: "neon-border-purple",
-                  btn: "bg-primary text-primary-foreground hover:bg-primary/90 glow-purple",
-                  msg: "Hi%20I%20want%20the%20Quarterly%20Supporter%20plan%20%E2%82%AC42.99",
-                },
-                {
-                  label: "Yearly",
-                  price: "€159.99",
-                  period: "/year",
-                  note: "save €31.89",
-                  color: "neon-text-blue",
-                  border: "border-secondary/40",
-                  btn: "bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-blue",
-                  msg: "Hi%20I%20want%20the%20Yearly%20Supporter%20plan%20%E2%82%AC159.99",
-                },
-              ].map((opt) => (
-                <button
-                  key={opt.label}
-                  onClick={() => window.open(`https://t.me/L7kznr?text=${opt.msg}`, "_blank")}
-                  className={`text-left rounded-xl bg-card border p-4 transition-all hover:scale-[1.02] ${opt.border}`}
-                >
-                  <p className={`text-sm font-semibold ${opt.color}`}>{opt.label}</p>
-                  <div className="mt-1">
-                    <span className="text-2xl font-bold text-foreground">{opt.price}</span>
-                    <span className="text-xs text-muted-foreground ml-1">{opt.period}</span>
-                  </div>
-                  {opt.note && <p className="text-[11px] text-secondary mt-0.5">{opt.note}</p>}
-                  <div className={`mt-3 inline-flex items-center justify-center w-full rounded-full px-3 py-1.5 text-xs font-semibold ${opt.btn}`}>
-                    <Crown className="w-3 h-3 mr-1" /> Choose
-                  </div>
-                </button>
-              ))}
-            </div>
-          </motion.div>
         </div>
       </section>
+
 
       {/* DEVICES */}
       <section className="py-16 sm:py-24 px-4">
