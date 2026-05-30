@@ -72,12 +72,9 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setIsArchived(content.is_archived || false);
       setSynopsis((content as any).synopsis || "");
       supabase
-        .from("episodes")
-        .select("*")
-        .eq("content_id", content.id)
-        .order("episode_number")
+        .rpc("admin_get_episodes", { _content_id: content.id })
         .then(({ data }) => {
-          const list = (data || []).map((ep: any) => ({
+          const list = ((data as any[]) || []).map((ep: any) => ({
             ...ep,
             player_url: ep.player_url || "",
           }));
