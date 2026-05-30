@@ -152,7 +152,24 @@ const Player = () => {
   const episodePremiumBlocked = currentEp?.is_premium && !userIsPremium && !isAdmin;
   const isBlocked = premiumBlocked || episodePremiumBlocked;
 
-  const rawPlayerUrl = currentEp?.player_url || content?.player_url || "";
+  const [rawPlayerUrl, setRawPlayerUrl] = useState("");
+  useEffect(() => {
+    let cancelled = false;
+    const resolve = async () => {
+      if (isBlocked) { setRawPlayerUrl(""); return; }
+      if (currentEp?.id) {
+        const { data } = await supabase.rpc("get_episode_player_url", { _episode_id: currentEp.id });
+        if (!cancelled) setRawPlayerUrl((data as string | null) || "");
+      } else if (content?.id) {
+        const { data } = await supabase.rpc("get_content_player_url", { _content_id: content.id });
+        if (!cancelled) setRawPlayerUrl((data as string | null) || "");
+      } else {
+        setRawPlayerUrl("");
+      }
+    };
+    void resolve();
+    return () => { cancelled = true; };
+  }, [currentEp?.id, content?.id, isBlocked, userIsPremium, isAdmin]);
 
   const getEmbedUrl = (url: string) => {
     const trimmedUrl = url.trim();
