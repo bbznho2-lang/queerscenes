@@ -61,7 +61,11 @@ const Player = () => {
 
   const fetchContent = async () => {
     if (!id) return;
-    const { data } = await supabase.from("contents").select("*").eq("id", id).single();
+    const { data } = await supabase
+      .from("contents")
+      .select("id, title, year, tag, type, banner_url, section, position, is_premium, supporter_player_enabled, synopsis")
+      .eq("id", id)
+      .single();
     if (data) {
       setContent(data as ContentItem);
 
