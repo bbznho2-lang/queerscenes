@@ -124,13 +124,17 @@ const Player = () => {
       }
 
       if (data.type === "serie" || data.type === "novela" || data.type === "anime") {
-        const { data: eps } = await supabase.from("episodes").select("*").eq("content_id", id).order("season").order("episode_number");
+        const { data: eps } = await supabase
+          .from("episodes")
+          .select("id, content_id, title, episode_number, season, is_premium, created_at")
+          .eq("content_id", id)
+          .order("season")
+          .order("episode_number");
         const normalizedEpisodes = ((eps || []) as Episode[]).map(e => ({ ...e, season: e.season || 1 }));
         setEpisodes(normalizedEpisodes);
         if (normalizedEpisodes.length > 0) {
           setSelectedSeason(normalizedEpisodes[0].season);
-          const firstPlayable = normalizedEpisodes.find((ep) => Boolean((ep.player_url || "").trim()));
-          setCurrentEp(firstPlayable || normalizedEpisodes[0]);
+          setCurrentEp(normalizedEpisodes[0]);
         } else {
           setCurrentEp(null);
         }
