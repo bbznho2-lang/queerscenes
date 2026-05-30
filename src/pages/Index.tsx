@@ -125,12 +125,43 @@ const Index = () => {
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (window.location.hash !== "#planos") return;
-    // Wait a tick for the section to mount
     const timeout = setTimeout(() => {
       document.getElementById("planos")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 100);
     return () => clearTimeout(timeout);
   }, []);
+
+  // Pre-fill checkout email
+  useEffect(() => {
+    if (user?.email && !checkoutEmail) setCheckoutEmail(user.email);
+  }, [user?.email]);
+
+  // After returning from Stripe Checkout, claim the supporter status and refresh
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("supporter") !== "success") return;
+    const run = async () => {
+      if (user) {
+        const { data } = await supabase.rpc("claim_supporter_for_current_user" as any);
+        if ((data as any)?.claimed) {
+          toast.success("Welcome, Supporter! 💜 Your access is now active.");
+          setIsPremiumUser(true);
+        } else {
+          toast.success("Payment confirmed! Sign in with your paid email to unlock Supporter.");
+        }
+      } else {
+        toast.success("Payment confirmed! Create an account or sign in with the paid email to unlock Supporter.");
+      }
+      // clean the query string
+      const url = new URL(window.location.href);
+      url.searchParams.delete("supporter");
+      url.searchParams.delete("email");
+      window.history.replaceState({}, "", url.toString());
+      document.getElementById("login")?.scrollIntoView({ behavior: "smooth" });
+    };
+    void run();
+  }, [user]);
 
   // Rotate hero banners
   useEffect(() => {
