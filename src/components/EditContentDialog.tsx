@@ -66,6 +66,11 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setSection(content.section);
       const legacy = content.player_url || (content as any).player_url_free || "";
       setPlayerUrl(legacy);
+      if (!legacy) {
+        supabase.rpc("get_content_player_url", { _content_id: content.id }).then(({ data }) => {
+          if (data) setPlayerUrl(data as string);
+        });
+      }
       setBannerPreview(content.banner_url || "");
       setBannerUrlInput(content.banner_url || "");
       setIsPremium(content.is_premium || false);
