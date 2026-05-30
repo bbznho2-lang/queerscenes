@@ -52,6 +52,8 @@ const Index = () => {
   const [heroBanners, setHeroBanners] = useState<Array<{ id: string; title: string; banner_url: string | null; synopsis: string | null }>>([]);
   const [currentBanner, setCurrentBanner] = useState(0);
   const [top10Ids, setTop10Ids] = useState<string[]>([]);
+  const [checkoutEmail, setCheckoutEmail] = useState("");
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const navigate = useNavigate();
   const { user, loading: authLoading, isAdmin, signIn, signUp } = useAuth();
 
