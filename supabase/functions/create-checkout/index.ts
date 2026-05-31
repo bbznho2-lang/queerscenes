@@ -34,7 +34,12 @@ Deno.serve(async (req) => {
       apiVersion: "2024-12-18.acacia" as any,
     });
 
-    const origin = req.headers.get("origin") || "https://queerscenes.lovable.app";
+    const ALLOWED_ORIGINS = new Set([
+      "https://queerscenes.lovable.app",
+      "https://id-preview--fd2d5d8f-022f-4e0b-9296-7902e2ff85b2.lovable.app",
+    ]);
+    const rawOrigin = req.headers.get("origin") || "";
+    const origin = ALLOWED_ORIGINS.has(rawOrigin) ? rawOrigin : "https://queerscenes.lovable.app";
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
