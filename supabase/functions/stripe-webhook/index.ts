@@ -21,6 +21,8 @@ function addMonths(date: Date, months: number): Date {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  console.log("[stripe-webhook] Request received", { method: req.method });
+
   const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
     apiVersion: "2024-12-18.acacia" as any,
   });
@@ -28,13 +30,21 @@ Deno.serve(async (req) => {
   const signature = req.headers.get("stripe-signature");
   const body = await req.text();
 
+  console.log("[stripe-webhook] Env check", {
+    hasSecret: !!webhookSecret,
+    hasSignature: !!signature,
+    bodyLen: body.length,
+  });
+
   let event: Stripe.Event;
   try {
-    if (!webhookSecret || !signature) throw new Error("Missing webhook secret or signature");
+    if (!webhookSecret) throw new Error("STRIPE_WEBHOOK_SECRET not configured");
+    if (!signature) throw new Error("Missing stripe-signature header");
     event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
+    console.log("[stripe-webhook] Event verified", { type: event.type, id: event.id });
   } catch (err) {
-    console.error("Webhook signature verification failed:", (err as Error).message);
-    return new Response(JSON.stringify({ error: "Invalid signature" }), {
+    console.error("[stripe-webhook] Signature verification failed:", (err as Error).message);
+    return new Response(JSON.stringify({ error: "Invalid signature", detail: (err as Error).message }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
