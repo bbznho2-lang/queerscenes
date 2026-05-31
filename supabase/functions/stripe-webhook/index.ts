@@ -21,6 +21,8 @@ function addMonths(date: Date, months: number): Date {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  console.log("[stripe-webhook] Request received", { method: req.method });
+
   const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
     apiVersion: "2024-12-18.acacia" as any,
   });
@@ -28,13 +30,21 @@ Deno.serve(async (req) => {
   const signature = req.headers.get("stripe-signature");
   const body = await req.text();
 
+  console.log("[stripe-webhook] Env check", {
+    hasSecret: !!webhookSecret,
+    hasSignature: !!signature,
+    bodyLen: body.length,
+  });
+
   let event: Stripe.Event;
   try {
-    if (!webhookSecret || !signature) throw new Error("Missing webhook secret or signature");
+    if (!webhookSecret) throw new Error("STRIPE_WEBHOOK_SECRET not configured");
+    if (!signature) throw new Error("Missing stripe-signature header");
     event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
+    console.log("[stripe-webhook] Event verified", { type: event.type, id: event.id });
   } catch (err) {
-    console.error("Webhook signature verification failed:", (err as Error).message);
-    return new Response(JSON.stringify({ error: "Invalid signature" }), {
+    console.error("[stripe-webhook] Signature verification failed:", (err as Error).message);
+    return new Response(JSON.stringify({ error: "Invalid signature", detail: (err as Error).message }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
@@ -55,12 +65,21 @@ Deno.serve(async (req) => {
     const email = opts.email.trim().toLowerCase();
     const mapping = PRICE_TO_PLAN[opts.priceId];
     if (!mapping) {
-      console.warn("Unknown priceId:", opts.priceId);
+      console.warn("[stripe-webhook] Unknown priceId:", opts.priceId);
       return;
     }
     const expiresAt = opts.periodEnd
       ? new Date(opts.periodEnd * 1000)
       : addMonths(new Date(), mapping.months);
+
+    console.log("[stripe-webhook] applySupporter", {
+      email,
+      plan: mapping.plan,
+      months: mapping.months,
+      expiresAt: expiresAt.toISOString(),
+      customerId: opts.customerId,
+      subscriptionId: opts.subscriptionId,
+    });
 
     // 1) Upsert pending_supporters (for users that haven't signed up yet)
     const { error: pendErr } = await supabase
@@ -73,14 +92,17 @@ Deno.serve(async (req) => {
         stripe_subscription_id: opts.subscriptionId ?? null,
         status: "paid",
       });
-    if (pendErr) console.error("pending_supporters insert error", pendErr);
+    if (pendErr) console.error("[stripe-webhook] pending_supporters insert error", pendErr);
+    else console.log("[stripe-webhook] pending_supporters inserted for", email);
 
     // 2) If a profile already exists with that email, also promote it immediately.
-    const { data: existing } = await supabase
+    const { data: existing, error: lookupErr } = await supabase
       .from("profiles")
       .select("user_id")
       .ilike("email", email)
       .maybeSingle();
+    if (lookupErr) console.error("[stripe-webhook] profile lookup error", lookupErr);
+
     if (existing?.user_id) {
       const { error: upErr } = await supabase
         .from("profiles")
@@ -90,13 +112,16 @@ Deno.serve(async (req) => {
           premium_expires_at: expiresAt.toISOString(),
         })
         .eq("user_id", existing.user_id);
-      if (upErr) console.error("profiles update error", upErr);
+      if (upErr) console.error("[stripe-webhook] profiles update error", upErr);
+      else console.log("[stripe-webhook] profile promoted directly", { user_id: existing.user_id });
 
       await supabase
         .from("pending_supporters")
         .update({ status: "claimed", claimed_at: new Date().toISOString() })
         .ilike("email", email)
         .eq("status", "paid");
+    } else {
+      console.log("[stripe-webhook] no profile yet for", email, "— will be claimed at next login");
     }
   }
 
