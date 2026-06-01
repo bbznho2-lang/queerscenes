@@ -6,9 +6,13 @@ const corsHeaders = {
 };
 
 const ALLOWED_PRICE_IDS = new Set([
-  "price_1TcrpkJ5xR4MDdjr0jHKThue", // monthly
-  "price_1TcrrpJ5xR4MDdjrEx4LeBub", // quarterly
-  "price_1TcrtPJ5xR4MDdjrM2sTnTPr", // yearly
+  "price_1TdJouJ5xR4MDdjriK0vTZr3", // monthly €9.99
+  "price_1TdJpxJ5xR4MDdjr6CYmpFZk", // quarterly €24.99
+  "price_1TdJrtJ5xR4MDdjrEdxuGjSz", // yearly €89.99
+  // legacy price IDs (kept for backward compat)
+  "price_1TcrpkJ5xR4MDdjr0jHKThue",
+  "price_1TcrrpJ5xR4MDdjrEx4LeBub",
+  "price_1TcrtPJ5xR4MDdjrM2sTnTPr",
 ]);
 
 Deno.serve(async (req) => {
