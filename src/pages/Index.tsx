@@ -724,33 +724,33 @@ const Index = () => {
                       {[
                         {
                           label: "Monthly",
-                          price: "€15.99",
+                          price: "€9.99",
                           period: "/month",
                           note: "",
                           color: "neon-text-pink",
                           border: "neon-border-pink",
                           btn: "bg-accent text-accent-foreground hover:bg-accent/90 glow-pink",
-                          priceId: "price_1TcrpkJ5xR4MDdjr0jHKThue",
+                          priceId: "price_1TdJouJ5xR4MDdjriK0vTZr3",
                         },
                         {
                           label: "Quarterly",
-                          price: "€42.99",
+                          price: "€24.99",
                           period: "/3 months",
-                          note: "save €4.98",
+                          note: "save 17%",
                           color: "neon-text-purple",
                           border: "neon-border-purple",
                           btn: "bg-primary text-primary-foreground hover:bg-primary/90 glow-purple",
-                          priceId: "price_1TcrrpJ5xR4MDdjrEx4LeBub",
+                          priceId: "price_1TdJpxJ5xR4MDdjr6CYmpFZk",
                         },
                         {
                           label: "Yearly",
-                          price: "€159.99",
+                          price: "€89.99",
                           period: "/year",
-                          note: "save €31.89",
+                          note: "save 25%",
                           color: "neon-text-blue",
                           border: "border-secondary/40",
                           btn: "bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-blue",
-                          priceId: "price_1TcrtPJ5xR4MDdjrM2sTnTPr",
+                          priceId: "price_1TdJrtJ5xR4MDdjrEdxuGjSz",
                         },
                       ].map((opt) => {
                         const loading = checkoutLoading === opt.priceId;
@@ -778,6 +778,14 @@ const Index = () => {
                     <p className="text-center text-[11px] text-muted-foreground mt-1">
                       Secure checkout by Stripe • Cancel anytime
                     </p>
+                    <a
+                      href="https://t.me/L7kznr"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-3 flex items-center justify-center gap-2 w-full py-2 rounded-full neon-border-blue text-secondary hover:bg-secondary/10 transition-colors text-xs font-medium"
+                    >
+                      💬 Need help choosing a plan? Talk to support on Telegram
+                    </a>
                   </div>
                 </CardContent>
               </Card>
