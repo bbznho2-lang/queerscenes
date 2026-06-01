@@ -42,11 +42,11 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
     }
   }, [open]);
 
-  // Poll for new messages every 2.5s while chat is open
+  // Poll for new messages every 1.2s while chat is open
   useEffect(() => {
     if (!chatId) return;
     loadMessages(chatId);
-    const interval = setInterval(() => loadMessages(chatId), 2500);
+    const interval = setInterval(() => loadMessages(chatId), 1200);
     return () => clearInterval(interval);
   }, [chatId]);
 

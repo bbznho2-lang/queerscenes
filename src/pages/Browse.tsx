@@ -270,10 +270,11 @@ const Browse = () => {
     { label: "GL Dramas", icon: "🌸", action: () => { setMenuOpen(false); document.getElementById("gl")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Exclusives", icon: "⭐", action: () => { setMenuOpen(false); document.getElementById("exclusivos")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "My List", icon: "🔖", action: () => { setMenuOpen(false); document.getElementById("minha-lista")?.scrollIntoView({ behavior: "smooth" }); } },
-    { label: "Profile", icon: "👤", action: () => { setMenuOpen(false); setProfileOpen(true); } },
-    { label: "Support", icon: "💬", action: () => { setMenuOpen(false); setSupportOpen(true); } },
-    ...(isAdmin ? [{ label: "Admin Panel", icon: "⚙️", action: () => { setMenuOpen(false); navigate("/admin"); } }] : []),
     ...(!isAdmin && !userIsPremium ? [{ label: "Become a Supporter", icon: "👑", action: () => { setMenuOpen(false); navigate("/#planos"); }, premium: true }] : []),
+    { label: "Telegram Community", icon: "📣", action: () => { setMenuOpen(false); window.open("https://t.me/QueerScenesTv", "_blank", "noopener,noreferrer"); } },
+    { label: "Support", icon: "💬", action: () => { setMenuOpen(false); setSupportOpen(true); } },
+    { label: "Profile", icon: "👤", action: () => { setMenuOpen(false); setProfileOpen(true); } },
+    ...(isAdmin ? [{ label: "Admin Panel", icon: "⚙️", action: () => { setMenuOpen(false); navigate("/admin"); } }] : []),
   ];
 
   return (
@@ -626,6 +627,14 @@ const Browse = () => {
               </div>
             ))}
           </div>
+          <a
+            href="https://t.me/QueerScenesTv"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 flex items-center justify-center gap-2 w-full py-2 rounded-full neon-border-purple text-primary hover:bg-primary/10 transition-colors text-xs font-medium"
+          >
+            📣 Join our Telegram community for updates & news
+          </a>
           <div className="flex flex-col gap-2 mt-4">
             <Button
               onClick={() => { setPremiumPopupOpen(false); navigate("/"); setTimeout(() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" }), 300); }}

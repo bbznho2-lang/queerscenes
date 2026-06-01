@@ -7,6 +7,11 @@ const corsHeaders = {
 };
 
 const PRICE_TO_PLAN: Record<string, { plan: string; months: number }> = {
+  // current prices
+  price_1TdJouJ5xR4MDdjriK0vTZr3: { plan: "monthly", months: 1 },
+  price_1TdJpxJ5xR4MDdjr6CYmpFZk: { plan: "quarterly", months: 3 },
+  price_1TdJrtJ5xR4MDdjrEdxuGjSz: { plan: "yearly", months: 12 },
+  // legacy prices (kept so existing subscriptions still grant access)
   price_1TcrpkJ5xR4MDdjr0jHKThue: { plan: "monthly", months: 1 },
   price_1TcrrpJ5xR4MDdjrEx4LeBub: { plan: "quarterly", months: 3 },
   price_1TcrtPJ5xR4MDdjrM2sTnTPr: { plan: "yearly", months: 12 },
