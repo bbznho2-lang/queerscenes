@@ -776,29 +776,27 @@ const Admin = () => {
                       <span className="text-sm font-medium text-foreground">{activeChat.user_name}</span>
                       <span className="text-xs text-muted-foreground ml-2">{activeChat.user_email}</span>
                     </div>
-                    <ScrollArea className="flex-1 min-h-[200px] max-h-[280px]">
-                      <div ref={chatScrollRef} className="space-y-3 py-2 pr-2">
-                        {chatMessages.length === 0 && (
-                          <p className="text-xs text-muted-foreground text-center py-8">No messages yet.</p>
-                        )}
-                        {chatMessages.map((msg) => (
-                          <div key={msg.id} className={`flex ${msg.sender_role === "admin" ? "justify-end" : "justify-start"}`}>
-                            <div
-                              className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm ${
-                                msg.sender_role === "admin"
-                                  ? "bg-secondary text-secondary-foreground rounded-br-md"
-                                  : "bg-muted text-foreground rounded-bl-md"
-                              }`}
-                            >
-                              <p className="whitespace-pre-wrap break-words">{msg.message}</p>
-                              <span className="text-[10px] opacity-60 mt-1 block">
-                                {new Date(msg.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
-                              </span>
-                            </div>
+                    <div ref={chatScrollRef} className="flex-1 min-h-[300px] max-h-[55vh] overflow-y-auto pr-2 space-y-3 py-2">
+                      {chatMessages.length === 0 && (
+                        <p className="text-xs text-muted-foreground text-center py-8">No messages yet.</p>
+                      )}
+                      {chatMessages.map((msg) => (
+                        <div key={msg.id} className={`flex ${msg.sender_role === "admin" ? "justify-end" : "justify-start"}`}>
+                          <div
+                            className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm ${
+                              msg.sender_role === "admin"
+                                ? "bg-secondary text-secondary-foreground rounded-br-md"
+                                : "bg-muted text-foreground rounded-bl-md"
+                            }`}
+                          >
+                            <p className="whitespace-pre-wrap break-words">{msg.message}</p>
+                            <span className="text-[10px] opacity-60 mt-1 block">
+                              {new Date(msg.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                            </span>
                           </div>
-                        ))}
-                      </div>
-                    </ScrollArea>
+                        </div>
+                      ))}
+                    </div>
                     <form onSubmit={sendAdminReply} className="flex gap-2 pt-3 border-t border-border mt-2">
                       <Input
                         placeholder="Type your reply..."
