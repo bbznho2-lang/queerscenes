@@ -148,7 +148,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         const { error } = await supabase.from("contents").update(payload).eq("id", content.id);
         if (error) throw error;
       } else {
-        const { data, error } = await supabase.from("contents").insert(payload).select().single();
+        const { data, error } = await supabase.from("contents").insert(payload).select('id').single();
         if (error) throw error;
         contentId = data.id;
       }
@@ -247,6 +247,8 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                   <SelectItem value="serie">Series</SelectItem>
                   <SelectItem value="filme">Movie</SelectItem>
                   <SelectItem value="novela">Soap Opera</SelectItem>
+                  <SelectItem value="anime">Anime</SelectItem>
+
                   
                 </SelectContent>
               </Select>
@@ -260,8 +262,9 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                   <SelectItem value="filmes">Movies</SelectItem>
                   <SelectItem value="novelas">Soap Operas</SelectItem>
                   <SelectItem value="gl">GL Dramas</SelectItem>
-                  
+                  <SelectItem value="animes">Animes</SelectItem>
                   <SelectItem value="exclusivos">Exclusives</SelectItem>
+
                 </SelectContent>
               </Select>
             </div>
