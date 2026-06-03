@@ -508,12 +508,14 @@ const Player = () => {
           {(() => {
             const currentLink = selectedLinkIdx >= 0 ? episodeLinks[selectedLinkIdx] : null;
             const showIframe = currentLink?.type === "embed" && hasPlayerUrl;
+            const pad2 = (n: number) => String(n).padStart(2, "0");
             const headingMain = currentEp && content
-              ? `${content.title}: ${currentEp.season}x${currentEp.episode_number}`
+              ? `${content.title}: ${currentEp.season}x${pad2(currentEp.episode_number)}`
               : (content?.title || "");
             const headingSub = currentEp
-              ? `Episode ${currentEp.episode_number}${currentEp.title ? ` — ${currentEp.title}` : ""}`
-              : (content ? `${content.type === "filme" ? "Movie" : ""}${content.year ? ` ${content.year}` : ""}`.trim() : "");
+              ? (currentEp.title || `Episode ${currentEp.episode_number}`)
+              : "";
+
             return (
               <>
                 {content && (
