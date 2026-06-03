@@ -62,93 +62,90 @@ const Player = () => {
 
   const fetchContent = async () => {
     if (!id) return;
-    const { data } = await supabase
+    if (authLoading) return; // wait for auth to settle to avoid double-fetch
+    const contentPromise = supabase
       .from("contents")
       .select("id, title, year, tag, type, banner_url, section, position, is_premium, supporter_player_enabled, synopsis")
       .eq("id", id)
       .single();
-    if (data) {
-      setContent(data as ContentItem);
+    const profilePromise = user
+      ? supabase
+          .from("profiles")
+          .select("is_premium, premium_expires_at")
+          .eq("user_id", user.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null, error: null } as any);
 
-      if (data.is_premium) {
-        if (authLoading) {
-          setPremiumBlocked(true);
-          setUserIsPremium(false);
-        } else if (isAdmin) {
-          setPremiumBlocked(false);
-          setUserIsPremium(true);
-        } else if (!user) {
-          setPremiumBlocked(true);
-          setUserIsPremium(false);
-        } else {
-          const { data: profile, error: profileError } = await supabase
-            .from("profiles")
-            .select("is_premium, premium_expires_at")
-            .eq("user_id", user.id)
-            .maybeSingle();
-          if (profileError) {
-            setPremiumBlocked(true);
-            setUserIsPremium(false);
-            setUserExpired(false);
-            setUserExpiredAt(null);
-          } else {
-            const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
-            const hasPremium = !!(profile?.is_premium && notExpired);
-            const expired = !!(profile?.is_premium && profile?.premium_expires_at && new Date(profile.premium_expires_at) <= new Date());
-            setPremiumBlocked(!hasPremium);
-            setUserIsPremium(hasPremium);
-            setUserExpired(expired);
-            setUserExpiredAt(expired ? profile.premium_expires_at : null);
-          }
-        }
-      } else {
+    const [{ data }, { data: profile, error: profileError }] = await Promise.all([
+      contentPromise,
+      profilePromise,
+    ]);
+    if (!data) return;
+    setContent(data as ContentItem);
+
+    const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
+    const hasPremium = !!(profile?.is_premium && notExpired);
+    const expired = !!(profile?.is_premium && profile?.premium_expires_at && new Date(profile.premium_expires_at) <= new Date());
+
+    if (data.is_premium) {
+      if (isAdmin) {
         setPremiumBlocked(false);
-        if (isAdmin) {
-          setUserIsPremium(true);
-          setUserExpired(false);
-        } else if (user) {
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("is_premium, premium_expires_at")
-            .eq("user_id", user.id)
-            .maybeSingle();
-          const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
-          const expired = !!(profile?.is_premium && profile?.premium_expires_at && new Date(profile.premium_expires_at) <= new Date());
-          setUserIsPremium(!!(profile?.is_premium && notExpired));
-          setUserExpired(expired);
-          setUserExpiredAt(expired ? profile!.premium_expires_at : null);
-        } else {
-          setUserIsPremium(false);
-          setUserExpired(false);
-          setUserExpiredAt(null);
-        }
-      }
-
-      if (data.type === "serie" || data.type === "novela" || data.type === "anime") {
-        const { data: eps } = await supabase
-          .from("episodes")
-          .select("id, content_id, title, episode_number, season, is_premium, created_at")
-          .eq("content_id", id)
-          .order("season")
-          .order("episode_number");
-        const normalizedEpisodes = ((eps || []) as Episode[]).map(e => ({ ...e, season: e.season || 1 }));
-        setEpisodes(normalizedEpisodes);
-        if (normalizedEpisodes.length > 0) {
-          setSelectedSeason(normalizedEpisodes[0].season);
-          setCurrentEp(normalizedEpisodes[0]);
-        } else {
-          setCurrentEp(null);
-        }
+        setUserIsPremium(true);
+      } else if (!user) {
+        setPremiumBlocked(true);
+        setUserIsPremium(false);
+      } else if (profileError) {
+        setPremiumBlocked(true);
+        setUserIsPremium(false);
+        setUserExpired(false);
+        setUserExpiredAt(null);
       } else {
-        setEpisodes([]);
+        setPremiumBlocked(!hasPremium);
+        setUserIsPremium(hasPremium);
+        setUserExpired(expired);
+        setUserExpiredAt(expired ? profile!.premium_expires_at : null);
+      }
+    } else {
+      setPremiumBlocked(false);
+      if (isAdmin) {
+        setUserIsPremium(true);
+        setUserExpired(false);
+      } else if (user) {
+        setUserIsPremium(hasPremium);
+        setUserExpired(expired);
+        setUserExpiredAt(expired ? profile!.premium_expires_at : null);
+      } else {
+        setUserIsPremium(false);
+        setUserExpired(false);
+        setUserExpiredAt(null);
+      }
+    }
+
+    if (data.type === "serie" || data.type === "novela" || data.type === "anime") {
+      const { data: eps } = await supabase
+        .from("episodes")
+        .select("id, content_id, title, episode_number, season, is_premium, created_at")
+        .eq("content_id", id)
+        .order("season")
+        .order("episode_number");
+      const normalizedEpisodes = ((eps || []) as Episode[]).map(e => ({ ...e, season: e.season || 1 }));
+      setEpisodes(normalizedEpisodes);
+      if (normalizedEpisodes.length > 0) {
+        setSelectedSeason(normalizedEpisodes[0].season);
+        setCurrentEp(normalizedEpisodes[0]);
+      } else {
         setCurrentEp(null);
       }
+    } else {
+      setEpisodes([]);
+      setCurrentEp(null);
     }
   };
 
   useEffect(() => {
     fetchContent();
   }, [id, user?.id, isAdmin, authLoading]);
+
 
   const episodePremiumBlocked = currentEp?.is_premium && !userIsPremium && !isAdmin;
   const isBlocked = premiumBlocked || episodePremiumBlocked;
