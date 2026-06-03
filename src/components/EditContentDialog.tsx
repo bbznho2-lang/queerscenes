@@ -23,12 +23,15 @@ interface ContentItem {
   supporter_player_enabled?: boolean;
 }
 
+type EpisodeLink = { title: string; type: "embed" | "redirect"; url: string };
+
 interface Episode {
   id: string;
   content_id: string;
   title: string;
   episode_number: number;
   player_url: string | null;
+  links: EpisodeLink[];
   season: number;
   is_premium: boolean;
 }
@@ -79,10 +82,13 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       supabase
         .rpc("admin_get_episodes", { _content_id: content.id })
         .then(({ data }) => {
-          const list = ((data as any[]) || []).map((ep: any) => ({
-            ...ep,
-            player_url: ep.player_url || "",
-          }));
+          const list = ((data as any[]) || []).map((ep: any) => {
+            let links: EpisodeLink[] = Array.isArray(ep.links) ? ep.links : [];
+            if (links.length === 0 && ep.player_url && String(ep.player_url).trim()) {
+              links = [{ title: "Watch on site", type: "embed", url: ep.player_url }];
+            }
+            return { ...ep, player_url: ep.player_url || "", links };
+          });
           setEpisodes(list);
         });
     } else {
