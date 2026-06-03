@@ -144,6 +144,7 @@ export type Database = {
           id: string
           is_archived: boolean
           is_premium: boolean
+          links: Json
           player_url: string | null
           position: number
           section: string
@@ -161,6 +162,7 @@ export type Database = {
           id?: string
           is_archived?: boolean
           is_premium?: boolean
+          links?: Json
           player_url?: string | null
           position?: number
           section?: string
@@ -178,6 +180,7 @@ export type Database = {
           id?: string
           is_archived?: boolean
           is_premium?: boolean
+          links?: Json
           player_url?: string | null
           position?: number
           section?: string
@@ -516,6 +519,23 @@ export type Database = {
           year: number
         }[]
       }
+      admin_get_contents_v2: {
+        Args: { _ids: string[] }
+        Returns: {
+          banner_url: string
+          id: string
+          is_premium: boolean
+          links: Json
+          player_url: string
+          position: number
+          section: string
+          synopsis: string
+          tag: string
+          title: string
+          type: string
+          year: number
+        }[]
+      }
       admin_get_episodes: {
         Args: { _content_id: string }
         Returns: {
@@ -532,6 +552,7 @@ export type Database = {
       }
       claim_supporter_for_current_user: { Args: never; Returns: Json }
       current_user_can_play_premium: { Args: never; Returns: boolean }
+      get_content_links: { Args: { _content_id: string }; Returns: Json }
       get_content_player_url: { Args: { _content_id: string }; Returns: string }
       get_episode_links: { Args: { _episode_id: string }; Returns: Json }
       get_episode_player_url: { Args: { _episode_id: string }; Returns: string }
