@@ -58,7 +58,9 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
   const [isArchived, setIsArchived] = useState(false);
   const [synopsis, setSynopsis] = useState("");
   const [episodes, setEpisodes] = useState<Episode[]>([]);
+  const [movieLinks, setMovieLinks] = useState<EpisodeLink[]>([]);
   const [saving, setSaving] = useState(false);
+
 
   useEffect(() => {
     if (content) {
@@ -74,6 +76,15 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
           if (data) setPlayerUrl(data as string);
         });
       }
+      // Load multi-link list for movies/single titles
+      (supabase.rpc as any)("admin_get_contents_v2", { _ids: [content.id] }).then(({ data }: any) => {
+        const row = Array.isArray(data) ? data[0] : null;
+        let links: EpisodeLink[] = Array.isArray(row?.links) ? row.links : [];
+        if (links.length === 0 && legacy && String(legacy).trim()) {
+          links = [{ title: "Watch on site", type: "embed", url: legacy }];
+        }
+        setMovieLinks(links);
+      });
       setBannerPreview(content.banner_url || "");
       setBannerUrlInput(content.banner_url || "");
       setIsPremium(content.is_premium || false);
@@ -104,7 +115,9 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setIsArchived(false);
       setSynopsis("");
       setEpisodes([]);
+      setMovieLinks([]);
     }
+
   }, [content, open]);
 
   const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,13 +147,23 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         bannerUrl = bannerUrlInput.trim();
       }
 
+      const cleanMovieLinks = (movieLinks || [])
+        .filter(l => l && l.url && l.url.trim())
+        .map(l => ({
+          title: (l.title || "").trim() || "Watch",
+          type: l.type === "redirect" ? "redirect" : "embed",
+          url: l.url.trim(),
+        }));
+      const legacyMoviePlayer = cleanMovieLinks.find(l => l.type === "embed")?.url || playerUrl || null;
+
       const payload = {
         title,
         year,
         tag,
         type,
         section,
-        player_url: playerUrl || null,
+        player_url: legacyMoviePlayer,
+        links: cleanMovieLinks as any,
         banner_url: bannerUrl,
         is_premium: isPremium,
         is_archived: isArchived,
@@ -148,16 +171,18 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         synopsis: synopsis || null,
       };
 
+
       let contentId = content?.id;
 
       if (content) {
-        const { error } = await supabase.from("contents").update(payload).eq("id", content.id);
+        const { error } = await supabase.from("contents").update(payload as any).eq("id", content.id);
         if (error) throw error;
       } else {
-        const { data, error } = await supabase.from("contents").insert(payload).select('id').single();
+        const { data, error } = await supabase.from("contents").insert(payload as any).select('id').single();
         if (error) throw error;
         contentId = data.id;
       }
+
 
       if (contentId && (type === "serie" || type === "novela" || type === "anime")) {
         for (const ep of episodes) {
@@ -334,18 +359,73 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
             />
           </div>
 
-          <div className="space-y-3 border border-border rounded-lg p-3 bg-muted/20">
-            <p className="text-xs font-semibold text-foreground">Player (Movies / Single titles)</p>
-            <div>
-              <label className="text-xs text-muted-foreground">Player URL or iframe code</label>
-              <Input
-                value={playerUrl}
-                onChange={(e) => setPlayerUrl(e.target.value)}
-                placeholder="https://... or <iframe ...></iframe>"
-                className="bg-muted border-border mt-1"
-              />
+          {(type === "filme") && (
+            <div className="space-y-2 border border-border rounded-lg p-3 bg-muted/20">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold text-foreground">Links (Movie)</p>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setMovieLinks([...(movieLinks || []), { title: "", type: "embed", url: "" }])}
+                  className="h-7 gap-1 text-[11px]"
+                >
+                  <Plus className="w-3 h-3" /> Add link
+                </Button>
+              </div>
+              {(movieLinks || []).length === 0 && (
+                <p className="text-[11px] text-muted-foreground">No links yet. Click "Add link" to add one.</p>
+              )}
+              {(movieLinks || []).map((lnk, idx) => (
+                <div key={idx} className="space-y-1.5 rounded-md bg-muted/40 p-2">
+                  <div className="flex gap-1.5">
+                    <Input
+                      value={lnk.title}
+                      onChange={(e) => {
+                        const next = [...movieLinks];
+                        next[idx] = { ...next[idx], title: e.target.value };
+                        setMovieLinks(next);
+                      }}
+                      placeholder="Tab title (e.g. Telegram)"
+                      className="bg-muted border-border text-xs flex-1"
+                    />
+                    <Select
+                      value={lnk.type}
+                      onValueChange={(v) => {
+                        const next = [...movieLinks];
+                        next[idx] = { ...next[idx], type: v as "embed" | "redirect" };
+                        setMovieLinks(next);
+                      }}
+                    >
+                      <SelectTrigger className="bg-muted border-border w-[110px] text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="embed">embed</SelectItem>
+                        <SelectItem value="redirect">redirect</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => setMovieLinks(movieLinks.filter((_, i) => i !== idx))}
+                      className="text-destructive h-8 w-8"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                  <Input
+                    value={lnk.url}
+                    onChange={(e) => {
+                      const next = [...movieLinks];
+                      next[idx] = { ...next[idx], url: e.target.value };
+                      setMovieLinks(next);
+                    }}
+                    placeholder="https://... or <iframe ...></iframe>"
+                    className="bg-muted border-border text-xs"
+                  />
+                </div>
+              ))}
             </div>
-          </div>
+          )}
+
 
           <div>
             <label className="text-sm text-muted-foreground">Banner / Image</label>

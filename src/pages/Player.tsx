@@ -177,10 +177,17 @@ const Player = () => {
         setSelectedLinkIdx(-1);
         setRawPlayerUrl("");
       } else if (content?.id) {
-        const { data } = await supabase.rpc("get_content_player_url", { _content_id: content.id });
-        const url = (data as string | null) || "";
+        const { data } = await (supabase.rpc as any)("get_content_links", { _content_id: content.id });
+        const links = Array.isArray(data) ? (data as EpisodeLink[]) : [];
         if (cancelled) return;
-        setEpisodeLinks(url ? [{ title: "Watch on site", type: "embed", url }] : []);
+        if (links.length > 0) {
+          setEpisodeLinks(links);
+        } else {
+          const { data: legacy } = await supabase.rpc("get_content_player_url", { _content_id: content.id });
+          const url = (legacy as string | null) || "";
+          if (cancelled) return;
+          setEpisodeLinks(url ? [{ title: "Watch on site", type: "embed", url }] : []);
+        }
         setSelectedLinkIdx(-1);
         setRawPlayerUrl("");
       } else {
@@ -188,6 +195,7 @@ const Player = () => {
         setSelectedLinkIdx(-1);
         setRawPlayerUrl("");
       }
+
     };
     void resolve();
     return () => { cancelled = true; };
@@ -500,12 +508,14 @@ const Player = () => {
           {(() => {
             const currentLink = selectedLinkIdx >= 0 ? episodeLinks[selectedLinkIdx] : null;
             const showIframe = currentLink?.type === "embed" && hasPlayerUrl;
+            const pad2 = (n: number) => String(n).padStart(2, "0");
             const headingMain = currentEp && content
-              ? `${content.title}: ${currentEp.season}x${currentEp.episode_number}`
+              ? `${content.title}: ${currentEp.season}x${pad2(currentEp.episode_number)}`
               : (content?.title || "");
             const headingSub = currentEp
-              ? `Episode ${currentEp.episode_number}${currentEp.title ? ` — ${currentEp.title}` : ""}`
-              : (content ? `${content.type === "filme" ? "Movie" : ""}${content.year ? ` ${content.year}` : ""}`.trim() : "");
+              ? (currentEp.title || `Episode ${currentEp.episode_number}`)
+              : "";
+
             return (
               <>
                 {content && (
