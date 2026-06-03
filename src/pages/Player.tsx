@@ -155,47 +155,37 @@ const Player = () => {
 
   type EpisodeLink = { title: string; type: "embed" | "redirect"; url: string };
   const [episodeLinks, setEpisodeLinks] = useState<EpisodeLink[]>([]);
-  const [selectedLinkIdx, setSelectedLinkIdx] = useState(0);
+  const [selectedLinkIdx, setSelectedLinkIdx] = useState(-1);
   const [rawPlayerUrl, setRawPlayerUrl] = useState("");
 
   useEffect(() => {
     let cancelled = false;
     const resolve = async () => {
-      if (isBlocked) { setEpisodeLinks([]); setRawPlayerUrl(""); return; }
+      if (isBlocked) { setEpisodeLinks([]); setRawPlayerUrl(""); setSelectedLinkIdx(-1); return; }
       if (currentEp?.id) {
         const { data } = await (supabase.rpc as any)("get_episode_links", { _episode_id: currentEp.id });
         const links = Array.isArray(data) ? (data as EpisodeLink[]) : [];
         if (cancelled) return;
         if (links.length > 0) {
-          const firstEmbedIdx = links.findIndex((l) => l.type === "embed");
-          const startIdx = firstEmbedIdx >= 0 ? firstEmbedIdx : 0;
           setEpisodeLinks(links);
-          setSelectedLinkIdx(startIdx);
-          const first = links[startIdx];
-          setRawPlayerUrl(first.type === "embed" ? first.url : "");
         } else {
-          // Fallback to legacy single URL RPC
           const { data: legacy } = await supabase.rpc("get_episode_player_url", { _episode_id: currentEp.id });
           const url = (legacy as string | null) || "";
           if (cancelled) return;
-          if (url) {
-            const fallback: EpisodeLink[] = [{ title: "Watch on site", type: "embed", url }];
-            setEpisodeLinks(fallback);
-            setSelectedLinkIdx(0);
-            setRawPlayerUrl(url);
-          } else {
-            setEpisodeLinks([]);
-            setRawPlayerUrl("");
-          }
+          setEpisodeLinks(url ? [{ title: "Watch on site", type: "embed", url }] : []);
         }
+        setSelectedLinkIdx(-1);
+        setRawPlayerUrl("");
       } else if (content?.id) {
         const { data } = await supabase.rpc("get_content_player_url", { _content_id: content.id });
-        if (!cancelled) {
-          setEpisodeLinks([]);
-          setRawPlayerUrl((data as string | null) || "");
-        }
+        const url = (data as string | null) || "";
+        if (cancelled) return;
+        setEpisodeLinks(url ? [{ title: "Watch on site", type: "embed", url }] : []);
+        setSelectedLinkIdx(-1);
+        setRawPlayerUrl("");
       } else {
         setEpisodeLinks([]);
+        setSelectedLinkIdx(-1);
         setRawPlayerUrl("");
       }
     };
@@ -508,19 +498,26 @@ const Player = () => {
       <div className={isMobile ? "w-full flex-shrink-0 min-h-0 pt-[calc(env(safe-area-inset-top)+20px)]" : "w-full flex-1 flex flex-col items-center px-4 pt-16 pb-4 min-h-0"}>
         <div className={isMobile ? "w-full min-h-0" : "w-full max-w-5xl min-h-0"}>
           {(() => {
-            const currentLink = episodeLinks[selectedLinkIdx];
-            const hasAnyEmbed = episodeLinks.some((l) => l.type === "embed");
-            const showIframe = hasAnyEmbed && currentLink?.type === "embed" && hasPlayerUrl;
+            const currentLink = selectedLinkIdx >= 0 ? episodeLinks[selectedLinkIdx] : null;
+            const showIframe = currentLink?.type === "embed" && hasPlayerUrl;
+            const headingMain = currentEp && content
+              ? `${content.title}: ${currentEp.season}x${currentEp.episode_number}`
+              : (content?.title || "");
+            const headingSub = currentEp
+              ? `Episode ${currentEp.episode_number}${currentEp.title ? ` — ${currentEp.title}` : ""}`
+              : (content ? `${content.type === "filme" ? "Movie" : ""}${content.year ? ` ${content.year}` : ""}`.trim() : "");
             return (
               <>
-                {currentEp && content && (
+                {content && (
                   <div className={isMobile ? "px-3 pt-2 pb-3" : "pb-3"}>
-                    <h1 className="text-lg sm:text-2xl font-bold text-foreground">
-                      {content.title}: {currentEp.season}x{currentEp.episode_number}
+                    <h1 className="text-xl sm:text-3xl font-bold text-foreground">
+                      {headingMain}
                     </h1>
-                    <p className="text-sm sm:text-base text-muted-foreground mt-0.5">
-                      Episode {currentEp.episode_number}{currentEp.title ? ` — ${currentEp.title}` : ""}
-                    </p>
+                    {headingSub && (
+                      <p className="text-sm sm:text-base text-muted-foreground mt-1">
+                        {headingSub}
+                      </p>
+                    )}
                   </div>
                 )}
 
@@ -570,75 +567,58 @@ const Player = () => {
                   </div>
                 )}
 
-                {!showIframe && !hasAnyEmbed && episodeLinks.length === 0 && (
-                  <div className={isMobile ? "relative w-full overflow-hidden bg-black" : "relative w-full overflow-hidden rounded-2xl bg-black neon-border-purple"}
-                    style={{ position: "relative", width: "100%", paddingBottom: playerPaddingBottom, height: 0 }}>
-                    <div className="absolute inset-0">
-                      <img src={content?.banner_url || "/placeholder.svg"} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]" />
-                      <div className="absolute inset-0 flex items-center justify-center px-4 text-center">
-                        <p className="text-sm text-foreground">Video unavailable for this content.</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {episodeLinks.length > 0 && (
+                {episodeLinks.length > 0 ? (
                   <div className={isMobile ? "mt-4 px-3" : "mt-5"}>
-                    <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
-                      <Play className="w-4 h-4 text-primary" /> Available players
+                    <h3 className="text-base font-semibold text-foreground mb-3 pb-2 border-b border-border">
+                      Links
                     </h3>
-                    <div className="rounded-xl border border-border overflow-hidden bg-card">
-                      <div className="grid grid-cols-[1fr_auto] gap-2 px-3 py-2 bg-muted/40 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                        <span>Option</span>
-                        <span>Type</span>
-                      </div>
-                      <div className="divide-y divide-border/60">
-                        {episodeLinks.map((lnk, idx) => {
-                          const isActive = lnk.type === "embed" && idx === selectedLinkIdx && showIframe;
-                          if (lnk.type === "embed") {
-                            return (
+                    <ul className="divide-y divide-border/60">
+                      {episodeLinks.map((lnk, idx) => {
+                        const isActive = lnk.type === "embed" && idx === selectedLinkIdx && showIframe;
+                        if (lnk.type === "embed") {
+                          return (
+                            <li key={idx}>
                               <button
-                                key={idx}
                                 type="button"
                                 onClick={() => selectLink(idx)}
-                                className={`w-full grid grid-cols-[1fr_auto] gap-2 items-center px-3 py-2.5 text-left transition-colors ${
-                                  isActive ? "bg-primary/10" : "hover:bg-muted/30"
+                                className={`w-full flex items-center gap-3 py-3 text-left transition-colors ${
+                                  isActive ? "text-primary" : "text-foreground hover:text-primary"
                                 }`}
                               >
-                                <span className={`text-sm flex items-center gap-2 ${isActive ? "text-primary font-semibold" : "text-foreground"}`}>
-                                  <Play className={`w-3.5 h-3.5 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
+                                <Play className={`w-4 h-4 flex-shrink-0 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
+                                <span className={`text-sm sm:text-base ${isActive ? "font-semibold" : ""}`}>
                                   {lnk.title || "Watch on site"}
-                                  {isActive && (
-                                    <span className="text-[10px] uppercase tracking-wider text-primary">• Playing</span>
-                                  )}
                                 </span>
-                                <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase px-2 py-0.5 rounded-full bg-primary/15 text-primary">
-                                  Embed ▶
-                                </span>
+                                {isActive && (
+                                  <span className="ml-auto text-[10px] uppercase tracking-wider text-primary font-bold">
+                                    Playing
+                                  </span>
+                                )}
                               </button>
-                            );
-                          }
-                          return (
+                            </li>
+                          );
+                        }
+                        return (
+                          <li key={idx}>
                             <a
-                              key={idx}
                               href={lnk.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="w-full grid grid-cols-[1fr_auto] gap-2 items-center px-3 py-2.5 text-left transition-colors hover:bg-muted/30"
+                              className="w-full flex items-center gap-3 py-3 text-foreground hover:text-primary transition-colors"
                             >
-                              <span className="text-sm text-foreground flex items-center gap-2">
-                                <ExternalLink className="w-3.5 h-3.5 text-muted-foreground" />
+                              <ExternalLink className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
+                              <span className="text-sm sm:text-base">
                                 {lnk.title || "External link"}
                               </span>
-                              <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase px-2 py-0.5 rounded-full bg-accent/15 text-accent">
-                                External ↗
-                              </span>
                             </a>
-                          );
-                        })}
-                      </div>
-                    </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                ) : (
+                  <div className={isMobile ? "mt-4 px-3" : "mt-5"}>
+                    <p className="text-sm text-muted-foreground">No links available for this {currentEp ? "episode" : "title"} yet.</p>
                   </div>
                 )}
 
@@ -654,8 +634,7 @@ const Player = () => {
       {!isBlocked && (
       <div className="w-full max-w-5xl mx-auto px-4 sm:px-0 pb-8">
         <div className="mt-4 sm:mt-6">
-          <h1 className="text-lg sm:text-2xl font-bold">{content?.title || "Loading..."}</h1>
-          <div className="flex flex-wrap gap-2 mt-2 sm:mt-3">
+          <div className="flex flex-wrap gap-2">
             <span className="px-2 py-0.5 text-xs rounded bg-primary/20 text-primary">{content?.tag}</span>
             <span className="px-2 py-0.5 text-xs rounded bg-secondary/20 text-secondary">{content?.year}</span>
             <span className="px-2 py-0.5 text-xs rounded bg-muted text-muted-foreground">{content?.type === "serie" ? "Series" : content?.type === "novela" ? "Soap Opera" : "Movie"}</span>
