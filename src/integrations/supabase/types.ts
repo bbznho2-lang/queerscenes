@@ -198,6 +198,7 @@ export type Database = {
           episode_number: number
           id: string
           is_premium: boolean
+          links: Json
           player_url: string | null
           season: number
           title: string
@@ -208,6 +209,7 @@ export type Database = {
           episode_number?: number
           id?: string
           is_premium?: boolean
+          links?: Json
           player_url?: string | null
           season?: number
           title?: string
@@ -218,6 +220,7 @@ export type Database = {
           episode_number?: number
           id?: string
           is_premium?: boolean
+          links?: Json
           player_url?: string | null
           season?: number
           title?: string
