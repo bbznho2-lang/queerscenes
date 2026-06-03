@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Sparkles, Trash2, ArrowUp, ArrowDown, Plus } from "lucide-react";
+import { Search, Sparkles, Trash2, ArrowUp, ArrowDown, Plus, Film, Tv } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -15,33 +15,47 @@ interface EpisodeRow {
   content_title?: string;
 }
 
+interface ContentRow {
+  id: string;
+  title: string;
+  type: string;
+}
+
 interface FeaturedRow {
   id: string;
-  episode_id: string;
+  episode_id: string | null;
+  content_id: string | null;
   position: number;
   episode?: EpisodeRow | null;
+  content?: ContentRow | null;
 }
 
 const FeaturedEpisodesAdmin = () => {
   const [featured, setFeatured] = useState<FeaturedRow[]>([]);
   const [allEpisodes, setAllEpisodes] = useState<EpisodeRow[]>([]);
+  const [allContents, setAllContents] = useState<ContentRow[]>([]);
   const [search, setSearch] = useState("");
 
   const load = async () => {
     const [{ data: ep }, { data: ct }, { data: feat }] = await Promise.all([
       supabase.from("episodes").select("id, title, season, episode_number, content_id"),
-      supabase.from("contents").select("id, title"),
+      supabase.from("contents").select("id, title, type"),
       (supabase as any).from("featured_episodes").select("*").order("position", { ascending: true }),
     ]);
-    const cMap = new Map((ct || []).map((c: any) => [c.id, c.title]));
+    const cMap = new Map((ct || []).map((c: any) => [c.id, c]));
     const eps: EpisodeRow[] = (ep || []).map((e: any) => ({
       ...e,
-      content_title: cMap.get(e.content_id) || "Unknown",
+      content_title: (cMap.get(e.content_id) as any)?.title || "Unknown",
     }));
     const eMap = new Map(eps.map((e) => [e.id, e]));
     setAllEpisodes(eps);
+    setAllContents((ct || []) as ContentRow[]);
     setFeatured(
-      (feat || []).map((f: any) => ({ ...f, episode: eMap.get(f.episode_id) || null })),
+      (feat || []).map((f: any) => ({
+        ...f,
+        episode: f.episode_id ? eMap.get(f.episode_id) || null : null,
+        content: f.content_id ? (cMap.get(f.content_id) as any) || null : null,
+      })),
     );
   };
 
@@ -49,37 +63,28 @@ const FeaturedEpisodesAdmin = () => {
     void load();
   }, []);
 
-  const featuredIds = useMemo(() => new Set(featured.map((f) => f.episode_id)), [featured]);
+  const featuredEpIds = useMemo(() => new Set(featured.map((f) => f.episode_id).filter(Boolean) as string[]), [featured]);
+  const featuredContentIds = useMemo(() => new Set(featured.map((f) => f.content_id).filter(Boolean) as string[]), [featured]);
 
   const results = useMemo(() => {
     const raw = search.trim();
-    if (!raw) return [];
+    if (!raw) return { episodes: [] as EpisodeRow[], contents: [] as ContentRow[] };
     const q = raw.toLowerCase();
-
-    // Parse patterns like "S1", "S1E2", "S01E02", or "Title S1E2"
     const seasonEpRe = /s(\d{1,3})(?:\s*[ex]\s*(\d{1,3}))?/i;
     const m = raw.match(seasonEpRe);
     const wantedSeason = m ? parseInt(m[1], 10) : null;
     const wantedEpisode = m && m[2] ? parseInt(m[2], 10) : null;
-    // Text portion with the SxxExx removed
     const textQ = (m ? raw.replace(m[0], "") : raw).trim().toLowerCase();
 
-    return allEpisodes
-      .filter((e) => !featuredIds.has(e.id))
+    const episodes = allEpisodes
+      .filter((e) => !featuredEpIds.has(e.id))
       .filter((e) => {
         const showTitle = (e.content_title || "").toLowerCase();
         const epTitle = e.title.toLowerCase();
-        // Text must match show or episode title (when provided)
-        const textOk =
-          !textQ || showTitle.includes(textQ) || epTitle.includes(textQ);
+        const textOk = !textQ || showTitle.includes(textQ) || epTitle.includes(textQ);
         const seasonOk = wantedSeason === null || e.season === wantedSeason;
-        const episodeOk =
-          wantedEpisode === null || e.episode_number === wantedEpisode;
-        // If no text and no season/episode pattern, fall back to plain contains
-        const fallback =
-          !textQ && wantedSeason === null
-            ? showTitle.includes(q) || epTitle.includes(q)
-            : true;
+        const episodeOk = wantedEpisode === null || e.episode_number === wantedEpisode;
+        const fallback = !textQ && wantedSeason === null ? showTitle.includes(q) || epTitle.includes(q) : true;
         return textOk && seasonOk && episodeOk && fallback;
       })
       .sort((a, b) => {
@@ -88,18 +93,34 @@ const FeaturedEpisodesAdmin = () => {
         if (a.season !== b.season) return a.season - b.season;
         return a.episode_number - b.episode_number;
       })
-      .slice(0, 50);
-  }, [search, allEpisodes, featuredIds]);
+      .slice(0, 30);
+
+    const contents = allContents
+      .filter((c) => !featuredContentIds.has(c.id))
+      .filter((c) => c.title.toLowerCase().includes(q))
+      .sort((a, b) => a.title.localeCompare(b.title))
+      .slice(0, 30);
+
+    return { episodes, contents };
+  }, [search, allEpisodes, allContents, featuredEpIds, featuredContentIds]);
 
   const addEpisode = async (ep: EpisodeRow) => {
     const nextPos = featured.length;
     const { error } = await (supabase as any)
       .from("featured_episodes")
-      .insert({ episode_id: ep.id, position: nextPos });
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
+      .insert({ episode_id: ep.id, content_id: null, position: nextPos });
+    if (error) { toast.error(error.message); return; }
+    setSearch("");
+    toast.success("Added to Recent Updates");
+    void load();
+  };
+
+  const addContent = async (c: ContentRow) => {
+    const nextPos = featured.length;
+    const { error } = await (supabase as any)
+      .from("featured_episodes")
+      .insert({ episode_id: null, content_id: c.id, position: nextPos });
+    if (error) { toast.error(error.message); return; }
     setSearch("");
     toast.success("Added to Recent Updates");
     void load();
@@ -107,10 +128,7 @@ const FeaturedEpisodesAdmin = () => {
 
   const removeFeatured = async (id: string) => {
     const { error } = await (supabase as any).from("featured_episodes").delete().eq("id", id);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
+    if (error) { toast.error(error.message); return; }
     void load();
   };
 
@@ -129,12 +147,12 @@ const FeaturedEpisodesAdmin = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-foreground">
           <Sparkles className="w-5 h-5 text-primary" />
-          Recent Updates (curated episodes)
+          Recent Updates (episodes & titles)
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-1.5">
-          <label className="text-xs text-muted-foreground">Search episodes by title or show</label>
+          <label className="text-xs text-muted-foreground">Search episodes, movies, series or any title</label>
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -144,26 +162,47 @@ const FeaturedEpisodesAdmin = () => {
               className="bg-muted border-border pl-9"
             />
           </div>
-          {results.length > 0 && (
-            <div className="mt-2 max-h-60 overflow-y-auto border border-border rounded-lg divide-y divide-border/50">
-              {results.map((e) => (
+          {(results.episodes.length > 0 || results.contents.length > 0) && (
+            <div className="mt-2 max-h-72 overflow-y-auto border border-border rounded-lg divide-y divide-border/50">
+              {results.contents.length > 0 && (
+                <div className="px-3 py-1 text-[10px] uppercase tracking-wider text-muted-foreground bg-muted/30">Titles (Movies / Series)</div>
+              )}
+              {results.contents.map((c) => (
                 <button
-                  key={e.id}
+                  key={`c-${c.id}`}
+                  onClick={() => addContent(c)}
+                  className="w-full text-left px-3 py-2 hover:bg-muted/40 transition-colors flex items-center gap-3"
+                >
+                  <Film className="w-4 h-4 text-accent flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-foreground truncate">{c.title}</p>
+                    <p className="text-xs text-muted-foreground truncate capitalize">{c.type}</p>
+                  </div>
+                  <Plus className="w-4 h-4 text-primary" />
+                </button>
+              ))}
+              {results.episodes.length > 0 && (
+                <div className="px-3 py-1 text-[10px] uppercase tracking-wider text-muted-foreground bg-muted/30">Episodes</div>
+              )}
+              {results.episodes.map((e) => (
+                <button
+                  key={`e-${e.id}`}
                   onClick={() => addEpisode(e)}
                   className="w-full text-left px-3 py-2 hover:bg-muted/40 transition-colors flex items-center gap-3"
                 >
-                  <Plus className="w-4 h-4 text-primary flex-shrink-0" />
+                  <Tv className="w-4 h-4 text-primary flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-foreground truncate">
                       {e.content_title} <span className="text-muted-foreground">— S{e.season}E{e.episode_number}</span>
                     </p>
                     <p className="text-xs text-muted-foreground truncate">{e.title}</p>
                   </div>
+                  <Plus className="w-4 h-4 text-primary" />
                 </button>
               ))}
             </div>
           )}
-          {search.trim() && results.length === 0 && (
+          {search.trim() && results.episodes.length === 0 && results.contents.length === 0 && (
             <p className="text-xs text-muted-foreground text-center py-3">No matches.</p>
           )}
         </div>
@@ -173,7 +212,7 @@ const FeaturedEpisodesAdmin = () => {
             Featured ({featured.length}) — shown on the homepage
           </p>
           {featured.length === 0 ? (
-            <p className="text-muted-foreground text-center text-sm py-6">No episodes featured yet.</p>
+            <p className="text-muted-foreground text-center text-sm py-6">Nothing featured yet.</p>
           ) : (
             featured.map((f, idx) => (
               <div
@@ -184,16 +223,21 @@ const FeaturedEpisodesAdmin = () => {
                 <div className="flex-1 min-w-0">
                   {f.episode ? (
                     <>
-                      <p className="text-sm text-foreground truncate">
+                      <p className="text-sm text-foreground truncate flex items-center gap-1.5">
+                        <Tv className="w-3.5 h-3.5 text-primary flex-shrink-0" />
                         {f.episode.content_title}{" "}
-                        <span className="text-muted-foreground">
-                          — S{f.episode.season}E{f.episode.episode_number}
-                        </span>
+                        <span className="text-muted-foreground">— S{f.episode.season}E{f.episode.episode_number}</span>
                       </p>
-                      <p className="text-xs text-muted-foreground truncate">{f.episode.title}</p>
+                      <p className="text-xs text-muted-foreground truncate pl-5">{f.episode.title}</p>
                     </>
+                  ) : f.content ? (
+                    <p className="text-sm text-foreground truncate flex items-center gap-1.5">
+                      <Film className="w-3.5 h-3.5 text-accent flex-shrink-0" />
+                      {f.content.title}
+                      <span className="text-[10px] text-muted-foreground capitalize ml-1">({f.content.type})</span>
+                    </p>
                   ) : (
-                    <p className="text-sm text-destructive">Episode missing</p>
+                    <p className="text-sm text-destructive">Item missing</p>
                   )}
                 </div>
                 <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => move(idx, -1)} disabled={idx === 0}>
