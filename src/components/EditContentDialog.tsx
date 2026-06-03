@@ -76,6 +76,15 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
           if (data) setPlayerUrl(data as string);
         });
       }
+      // Load multi-link list for movies/single titles
+      (supabase.rpc as any)("admin_get_contents_v2", { _ids: [content.id] }).then(({ data }: any) => {
+        const row = Array.isArray(data) ? data[0] : null;
+        let links: EpisodeLink[] = Array.isArray(row?.links) ? row.links : [];
+        if (links.length === 0 && legacy && String(legacy).trim()) {
+          links = [{ title: "Watch on site", type: "embed", url: legacy }];
+        }
+        setMovieLinks(links);
+      });
       setBannerPreview(content.banner_url || "");
       setBannerUrlInput(content.banner_url || "");
       setIsPremium(content.is_premium || false);
@@ -106,7 +115,9 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setIsArchived(false);
       setSynopsis("");
       setEpisodes([]);
+      setMovieLinks([]);
     }
+
   }, [content, open]);
 
   const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
