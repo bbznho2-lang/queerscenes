@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import EditContentDialog from "@/components/EditContentDialog";
 import CommentsSection from "@/components/CommentsSection";
 import { trackSupporterEvent, type SupporterEventType } from "@/lib/supporter-tracking";
+import { getEmailRedirectUrl } from "@/lib/auth-urls";
 
 
 interface ContentItem {
@@ -58,6 +59,7 @@ const Player = () => {
   const [signupFirstName, setSignupFirstName] = useState("");
   const [signupSubmitting, setSignupSubmitting] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
+  const [paywallMode, setPaywallMode] = useState<"signup" | "login">("login");
 
 
   const fetchContent = async () => {
@@ -289,21 +291,37 @@ const Player = () => {
     if (signupSubmitting) return;
     setSignupSubmitting(true);
     void trackEvent("paywall_signup_submit", "paywall_inline_form");
-    const { error } = await supabase.auth.signUp({
-      email: signupEmail.trim(),
-      password: signupPassword,
-      options: {
-        emailRedirectTo: `${window.location.origin}/player/${id}`,
-        data: { first_name: signupFirstName.trim() },
-      },
-    });
+    const email = signupEmail.trim().toLowerCase();
+    const redirectPath = `/player/${id}`;
+    const authAction = paywallMode === "login"
+      ? supabase.auth.signInWithPassword({ email, password: signupPassword })
+      : supabase.auth.signUp({
+          email,
+          password: signupPassword,
+          options: {
+            emailRedirectTo: getEmailRedirectUrl(redirectPath),
+            data: { first_name: signupFirstName.trim() },
+          },
+        });
+
+    const { error } = await authAction;
     setSignupSubmitting(false);
     if (error) {
-      toast({ title: "Sign up failed", description: error.message, variant: "destructive" });
+      toast({
+        title: paywallMode === "login" ? "Login failed" : "Sign up failed",
+        description: error.message,
+        variant: "destructive",
+      });
       return;
     }
+
+    if (paywallMode === "login") {
+      toast({ title: "Logged in!", description: "Your session was restored. Choose a Supporter plan to unlock the content." });
+      return;
+    }
+
     setSignupSuccess(true);
-    toast({ title: "Account created!", description: "Now choose a Supporter plan to unlock the content." });
+    toast({ title: "Account created!", description: "Check your email to confirm, then choose a Supporter plan to unlock the content." });
   };
 
 
@@ -371,7 +389,7 @@ const Player = () => {
                     <Crown className="w-3.5 h-3.5" /> Supporters only
                   </div>
                   <h2 className="text-xl sm:text-2xl font-extrabold mb-1.5">
-                    {currentEp ? `“${currentEp.title}” is waiting for you` : `“${content?.title ?? "This title"}” is waiting for you`}
+                    {currentEp ? `“${currentEp.title.replace(/^Episódio\s+/i, "Episode ")}" is waiting for you` : `“${content?.title ?? "This title"}” is waiting for you`}
                   </h2>
 
                   {(() => {
@@ -433,15 +451,33 @@ const Player = () => {
 
               {!user && !signupSuccess && (
                 <form onSubmit={handleSupporterSignup} className="w-full max-w-sm space-y-2 mb-3 text-left" aria-label="Supporter signup">
-                  <input
-                    type="text"
-                    placeholder="Your first name"
-                    value={signupFirstName}
-                    onChange={(e) => setSignupFirstName(e.target.value)}
-                    className="w-full rounded-lg bg-card border border-border px-3 py-2 text-sm focus:outline-none focus:border-primary"
-                    required
-                    maxLength={50}
-                  />
+                  <div className="flex rounded-full bg-muted p-1 mb-1">
+                    <button
+                      type="button"
+                      onClick={() => setPaywallMode("login")}
+                      className={`flex-1 rounded-full px-3 py-2 text-xs font-semibold transition-colors ${paywallMode === "login" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                    >
+                      Login
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaywallMode("signup")}
+                      className={`flex-1 rounded-full px-3 py-2 text-xs font-semibold transition-colors ${paywallMode === "signup" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                    >
+                      Create account
+                    </button>
+                  </div>
+                  {paywallMode === "signup" && (
+                    <input
+                      type="text"
+                      placeholder="Your first name"
+                      value={signupFirstName}
+                      onChange={(e) => setSignupFirstName(e.target.value)}
+                      className="w-full rounded-lg bg-card border border-border px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                      required
+                      maxLength={50}
+                    />
+                  )}
                   <input
                     type="email"
                     placeholder="Email"
@@ -468,7 +504,7 @@ const Player = () => {
                     className="shine-cta w-full rounded-full bg-primary text-primary-foreground font-semibold py-2.5 text-sm flex items-center justify-center gap-2 hover:bg-primary/90 disabled:opacity-60 glow-purple"
                   >
                     {signupSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Crown className="w-4 h-4" />}
-                    Become a Supporter
+                    {paywallMode === "login" ? "Login and continue" : "Create account"}
                   </button>
                 </form>
               )}
@@ -522,7 +558,7 @@ const Player = () => {
                     </h1>
                     {headingSub && (
                       <p className="text-sm sm:text-base text-muted-foreground mt-1">
-                        {headingSub}
+                        {headingSub.replace(/^Episódio\s+/i, "Episode ")}
                       </p>
                     )}
                   </div>
