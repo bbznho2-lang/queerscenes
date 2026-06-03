@@ -163,7 +163,7 @@ const Player = () => {
     const resolve = async () => {
       if (isBlocked) { setEpisodeLinks([]); setRawPlayerUrl(""); return; }
       if (currentEp?.id) {
-        const { data } = await supabase.rpc("get_episode_links", { _episode_id: currentEp.id });
+        const { data } = await (supabase.rpc as any)("get_episode_links", { _episode_id: currentEp.id });
         const links = Array.isArray(data) ? (data as EpisodeLink[]) : [];
         if (cancelled) return;
         if (links.length > 0) {
