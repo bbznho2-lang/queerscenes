@@ -155,7 +155,7 @@ const Player = () => {
 
   type EpisodeLink = { title: string; type: "embed" | "redirect"; url: string };
   const [episodeLinks, setEpisodeLinks] = useState<EpisodeLink[]>([]);
-  const [selectedLinkIdx, setSelectedLinkIdx] = useState(0);
+  const [selectedLinkIdx, setSelectedLinkIdx] = useState(-1);
   const [rawPlayerUrl, setRawPlayerUrl] = useState("");
 
   useEffect(() => {
