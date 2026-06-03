@@ -58,7 +58,9 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
   const [isArchived, setIsArchived] = useState(false);
   const [synopsis, setSynopsis] = useState("");
   const [episodes, setEpisodes] = useState<Episode[]>([]);
+  const [movieLinks, setMovieLinks] = useState<EpisodeLink[]>([]);
   const [saving, setSaving] = useState(false);
+
 
   useEffect(() => {
     if (content) {
