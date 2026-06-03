@@ -32,7 +32,14 @@ export const useAuth = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!isMounted) return;
 
-      const currentUser = session?.user ?? null;
+      let currentUser = session?.user ?? null;
+
+      if (!currentUser) {
+        const { data: userData } = await supabase.auth.getUser();
+        if (!isMounted) return;
+        currentUser = userData.user ?? null;
+      }
+
       setUser(currentUser);
       await loadAdminStatus(currentUser?.id ?? null);
 
@@ -67,11 +74,11 @@ export const useAuth = () => {
     return { error };
   };
 
-  const signUp = async (email: string, password: string, firstName?: string, lastName?: string) => {
+  const signUp = async (email: string, password: string, firstName?: string, lastName?: string, redirectPath?: string) => {
     const { error, data } = await supabase.auth.signUp({
       email,
       password,
-      options: { emailRedirectTo: getEmailRedirectUrl() }
+      options: { emailRedirectTo: getEmailRedirectUrl(redirectPath) }
     });
     if (!error && data.user) {
       // Update profile with name
