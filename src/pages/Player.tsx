@@ -634,8 +634,7 @@ const Player = () => {
       {!isBlocked && (
       <div className="w-full max-w-5xl mx-auto px-4 sm:px-0 pb-8">
         <div className="mt-4 sm:mt-6">
-          <h1 className="text-lg sm:text-2xl font-bold">{content?.title || "Loading..."}</h1>
-          <div className="flex flex-wrap gap-2 mt-2 sm:mt-3">
+          <div className="flex flex-wrap gap-2">
             <span className="px-2 py-0.5 text-xs rounded bg-primary/20 text-primary">{content?.tag}</span>
             <span className="px-2 py-0.5 text-xs rounded bg-secondary/20 text-secondary">{content?.year}</span>
             <span className="px-2 py-0.5 text-xs rounded bg-muted text-muted-foreground">{content?.type === "serie" ? "Series" : content?.type === "novela" ? "Soap Opera" : "Movie"}</span>
