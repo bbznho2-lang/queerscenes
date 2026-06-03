@@ -64,7 +64,7 @@ Deno.serve(async (req) => {
     });
   } catch (err) {
     console.error("create-checkout error", err);
-    return new Response(JSON.stringify({ error: (err as Error).message }), {
+    return new Response(JSON.stringify({ error: "Checkout session could not be created. Please try again." }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
