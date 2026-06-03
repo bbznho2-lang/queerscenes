@@ -175,13 +175,14 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       let contentId = content?.id;
 
       if (content) {
-        const { error } = await supabase.from("contents").update(payload).eq("id", content.id);
+        const { error } = await supabase.from("contents").update(payload as any).eq("id", content.id);
         if (error) throw error;
       } else {
-        const { data, error } = await supabase.from("contents").insert(payload).select('id').single();
+        const { data, error } = await supabase.from("contents").insert(payload as any).select('id').single();
         if (error) throw error;
         contentId = data.id;
       }
+
 
       if (contentId && (type === "serie" || type === "novela" || type === "anime")) {
         for (const ep of episodes) {
