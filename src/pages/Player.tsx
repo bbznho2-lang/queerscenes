@@ -167,9 +167,11 @@ const Player = () => {
         const links = Array.isArray(data) ? (data as EpisodeLink[]) : [];
         if (cancelled) return;
         if (links.length > 0) {
+          const firstEmbedIdx = links.findIndex((l) => l.type === "embed");
+          const startIdx = firstEmbedIdx >= 0 ? firstEmbedIdx : 0;
           setEpisodeLinks(links);
-          setSelectedLinkIdx(0);
-          const first = links[0];
+          setSelectedLinkIdx(startIdx);
+          const first = links[startIdx];
           setRawPlayerUrl(first.type === "embed" ? first.url : "");
         } else {
           // Fallback to legacy single URL RPC
@@ -503,42 +505,32 @@ const Player = () => {
           </div>
         </div>
       ) : (
-      <div className={isMobile ? "w-full flex-shrink-0 min-h-0 pt-[calc(env(safe-area-inset-top)+20px)]" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-4 min-h-0"}>
+      <div className={isMobile ? "w-full flex-shrink-0 min-h-0 pt-[calc(env(safe-area-inset-top)+20px)]" : "w-full flex-1 flex flex-col items-center px-4 pt-16 pb-4 min-h-0"}>
         <div className={isMobile ? "w-full min-h-0" : "w-full max-w-5xl min-h-0"}>
           {(() => {
             const currentLink = episodeLinks[selectedLinkIdx];
-            const isRedirect = currentLink?.type === "redirect";
+            const hasAnyEmbed = episodeLinks.some((l) => l.type === "embed");
+            const showIframe = hasAnyEmbed && currentLink?.type === "embed" && hasPlayerUrl;
             return (
               <>
-                <div
-                  className={isMobile ? "relative w-full overflow-hidden bg-black" : "relative w-full overflow-hidden rounded-2xl bg-black neon-border-purple"}
-                  style={{ position: "relative", width: "100%", paddingBottom: playerPaddingBottom, height: 0, minHeight: 0, overflow: "hidden" }}
-                  ref={playerWrapperRef}
-                >
-                  {isRedirect ? (
-                    <div className="absolute inset-0">
-                      <img
-                        src={content?.banner_url || "/placeholder.svg"}
-                        alt=""
-                        className="absolute inset-0 w-full h-full object-cover opacity-40"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/85 to-background/95" />
-                      <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center gap-3">
-                        <p className="text-xs sm:text-sm text-muted-foreground">
-                          This option opens in a new tab.
-                        </p>
-                        <a
-                          href={currentLink.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground font-semibold px-5 py-2.5 text-sm hover:bg-primary/90 glow-purple"
-                        >
-                          Watch now <ExternalLink className="w-4 h-4" />
-                        </a>
-                      </div>
-                    </div>
-                  ) : hasPlayerUrl ? (
-                    isIframeHtml ? (
+                {currentEp && content && (
+                  <div className={isMobile ? "px-3 pt-2 pb-3" : "pb-3"}>
+                    <h1 className="text-lg sm:text-2xl font-bold text-foreground">
+                      {content.title}: {currentEp.season}x{currentEp.episode_number}
+                    </h1>
+                    <p className="text-sm sm:text-base text-muted-foreground mt-0.5">
+                      Episode {currentEp.episode_number}{currentEp.title ? ` — ${currentEp.title}` : ""}
+                    </p>
+                  </div>
+                )}
+
+                {showIframe && (
+                  <div
+                    className={isMobile ? "relative w-full overflow-hidden bg-black" : "relative w-full overflow-hidden rounded-2xl bg-black neon-border-purple"}
+                    style={{ position: "relative", width: "100%", paddingBottom: playerPaddingBottom, height: 0, minHeight: 0, overflow: "hidden" }}
+                    ref={playerWrapperRef}
+                  >
+                    {isIframeHtml ? (
                       <div
                         key={`${tier}-iframe-html-${selectedLinkIdx}`}
                         className="absolute inset-0 [&>iframe]:absolute [&>iframe]:inset-0 [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0"
@@ -564,52 +556,92 @@ const Player = () => {
                         referrerPolicy="strict-origin-when-cross-origin"
                         style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none", backgroundColor: "transparent", display: "block" }}
                       />
-                    )
-                  ) : (
+                    )}
+                    {isOdyseePlayer && (
+                      <button
+                        type="button"
+                        onClick={handleRequestFullscreen}
+                        aria-label="Enter fullscreen"
+                        className="absolute bottom-2 right-2 z-10 rounded-full bg-black/60 hover:bg-black/80 text-white p-2 backdrop-blur-sm border border-white/20"
+                      >
+                        <Maximize className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {!showIframe && !hasAnyEmbed && episodeLinks.length === 0 && (
+                  <div className={isMobile ? "relative w-full overflow-hidden bg-black" : "relative w-full overflow-hidden rounded-2xl bg-black neon-border-purple"}
+                    style={{ position: "relative", width: "100%", paddingBottom: playerPaddingBottom, height: 0 }}>
                     <div className="absolute inset-0">
-                      <img
-                        src={content?.banner_url || "/placeholder.svg"}
-                        alt={content?.title ? `Cover - ${content.title}` : "Content cover"}
-                        className="absolute inset-0 w-full h-full object-cover"
-                      />
+                      <img src={content?.banner_url || "/placeholder.svg"} alt="" className="absolute inset-0 w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]" />
                       <div className="absolute inset-0 flex items-center justify-center px-4 text-center">
                         <p className="text-sm text-foreground">Video unavailable for this content.</p>
                       </div>
                     </div>
-                  )}
-                  {isOdyseePlayer && hasPlayerUrl && !isRedirect && (
-                    <button
-                      type="button"
-                      onClick={handleRequestFullscreen}
-                      aria-label="Enter fullscreen"
-                      className="absolute bottom-2 right-2 z-10 rounded-full bg-black/60 hover:bg-black/80 text-white p-2 backdrop-blur-sm border border-white/20"
-                    >
-                      <Maximize className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-
-                {episodeLinks.length > 1 && (
-                  <div className="mt-3 px-3 sm:px-0 flex gap-2 flex-wrap">
-                    {episodeLinks.map((lnk, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => selectLink(idx)}
-                        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors border ${
-                          idx === selectedLinkIdx
-                            ? "bg-primary text-primary-foreground border-primary glow-purple"
-                            : "bg-card text-foreground border-border hover:border-primary/40"
-                        }`}
-                      >
-                        {lnk.title || (lnk.type === "embed" ? "Player" : "Link")}
-                        {lnk.type === "redirect" && <ExternalLink className="w-3 h-3" />}
-                      </button>
-                    ))}
                   </div>
                 )}
 
-                {/* Player tier selector */}
+                {episodeLinks.length > 0 && (
+                  <div className={isMobile ? "mt-4 px-3" : "mt-5"}>
+                    <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
+                      <Play className="w-4 h-4 text-primary" /> Available players
+                    </h3>
+                    <div className="rounded-xl border border-border overflow-hidden bg-card">
+                      <div className="grid grid-cols-[1fr_auto] gap-2 px-3 py-2 bg-muted/40 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        <span>Option</span>
+                        <span>Type</span>
+                      </div>
+                      <div className="divide-y divide-border/60">
+                        {episodeLinks.map((lnk, idx) => {
+                          const isActive = lnk.type === "embed" && idx === selectedLinkIdx && showIframe;
+                          if (lnk.type === "embed") {
+                            return (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => selectLink(idx)}
+                                className={`w-full grid grid-cols-[1fr_auto] gap-2 items-center px-3 py-2.5 text-left transition-colors ${
+                                  isActive ? "bg-primary/10" : "hover:bg-muted/30"
+                                }`}
+                              >
+                                <span className={`text-sm flex items-center gap-2 ${isActive ? "text-primary font-semibold" : "text-foreground"}`}>
+                                  <Play className={`w-3.5 h-3.5 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
+                                  {lnk.title || "Watch on site"}
+                                  {isActive && (
+                                    <span className="text-[10px] uppercase tracking-wider text-primary">• Playing</span>
+                                  )}
+                                </span>
+                                <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase px-2 py-0.5 rounded-full bg-primary/15 text-primary">
+                                  Embed ▶
+                                </span>
+                              </button>
+                            );
+                          }
+                          return (
+                            <a
+                              key={idx}
+                              href={lnk.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="w-full grid grid-cols-[1fr_auto] gap-2 items-center px-3 py-2.5 text-left transition-colors hover:bg-muted/30"
+                            >
+                              <span className="text-sm text-foreground flex items-center gap-2">
+                                <ExternalLink className="w-3.5 h-3.5 text-muted-foreground" />
+                                {lnk.title || "External link"}
+                              </span>
+                              <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase px-2 py-0.5 rounded-full bg-accent/15 text-accent">
+                                External ↗
+                              </span>
+                            </a>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {playerTierSelector}
               </>
             );

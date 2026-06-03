@@ -234,20 +234,23 @@ export type Database = {
       }
       featured_episodes: {
         Row: {
+          content_id: string | null
           created_at: string
-          episode_id: string
+          episode_id: string | null
           id: string
           position: number
         }
         Insert: {
+          content_id?: string | null
           created_at?: string
-          episode_id: string
+          episode_id?: string | null
           id?: string
           position?: number
         }
         Update: {
+          content_id?: string | null
           created_at?: string
-          episode_id?: string
+          episode_id?: string | null
           id?: string
           position?: number
         }
@@ -527,6 +530,7 @@ export type Database = {
       claim_supporter_for_current_user: { Args: never; Returns: Json }
       current_user_can_play_premium: { Args: never; Returns: boolean }
       get_content_player_url: { Args: { _content_id: string }; Returns: string }
+      get_episode_links: { Args: { _episode_id: string }; Returns: Json }
       get_episode_player_url: { Args: { _episode_id: string }; Returns: string }
       get_supporter_user_ids: {
         Args: { _user_ids: string[] }

@@ -409,7 +409,7 @@ const Admin = () => {
       .update({ is_premium: true, premium_plan: plan, premium_expires_at: expiresAt.toISOString() })
       .eq("id", profile.id);
     if (error) { toast.error("Error updating plan"); return; }
-    const planLabels: Record<string, string> = { monthly: "Monthly €15.99", quarterly: "Quarterly €42.99", annual: "Annual €159.99" };
+    const planLabels: Record<string, string> = { monthly: "Monthly €9.99", quarterly: "Quarterly €24.99", annual: "Annual €89.99" };
     toast.success(`Plan set to ${planLabels[plan] || plan}`);
     setProfiles(profiles.map((p) => p.id === profile.id ? { ...p, is_premium: true, premium_plan: plan, premium_expires_at: expiresAt.toISOString() } : p));
   };
@@ -883,7 +883,7 @@ const Admin = () => {
                           <span className="text-xs text-muted-foreground truncate block">{p.email || "No email"}</span>
                         </div>
                         <span className="text-xs text-muted-foreground hidden sm:block">
-                          {p.premium_plan === "monthly" ? "Monthly €15.99" : p.premium_plan === "annual" ? "Annual €159.99" : "—"}
+                          {p.premium_plan === "monthly" ? "Monthly €9.99" : p.premium_plan === "quarterly" ? "Quarterly €24.99" : p.premium_plan === "annual" ? "Annual €89.99" : "—"}
                         </span>
                         <div className="hidden sm:block">
                           <Switch checked={p.is_premium} onCheckedChange={() => togglePremium(p)} onClick={(e) => e.stopPropagation()} />
@@ -923,9 +923,9 @@ const Admin = () => {
                                 <SelectTrigger className="h-9 text-xs bg-background"><SelectValue placeholder="Select plan" /></SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="none">No plan</SelectItem>
-                                  <SelectItem value="monthly" style={{ color: 'hsl(330, 85%, 55%)' }}>Monthly — €15.99</SelectItem>
-                                  <SelectItem value="quarterly" style={{ color: 'hsl(280, 80%, 55%)' }}>Quarterly — €42.99</SelectItem>
-                                  <SelectItem value="annual">Annual — €159.99</SelectItem>
+                                  <SelectItem value="monthly" style={{ color: 'hsl(330, 85%, 55%)' }}>Monthly — €9.99</SelectItem>
+                                  <SelectItem value="quarterly" style={{ color: 'hsl(280, 80%, 55%)' }}>Quarterly — €24.99</SelectItem>
+                                  <SelectItem value="annual">Annual — €89.99</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
