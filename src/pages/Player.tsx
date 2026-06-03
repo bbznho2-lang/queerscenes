@@ -177,10 +177,17 @@ const Player = () => {
         setSelectedLinkIdx(-1);
         setRawPlayerUrl("");
       } else if (content?.id) {
-        const { data } = await supabase.rpc("get_content_player_url", { _content_id: content.id });
-        const url = (data as string | null) || "";
+        const { data } = await (supabase.rpc as any)("get_content_links", { _content_id: content.id });
+        const links = Array.isArray(data) ? (data as EpisodeLink[]) : [];
         if (cancelled) return;
-        setEpisodeLinks(url ? [{ title: "Watch on site", type: "embed", url }] : []);
+        if (links.length > 0) {
+          setEpisodeLinks(links);
+        } else {
+          const { data: legacy } = await supabase.rpc("get_content_player_url", { _content_id: content.id });
+          const url = (legacy as string | null) || "";
+          if (cancelled) return;
+          setEpisodeLinks(url ? [{ title: "Watch on site", type: "embed", url }] : []);
+        }
         setSelectedLinkIdx(-1);
         setRawPlayerUrl("");
       } else {
@@ -188,6 +195,7 @@ const Player = () => {
         setSelectedLinkIdx(-1);
         setRawPlayerUrl("");
       }
+
     };
     void resolve();
     return () => { cancelled = true; };
