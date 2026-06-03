@@ -147,19 +147,30 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         bannerUrl = bannerUrlInput.trim();
       }
 
+      const cleanMovieLinks = (movieLinks || [])
+        .filter(l => l && l.url && l.url.trim())
+        .map(l => ({
+          title: (l.title || "").trim() || "Watch",
+          type: l.type === "redirect" ? "redirect" : "embed",
+          url: l.url.trim(),
+        }));
+      const legacyMoviePlayer = cleanMovieLinks.find(l => l.type === "embed")?.url || playerUrl || null;
+
       const payload = {
         title,
         year,
         tag,
         type,
         section,
-        player_url: playerUrl || null,
+        player_url: legacyMoviePlayer,
+        links: cleanMovieLinks as any,
         banner_url: bannerUrl,
         is_premium: isPremium,
         is_archived: isArchived,
         supporter_player_enabled: false,
         synopsis: synopsis || null,
       };
+
 
       let contentId = content?.id;
 
