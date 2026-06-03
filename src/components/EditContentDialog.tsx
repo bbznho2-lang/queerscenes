@@ -161,12 +161,21 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
 
       if (contentId && (type === "serie" || type === "novela" || type === "anime")) {
         for (const ep of episodes) {
+          const cleanLinks = (ep.links || [])
+            .filter(l => l && l.url && l.url.trim())
+            .map(l => ({
+              title: (l.title || "").trim() || "Watch",
+              type: l.type === "redirect" ? "redirect" : "embed",
+              url: l.url.trim(),
+            }));
+          const legacyUrl = cleanLinks.find(l => l.type === "embed")?.url || null;
           if (ep.id.startsWith("new-")) {
             await supabase.from("episodes").insert({
               content_id: contentId,
               title: ep.title,
               episode_number: ep.episode_number,
-              player_url: ep.player_url,
+              player_url: legacyUrl,
+              links: cleanLinks as any,
               season: ep.season || 1,
               is_premium: ep.is_premium || false,
             });
@@ -174,7 +183,8 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
             await supabase.from("episodes").update({
               title: ep.title,
               episode_number: ep.episode_number,
-              player_url: ep.player_url,
+              player_url: legacyUrl,
+              links: cleanLinks as any,
               season: ep.season || 1,
               is_premium: ep.is_premium || false,
             }).eq("id", ep.id);
@@ -201,10 +211,32 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         title: `Episode ${episodes.length + 1}`,
         episode_number: episodes.length + 1,
         player_url: "",
+        links: [],
         season: Math.max(1, ...episodes.map(e => e.season || 1)),
         is_premium: false,
       },
     ]);
+  };
+
+  const addLink = (epId: string) => {
+    setEpisodes(episodes.map(e => e.id === epId
+      ? { ...e, links: [...(e.links || []), { title: "", type: "embed" as const, url: "" }] }
+      : e));
+  };
+
+  const updateLink = (epId: string, idx: number, field: keyof EpisodeLink, value: string) => {
+    setEpisodes(episodes.map(e => {
+      if (e.id !== epId) return e;
+      const links = [...(e.links || [])];
+      links[idx] = { ...links[idx], [field]: value } as EpisodeLink;
+      return { ...e, links };
+    }));
+  };
+
+  const removeLink = (epId: string, idx: number) => {
+    setEpisodes(episodes.map(e => e.id === epId
+      ? { ...e, links: (e.links || []).filter((_, i) => i !== idx) }
+      : e));
   };
 
   const removeEpisode = async (ep: Episode) => {
