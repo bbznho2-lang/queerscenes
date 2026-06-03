@@ -161,41 +161,31 @@ const Player = () => {
   useEffect(() => {
     let cancelled = false;
     const resolve = async () => {
-      if (isBlocked) { setEpisodeLinks([]); setRawPlayerUrl(""); return; }
+      if (isBlocked) { setEpisodeLinks([]); setRawPlayerUrl(""); setSelectedLinkIdx(-1); return; }
       if (currentEp?.id) {
         const { data } = await (supabase.rpc as any)("get_episode_links", { _episode_id: currentEp.id });
         const links = Array.isArray(data) ? (data as EpisodeLink[]) : [];
         if (cancelled) return;
         if (links.length > 0) {
-          const firstEmbedIdx = links.findIndex((l) => l.type === "embed");
-          const startIdx = firstEmbedIdx >= 0 ? firstEmbedIdx : 0;
           setEpisodeLinks(links);
-          setSelectedLinkIdx(startIdx);
-          const first = links[startIdx];
-          setRawPlayerUrl(first.type === "embed" ? first.url : "");
         } else {
-          // Fallback to legacy single URL RPC
           const { data: legacy } = await supabase.rpc("get_episode_player_url", { _episode_id: currentEp.id });
           const url = (legacy as string | null) || "";
           if (cancelled) return;
-          if (url) {
-            const fallback: EpisodeLink[] = [{ title: "Watch on site", type: "embed", url }];
-            setEpisodeLinks(fallback);
-            setSelectedLinkIdx(0);
-            setRawPlayerUrl(url);
-          } else {
-            setEpisodeLinks([]);
-            setRawPlayerUrl("");
-          }
+          setEpisodeLinks(url ? [{ title: "Watch on site", type: "embed", url }] : []);
         }
+        setSelectedLinkIdx(-1);
+        setRawPlayerUrl("");
       } else if (content?.id) {
         const { data } = await supabase.rpc("get_content_player_url", { _content_id: content.id });
-        if (!cancelled) {
-          setEpisodeLinks([]);
-          setRawPlayerUrl((data as string | null) || "");
-        }
+        const url = (data as string | null) || "";
+        if (cancelled) return;
+        setEpisodeLinks(url ? [{ title: "Watch on site", type: "embed", url }] : []);
+        setSelectedLinkIdx(-1);
+        setRawPlayerUrl("");
       } else {
         setEpisodeLinks([]);
+        setSelectedLinkIdx(-1);
         setRawPlayerUrl("");
       }
     };
