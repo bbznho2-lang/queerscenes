@@ -23,12 +23,15 @@ interface ContentItem {
   supporter_player_enabled?: boolean;
 }
 
+type EpisodeLink = { title: string; type: "embed" | "redirect"; url: string };
+
 interface Episode {
   id: string;
   content_id: string;
   title: string;
   episode_number: number;
   player_url: string | null;
+  links: EpisodeLink[];
   season: number;
   is_premium: boolean;
 }
@@ -79,10 +82,13 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       supabase
         .rpc("admin_get_episodes", { _content_id: content.id })
         .then(({ data }) => {
-          const list = ((data as any[]) || []).map((ep: any) => ({
-            ...ep,
-            player_url: ep.player_url || "",
-          }));
+          const list = ((data as any[]) || []).map((ep: any) => {
+            let links: EpisodeLink[] = Array.isArray(ep.links) ? ep.links : [];
+            if (links.length === 0 && ep.player_url && String(ep.player_url).trim()) {
+              links = [{ title: "Watch on site", type: "embed", url: ep.player_url }];
+            }
+            return { ...ep, player_url: ep.player_url || "", links };
+          });
           setEpisodes(list);
         });
     } else {
@@ -155,12 +161,21 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
 
       if (contentId && (type === "serie" || type === "novela" || type === "anime")) {
         for (const ep of episodes) {
+          const cleanLinks = (ep.links || [])
+            .filter(l => l && l.url && l.url.trim())
+            .map(l => ({
+              title: (l.title || "").trim() || "Watch",
+              type: l.type === "redirect" ? "redirect" : "embed",
+              url: l.url.trim(),
+            }));
+          const legacyUrl = cleanLinks.find(l => l.type === "embed")?.url || null;
           if (ep.id.startsWith("new-")) {
             await supabase.from("episodes").insert({
               content_id: contentId,
               title: ep.title,
               episode_number: ep.episode_number,
-              player_url: ep.player_url,
+              player_url: legacyUrl,
+              links: cleanLinks as any,
               season: ep.season || 1,
               is_premium: ep.is_premium || false,
             });
@@ -168,7 +183,8 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
             await supabase.from("episodes").update({
               title: ep.title,
               episode_number: ep.episode_number,
-              player_url: ep.player_url,
+              player_url: legacyUrl,
+              links: cleanLinks as any,
               season: ep.season || 1,
               is_premium: ep.is_premium || false,
             }).eq("id", ep.id);
@@ -195,10 +211,32 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         title: `Episode ${episodes.length + 1}`,
         episode_number: episodes.length + 1,
         player_url: "",
+        links: [],
         season: Math.max(1, ...episodes.map(e => e.season || 1)),
         is_premium: false,
       },
     ]);
+  };
+
+  const addLink = (epId: string) => {
+    setEpisodes(episodes.map(e => e.id === epId
+      ? { ...e, links: [...(e.links || []), { title: "", type: "embed" as const, url: "" }] }
+      : e));
+  };
+
+  const updateLink = (epId: string, idx: number, field: keyof EpisodeLink, value: string) => {
+    setEpisodes(episodes.map(e => {
+      if (e.id !== epId) return e;
+      const links = [...(e.links || [])];
+      links[idx] = { ...links[idx], [field]: value } as EpisodeLink;
+      return { ...e, links };
+    }));
+  };
+
+  const removeLink = (epId: string, idx: number) => {
+    setEpisodes(episodes.map(e => e.id === epId
+      ? { ...e, links: (e.links || []).filter((_, i) => i !== idx) }
+      : e));
   };
 
   const removeEpisode = async (ep: Episode) => {
@@ -365,12 +403,45 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
-                        <Input
-                          value={ep.player_url || ""}
-                          onChange={(e) => updateEpisode(ep.id, "player_url", e.target.value)}
-                          placeholder="Player URL or <iframe ...></iframe>"
-                          className="bg-muted border-border text-xs"
-                        />
+                        <div className="space-y-2 rounded-lg border border-border bg-background/40 p-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-semibold text-foreground/80">Links</span>
+                            <Button size="sm" variant="outline" onClick={() => addLink(ep.id)} className="h-7 gap-1 text-[11px]">
+                              <Plus className="w-3 h-3" /> Add link
+                            </Button>
+                          </div>
+                          {(ep.links || []).length === 0 && (
+                            <p className="text-[11px] text-muted-foreground">No links yet. Click "Add link" to add one.</p>
+                          )}
+                          {(ep.links || []).map((lnk, idx) => (
+                            <div key={idx} className="space-y-1.5 rounded-md bg-muted/40 p-2">
+                              <div className="flex gap-1.5">
+                                <Input
+                                  value={lnk.title}
+                                  onChange={(e) => updateLink(ep.id, idx, "title", e.target.value)}
+                                  placeholder="Tab title (e.g. Telegram)"
+                                  className="bg-muted border-border text-xs flex-1"
+                                />
+                                <Select value={lnk.type} onValueChange={(v) => updateLink(ep.id, idx, "type", v)}>
+                                  <SelectTrigger className="bg-muted border-border w-[110px] text-xs"><SelectValue /></SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="embed">embed</SelectItem>
+                                    <SelectItem value="redirect">redirect</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <Button size="icon" variant="ghost" onClick={() => removeLink(ep.id, idx)} className="text-destructive h-9 w-9">
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </Button>
+                              </div>
+                              <Input
+                                value={lnk.url}
+                                onChange={(e) => updateLink(ep.id, idx, "url", e.target.value)}
+                                placeholder="URL or <iframe ...></iframe>"
+                                className="bg-muted border-border text-xs"
+                              />
+                            </div>
+                          ))}
+                        </div>
                         <div className="flex items-center gap-2">
                           <Switch
                             checked={ep.is_premium || false}
