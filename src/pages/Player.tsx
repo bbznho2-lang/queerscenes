@@ -505,66 +505,115 @@ const Player = () => {
       ) : (
       <div className={isMobile ? "w-full flex-shrink-0 min-h-0 pt-[calc(env(safe-area-inset-top)+20px)]" : "w-full flex-1 flex items-center justify-center px-4 pt-16 pb-4 min-h-0"}>
         <div className={isMobile ? "w-full min-h-0" : "w-full max-w-5xl min-h-0"}>
-          <div
-            className={isMobile ? "relative w-full overflow-hidden bg-black" : "relative w-full overflow-hidden rounded-2xl bg-black neon-border-purple"}
-            style={{ position: "relative", width: "100%", paddingBottom: playerPaddingBottom, height: 0, minHeight: 0, overflow: "hidden" }}
-            ref={playerWrapperRef}
-          >
-            {hasPlayerUrl ? (
-              isIframeHtml ? (
+          {(() => {
+            const currentLink = episodeLinks[selectedLinkIdx];
+            const isRedirect = currentLink?.type === "redirect";
+            return (
+              <>
                 <div
-                  key={`${tier}-iframe-html`}
-                  className="absolute inset-0 [&>iframe]:absolute [&>iframe]:inset-0 [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0"
-                  dangerouslySetInnerHTML={{
-                    __html: rawPlayerUrl
-                      .replace(/<iframe\b(?![^>]*\sallowfullscreen)/i, '<iframe allowfullscreen webkitallowfullscreen mozallowfullscreen webkit-playsinline')
-                      .replace(/<iframe\b(?=[^>]*\sallowfullscreen)(?![^>]*\swebkitallowfullscreen)/i, '<iframe webkitallowfullscreen mozallowfullscreen webkit-playsinline')
-                      .replace(/<iframe\b(?![^>]*\sallow=)/i, '<iframe allow="fullscreen; accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"'),
-                  }}
-                />
-              ) : (
-              <iframe
-                key={`${tier}-${activePlayerUrl}`}
-                ref={iframeRef}
-                src={activePlayerUrl}
-                title={content?.title ? `Player - ${content.title}` : "Player"}
-                className={iframeClassName}
-                allowFullScreen
-                {...({ webkitallowfullscreen: "true", mozallowfullscreen: "true", "webkit-playsinline": "true" } as any)}
-                allow="fullscreen; accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
-                loading="eager"
-                referrerPolicy="strict-origin-when-cross-origin"
-                style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none", backgroundColor: "transparent", display: "block" }}
-              />
-              )
-            ) : (
-              <div className="absolute inset-0">
-                <img
-                  src={content?.banner_url || "/placeholder.svg"}
-                  alt={content?.title ? `Cover - ${content.title}` : "Content cover"}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]" />
-                <div className="absolute inset-0 flex items-center justify-center px-4 text-center">
-                  <p className="text-sm text-foreground">Video unavailable for this content.</p>
+                  className={isMobile ? "relative w-full overflow-hidden bg-black" : "relative w-full overflow-hidden rounded-2xl bg-black neon-border-purple"}
+                  style={{ position: "relative", width: "100%", paddingBottom: playerPaddingBottom, height: 0, minHeight: 0, overflow: "hidden" }}
+                  ref={playerWrapperRef}
+                >
+                  {isRedirect ? (
+                    <div className="absolute inset-0">
+                      <img
+                        src={content?.banner_url || "/placeholder.svg"}
+                        alt=""
+                        className="absolute inset-0 w-full h-full object-cover opacity-40"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/85 to-background/95" />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center gap-3">
+                        <p className="text-xs sm:text-sm text-muted-foreground">
+                          This option opens in a new tab.
+                        </p>
+                        <a
+                          href={currentLink.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground font-semibold px-5 py-2.5 text-sm hover:bg-primary/90 glow-purple"
+                        >
+                          Watch now <ExternalLink className="w-4 h-4" />
+                        </a>
+                      </div>
+                    </div>
+                  ) : hasPlayerUrl ? (
+                    isIframeHtml ? (
+                      <div
+                        key={`${tier}-iframe-html-${selectedLinkIdx}`}
+                        className="absolute inset-0 [&>iframe]:absolute [&>iframe]:inset-0 [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0"
+                        dangerouslySetInnerHTML={{
+                          __html: DOMPurify.sanitize(rawPlayerUrl, {
+                            ALLOWED_TAGS: ["iframe"],
+                            ALLOWED_ATTR: ["src", "allow", "allowfullscreen", "width", "height", "frameborder", "referrerpolicy", "title", "loading", "sandbox"],
+                            ADD_ATTR: ["allowfullscreen"],
+                          }),
+                        }}
+                      />
+                    ) : (
+                      <iframe
+                        key={`${tier}-${activePlayerUrl}-${selectedLinkIdx}`}
+                        ref={iframeRef}
+                        src={activePlayerUrl}
+                        title={content?.title ? `Player - ${content.title}` : "Player"}
+                        className={iframeClassName}
+                        allowFullScreen
+                        {...({ webkitallowfullscreen: "true", mozallowfullscreen: "true", "webkit-playsinline": "true" } as any)}
+                        allow="fullscreen; accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        loading="eager"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                        style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none", backgroundColor: "transparent", display: "block" }}
+                      />
+                    )
+                  ) : (
+                    <div className="absolute inset-0">
+                      <img
+                        src={content?.banner_url || "/placeholder.svg"}
+                        alt={content?.title ? `Cover - ${content.title}` : "Content cover"}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]" />
+                      <div className="absolute inset-0 flex items-center justify-center px-4 text-center">
+                        <p className="text-sm text-foreground">Video unavailable for this content.</p>
+                      </div>
+                    </div>
+                  )}
+                  {isOdyseePlayer && hasPlayerUrl && !isRedirect && (
+                    <button
+                      type="button"
+                      onClick={handleRequestFullscreen}
+                      aria-label="Enter fullscreen"
+                      className="absolute bottom-2 right-2 z-10 rounded-full bg-black/60 hover:bg-black/80 text-white p-2 backdrop-blur-sm border border-white/20"
+                    >
+                      <Maximize className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
-              </div>
 
-            )}
-            {isOdyseePlayer && hasPlayerUrl && (
-              <button
-                type="button"
-                onClick={handleRequestFullscreen}
-                aria-label="Enter fullscreen"
-                className="absolute bottom-2 right-2 z-10 rounded-full bg-black/60 hover:bg-black/80 text-white p-2 backdrop-blur-sm border border-white/20"
-              >
-                <Maximize className="w-4 h-4" />
-              </button>
-            )}
-          </div>
+                {episodeLinks.length > 1 && (
+                  <div className="mt-3 px-3 sm:px-0 flex gap-2 flex-wrap">
+                    {episodeLinks.map((lnk, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => selectLink(idx)}
+                        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors border ${
+                          idx === selectedLinkIdx
+                            ? "bg-primary text-primary-foreground border-primary glow-purple"
+                            : "bg-card text-foreground border-border hover:border-primary/40"
+                        }`}
+                      >
+                        {lnk.title || (lnk.type === "embed" ? "Player" : "Link")}
+                        {lnk.type === "redirect" && <ExternalLink className="w-3 h-3" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
 
-          {/* Player tier selector */}
-          {playerTierSelector}
+                {/* Player tier selector */}
+                {playerTierSelector}
+              </>
+            );
+          })()}
         </div>
       </div>
       )}
