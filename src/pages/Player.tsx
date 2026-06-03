@@ -156,6 +156,10 @@ const Player = () => {
   const [episodeLinks, setEpisodeLinks] = useState<EpisodeLink[]>([]);
   const [selectedLinkIdx, setSelectedLinkIdx] = useState(-1);
   const [rawPlayerUrl, setRawPlayerUrl] = useState("");
+  const normalizeEpisodeLabel = (value?: string | null, fallbackEpisodeNumber?: number) => {
+    const normalized = (value || "").trim().replace(/^Episódio\s+/i, "Episode ");
+    return normalized || (fallbackEpisodeNumber ? `Episode ${fallbackEpisodeNumber}` : "Episode");
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -389,7 +393,7 @@ const Player = () => {
                     <Crown className="w-3.5 h-3.5" /> Supporters only
                   </div>
                   <h2 className="text-xl sm:text-2xl font-extrabold mb-1.5">
-                    {currentEp ? `“${currentEp.title.replace(/^Episódio\s+/i, "Episode ")}" is waiting for you` : `“${content?.title ?? "This title"}” is waiting for you`}
+                    {currentEp ? `“${normalizeEpisodeLabel(currentEp.title, currentEp.episode_number)}” is waiting for you` : `“${content?.title ?? "This title"}” is waiting for you`}
                   </h2>
 
                   {(() => {
@@ -545,8 +549,8 @@ const Player = () => {
             const headingMain = currentEp && content
               ? `${content.title}: ${currentEp.season}x${pad2(currentEp.episode_number)}`
               : (content?.title || "");
-            const headingSub = currentEp
-              ? (currentEp.title || `Episode ${currentEp.episode_number}`)
+              const headingSub = currentEp
+                ? normalizeEpisodeLabel(currentEp.title, currentEp.episode_number)
               : "";
 
             return (
@@ -558,7 +562,7 @@ const Player = () => {
                     </h1>
                     {headingSub && (
                       <p className="text-sm sm:text-base text-muted-foreground mt-1">
-                        {headingSub.replace(/^Episódio\s+/i, "Episode ")}
+                        {headingSub}
                       </p>
                     )}
                   </div>
@@ -728,7 +732,7 @@ const Player = () => {
                     }`}
                   >
                     <span className={isMobile ? "w-7 h-7 rounded-full bg-muted flex items-center justify-center text-[11px] font-bold text-foreground" : "w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-foreground"}>{ep.episode_number}</span>
-                    <span className={isMobile ? "text-xs text-foreground" : "text-sm text-foreground"}>{ep.title}</span>
+                    <span className={isMobile ? "text-xs text-foreground" : "text-sm text-foreground"}>{normalizeEpisodeLabel(ep.title, ep.episode_number)}</span>
                     {ep.is_premium && (
                       <Crown className="w-3 h-3 text-secondary flex-shrink-0" />
                     )}
