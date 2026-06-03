@@ -358,18 +358,73 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
             />
           </div>
 
-          <div className="space-y-3 border border-border rounded-lg p-3 bg-muted/20">
-            <p className="text-xs font-semibold text-foreground">Player (Movies / Single titles)</p>
-            <div>
-              <label className="text-xs text-muted-foreground">Player URL or iframe code</label>
-              <Input
-                value={playerUrl}
-                onChange={(e) => setPlayerUrl(e.target.value)}
-                placeholder="https://... or <iframe ...></iframe>"
-                className="bg-muted border-border mt-1"
-              />
+          {(type === "filme") && (
+            <div className="space-y-2 border border-border rounded-lg p-3 bg-muted/20">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold text-foreground">Links (Movie)</p>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setMovieLinks([...(movieLinks || []), { title: "", type: "embed", url: "" }])}
+                  className="h-7 gap-1 text-[11px]"
+                >
+                  <Plus className="w-3 h-3" /> Add link
+                </Button>
+              </div>
+              {(movieLinks || []).length === 0 && (
+                <p className="text-[11px] text-muted-foreground">No links yet. Click "Add link" to add one.</p>
+              )}
+              {(movieLinks || []).map((lnk, idx) => (
+                <div key={idx} className="space-y-1.5 rounded-md bg-muted/40 p-2">
+                  <div className="flex gap-1.5">
+                    <Input
+                      value={lnk.title}
+                      onChange={(e) => {
+                        const next = [...movieLinks];
+                        next[idx] = { ...next[idx], title: e.target.value };
+                        setMovieLinks(next);
+                      }}
+                      placeholder="Tab title (e.g. Telegram)"
+                      className="bg-muted border-border text-xs flex-1"
+                    />
+                    <Select
+                      value={lnk.type}
+                      onValueChange={(v) => {
+                        const next = [...movieLinks];
+                        next[idx] = { ...next[idx], type: v as "embed" | "redirect" };
+                        setMovieLinks(next);
+                      }}
+                    >
+                      <SelectTrigger className="bg-muted border-border w-[110px] text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="embed">embed</SelectItem>
+                        <SelectItem value="redirect">redirect</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => setMovieLinks(movieLinks.filter((_, i) => i !== idx))}
+                      className="text-destructive h-8 w-8"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                  <Input
+                    value={lnk.url}
+                    onChange={(e) => {
+                      const next = [...movieLinks];
+                      next[idx] = { ...next[idx], url: e.target.value };
+                      setMovieLinks(next);
+                    }}
+                    placeholder="https://... or <iframe ...></iframe>"
+                    className="bg-muted border-border text-xs"
+                  />
+                </div>
+              ))}
             </div>
-          </div>
+          )}
+
 
           <div>
             <label className="text-sm text-muted-foreground">Banner / Image</label>
