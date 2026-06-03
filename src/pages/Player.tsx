@@ -167,9 +167,11 @@ const Player = () => {
         const links = Array.isArray(data) ? (data as EpisodeLink[]) : [];
         if (cancelled) return;
         if (links.length > 0) {
+          const firstEmbedIdx = links.findIndex((l) => l.type === "embed");
+          const startIdx = firstEmbedIdx >= 0 ? firstEmbedIdx : 0;
           setEpisodeLinks(links);
-          setSelectedLinkIdx(0);
-          const first = links[0];
+          setSelectedLinkIdx(startIdx);
+          const first = links[startIdx];
           setRawPlayerUrl(first.type === "embed" ? first.url : "");
         } else {
           // Fallback to legacy single URL RPC
