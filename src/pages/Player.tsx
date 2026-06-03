@@ -153,24 +153,64 @@ const Player = () => {
   const episodePremiumBlocked = currentEp?.is_premium && !userIsPremium && !isAdmin;
   const isBlocked = premiumBlocked || episodePremiumBlocked;
 
+  type EpisodeLink = { title: string; type: "embed" | "redirect"; url: string };
+  const [episodeLinks, setEpisodeLinks] = useState<EpisodeLink[]>([]);
+  const [selectedLinkIdx, setSelectedLinkIdx] = useState(0);
   const [rawPlayerUrl, setRawPlayerUrl] = useState("");
+
   useEffect(() => {
     let cancelled = false;
     const resolve = async () => {
-      if (isBlocked) { setRawPlayerUrl(""); return; }
+      if (isBlocked) { setEpisodeLinks([]); setRawPlayerUrl(""); return; }
       if (currentEp?.id) {
-        const { data } = await supabase.rpc("get_episode_player_url", { _episode_id: currentEp.id });
-        if (!cancelled) setRawPlayerUrl((data as string | null) || "");
+        const { data } = await supabase.rpc("get_episode_links", { _episode_id: currentEp.id });
+        const links = Array.isArray(data) ? (data as EpisodeLink[]) : [];
+        if (cancelled) return;
+        if (links.length > 0) {
+          setEpisodeLinks(links);
+          setSelectedLinkIdx(0);
+          const first = links[0];
+          setRawPlayerUrl(first.type === "embed" ? first.url : "");
+        } else {
+          // Fallback to legacy single URL RPC
+          const { data: legacy } = await supabase.rpc("get_episode_player_url", { _episode_id: currentEp.id });
+          const url = (legacy as string | null) || "";
+          if (cancelled) return;
+          if (url) {
+            const fallback: EpisodeLink[] = [{ title: "Watch on site", type: "embed", url }];
+            setEpisodeLinks(fallback);
+            setSelectedLinkIdx(0);
+            setRawPlayerUrl(url);
+          } else {
+            setEpisodeLinks([]);
+            setRawPlayerUrl("");
+          }
+        }
       } else if (content?.id) {
         const { data } = await supabase.rpc("get_content_player_url", { _content_id: content.id });
-        if (!cancelled) setRawPlayerUrl((data as string | null) || "");
+        if (!cancelled) {
+          setEpisodeLinks([]);
+          setRawPlayerUrl((data as string | null) || "");
+        }
       } else {
+        setEpisodeLinks([]);
         setRawPlayerUrl("");
       }
     };
     void resolve();
     return () => { cancelled = true; };
   }, [currentEp?.id, content?.id, isBlocked, userIsPremium, isAdmin]);
+
+  const selectLink = (idx: number) => {
+    const lnk = episodeLinks[idx];
+    if (!lnk) return;
+    setSelectedLinkIdx(idx);
+    if (lnk.type === "embed") {
+      setRawPlayerUrl(lnk.url);
+    } else {
+      setRawPlayerUrl("");
+    }
+  };
 
   const getEmbedUrl = (url: string) => {
     const trimmedUrl = url.trim();
