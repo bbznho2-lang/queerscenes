@@ -10,6 +10,7 @@ import EditContentDialog from "@/components/EditContentDialog";
 import CommentsSection from "@/components/CommentsSection";
 import { trackSupporterEvent, type SupporterEventType } from "@/lib/supporter-tracking";
 import { getEmailRedirectUrl } from "@/lib/auth-urls";
+import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 
 
 interface ContentItem {
