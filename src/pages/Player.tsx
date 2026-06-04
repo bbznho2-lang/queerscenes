@@ -10,7 +10,6 @@ import EditContentDialog from "@/components/EditContentDialog";
 import CommentsSection from "@/components/CommentsSection";
 import { trackSupporterEvent, type SupporterEventType } from "@/lib/supporter-tracking";
 import { getEmailRedirectUrl } from "@/lib/auth-urls";
-import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 
 
 interface ContentItem {
@@ -511,11 +510,6 @@ const Player = () => {
                     {signupSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Crown className="w-4 h-4" />}
                     {paywallMode === "login" ? "Login and continue" : "Create account"}
                   </button>
-                  <div className="relative my-1">
-                    <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
-                    <div className="relative flex justify-center text-[10px] uppercase tracking-wider"><span className="bg-card px-2 text-muted-foreground">or</span></div>
-                  </div>
-                  <GoogleSignInButton redirectPath={`/player/${id}`} />
                 </form>
               )}
 
