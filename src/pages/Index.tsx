@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { getResetPasswordRedirectUrl } from "@/lib/auth-urls";
 import { buildUniqueTopContent, fetchTopContentRanking, getUniqueItemsByTitle } from "@/lib/top-content";
 import { toast } from "sonner";
+import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 
 const fade = {
   hidden: { opacity: 0, y: 20 },
@@ -450,6 +451,15 @@ const Index = () => {
                    <Button type="submit" disabled={loading} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full glow-purple">
                      {loading ? "Please wait..." : isForgot ? "SEND RESET LINK" : isSignUp ? "CREATE ACCOUNT" : "SIGN IN"}
                    </Button>
+                   {!isForgot && (
+                     <>
+                       <div className="relative my-2">
+                         <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
+                         <div className="relative flex justify-center text-[10px] uppercase tracking-wider"><span className="bg-card px-2 text-muted-foreground">or</span></div>
+                       </div>
+                       <GoogleSignInButton redirectPath="/browse" />
+                     </>
+                   )}
                    {!isSignUp && !isForgot && (
                      <div className="flex items-center justify-between">
                        <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer select-none">
