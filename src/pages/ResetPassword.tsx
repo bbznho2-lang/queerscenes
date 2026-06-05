@@ -140,59 +140,87 @@ const ResetPassword = () => {
 
   if (!isRecovery) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-4">
-        <Card className="w-full max-w-md bg-card border-border">
-          <CardContent className="pt-8 pb-8 text-center">
-            <Lock className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">
-              {errorMsg ?? "This page is used to reset your password. Please use the link sent to your email."}
-            </p>
-            <Button onClick={() => navigate("/")} className="mt-6 rounded-full" variant="outline">
-              Back to Home
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-background flex items-center justify-center px-4 py-16">
+        <div className="w-full max-w-sm sm:max-w-md">
+          <Card className="bg-card neon-border-pink overflow-hidden">
+            <CardHeader className="text-center pb-2">
+              <div className="mx-auto w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mb-3">
+                <Lock className="w-5 h-5 text-accent" />
+              </div>
+              <CardTitle className="text-xl sm:text-2xl neon-text-pink">RESET PASSWORD</CardTitle>
+              <p className="text-muted-foreground text-sm mt-1">
+                {errorMsg ?? "Please use the link sent to your email."}
+              </p>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <Button
+                onClick={() => navigate("/")}
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full glow-purple"
+              >
+                BACK TO HOME
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
-      <Card className="w-full max-w-md bg-card border-border">
-        <CardHeader className="text-center">
-          <Lock className="w-10 h-10 text-primary mx-auto mb-2" />
-          <CardTitle className="text-xl neon-text-purple">Reset Password</CardTitle>
-          <p className="text-muted-foreground text-sm mt-1">Enter your new password</p>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleReset} className="space-y-4">
-            <div className="relative">
-              <Input
-                type={showPassword ? "text" : "password"}
-                placeholder="New password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="bg-muted border-border pr-10"
-                required
-              />
-              <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-16">
+      <div className="w-full max-w-sm sm:max-w-md">
+        <Card className="bg-card neon-border-pink overflow-hidden">
+          <CardHeader className="text-center pb-2">
+            <div className="mx-auto w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mb-3">
+              <Lock className="w-5 h-5 text-accent" />
             </div>
-            <Input
-              type={showPassword ? "text" : "password"}
-              placeholder="Confirm new password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="bg-muted border-border"
-              required
-            />
-            <Button type="submit" disabled={loading} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full glow-purple">
-              {loading ? "Updating..." : "Update Password"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+            <CardTitle className="text-xl sm:text-2xl neon-text-pink">RESET PASSWORD</CardTitle>
+            <p className="text-muted-foreground text-sm mt-1">Enter your new password</p>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <form onSubmit={handleReset} className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground">New Password</label>
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="bg-muted border-border focus:border-primary pr-10"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground">Confirm Password</label>
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="bg-muted border-border focus:border-primary"
+                  required
+                />
+              </div>
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full glow-purple"
+              >
+                {loading ? "Please wait..." : "UPDATE PASSWORD"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
