@@ -249,8 +249,6 @@ const Admin = () => {
       setClickStats(stats);
     }
 
-    // Fetch support chats
-    await fetchChats();
 
     // Fetch supporter events (paywall analytics)
     const { data: events } = await supabase
