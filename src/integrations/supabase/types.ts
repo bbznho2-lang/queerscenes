@@ -194,6 +194,65 @@ export type Database = {
         }
         Relationships: []
       }
+      direct_message_reads: {
+        Row: {
+          message_id: string
+          read_at: string
+          user_id: string
+        }
+        Insert: {
+          message_id: string
+          read_at?: string
+          user_id: string
+        }
+        Update: {
+          message_id?: string
+          read_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "direct_message_reads_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "direct_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      direct_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          media_name: string | null
+          media_type: string | null
+          media_url: string | null
+          recipient_id: string | null
+          sender_id: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          media_name?: string | null
+          media_type?: string | null
+          media_url?: string | null
+          recipient_id?: string | null
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          media_name?: string | null
+          media_type?: string | null
+          media_url?: string | null
+          recipient_id?: string | null
+          sender_id?: string
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -662,6 +721,7 @@ export type Database = {
         }[]
       }
       claim_supporter_for_current_user: { Args: never; Returns: Json }
+      count_unread_direct_messages: { Args: never; Returns: number }
       current_user_can_play_premium: { Args: never; Returns: boolean }
       delete_email: {
         Args: { message_id: number; queue_name: string }
