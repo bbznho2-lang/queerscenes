@@ -47,23 +47,6 @@ interface AggregatedUserClick {
   last_clicked_at: string;
 }
 
-interface SupportChat {
-  id: string;
-  user_name: string;
-  user_email: string;
-  status: string;
-  created_at: string;
-  updated_at: string;
-  unread_count?: number;
-}
-
-interface ChatMessage {
-  id: string;
-  chat_id: string;
-  sender_role: string;
-  message: string;
-  created_at: string;
-}
 
 const AdminStatsCards = ({ totalUsers, premiumUsers, totalClicks }: { totalUsers: number; premiumUsers: number; totalClicks: number }) => (
   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
