@@ -262,50 +262,6 @@ const Admin = () => {
 
   };
 
-  const openChat = async (chatId: string) => {
-    setActiveChatId(chatId);
-    const { data } = await supabase
-      .from("chat_messages" as any)
-      .select("*")
-      .eq("chat_id", chatId)
-      .order("created_at", { ascending: true }) as any;
-    setChatMessages((data as ChatMessage[]) || []);
-  };
-
-  const sendAdminReply = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!adminReply.trim() || !activeChatId) return;
-    setSendingReply(true);
-    try {
-      const { error } = await supabase
-        .from("chat_messages" as any)
-        .insert({ chat_id: activeChatId, sender_role: "admin", message: adminReply.trim() } as any);
-      if (error) {
-        toast.error("Error sending reply");
-        return;
-      }
-      setAdminReply("");
-    } finally {
-      setSendingReply(false);
-    }
-  };
-
-  const deleteChat = async (chatId: string) => {
-    const { error } = await supabase
-      .from("support_chats" as any)
-      .delete()
-      .eq("id", chatId) as any;
-    if (error) {
-      toast.error("Error deleting chat");
-      return;
-    }
-    setSupportChats((chats) => chats.filter((c) => c.id !== chatId));
-    if (activeChatId === chatId) {
-      setActiveChatId(null);
-      setChatMessages([]);
-    }
-    toast.success("Chat deleted");
-  };
 
   const togglePremium = async (profile: Profile) => {
     const newPremium = !profile.is_premium;
