@@ -691,132 +691,28 @@ const Admin = () => {
           </CardContent>
         </Card>
 
-        {/* Live Support Chat */}
+        {/* Support: Telegram */}
         <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <MessageCircle className="w-5 h-5 text-secondary" />
-              Live Support
-              {supportChats.filter((c) => c.status === "open").length > 0 && (
-                <span className="ml-auto text-xs font-normal bg-secondary/20 text-secondary px-2 py-0.5 rounded-full">
-                  {supportChats.filter((c) => c.status === "open").length} open
-                </span>
-              )}
+              Support
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col sm:flex-row gap-4 min-h-[350px]">
-              {/* Chat list */}
-              <div className="sm:w-1/3 border-r border-border/50 pr-4 space-y-2 max-h-[400px] overflow-y-auto">
-                {supportChats.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8 text-sm">No chats yet.</p>
-                ) : (
-                  <>
-                    {supportChats.slice((chatsPage - 1) * CHATS_PER_PAGE, chatsPage * CHATS_PER_PAGE).map((chat) => (
-                      <div
-                        key={chat.id}
-                        onClick={() => openChat(chat.id)}
-                        className={`p-3 rounded-lg cursor-pointer transition-colors border ${
-                          activeChatId === chat.id
-                            ? "bg-secondary/10 border-secondary/30"
-                            : "hover:bg-muted/30 border-border/30"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-foreground truncate">{chat.user_name}</span>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <button
-                                onClick={(e) => e.stopPropagation()}
-                                className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Delete chat?</AlertDialogTitle>
-                                <AlertDialogDescription>This will permanently delete this chat and all messages.</AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => deleteChat(chat.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                        <span className="text-[11px] text-muted-foreground truncate block">{chat.user_email}</span>
-                        <span className="text-[10px] text-muted-foreground">
-                          {new Date(chat.created_at).toLocaleDateString("pt-BR")} {new Date(chat.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
-                        </span>
-                      </div>
-                    ))}
-                    {supportChats.length > CHATS_PER_PAGE && (
-                      <div className="flex items-center justify-between pt-2 border-t border-border">
-                        <span className="text-[10px] text-muted-foreground">{chatsPage}/{Math.ceil(supportChats.length / CHATS_PER_PAGE)}</span>
-                        <div className="flex gap-1">
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" disabled={chatsPage <= 1} onClick={() => setChatsPage(p => p - 1)}>
-                            <ChevronLeft className="w-3 h-3" />
-                          </Button>
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" disabled={chatsPage >= Math.ceil(supportChats.length / CHATS_PER_PAGE)} onClick={() => setChatsPage(p => p + 1)}>
-                            <ChevronRight className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-
-              {/* Chat conversation */}
-              <div className="flex-1 flex flex-col min-h-0">
-                {activeChatId && activeChat ? (
-                  <>
-                    <div className="border-b border-border pb-2 mb-3">
-                      <span className="text-sm font-medium text-foreground">{activeChat.user_name}</span>
-                      <span className="text-xs text-muted-foreground ml-2">{activeChat.user_email}</span>
-                    </div>
-                    <div ref={chatScrollRef} className="flex-1 min-h-[300px] max-h-[55vh] overflow-y-auto pr-2 space-y-3 py-2">
-                      {chatMessages.length === 0 && (
-                        <p className="text-xs text-muted-foreground text-center py-8">No messages yet.</p>
-                      )}
-                      {chatMessages.map((msg) => (
-                        <div key={msg.id} className={`flex ${msg.sender_role === "admin" ? "justify-end" : "justify-start"}`}>
-                          <div
-                            className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm ${
-                              msg.sender_role === "admin"
-                                ? "bg-secondary text-secondary-foreground rounded-br-md"
-                                : "bg-muted text-foreground rounded-bl-md"
-                            }`}
-                          >
-                            <p className="whitespace-pre-wrap break-words">{msg.message}</p>
-                            <span className="text-[10px] opacity-60 mt-1 block">
-                              {new Date(msg.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <form onSubmit={sendAdminReply} className="flex gap-2 pt-3 border-t border-border mt-2">
-                      <Input
-                        placeholder="Type your reply..."
-                        value={adminReply}
-                        onChange={(e) => setAdminReply(e.target.value)}
-                        className="bg-muted/50 border-border flex-1"
-                        maxLength={1000}
-                      />
-                      <Button type="submit" size="icon" disabled={sendingReply || !adminReply.trim()} className="bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-full shrink-0">
-                        <Send className="w-4 h-4" />
-                      </Button>
-                    </form>
-                  </>
-                ) : (
-                  <div className="flex-1 flex items-center justify-center">
-                    <p className="text-muted-foreground text-sm">Select a chat to respond</p>
-                  </div>
-                )}
-              </div>
-            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              Support requests now go directly to your Telegram. Users see a Reply button on every message that opens
+              this same chat.
+            </p>
+            <a
+              href="https://t.me/L7kznr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/90 transition-colors text-sm font-medium"
+            >
+              <Send className="w-4 h-4" />
+              Open @L7kznr on Telegram
+            </a>
           </CardContent>
         </Card>
 
