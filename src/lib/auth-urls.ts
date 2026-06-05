@@ -1,7 +1,10 @@
-const PUBLISHED_APP_URL = "https://queerscenes.lovable.app";
+const PUBLISHED_APP_URL = "https://queerscenes.com";
 
 const isPreviewOrigin = (origin: string) =>
-  origin.includes("lovableproject.com") || origin.includes("id-preview--");
+  origin.includes("lovableproject.com") ||
+  origin.includes("id-preview--") ||
+  origin.includes("lovable.app");
+
 
 const normalizeRedirectPath = (path?: string) => {
   if (!path) return "";
