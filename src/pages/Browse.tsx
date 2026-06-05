@@ -127,6 +127,11 @@ const Browse = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [broadcastOpen, setBroadcastOpen] = useState(false);
+  const [broadcastTitle, setBroadcastTitle] = useState("Announcement");
+  const [broadcastBody, setBroadcastBody] = useState("");
+  const [broadcastColor, setBroadcastColor] = useState("#7c3aed");
+  const [sendingBroadcast, setSendingBroadcast] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
