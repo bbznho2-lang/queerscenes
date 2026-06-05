@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { linkify } from "@/lib/linkify";
 
 interface SiteNote {
   id: string;
