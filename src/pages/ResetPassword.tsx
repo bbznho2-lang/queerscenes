@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, EyeOff, Lock } from "lucide-react";
+import { Eye, EyeOff, Lock, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 const ResetPassword = () => {
@@ -13,23 +13,97 @@ const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isRecovery, setIsRecovery] = useState(false);
+  const [checking, setChecking] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Listen for the PASSWORD_RECOVERY event
+    let cancelled = false;
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
         setIsRecovery(true);
+        setChecking(false);
       }
     });
 
-    // Also check hash for type=recovery
-    const hash = window.location.hash;
-    if (hash.includes("type=recovery")) {
-      setIsRecovery(true);
-    }
+    const init = async () => {
+      try {
+        const url = new URL(window.location.href);
+        const hash = window.location.hash.startsWith("#")
+          ? window.location.hash.slice(1)
+          : window.location.hash;
+        const hashParams = new URLSearchParams(hash);
 
-    return () => subscription.unsubscribe();
+        const errorDescription = url.searchParams.get("error_description") || hashParams.get("error_description");
+        const errorCode = url.searchParams.get("error") || hashParams.get("error");
+        if (errorDescription || errorCode) {
+          if (!cancelled) {
+            setErrorMsg(errorDescription || "This recovery link is invalid or has expired. Please request a new one.");
+            setChecking(false);
+          }
+          return;
+        }
+
+        // New flow: ?code=...
+        const code = url.searchParams.get("code");
+        if (code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (cancelled) return;
+          if (error) {
+            setErrorMsg("This recovery link is invalid or has expired. Please request a new one.");
+            setChecking(false);
+            return;
+          }
+          // Clean URL
+          window.history.replaceState({}, "", url.pathname);
+          setIsRecovery(true);
+          setChecking(false);
+          return;
+        }
+
+        // Legacy flow: #access_token=...&type=recovery
+        const accessToken = hashParams.get("access_token");
+        const refreshToken = hashParams.get("refresh_token");
+        const type = hashParams.get("type");
+        if (accessToken && refreshToken && type === "recovery") {
+          const { error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+          if (cancelled) return;
+          if (error) {
+            setErrorMsg("This recovery link is invalid or has expired. Please request a new one.");
+            setChecking(false);
+            return;
+          }
+          window.history.replaceState({}, "", url.pathname);
+          setIsRecovery(true);
+          setChecking(false);
+          return;
+        }
+
+        // Fallback: maybe a session already exists from PASSWORD_RECOVERY event
+        const { data: { session } } = await supabase.auth.getSession();
+        if (cancelled) return;
+        if (session) {
+          setIsRecovery(true);
+        }
+        setChecking(false);
+      } catch (e) {
+        if (!cancelled) {
+          setErrorMsg("Something went wrong validating your recovery link.");
+          setChecking(false);
+        }
+      }
+    };
+
+    void init();
+
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const handleReset = async (e: React.FormEvent) => {
@@ -53,6 +127,17 @@ const ResetPassword = () => {
     }
   };
 
+  if (checking) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <div className="flex flex-col items-center gap-3 text-muted-foreground">
+          <Loader2 className="w-6 h-6 animate-spin" />
+          <p className="text-sm">Validating your recovery link...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!isRecovery) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-4">
@@ -60,7 +145,7 @@ const ResetPassword = () => {
           <CardContent className="pt-8 pb-8 text-center">
             <Lock className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">
-              This page is used to reset your password. Please use the link sent to your email.
+              {errorMsg ?? "This page is used to reset your password. Please use the link sent to your email."}
             </p>
             <Button onClick={() => navigate("/")} className="mt-6 rounded-full" variant="outline">
               Back to Home
