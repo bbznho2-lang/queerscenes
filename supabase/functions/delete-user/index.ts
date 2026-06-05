@@ -76,7 +76,8 @@ Deno.serve(async (req) => {
     const cleanupError = cleanupResults.find((result) => result.error)?.error;
 
     if (cleanupError) {
-      return new Response(JSON.stringify({ error: cleanupError.message }), {
+      console.error("[delete-user] cleanup failed", cleanupError);
+      return new Response(JSON.stringify({ error: "Cleanup failed. Please try again." }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -84,7 +85,8 @@ Deno.serve(async (req) => {
 
     const { error } = await adminClient.auth.admin.deleteUser(user_id);
     if (error && !error.message.toLowerCase().includes("not found")) {
-      return new Response(JSON.stringify({ error: error.message }), {
+      console.error("[delete-user] auth deleteUser error", error);
+      return new Response(JSON.stringify({ error: "Failed to delete user" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -94,8 +96,8 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return new Response(JSON.stringify({ error: message }), {
+    console.error("[delete-user] unhandled error", err);
+    return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
