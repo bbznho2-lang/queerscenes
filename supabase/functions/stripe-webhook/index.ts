@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
     console.log("[stripe-webhook] Event verified", { type: event.type, id: event.id });
   } catch (err) {
     console.error("[stripe-webhook] Signature verification failed:", (err as Error).message);
-    return new Response(JSON.stringify({ error: "Invalid signature", detail: (err as Error).message }), {
+    return new Response(JSON.stringify({ error: "Webhook verification failed" }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
@@ -183,7 +183,7 @@ Deno.serve(async (req) => {
     });
   } catch (err) {
     console.error("stripe-webhook handler error", err);
-    return new Response(JSON.stringify({ error: (err as Error).message }), {
+    return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
