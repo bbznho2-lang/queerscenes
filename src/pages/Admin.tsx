@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Users, BarChart3, Crown, Mail, Eye, Calendar, CreditCard, Trash2, ChevronLeft, ChevronRight, MessageCircle, MousePointerClick, Send, X } from "lucide-react";
@@ -47,23 +47,6 @@ interface AggregatedUserClick {
   last_clicked_at: string;
 }
 
-interface SupportChat {
-  id: string;
-  user_name: string;
-  user_email: string;
-  status: string;
-  created_at: string;
-  updated_at: string;
-  unread_count?: number;
-}
-
-interface ChatMessage {
-  id: string;
-  chat_id: string;
-  sender_role: string;
-  message: string;
-  created_at: string;
-}
 
 const AdminStatsCards = ({ totalUsers, premiumUsers, totalClicks }: { totalUsers: number; premiumUsers: number; totalClicks: number }) => (
   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -115,11 +98,6 @@ const Admin = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [clickStats, setClickStats] = useState<ClickStat[]>([]);
   const [aggregatedClicks, setAggregatedClicks] = useState<AggregatedUserClick[]>([]);
-  const [supportChats, setSupportChats] = useState<SupportChat[]>([]);
-  const [activeChatId, setActiveChatId] = useState<string | null>(null);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [adminReply, setAdminReply] = useState("");
-  const [sendingReply, setSendingReply] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
   const [premiumEmail, setPremiumEmail] = useState("");
@@ -127,15 +105,12 @@ const Admin = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [clicksPage, setClicksPage] = useState(1);
-  const [chatsPage, setChatsPage] = useState(1);
   const [supporterEvents, setSupporterEvents] = useState<Array<{ id: string; event_type: string; source: string | null; user_id: string | null; content_id: string | null; created_at: string; metadata: any }>>([]);
   const [eventsPage, setEventsPage] = useState(1);
   const EVENTS_PER_PAGE = 15;
 
-  const chatScrollRef = useRef<HTMLDivElement>(null);
   const USERS_PER_PAGE = 20;
   const CLICKS_PER_PAGE = 20;
-  const CHATS_PER_PAGE = 10;
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
@@ -146,35 +121,6 @@ const Admin = () => {
   useEffect(() => {
     if (isAdmin) fetchData();
   }, [isAdmin]);
-
-  // Realtime for chat messages
-  useEffect(() => {
-    if (!activeChatId) return;
-
-    const channel = supabase
-      .channel(`admin-chat-${activeChatId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "chat_messages",
-          filter: `chat_id=eq.${activeChatId}`,
-        },
-        (payload) => {
-          const msg = payload.new as ChatMessage;
-          setChatMessages((prev) => {
-            if (prev.some((m) => m.id === msg.id)) return prev;
-            return [...prev, msg];
-          });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [activeChatId]);
 
   // Realtime for new clicks
   useEffect(() => {
@@ -200,44 +146,6 @@ const Admin = () => {
     };
   }, [isAdmin]);
 
-  // Realtime for new chats
-  useEffect(() => {
-    if (!isAdmin) return;
-
-    const channel = supabase
-      .channel("admin-new-chats")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "support_chats",
-        },
-        () => {
-          fetchChats();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [isAdmin]);
-
-  // Auto-scroll chat
-  useEffect(() => {
-    if (chatScrollRef.current) {
-      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
-    }
-  }, [chatMessages]);
-
-  const fetchChats = async () => {
-    const { data: chats } = await supabase
-      .from("support_chats" as any)
-      .select("*")
-      .order("updated_at", { ascending: false }) as any;
-    setSupportChats((chats as SupportChat[]) || []);
-  };
 
   const fetchData = async () => {
     setLoadingData(true);
@@ -321,8 +229,6 @@ const Admin = () => {
       setClickStats(stats);
     }
 
-    // Fetch support chats
-    await fetchChats();
 
     // Fetch supporter events (paywall analytics)
     const { data: events } = await supabase
@@ -336,50 +242,6 @@ const Admin = () => {
 
   };
 
-  const openChat = async (chatId: string) => {
-    setActiveChatId(chatId);
-    const { data } = await supabase
-      .from("chat_messages" as any)
-      .select("*")
-      .eq("chat_id", chatId)
-      .order("created_at", { ascending: true }) as any;
-    setChatMessages((data as ChatMessage[]) || []);
-  };
-
-  const sendAdminReply = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!adminReply.trim() || !activeChatId) return;
-    setSendingReply(true);
-    try {
-      const { error } = await supabase
-        .from("chat_messages" as any)
-        .insert({ chat_id: activeChatId, sender_role: "admin", message: adminReply.trim() } as any);
-      if (error) {
-        toast.error("Error sending reply");
-        return;
-      }
-      setAdminReply("");
-    } finally {
-      setSendingReply(false);
-    }
-  };
-
-  const deleteChat = async (chatId: string) => {
-    const { error } = await supabase
-      .from("support_chats" as any)
-      .delete()
-      .eq("id", chatId) as any;
-    if (error) {
-      toast.error("Error deleting chat");
-      return;
-    }
-    setSupportChats((chats) => chats.filter((c) => c.id !== chatId));
-    if (activeChatId === chatId) {
-      setActiveChatId(null);
-      setChatMessages([]);
-    }
-    toast.success("Chat deleted");
-  };
 
   const togglePremium = async (profile: Profile) => {
     const newPremium = !profile.is_premium;
@@ -508,7 +370,7 @@ const Admin = () => {
     return new Date(date) < new Date();
   };
 
-  const activeChat = supportChats.find((c) => c.id === activeChatId);
+  
 
   return (
     <div className="min-h-screen bg-background">
@@ -691,132 +553,28 @@ const Admin = () => {
           </CardContent>
         </Card>
 
-        {/* Live Support Chat */}
+        {/* Support: Telegram */}
         <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-foreground">
               <MessageCircle className="w-5 h-5 text-secondary" />
-              Live Support
-              {supportChats.filter((c) => c.status === "open").length > 0 && (
-                <span className="ml-auto text-xs font-normal bg-secondary/20 text-secondary px-2 py-0.5 rounded-full">
-                  {supportChats.filter((c) => c.status === "open").length} open
-                </span>
-              )}
+              Support
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col sm:flex-row gap-4 min-h-[350px]">
-              {/* Chat list */}
-              <div className="sm:w-1/3 border-r border-border/50 pr-4 space-y-2 max-h-[400px] overflow-y-auto">
-                {supportChats.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8 text-sm">No chats yet.</p>
-                ) : (
-                  <>
-                    {supportChats.slice((chatsPage - 1) * CHATS_PER_PAGE, chatsPage * CHATS_PER_PAGE).map((chat) => (
-                      <div
-                        key={chat.id}
-                        onClick={() => openChat(chat.id)}
-                        className={`p-3 rounded-lg cursor-pointer transition-colors border ${
-                          activeChatId === chat.id
-                            ? "bg-secondary/10 border-secondary/30"
-                            : "hover:bg-muted/30 border-border/30"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-foreground truncate">{chat.user_name}</span>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <button
-                                onClick={(e) => e.stopPropagation()}
-                                className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Delete chat?</AlertDialogTitle>
-                                <AlertDialogDescription>This will permanently delete this chat and all messages.</AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => deleteChat(chat.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                        <span className="text-[11px] text-muted-foreground truncate block">{chat.user_email}</span>
-                        <span className="text-[10px] text-muted-foreground">
-                          {new Date(chat.created_at).toLocaleDateString("pt-BR")} {new Date(chat.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
-                        </span>
-                      </div>
-                    ))}
-                    {supportChats.length > CHATS_PER_PAGE && (
-                      <div className="flex items-center justify-between pt-2 border-t border-border">
-                        <span className="text-[10px] text-muted-foreground">{chatsPage}/{Math.ceil(supportChats.length / CHATS_PER_PAGE)}</span>
-                        <div className="flex gap-1">
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" disabled={chatsPage <= 1} onClick={() => setChatsPage(p => p - 1)}>
-                            <ChevronLeft className="w-3 h-3" />
-                          </Button>
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" disabled={chatsPage >= Math.ceil(supportChats.length / CHATS_PER_PAGE)} onClick={() => setChatsPage(p => p + 1)}>
-                            <ChevronRight className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-
-              {/* Chat conversation */}
-              <div className="flex-1 flex flex-col min-h-0">
-                {activeChatId && activeChat ? (
-                  <>
-                    <div className="border-b border-border pb-2 mb-3">
-                      <span className="text-sm font-medium text-foreground">{activeChat.user_name}</span>
-                      <span className="text-xs text-muted-foreground ml-2">{activeChat.user_email}</span>
-                    </div>
-                    <div ref={chatScrollRef} className="flex-1 min-h-[300px] max-h-[55vh] overflow-y-auto pr-2 space-y-3 py-2">
-                      {chatMessages.length === 0 && (
-                        <p className="text-xs text-muted-foreground text-center py-8">No messages yet.</p>
-                      )}
-                      {chatMessages.map((msg) => (
-                        <div key={msg.id} className={`flex ${msg.sender_role === "admin" ? "justify-end" : "justify-start"}`}>
-                          <div
-                            className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm ${
-                              msg.sender_role === "admin"
-                                ? "bg-secondary text-secondary-foreground rounded-br-md"
-                                : "bg-muted text-foreground rounded-bl-md"
-                            }`}
-                          >
-                            <p className="whitespace-pre-wrap break-words">{msg.message}</p>
-                            <span className="text-[10px] opacity-60 mt-1 block">
-                              {new Date(msg.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <form onSubmit={sendAdminReply} className="flex gap-2 pt-3 border-t border-border mt-2">
-                      <Input
-                        placeholder="Type your reply..."
-                        value={adminReply}
-                        onChange={(e) => setAdminReply(e.target.value)}
-                        className="bg-muted/50 border-border flex-1"
-                        maxLength={1000}
-                      />
-                      <Button type="submit" size="icon" disabled={sendingReply || !adminReply.trim()} className="bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-full shrink-0">
-                        <Send className="w-4 h-4" />
-                      </Button>
-                    </form>
-                  </>
-                ) : (
-                  <div className="flex-1 flex items-center justify-center">
-                    <p className="text-muted-foreground text-sm">Select a chat to respond</p>
-                  </div>
-                )}
-              </div>
-            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              Support requests now go directly to your Telegram. Users see a Reply button on every message that opens
+              this same chat.
+            </p>
+            <a
+              href="https://t.me/L7kznr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/90 transition-colors text-sm font-medium"
+            >
+              <Send className="w-4 h-4" />
+              Open @L7kznr on Telegram
+            </a>
           </CardContent>
         </Card>
 
