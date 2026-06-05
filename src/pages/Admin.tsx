@@ -115,11 +115,6 @@ const Admin = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [clickStats, setClickStats] = useState<ClickStat[]>([]);
   const [aggregatedClicks, setAggregatedClicks] = useState<AggregatedUserClick[]>([]);
-  const [supportChats, setSupportChats] = useState<SupportChat[]>([]);
-  const [activeChatId, setActiveChatId] = useState<string | null>(null);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [adminReply, setAdminReply] = useState("");
-  const [sendingReply, setSendingReply] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
   const [premiumEmail, setPremiumEmail] = useState("");
