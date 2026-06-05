@@ -59,8 +59,8 @@ const SiteNoteBanner = () => {
               <h3 className="text-sm sm:text-base font-bold text-foreground mb-1">
                 {note.title}
               </h3>
-              <p className="text-xs sm:text-sm text-foreground/80 whitespace-pre-wrap leading-relaxed">
-                {note.body}
+              <p className="text-xs sm:text-sm text-foreground/80 whitespace-pre-wrap leading-relaxed break-words">
+                {linkify(note.body)}
               </p>
             </div>
           </div>
