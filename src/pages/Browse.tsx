@@ -295,73 +295,7 @@ const Browse = () => {
                 <Plus className="w-5 h-5 text-primary" />
               </button>
             )}
-            {isAdmin && (
-              <Popover open={broadcastOpen} onOpenChange={setBroadcastOpen}>
-                <PopoverTrigger asChild>
-                  <button
-                    className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-primary/20 transition-colors"
-                    title="Send broadcast message"
-                  >
-                    <Megaphone className="w-5 h-5 text-primary" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent align="end" className="w-80 p-3 space-y-2 bg-card border-border">
-                  <p className="text-xs font-medium text-foreground">Broadcast to all users</p>
-                  <input
-                    type="text"
-                    value={broadcastTitle}
-                    onChange={(e) => setBroadcastTitle(e.target.value)}
-                    placeholder="Title"
-                    className="w-full bg-muted/50 border border-border rounded-md px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
-                    maxLength={80}
-                  />
-                  <Textarea
-                    value={broadcastBody}
-                    onChange={(e) => setBroadcastBody(e.target.value)}
-                    placeholder="Type your message... links like https://example.com become clickable."
-                    rows={4}
-                    className="bg-muted/50 border-border text-xs resize-none"
-                    maxLength={1000}
-                  />
-                  <div className="flex items-center justify-between gap-2">
-                    <input
-                      type="color"
-                      value={broadcastColor}
-                      onChange={(e) => setBroadcastColor(e.target.value)}
-                      className="w-8 h-8 rounded cursor-pointer bg-transparent border border-border"
-                      title="Banner color"
-                    />
-                    <Button
-                      size="sm"
-                      disabled={sendingBroadcast || !broadcastBody.trim()}
-                      onClick={async () => {
-                        setSendingBroadcast(true);
-                        try {
-                          const { error } = await (supabase as any).from("site_notes").insert({
-                            title: broadcastTitle.trim() || "Announcement",
-                            body: broadcastBody.trim(),
-                            color: broadcastColor,
-                            is_active: true,
-                          });
-                          if (error) throw error;
-                          toast.success("Message sent to all users");
-                          setBroadcastBody("");
-                          setBroadcastOpen(false);
-                        } catch (e: any) {
-                          toast.error(e.message || "Failed to send");
-                        } finally {
-                          setSendingBroadcast(false);
-                        }
-                      }}
-                      className="bg-primary text-primary-foreground hover:bg-primary/90 gap-1"
-                    >
-                      <Send className="w-3.5 h-3.5" />
-                      {sendingBroadcast ? "Sending..." : "Send"}
-                    </Button>
-                  </div>
-                </PopoverContent>
-              </Popover>
-            )}
+            {user && <MessagesPopover userId={user.id} isAdmin={isAdmin} />}
             <button onClick={() => setSearchOpen(!searchOpen)} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-muted transition-colors">
               <Search className="w-5 h-5 text-foreground" />
             </button>
