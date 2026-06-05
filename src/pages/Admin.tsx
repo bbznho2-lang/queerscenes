@@ -142,35 +142,6 @@ const Admin = () => {
     if (isAdmin) fetchData();
   }, [isAdmin]);
 
-  // Realtime for chat messages
-  useEffect(() => {
-    if (!activeChatId) return;
-
-    const channel = supabase
-      .channel(`admin-chat-${activeChatId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "chat_messages",
-          filter: `chat_id=eq.${activeChatId}`,
-        },
-        (payload) => {
-          const msg = payload.new as ChatMessage;
-          setChatMessages((prev) => {
-            if (prev.some((m) => m.id === msg.id)) return prev;
-            return [...prev, msg];
-          });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [activeChatId]);
-
   // Realtime for new clicks
   useEffect(() => {
     if (!isAdmin) return;
@@ -195,44 +166,6 @@ const Admin = () => {
     };
   }, [isAdmin]);
 
-  // Realtime for new chats
-  useEffect(() => {
-    if (!isAdmin) return;
-
-    const channel = supabase
-      .channel("admin-new-chats")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "support_chats",
-        },
-        () => {
-          fetchChats();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [isAdmin]);
-
-  // Auto-scroll chat
-  useEffect(() => {
-    if (chatScrollRef.current) {
-      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
-    }
-  }, [chatMessages]);
-
-  const fetchChats = async () => {
-    const { data: chats } = await supabase
-      .from("support_chats" as any)
-      .select("*")
-      .order("updated_at", { ascending: false }) as any;
-    setSupportChats((chats as SupportChat[]) || []);
-  };
 
   const fetchData = async () => {
     setLoadingData(true);
