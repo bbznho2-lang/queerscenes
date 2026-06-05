@@ -390,7 +390,7 @@ const Admin = () => {
     return new Date(date) < new Date();
   };
 
-  const activeChat = supportChats.find((c) => c.id === activeChatId);
+  
 
   return (
     <div className="min-h-screen bg-background">
