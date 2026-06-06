@@ -333,7 +333,7 @@ const Index = () => {
           {top10CatalogItems.length > 0 && (
             <motion.div initial="hidden" animate="visible" variants={fade} custom={6} className="mt-10 sm:mt-12 w-full overflow-hidden">
               <p className="text-xs sm:text-sm text-muted-foreground/80 uppercase tracking-widest mb-4 sm:mb-5 flex items-center justify-center gap-2">
-                <TrendingUp className="w-4 h-4" /> <span className="rainbow-text font-bold">TOP 10</span> THIS WEEK
+                <TrendingUp className="w-4 h-4" /> <span className="rainbow-text font-bold">TOP 10</span> THIS MONTH
               </p>
               <div className="relative">
                 <div className="flex gap-3 sm:gap-5 animate-scroll-left" style={{ width: 'max-content' }}>
