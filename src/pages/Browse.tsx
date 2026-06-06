@@ -346,7 +346,7 @@ const Browse = () => {
                 </p>
                 <div className="flex items-center gap-2 px-3 pb-1">
                   {[
-                    { label: "Instagram", Icon: Instagram, href: "https://instagram.com/queerscenes" },
+                    { label: "Instagram", Icon: Instagram, href: "https://www.instagram.com/queer.scenes" },
                     { label: "TikTok", Icon: Music2, href: "https://www.tiktok.com/@queer.scenes" },
                     { label: "X / Twitter", Icon: Twitter, href: "https://twitter.com/queerscenes" },
                     { label: "YouTube", Icon: Youtube, href: "https://youtube.com/@queerscenestv?si=8mlUwn2WVYa-g-e5" },
