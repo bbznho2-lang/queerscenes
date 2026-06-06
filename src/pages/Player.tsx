@@ -420,9 +420,9 @@ const Player = () => {
                     if (idxB === idxA) idxB = (idxB + 1) % names.length;
                     const a = names[idxA];
                     const b = names[idxB];
-                    // Base of 53 supporters + 3 extra per new supporter joining (grows over time)
+                    // Capped at 62 supporters total — never inflated past reality
                     const growthBucket = Math.floor(Date.now() / (1000 * 60 * 60 * 24 * 3));
-                    const others = 53 + (growthBucket % 40) * 3;
+                    const others = Math.min(62, 53 + (growthBucket % 4) * 2);
                     return (
                       <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
                         <span className="inline-flex items-center gap-1.5 rounded-full bg-green-500/15 border border-green-500/40 text-green-400 px-2.5 py-1 text-[11px] font-semibold">
