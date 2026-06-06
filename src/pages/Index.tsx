@@ -780,7 +780,7 @@ const Index = () => {
                   </ul>
                   <div className="mt-5 mb-2 flex items-center justify-center gap-2 rounded-full bg-primary/10 border border-primary/30 px-3 py-1.5 text-xs font-semibold text-foreground">
                     <span aria-hidden>💜</span>
-                    <span>More than 50 people already support the project</span>
+                    <span>62 supporters already back the project</span>
                   </div>
 
                   {/* Email + plan picker */}
