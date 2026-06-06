@@ -338,6 +338,35 @@ const Browse = () => {
                   <span>{item.label}</span>
                 </button>
               ))}
+
+              {/* QueerScenes Social Media */}
+              <div className="border-t border-border pt-3 mt-2">
+                <p className="px-3 pb-2 text-[10px] uppercase tracking-widest text-muted-foreground/70 font-semibold">
+                  QueerScenes Social Media
+                </p>
+                <div className="flex items-center gap-2 px-3 pb-1">
+                  {[
+                    { label: "Instagram", Icon: Instagram, href: "https://instagram.com/queerscenes" },
+                    { label: "TikTok", Icon: Music2, href: "https://tiktok.com/@queerscenes" },
+                    { label: "X / Twitter", Icon: Twitter, href: "https://twitter.com/queerscenes" },
+                    { label: "YouTube", Icon: Youtube, href: "https://youtube.com/@queerscenes" },
+                    { label: "Facebook", Icon: Facebook, href: "https://facebook.com/queerscenes" },
+                  ].map(({ label, Icon, href }) => (
+                    <a
+                      key={label}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={label}
+                      aria-label={label}
+                      className="w-9 h-9 flex items-center justify-center rounded-full bg-muted/50 hover:bg-primary/20 hover:text-primary text-muted-foreground transition-colors"
+                    >
+                      <Icon className="w-4 h-4" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+
               <div className="border-t border-border pt-2 mt-2">
                 <button onClick={async () => { setMenuOpen(false); await signOut(); navigate("/"); }} className="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-accent hover:bg-accent/10 transition-colors">
                   <LogOut className="w-4 h-4" />
