@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Play, Lock, Heart, Film, Crown, ArrowRight, HelpCircle, Tv, Smartphone, Tablet, Eye, EyeOff, TrendingUp } from "lucide-react";
+import { Play, Lock, Heart, Film, Crown, ArrowRight, HelpCircle, Tv, Smartphone, Tablet, Eye, EyeOff, TrendingUp, Subtitles, Sparkles, ShieldCheck, MessageCircle, Zap, Wrench } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -600,6 +600,87 @@ const Index = () => {
             );
           })()}
 
+          {/* What makes Queer Scenes different — bento cards */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mt-14"
+          >
+            <h3 className="text-center text-lg sm:text-2xl font-bold mb-2">
+              Why <span className="neon-text-purple">Queer Scenes</span> is different
+            </h3>
+            <p className="text-center text-muted-foreground text-xs sm:text-sm mb-8 max-w-xl mx-auto">
+              We're not just another streaming platform — every detail is crafted by hand, with you in mind.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[
+                {
+                  icon: Subtitles,
+                  title: "Manually subtitled",
+                  text: "Every title is translated and reviewed by hand — no auto-translate, no shortcuts.",
+                  color: "text-primary",
+                  border: "neon-border-purple",
+                },
+                {
+                  icon: Sparkles,
+                  title: "Exclusive titles",
+                  text: "We bring queer films and series you won't find on any other streaming service.",
+                  color: "text-secondary",
+                  border: "neon-border-pink",
+                },
+                {
+                  icon: Wrench,
+                  title: "Handcrafted experience",
+                  text: "Each release is curated, tested and polished — built for the way you actually watch.",
+                  color: "text-accent",
+                  border: "neon-border-blue",
+                },
+                {
+                  icon: MessageCircle,
+                  title: "Human support",
+                  text: "Real people answer you on Telegram — no bots, no scripts. We never leave supporters hanging.",
+                  color: "text-primary",
+                  border: "neon-border-purple",
+                },
+                {
+                  icon: Zap,
+                  title: "Latest premieres",
+                  text: "We chase the newest releases of the moment so you always have something fresh to watch.",
+                  color: "text-secondary",
+                  border: "neon-border-pink",
+                },
+                {
+                  icon: ShieldCheck,
+                  title: "Made with care",
+                  text: "Quality-checked uploads with working players — focused entirely on user experience.",
+                  color: "text-accent",
+                  border: "neon-border-blue",
+                },
+              ].map((card, i) => {
+                const Icon = card.icon;
+                return (
+                  <motion.div
+                    key={card.title}
+                    initial={{ opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ duration: 0.5, delay: i * 0.08 }}
+                    whileHover={{ y: -4 }}
+                    className={`rounded-xl bg-card/70 backdrop-blur-sm border border-border p-5 text-left ${card.border} hover:border-primary/40 transition-colors`}
+                  >
+                    <div className={`w-10 h-10 rounded-lg bg-background/60 flex items-center justify-center mb-3 ${card.color}`}>
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <h4 className="font-semibold text-foreground text-sm sm:text-base mb-1.5">{card.title}</h4>
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{card.text}</p>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
+
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -835,7 +916,7 @@ const Index = () => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
             <Accordion type="single" collapsible className="space-y-3">
               {[
-                { q: "Is Queer Scenes free?", a: "Yes. We have free content available. We also offer a premium plan with full access." },
+                { q: "Is Queer Scenes free?", a: "Yes. We have free content available. We also offer Supporter plans with exclusive access for the full experience." },
                 { q: "Do I need to create an account?", a: "Yes. To access the content you need to create a login with email and password." },
                 { q: "Is the content only LGBTQIA+?", a: "Yes. The platform's focus is exclusively on stories, scenes, and productions with LGBTQIA+ representation." },
                 { q: "Can I cancel the premium plan?", a: "Yes. Cancellation can be done at any time." },
