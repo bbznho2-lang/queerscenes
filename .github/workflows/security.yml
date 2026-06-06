@@ -1,0 +1,69 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 6 * * 1"
+
+jobs:
+  audit:
+    name: Dependency & Secret Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run dependency audit (high+critical)
+        run: bun audit --prod || true
+
+      - name: Scan for accidentally committed secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+  supabase-lint:
+    name: Supabase Security Lint
+    runs-on: ubuntu-latest
+    if: ${{ env.SUPABASE_ACCESS_TOKEN != '' }}
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Run database linter
+        run: |
+          supabase link --project-ref "$SUPABASE_PROJECT_ID"
+          supabase db lint --level warning
+
+  rls-policy-check:
+    name: RLS Policy Sanity Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ensure premium columns are never granted to anon/authenticated
+        run: |
+          set -e
+          # Fails if any migration grants column-level SELECT on player_url/links to anon/authenticated
+          if grep -RInE "GRANT[[:space:]]+SELECT[[:space:]]*\([^)]*(player_url|links)[^)]*\)[[:space:]]+ON[[:space:]]+public\.(contents|episodes)[[:space:]]+TO[[:space:]]+(anon|authenticated)" supabase/migrations; then
+            echo "::error::Premium column (player_url/links) granted to public role — must be accessed via SECURITY DEFINER RPC only."
+            exit 1
+          fi
+          echo "OK: premium columns are not exposed via column grants."
