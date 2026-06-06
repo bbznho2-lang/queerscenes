@@ -916,7 +916,7 @@ const Index = () => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
             <Accordion type="single" collapsible className="space-y-3">
               {[
-                { q: "Is Queer Scenes free?", a: "Yes. We have free content available. We also offer a premium plan with full access." },
+                { q: "Is Queer Scenes free?", a: "Yes. We have free content available. We also offer Supporter plans with exclusive access for the full experience." },
                 { q: "Do I need to create an account?", a: "Yes. To access the content you need to create a login with email and password." },
                 { q: "Is the content only LGBTQIA+?", a: "Yes. The platform's focus is exclusively on stories, scenes, and productions with LGBTQIA+ representation." },
                 { q: "Can I cancel the premium plan?", a: "Yes. Cancellation can be done at any time." },
