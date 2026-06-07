@@ -49,8 +49,10 @@ const RecentUpdatesSection = () => {
     const allContentIds = Array.from(new Set([...directContentIds, ...epContentIds]));
 
     const { data: contents } = allContentIds.length
-      ? await supabase.from("contents").select("id, title, banner_url, tag, year").in("id", allContentIds)
+      ? await supabase.from("contents").select("id, title, banner_url, tag, year, is_archived").in("id", allContentIds)
       : { data: [] as any[] };
+    const visibleContents = (contents || []).filter((c: any) => !c.is_archived);
+    const visibleIds = new Set(visibleContents.map((c: any) => c.id));
 
     const cMap = new Map((contents || []).map((c: any) => [c.id, c]));
     const eMap = new Map((episodes || []).map((e: any) => [e.id, e]));

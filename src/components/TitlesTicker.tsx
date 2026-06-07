@@ -12,9 +12,14 @@ const TitlesTicker = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    supabase.from("contents").select("id, title, synopsis").order("title").then(({ data }) => {
-      setContents(data || []);
-    });
+    supabase
+      .from("contents")
+      .select("id, title, synopsis")
+      .eq("is_archived", false)
+      .order("title")
+      .then(({ data }) => {
+        setContents(data || []);
+      });
   }, []);
 
   // Group titles by first letter
