@@ -338,15 +338,15 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
                             })}
                           </span>
                         </div>
-                        {isAdmin && (
-                          <button
-                            onClick={() => handleDelete(msg.id)}
-                            className="text-muted-foreground hover:text-destructive"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
-                        )}
+                        <button
+                          onClick={() => handleDelete(msg.id)}
+                          className="text-muted-foreground hover:text-destructive"
+                          title={isAdmin ? "Delete" : "Remove from inbox"}
+                          aria-label={isAdmin ? "Delete" : "Remove from inbox"}
+                        >
+                          {isAdmin ? <Trash2 className="w-3 h-3" /> : <X className="w-3.5 h-3.5" />}
+                        </button>
+
                       </div>
                       {msg.body && (
                         <p className="text-xs text-foreground whitespace-pre-wrap break-words">
