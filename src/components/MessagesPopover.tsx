@@ -223,14 +223,26 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!isAdmin) return;
-    const { error } = await (supabase as any).from("direct_messages").delete().eq("id", id);
-    if (error) {
-      toast.error("Failed to delete");
-      return;
+    if (isAdmin) {
+      const { error } = await (supabase as any).from("direct_messages").delete().eq("id", id);
+      if (error) {
+        toast.error("Failed to delete");
+        return;
+      }
+    } else {
+      // Regular users hide the message permanently from their own inbox
+      const { error } = await (supabase as any)
+        .from("direct_message_hides")
+        .upsert({ message_id: id, user_id: userId }, { onConflict: "message_id,user_id", ignoreDuplicates: true });
+      if (error) {
+        toast.error("Failed to remove");
+        return;
+      }
     }
     setMessages((prev) => prev.filter((m) => m.id !== id));
+    void fetchUnread();
   };
+
 
   const renderMedia = (msg: Message) => {
     const url = mediaUrls[msg.id];
