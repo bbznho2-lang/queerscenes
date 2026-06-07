@@ -66,21 +66,34 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
       .select("*")
       .order("created_at", { ascending: false })
       .limit(50);
-    const list = (data as Message[]) || [];
+    let list = (data as Message[]) || [];
+
+    const ids = list.map((m) => m.id);
+    // Filter out messages the current user has hidden
+    if (ids.length) {
+      const { data: hides } = await (supabase as any)
+        .from("direct_message_hides")
+        .select("message_id")
+        .in("message_id", ids)
+        .eq("user_id", userId);
+      const hiddenSet = new Set(((hides as any[]) || []).map((h) => h.message_id));
+      list = list.filter((m) => !hiddenSet.has(m.id));
+    }
     setMessages(list);
 
     // Load reads to know which are unread
-    const ids = list.map((m) => m.id);
-    if (ids.length) {
+    const visibleIds = list.map((m) => m.id);
+    if (visibleIds.length) {
       const { data: reads } = await (supabase as any)
         .from("direct_message_reads")
         .select("message_id")
-        .in("message_id", ids)
+        .in("message_id", visibleIds)
         .eq("user_id", userId);
       setReadIds(new Set(((reads as any[]) || []).map((r) => r.message_id)));
     } else {
       setReadIds(new Set());
     }
+
 
     // Sign URLs
     const toSign = list.filter((m) => m.media_url);
