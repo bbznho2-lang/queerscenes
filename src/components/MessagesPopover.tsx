@@ -66,21 +66,34 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
       .select("*")
       .order("created_at", { ascending: false })
       .limit(50);
-    const list = (data as Message[]) || [];
+    let list = (data as Message[]) || [];
+
+    const ids = list.map((m) => m.id);
+    // Filter out messages the current user has hidden
+    if (ids.length) {
+      const { data: hides } = await (supabase as any)
+        .from("direct_message_hides")
+        .select("message_id")
+        .in("message_id", ids)
+        .eq("user_id", userId);
+      const hiddenSet = new Set(((hides as any[]) || []).map((h) => h.message_id));
+      list = list.filter((m) => !hiddenSet.has(m.id));
+    }
     setMessages(list);
 
     // Load reads to know which are unread
-    const ids = list.map((m) => m.id);
-    if (ids.length) {
+    const visibleIds = list.map((m) => m.id);
+    if (visibleIds.length) {
       const { data: reads } = await (supabase as any)
         .from("direct_message_reads")
         .select("message_id")
-        .in("message_id", ids)
+        .in("message_id", visibleIds)
         .eq("user_id", userId);
       setReadIds(new Set(((reads as any[]) || []).map((r) => r.message_id)));
     } else {
       setReadIds(new Set());
     }
+
 
     // Sign URLs
     const toSign = list.filter((m) => m.media_url);
@@ -210,14 +223,26 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!isAdmin) return;
-    const { error } = await (supabase as any).from("direct_messages").delete().eq("id", id);
-    if (error) {
-      toast.error("Failed to delete");
-      return;
+    if (isAdmin) {
+      const { error } = await (supabase as any).from("direct_messages").delete().eq("id", id);
+      if (error) {
+        toast.error("Failed to delete");
+        return;
+      }
+    } else {
+      // Regular users hide the message permanently from their own inbox
+      const { error } = await (supabase as any)
+        .from("direct_message_hides")
+        .upsert({ message_id: id, user_id: userId }, { onConflict: "message_id,user_id", ignoreDuplicates: true });
+      if (error) {
+        toast.error("Failed to remove");
+        return;
+      }
     }
     setMessages((prev) => prev.filter((m) => m.id !== id));
+    void fetchUnread();
   };
+
 
   const renderMedia = (msg: Message) => {
     const url = mediaUrls[msg.id];
@@ -313,15 +338,15 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
                             })}
                           </span>
                         </div>
-                        {isAdmin && (
-                          <button
-                            onClick={() => handleDelete(msg.id)}
-                            className="text-muted-foreground hover:text-destructive"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
-                        )}
+                        <button
+                          onClick={() => handleDelete(msg.id)}
+                          className="text-muted-foreground hover:text-destructive"
+                          title={isAdmin ? "Delete" : "Remove from inbox"}
+                          aria-label={isAdmin ? "Delete" : "Remove from inbox"}
+                        >
+                          {isAdmin ? <Trash2 className="w-3 h-3" /> : <X className="w-3.5 h-3.5" />}
+                        </button>
+
                       </div>
                       {msg.body && (
                         <p className="text-xs text-foreground whitespace-pre-wrap break-words">

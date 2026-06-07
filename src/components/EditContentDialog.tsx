@@ -310,9 +310,6 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                   <SelectItem value="serie">Series</SelectItem>
                   <SelectItem value="filme">Movie</SelectItem>
                   <SelectItem value="novela">Soap Opera</SelectItem>
-                  <SelectItem value="anime">Anime</SelectItem>
-
-                  
                 </SelectContent>
               </Select>
             </div>
@@ -325,13 +322,12 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                   <SelectItem value="filmes">Movies</SelectItem>
                   <SelectItem value="novelas">Soap Operas</SelectItem>
                   <SelectItem value="gl">GL Dramas</SelectItem>
-                  <SelectItem value="animes">Animes</SelectItem>
-                  <SelectItem value="exclusivos">Exclusives</SelectItem>
-
+                  <SelectItem value="exclusivos">Queer Scenes Exclusives</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
+
 
           <div className="flex items-center justify-between py-2">
             <div>
