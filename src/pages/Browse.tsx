@@ -545,9 +545,14 @@ const Browse = () => {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl sm:text-3xl font-bold neon-text-pink">GL Dramas</h2>
               {isAdmin && (
-                <button onClick={() => handleNew("gl", "serie")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add GL Drama">
-                  <Plus className="w-5 h-5 text-primary" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => handleNew("gl", "serie")} className="h-9 px-3 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center gap-1.5 transition-colors text-xs font-medium text-primary" title="Add GL Series">
+                    <Plus className="w-3.5 h-3.5" /> Series
+                  </button>
+                  <button onClick={() => handleNew("gl", "filme")} className="h-9 px-3 rounded-full bg-secondary/10 hover:bg-secondary/20 flex items-center gap-1.5 transition-colors text-xs font-medium text-secondary" title="Add GL Movie">
+                    <Plus className="w-3.5 h-3.5" /> Movie
+                  </button>
+                </div>
               )}
             </div>
             {gl.length > 0 ? (
