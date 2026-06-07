@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Plus, Menu, X, Search, Bookmark, LogOut, Pencil, Trash2, Crown, Settings, Sparkles, Instagram, Twitter, Youtube, Facebook, Music2 } from "lucide-react";
+import { Play, Plus, Menu, X, Search, Bookmark, LogOut, Pencil, Trash2, Crown, Settings, Sparkles, Instagram, Youtube, Facebook, Music2 } from "lucide-react";
+import { XIcon } from "@/components/icons/XIcon";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import ProfileDialog from "@/components/ProfileDialog";
@@ -348,7 +349,7 @@ const Browse = () => {
                   {[
                     { label: "Instagram", Icon: Instagram, href: "https://www.instagram.com/queer.scenes" },
                     { label: "TikTok", Icon: Music2, href: "https://www.tiktok.com/@queer.scenes" },
-                    { label: "X / Twitter", Icon: Twitter, href: "https://twitter.com/queerscenes" },
+                    { label: "X", Icon: XIcon, href: "https://x.com/queerscenes" },
                     { label: "YouTube", Icon: Youtube, href: "https://youtube.com/@queerscenestv?si=8mlUwn2WVYa-g-e5" },
                   ].map(({ label, Icon, href }) => (
                     <a
@@ -545,9 +546,14 @@ const Browse = () => {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl sm:text-3xl font-bold neon-text-pink">GL Dramas</h2>
               {isAdmin && (
-                <button onClick={() => handleNew("gl", "serie")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add GL Drama">
-                  <Plus className="w-5 h-5 text-primary" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => handleNew("gl", "serie")} className="h-9 px-3 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center gap-1.5 transition-colors text-xs font-medium text-primary" title="Add GL Series">
+                    <Plus className="w-3.5 h-3.5" /> Series
+                  </button>
+                  <button onClick={() => handleNew("gl", "filme")} className="h-9 px-3 rounded-full bg-secondary/10 hover:bg-secondary/20 flex items-center gap-1.5 transition-colors text-xs font-medium text-secondary" title="Add GL Movie">
+                    <Plus className="w-3.5 h-3.5" /> Movie
+                  </button>
+                </div>
               )}
             </div>
             {gl.length > 0 ? (
