@@ -194,6 +194,32 @@ export type Database = {
         }
         Relationships: []
       }
+      direct_message_hides: {
+        Row: {
+          hidden_at: string
+          message_id: string
+          user_id: string
+        }
+        Insert: {
+          hidden_at?: string
+          message_id: string
+          user_id: string
+        }
+        Update: {
+          hidden_at?: string
+          message_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "direct_message_hides_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "direct_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       direct_message_reads: {
         Row: {
           message_id: string
