@@ -54,7 +54,7 @@ const RecentUpdatesSection = () => {
     const visibleContents = (contents || []).filter((c: any) => !c.is_archived);
     const visibleIds = new Set(visibleContents.map((c: any) => c.id));
 
-    const cMap = new Map((contents || []).map((c: any) => [c.id, c]));
+    const cMap = new Map(visibleContents.map((c: any) => [c.id, c]));
     const eMap = new Map((episodes || []).map((e: any) => [e.id, e]));
 
     setItems(
@@ -63,6 +63,7 @@ const RecentUpdatesSection = () => {
           if (f.episode_id) {
             const ep = eMap.get(f.episode_id);
             if (!ep) return null;
+            if (!visibleIds.has(ep.content_id)) return null;
             return {
               id: f.id,
               position: f.position,
@@ -71,6 +72,7 @@ const RecentUpdatesSection = () => {
             } as FeaturedItem;
           }
           if (f.content_id) {
+            if (!visibleIds.has(f.content_id)) return null;
             return {
               id: f.id,
               position: f.position,
