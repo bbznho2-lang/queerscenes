@@ -6,6 +6,31 @@
 
 @layer base {
   :root {
+    /* Raw Queer Scenes design-system tokens */
+    --bg: #060610;
+    --s1: #0c0c1e;
+    --s2: #12122a;
+    --s3: #181836;
+    --s4: #1e1e42;
+    --s5: #242454;
+    --b1: rgba(255,255,255,.05);
+    --b2: rgba(255,255,255,.09);
+    --b3: rgba(255,255,255,.16);
+    --b4: rgba(255,255,255,.24);
+    --t1: #eeeaff;
+    --t2: #9996bb;
+    --t3: #5e5b88;
+    --t4: #35335a;
+    --brand-purple: #8b2be2;
+    --brand-purple-light: #a855f7;
+    --brand-pink: #d946a8;
+    --brand-blue: #2563eb;
+    --brand-blue-light: #60a5fa;
+    --grad: linear-gradient(135deg, #8b2be2 0%, #d946a8 50%, #2563eb 100%);
+    --grad-pb: linear-gradient(135deg, #8b2be2, #d946a8);
+    --grad-bp: linear-gradient(135deg, #2563eb, #8b2be2);
+    --r-sm: 8px; --r: 12px; --r-md: 16px; --r-lg: 20px; --r-xl: 24px; --r-2xl: 28px;
+
     --background: 240 43% 5%;
     --foreground: 255 100% 96%;
 
