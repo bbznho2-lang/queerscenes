@@ -2,52 +2,52 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap');
 
 @layer base {
   :root {
-    --background: 240 15% 4%;
-    --foreground: 0 0% 95%;
+    --background: 240 43% 5%;
+    --foreground: 255 100% 96%;
 
-    --card: 240 12% 7%;
-    --card-foreground: 0 0% 95%;
+    --card: 240 50% 8%;
+    --card-foreground: 255 100% 96%;
 
-    --popover: 240 12% 7%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 240 42% 12%;
+    --popover-foreground: 255 100% 96%;
 
-    --primary: 280 80% 55%;
+    --primary: 274 76% 53%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 230 70% 40%;
+    --secondary: 224 83% 53%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 240 10% 12%;
-    --muted-foreground: 240 5% 55%;
+    --muted: 240 45% 16%;
+    --muted-foreground: 245 18% 66%;
 
-    --accent: 330 85% 55%;
+    --accent: 322 67% 56%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 90% 71%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 240 10% 14%;
-    --input: 240 10% 14%;
-    --ring: 280 80% 55%;
+    --border: 240 20% 18%;
+    --input: 240 20% 18%;
+    --ring: 274 76% 53%;
 
     --radius: 0.75rem;
 
-    --neon-purple: 280 80% 55%;
-    --neon-blue: 230 70% 40%;
-    --neon-pink: 330 85% 55%;
+    --neon-purple: 274 76% 53%;
+    --neon-blue: 224 83% 53%;
+    --neon-pink: 322 67% 56%;
 
-    --sidebar-background: 240 12% 7%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 270 100% 50%;
+    --sidebar-background: 240 50% 8%;
+    --sidebar-foreground: 255 100% 96%;
+    --sidebar-primary: 274 76% 53%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 10% 12%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 240 10% 14%;
-    --sidebar-ring: 270 100% 50%;
+    --sidebar-accent: 240 45% 16%;
+    --sidebar-accent-foreground: 255 100% 96%;
+    --sidebar-border: 240 20% 18%;
+    --sidebar-ring: 274 76% 53%;
   }
 }
 
@@ -58,33 +58,35 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Sora', system-ui, -apple-system, sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Sora', system-ui, -apple-system, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
   }
 }
 
 /* Neon utilities */
 .neon-text-purple {
-  color: hsl(280 80% 55%);
-  text-shadow: 0 0 10px hsl(280 80% 55% / 0.5), 0 0 30px hsl(280 80% 55% / 0.3);
+  color: hsl(274 76% 60%);
+  text-shadow: 0 0 10px hsl(274 76% 53% / 0.5), 0 0 30px hsl(274 76% 53% / 0.3);
 }
 
 .neon-text-blue {
-  color: hsl(230 70% 40%);
-  text-shadow: 0 0 10px hsl(230 70% 40% / 0.5), 0 0 30px hsl(230 70% 40% / 0.3);
+  color: hsl(224 83% 60%);
+  text-shadow: 0 0 10px hsl(224 83% 53% / 0.5), 0 0 30px hsl(224 83% 53% / 0.3);
 }
 
 .neon-text-pink {
-  color: hsl(330 85% 55%);
-  text-shadow: 0 0 10px hsl(330 85% 55% / 0.5), 0 0 30px hsl(330 85% 55% / 0.3);
+  color: hsl(322 67% 60%);
+  text-shadow: 0 0 10px hsl(322 67% 56% / 0.5), 0 0 30px hsl(322 67% 56% / 0.3);
 }
 
 .neon-text-bi-blue {
-  color: hsl(230 70% 45%);
-  text-shadow: 0 0 10px hsl(230 70% 45% / 0.5), 0 0 30px hsl(230 70% 45% / 0.3);
+  color: hsl(224 83% 60%);
+  text-shadow: 0 0 10px hsl(224 83% 53% / 0.5), 0 0 30px hsl(224 83% 53% / 0.3);
 }
 
 .neon-text-red {
