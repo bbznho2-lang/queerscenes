@@ -174,15 +174,27 @@
   animation: border-glow 4s ease-in-out infinite;
 }
 
+/* Brand gradients (Bi Pride: purple → pink → blue) */
+.bg-grad-brand { background: linear-gradient(135deg, #8b2be2 0%, #d946a8 50%, #2563eb 100%); }
+.bg-grad-pb { background: linear-gradient(135deg, #8b2be2, #d946a8); }
+.bg-grad-bp { background: linear-gradient(135deg, #2563eb, #8b2be2); }
+.text-grad-brand {
+  background: linear-gradient(135deg, #8b2be2 0%, #d946a8 50%, #2563eb 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: hsl(240 15% 4%);
+  background: #060610;
 }
 ::-webkit-scrollbar-thumb {
-  background: hsl(280 80% 55% / 0.4);
+  background: linear-gradient(180deg, #8b2be2, #d946a8);
   border-radius: 3px;
 }
 
