@@ -26,10 +26,13 @@
     --brand-pink: #d946a8;
     --brand-blue: #2563eb;
     --brand-blue-light: #60a5fa;
+    --teal: #00d4aa;
+    --amber: #f59e0b;
     --grad: linear-gradient(135deg, #8b2be2 0%, #d946a8 50%, #2563eb 100%);
     --grad-pb: linear-gradient(135deg, #8b2be2, #d946a8);
     --grad-bp: linear-gradient(135deg, #2563eb, #8b2be2);
     --r-sm: 8px; --r: 12px; --r-md: 16px; --r-lg: 20px; --r-xl: 24px; --r-2xl: 28px;
+
 
     --background: 240 43% 5%;
     --foreground: 255 100% 96%;
