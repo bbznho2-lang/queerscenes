@@ -286,9 +286,10 @@ const Browse = () => {
             {menuOpen ? <X className="w-5 h-5 text-foreground" /> : <Menu className="w-5 h-5 text-foreground" />}
           </button>
 
-          <Link to="/" className="absolute left-1/2 -translate-x-1/2 text-lg sm:text-xl font-bold neon-text-purple" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          <Link to="/" className="absolute left-1/2 -translate-x-1/2" style={{ fontFamily: "'Sora', sans-serif", fontSize: "13px", fontWeight: 700, letterSpacing: ".14em", color: "#a855f7", textShadow: "0 0 16px rgba(168,85,247,.4)" }}>
             QUEER SCENES
           </Link>
+
 
           <div className="flex items-center gap-2">
             {isAdmin && (
