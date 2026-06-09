@@ -268,54 +268,100 @@ const Index = () => {
 
         <div className="relative z-10 max-w-3xl mx-auto text-center">
           <motion.div initial="hidden" animate="visible" variants={fade} custom={0}>
-            <span className="inline-block px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium neon-border-pink neon-text-pink mb-6">
-              🎬 LGBTQIA+ Streaming
+            <span
+              className="inline-block mb-6 backdrop-blur-md"
+              style={{
+                background: "rgba(139,43,226,.14)",
+                border: "1px solid rgba(139,43,226,.28)",
+                color: "#c084fc",
+                padding: "5px 14px",
+                borderRadius: "100px",
+                fontSize: "10px",
+                fontWeight: 700,
+                letterSpacing: ".1em",
+              }}
+            >
+              🏳️‍🌈 LGBTQIA+ STREAMING
             </span>
           </motion.div>
 
           <motion.h1
-            className="text-3xl sm:text-6xl md:text-7xl font-bold tracking-tight mb-5 neon-text-purple"
-            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+            className="font-bold tracking-tight mb-5"
+            style={{
+              fontFamily: "'Sora', sans-serif",
+              fontSize: "clamp(38px, 11vw, 62px)",
+              fontWeight: 800,
+              letterSpacing: "-0.04em",
+              lineHeight: 0.95,
+              color: "#a855f7",
+              textShadow: "0 0 40px rgba(168,85,247,.55), 0 0 80px rgba(139,43,226,.30), 0 0 120px rgba(139,43,226,.15)",
+            }}
             initial="hidden" animate="visible" variants={fade} custom={1}
           >
             QUEER SCENES
           </motion.h1>
 
           <motion.p
-            className="text-[13px] sm:text-xl md:text-2xl font-semibold text-foreground max-w-[90vw] sm:max-w-2xl mx-auto mb-3 px-2 leading-snug"
+            className="mx-auto mb-3 px-2"
+            style={{ fontSize: "14px", color: "rgba(238,234,255,.75)", lineHeight: 1.68, maxWidth: 320 }}
             initial="hidden" animate="visible" variants={fade} custom={2}
           >
-            Stream free LGBTQIA+ content now.
+            Stream free LGBTQIA+ content now — series, movies & exclusive moments. 100% free to start.
           </motion.p>
 
           <motion.p
-            className="text-[11px] sm:text-base text-foreground/80 max-w-[85vw] sm:max-w-lg mx-auto mb-4 px-2 leading-relaxed font-medium"
+            className="mx-auto mb-7 px-2"
+            style={{ fontSize: "12px", color: "#9996bb", lineHeight: 1.6, maxWidth: 290 }}
             initial="hidden" animate="visible" variants={fade} custom={3}
           >
-            Series, movies & exclusive moments — <span className="neon-text-pink">100% free</span> to start.
-            <br className="hidden sm:block" />
-            Become a Supporter for the full experience. 🌈
+            Want the full experience?{" "}
+            <button
+              onClick={() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" })}
+              style={{ color: "#a855f7", background: "none", border: "none", padding: 0, cursor: "pointer", fontWeight: 600 }}
+            >
+              Become a Supporter
+            </button>{" "}
+            — unlock exclusive titles, weekly subtitled soap operas, GL Dramas & early access. 💜
           </motion.p>
 
-          <motion.div initial="hidden" animate="visible" variants={fade} custom={4} className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Button
-              size="lg"
+          <motion.div initial="hidden" animate="visible" variants={fade} custom={4} className="flex flex-col items-center gap-3 mx-auto" style={{ maxWidth: 290 }}>
+            <button
               onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
-              className="text-base sm:text-lg px-8 sm:px-10 py-5 sm:py-6 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple gap-2"
+              className="w-full flex items-center justify-center gap-2"
+              style={{
+                padding: "16px",
+                borderRadius: "20px",
+                background: "linear-gradient(135deg, #8b2be2 0%, #d946a8 50%, #2563eb 100%)",
+                color: "#fff",
+                fontSize: "14px",
+                fontWeight: 700,
+                border: "none",
+                boxShadow: "0 10px 32px rgba(139,43,226,.4)",
+                cursor: "pointer",
+              }}
             >
-              <Play className="w-5 h-5" />
+              <Play className="w-4 h-4" />
               START WATCHING FREE
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
+            </button>
+            <button
               onClick={() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" })}
-              className="text-sm sm:text-base px-6 py-4 sm:py-5 rounded-full border-accent/40 text-accent hover:bg-accent/10 gap-2"
+              className="w-full flex items-center justify-center gap-2 backdrop-blur-md"
+              style={{
+                padding: "15px",
+                borderRadius: "20px",
+                background: "rgba(255,255,255,.07)",
+                color: "#eeeaff",
+                fontSize: "14px",
+                fontWeight: 600,
+                border: "1px solid rgba(255,255,255,.14)",
+                cursor: "pointer",
+              }}
             >
               <Crown className="w-4 h-4" />
               BECOME A SUPPORTER
-            </Button>
+            </button>
           </motion.div>
+
 
           {/* Banner indicators */}
           {heroBanners.length > 1 && (
