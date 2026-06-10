@@ -73,10 +73,11 @@ const ContentCard = ({
       />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent opacity-80" />
       {item.is_premium && (
-        <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-primary/90 text-primary-foreground text-[10px] font-bold flex items-center gap-1">
+        <div className="absolute top-2 left-2 z-10 qs-badge-supporter">
           <Crown className="w-3 h-3" /> SUPPORTERS
         </div>
       )}
+
       <button
         onClick={(e) => { e.stopPropagation(); onToggleWatchlist(); }}
         className={`absolute top-2 ${isAdmin ? 'top-12' : 'top-2'} right-2 z-10 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-colors ${
