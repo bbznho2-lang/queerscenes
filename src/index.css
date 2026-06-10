@@ -226,6 +226,153 @@
   border-radius: 3px;
 }
 
+/* ============================================
+   Queer Scenes — Bi Pride visual system tokens
+   ============================================ */
+
+/* Cards & modals */
+.qs-card {
+  background: var(--s1);
+  border: 1px solid var(--b1);
+  border-radius: var(--r-lg);
+}
+.qs-card-lg {
+  background: var(--s1);
+  border: 1px solid var(--b1);
+  border-radius: var(--r-xl);
+}
+.qs-modal {
+  background: var(--s1) !important;
+  border: 1px solid var(--b2) !important;
+  border-radius: var(--r-2xl) !important;
+}
+.qs-modal-premium {
+  background: var(--s1) !important;
+  border: 1.5px solid rgba(139,43,226,.45) !important;
+  border-radius: var(--r-2xl) !important;
+  box-shadow: 0 0 60px -10px rgba(139,43,226,.35);
+}
+
+/* Inputs */
+.qs-input {
+  background: var(--s2) !important;
+  border: 1px solid var(--b2) !important;
+  border-radius: var(--r) !important;
+  color: var(--t1) !important;
+}
+.qs-input:focus, .qs-input:focus-visible {
+  border-color: var(--brand-purple) !important;
+  box-shadow: 0 0 0 3px rgba(139,43,226,.18) !important;
+  outline: none !important;
+}
+
+/* Primary CTA */
+.qs-btn-primary {
+  background: var(--grad) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  font-weight: 600;
+  transition: transform .15s ease, box-shadow .15s ease;
+  box-shadow: 0 8px 24px -8px rgba(139,43,226,.45);
+}
+.qs-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 12px 28px -8px rgba(139,43,226,.55); }
+
+/* Avatar circle */
+.qs-avatar-gradient {
+  background: var(--grad-pb);
+  color: #fff;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+}
+
+/* Badges */
+.qs-badge-supporter {
+  background: rgba(139,43,226,.25);
+  color: #c084fc;
+  border: 1px solid rgba(139,43,226,.4);
+  border-radius: 100px;
+  padding: 2px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.qs-badge-expired {
+  background: rgba(248,113,113,.18);
+  color: #fca5a5;
+  border: 1px solid rgba(248,113,113,.35);
+  border-radius: 100px;
+  padding: 2px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+/* Notice bar (Browse) */
+.qs-notice {
+  background: rgba(37,99,235,.07);
+  border: 1px solid rgba(37,99,235,.18);
+  border-radius: var(--r);
+  color: var(--t1);
+}
+
+/* Toggle */
+.qs-toggle-on { background-color: var(--brand-purple) !important; }
+.qs-toggle-off { background-color: var(--s4) !important; }
+
+/* Stat numbers */
+.qs-stat-users {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  font-weight: 800;
+}
+.qs-stat-supporters { color: var(--teal); font-weight: 800; }
+.qs-stat-clicks { color: var(--amber); font-weight: 800; }
+
+/* Sidebar / nav */
+.qs-sidebar { background: var(--s1); }
+.qs-section-label {
+  color: var(--t4);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.qs-signout { color: #f87171 !important; }
+.qs-signout:hover { background: rgba(248,113,113,.08) !important; }
+.qs-nav-active {
+  position: relative;
+}
+.qs-nav-active::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 6px; bottom: 6px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--grad-pb);
+}
+
+/* Crown circle for premium */
+.qs-crown-circle {
+  width: 56px; height: 56px;
+  border-radius: 9999px;
+  background: var(--grad);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 10px 30px -10px rgba(139,43,226,.55);
+}
+
 @keyframes scroll-left {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
