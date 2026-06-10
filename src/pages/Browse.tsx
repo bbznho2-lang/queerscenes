@@ -371,11 +371,12 @@ const Browse = () => {
               </div>
 
               <div className="border-t border-border pt-2 mt-2">
-                <button onClick={async () => { setMenuOpen(false); await signOut(); navigate("/"); }} className="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-accent hover:bg-accent/10 transition-colors">
+                <button onClick={async () => { setMenuOpen(false); await signOut(); navigate("/"); }} className="qs-signout w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors">
                   <LogOut className="w-4 h-4" />
                   <span>Sign Out</span>
                 </button>
               </div>
+
             </motion.div>
           )}
         </AnimatePresence>
