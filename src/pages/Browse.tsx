@@ -344,9 +344,10 @@ const Browse = () => {
 
               {/* QueerScenes Social Media */}
               <div className="border-t border-border pt-3 mt-2">
-                <p className="px-3 pb-2 text-[10px] uppercase tracking-widest text-muted-foreground/70 font-semibold">
+                <p className="px-3 pb-2 qs-section-label">
                   QueerScenes Social Media
                 </p>
+
                 <div className="flex items-center gap-2 px-3 pb-1">
                   {[
                     { label: "Instagram", Icon: Instagram, href: "https://www.instagram.com/queer.scenes" },
