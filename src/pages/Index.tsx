@@ -178,16 +178,15 @@ const Index = () => {
   const showSubscribeActions = !authLoading && !profileLoading && !isAdmin && !isPremiumUser;
 
   const startCheckout = async (priceId: string) => {
-    const value = checkoutEmail.trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-      toast.error("Enter a valid email to continue.");
-      document.getElementById("supporter-email")?.focus();
+    if (!user) {
+      toast.error("Please sign in to become a supporter.");
+      document.getElementById("login-form")?.scrollIntoView({ behavior: "smooth" });
       return;
     }
     setCheckoutLoading(priceId);
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { email: value, priceId },
+        body: { priceId },
       });
       if (error) throw error;
       const url = (data as any)?.url;
@@ -198,6 +197,7 @@ const Index = () => {
       setCheckoutLoading(null);
     }
   };
+
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
