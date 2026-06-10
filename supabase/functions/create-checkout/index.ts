@@ -1,4 +1,5 @@
 import Stripe from "npm:stripe@17.5.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -19,14 +20,30 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const { email, priceId } = await req.json();
-
-    if (!email || typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return new Response(JSON.stringify({ error: "Invalid email" }), {
-        status: 400,
+    // Require authenticated caller — prevents anonymous checkout-session spam.
+    const authHeader = req.headers.get("Authorization") ?? "";
+    const jwt = authHeader.replace(/^Bearer\s+/i, "").trim();
+    if (!jwt) {
+      return new Response(JSON.stringify({ error: "Authentication required" }), {
+        status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabase = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: `Bearer ${jwt}` } },
+    });
+    const { data: userResult, error: userErr } = await supabase.auth.getUser(jwt);
+    const authedEmail = userResult?.user?.email?.toLowerCase();
+    if (userErr || !authedEmail) {
+      return new Response(JSON.stringify({ error: "Authentication required" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { priceId } = await req.json();
     if (!priceId || !ALLOWED_PRICE_IDS.has(priceId)) {
       return new Response(JSON.stringify({ error: "Invalid priceId" }), {
         status: 400,
@@ -40,6 +57,7 @@ Deno.serve(async (req) => {
 
     const ALLOWED_ORIGINS = new Set([
       "https://queerscenes.lovable.app",
+      "https://queerscenes.com",
       "https://id-preview--fd2d5d8f-022f-4e0b-9296-7902e2ff85b2.lovable.app",
     ]);
     const rawOrigin = req.headers.get("origin") || "";
@@ -49,13 +67,13 @@ Deno.serve(async (req) => {
       mode: "subscription",
       payment_method_types: ["card"],
       line_items: [{ price: priceId, quantity: 1 }],
-      customer_email: email.trim().toLowerCase(),
-      success_url: `${origin}/?supporter=success&email=${encodeURIComponent(email.trim().toLowerCase())}`,
+      customer_email: authedEmail,
+      success_url: `${origin}/?supporter=success&email=${encodeURIComponent(authedEmail)}`,
       cancel_url: `${origin}/#planos`,
       allow_promotion_codes: true,
-      metadata: { email: email.trim().toLowerCase(), price_id: priceId },
+      metadata: { email: authedEmail, price_id: priceId },
       subscription_data: {
-        metadata: { email: email.trim().toLowerCase(), price_id: priceId },
+        metadata: { email: authedEmail, price_id: priceId },
       },
     });
 

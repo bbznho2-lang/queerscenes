@@ -73,10 +73,11 @@ const ContentCard = ({
       />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent opacity-80" />
       {item.is_premium && (
-        <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-primary/90 text-primary-foreground text-[10px] font-bold flex items-center gap-1">
+        <div className="absolute top-2 left-2 z-10 qs-badge-supporter">
           <Crown className="w-3 h-3" /> SUPPORTERS
         </div>
       )}
+
       <button
         onClick={(e) => { e.stopPropagation(); onToggleWatchlist(); }}
         className={`absolute top-2 ${isAdmin ? 'top-12' : 'top-2'} right-2 z-10 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-colors ${
@@ -343,9 +344,10 @@ const Browse = () => {
 
               {/* QueerScenes Social Media */}
               <div className="border-t border-border pt-3 mt-2">
-                <p className="px-3 pb-2 text-[10px] uppercase tracking-widest text-muted-foreground/70 font-semibold">
+                <p className="px-3 pb-2 qs-section-label">
                   QueerScenes Social Media
                 </p>
+
                 <div className="flex items-center gap-2 px-3 pb-1">
                   {[
                     { label: "Instagram", Icon: Instagram, href: "https://www.instagram.com/queer.scenes" },
@@ -369,11 +371,12 @@ const Browse = () => {
               </div>
 
               <div className="border-t border-border pt-2 mt-2">
-                <button onClick={async () => { setMenuOpen(false); await signOut(); navigate("/"); }} className="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-accent hover:bg-accent/10 transition-colors">
+                <button onClick={async () => { setMenuOpen(false); await signOut(); navigate("/"); }} className="qs-signout w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors">
                   <LogOut className="w-4 h-4" />
                   <span>Sign Out</span>
                 </button>
               </div>
+
             </motion.div>
           )}
         </AnimatePresence>

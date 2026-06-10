@@ -544,6 +544,7 @@ export type Database = {
       }
       support_chats: {
         Row: {
+          client_token: string
           created_at: string
           id: string
           status: string
@@ -552,6 +553,7 @@ export type Database = {
           user_name: string
         }
         Insert: {
+          client_token?: string
           created_at?: string
           id?: string
           status?: string
@@ -560,6 +562,7 @@ export type Database = {
           user_name: string
         }
         Update: {
+          client_token?: string
           created_at?: string
           id?: string
           status?: string
@@ -783,7 +786,7 @@ export type Database = {
         Returns: boolean
       }
       list_support_chat_messages: {
-        Args: { _chat_id: string }
+        Args: { _chat_id: string; _token: string }
         Returns: {
           chat_id: string
           created_at: string
@@ -810,12 +813,12 @@ export type Database = {
         }[]
       }
       send_support_chat_message: {
-        Args: { _chat_id: string; _message: string }
+        Args: { _chat_id: string; _message: string; _token: string }
         Returns: string
       }
       start_support_chat: {
         Args: { _email: string; _name: string }
-        Returns: string
+        Returns: Json
       }
     }
     Enums: {

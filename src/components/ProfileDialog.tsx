@@ -71,9 +71,9 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-card border-border max-w-md">
+      <DialogContent className="qs-modal max-w-md">
         <DialogHeader>
-          <DialogTitle className="neon-text-purple text-xl" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          <DialogTitle className="text-xl text-grad-brand">
             My Profile
           </DialogTitle>
         </DialogHeader>
@@ -81,12 +81,12 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
         <div className="space-y-6 pt-2">
           <div className="flex flex-col items-center gap-3">
             <div className="relative">
-              <Avatar className="w-24 h-24 border-2 border-primary/40">
+              <Avatar className="w-24 h-24 border-2 border-[rgba(139,43,226,.4)]">
                 <AvatarImage src={avatarUrl || undefined} />
-                <AvatarFallback className="bg-muted text-2xl">{initials}</AvatarFallback>
+                <AvatarFallback className="qs-avatar-gradient text-2xl">{initials}</AvatarFallback>
               </Avatar>
-              <label className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center cursor-pointer hover:bg-primary/80 transition-colors">
-                <Camera className="w-4 h-4 text-primary-foreground" />
+              <label className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-grad-pb flex items-center justify-center cursor-pointer hover:opacity-90 transition-opacity">
+                <Camera className="w-4 h-4 text-white" />
                 <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
               </label>
             </div>
@@ -94,24 +94,25 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label className="text-muted-foreground text-xs">First Name</Label>
-              <Input value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="First name" className="bg-muted/50 border-border" />
+              <Label className="text-[var(--t2)] text-xs">First Name</Label>
+              <Input value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="First name" className="qs-input" />
             </div>
             <div className="space-y-1">
-              <Label className="text-muted-foreground text-xs">Last Name</Label>
-              <Input value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Last name" className="bg-muted/50 border-border" />
+              <Label className="text-[var(--t2)] text-xs">Last Name</Label>
+              <Input value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Last name" className="qs-input" />
             </div>
           </div>
-          <Button onClick={handleSaveName} disabled={saving} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full glow-purple">
+          <Button onClick={handleSaveName} disabled={saving} className="qs-btn-primary w-full">
             {saving ? "Saving..." : "Save Name"}
           </Button>
 
           <div className="space-y-2">
-            <Label className="text-muted-foreground text-xs">Email</Label>
-            <div className="px-3 py-2.5 rounded-md bg-muted/50 border border-border text-sm text-foreground">
+            <Label className="text-[var(--t2)] text-xs">Email</Label>
+            <div className="px-3 py-2.5 rounded-xl bg-[var(--s2)] border border-white/5 text-sm text-[var(--t1)]">
               {email}
             </div>
           </div>
+
 
           {(() => {
             const expired = !!(isPremium && premiumExpiresAt && new Date(premiumExpiresAt) <= new Date());
