@@ -55,6 +55,7 @@ const Index = () => {
   const [top10Ids, setTop10Ids] = useState<string[]>([]);
   const [checkoutEmail, setCheckoutEmail] = useState("");
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [selectedPlanId, setSelectedPlanId] = useState<string>("price_1TdJouJ5xR4MDdjriK0vTZr3");
   
   const navigate = useNavigate();
   const { user, loading: authLoading, isAdmin, signIn, signUp } = useAuth();
@@ -393,9 +394,8 @@ const Index = () => {
                 <div className="flex gap-4 sm:gap-5 pb-4" style={{ width: "max-content" }}>
                   {top10CatalogItems.map((item, i) => {
                     const rank = i + 1;
-                    const tint = i % 3;
                     return (
-                      <article key={`top10-${item.id}`} className={`qs-top10-card qs-top10-tint-${tint} flex-shrink-0`} style={{ width: "clamp(155px, 32vw, 200px)" }}>
+                      <article key={`top10-${item.id}`} className="qs-top10-card flex-shrink-0" style={{ width: "clamp(155px, 32vw, 200px)" }}>
                         <div className="qs-top10-poster">
                           {item.banner_url ? (
                             <img src={item.banner_url} alt={item.title} loading="lazy" />
@@ -405,7 +405,6 @@ const Index = () => {
                             </div>
                           )}
                           <div className="qs-top10-shade" />
-                          <span className="qs-top10-crown">👑 S</span>
                           <h4 className="qs-top10-title-overlay">{item.title}</h4>
                         </div>
                         <div className="qs-top10-foot">
@@ -630,132 +629,101 @@ const Index = () => {
 
             {/* SUPPORTER */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2}>
-              <div className="qs-supporter-panel p-5 sm:p-6 h-full flex flex-col relative overflow-hidden">
+              <div className="qs-supporter-panel p-6 sm:p-7 h-full flex flex-col relative overflow-visible">
                 <div className="qs-supporter-glow" aria-hidden />
 
-                <div className="relative z-10 flex items-start justify-between gap-4">
-                  <div>
-                    <span className="qs-supporter-pill">MOST POPULAR</span>
-                    <h3 className="mt-4 text-2xl sm:text-3xl font-black tracking-tight text-[var(--t1)]">Supporter</h3>
-                    <p className="mt-2 text-sm text-[var(--t2)] max-w-sm">
-                      Support the project and unlock the full experience with exclusive releases, weekly updates and premium access.
-                    </p>
-                  </div>
+                <span className="qs-supporter-pill">✦ MOST POPULAR</span>
 
-                  <div className="qs-supporter-icon shrink-0">
-                    <Crown className="w-5 h-5" />
-                  </div>
+                <div className="relative z-10 text-center pt-3">
+                  <div className="text-4xl mb-1">💜</div>
+                  <h3 className="text-2xl font-black tracking-tight" style={{ color: "#c084fc" }}>Supporter</h3>
                 </div>
 
-                <div className="relative z-10 mt-5 qs-supporter-stat">
-                  <span className="text-lg">💜</span>
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.18em] text-[var(--brand-pink)] font-bold">Community</p>
-                    <p className="text-sm font-semibold text-[var(--t1)]">62 supporters already back the project</p>
-                  </div>
-                </div>
-
-                <div className="relative z-10 mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                {/* Plan selector */}
+                <div className="relative z-10 mt-5 grid grid-cols-3 gap-2.5">
                   {[
-                    "Everything in the Free plan",
-                    "Smooth, uninterrupted experience",
-                    "Soap operas subtitled in English every week",
-                    "International LGBTQIA+ series and movies subtitled",
-                    "GL dramas subtitled",
+                    { label: "Monthly", price: "€9.99", note: "", priceId: "price_1TdJouJ5xR4MDdjriK0vTZr3" },
+                    { label: "Quarterly", price: "€24.99", note: "Save 17%", priceId: "price_1TdJpxJ5xR4MDdjr6CYmpFZk" },
+                    { label: "Yearly", price: "€89.99", note: "Save 25%", priceId: "price_1TdJrtJ5xR4MDdjrEdxuGjSz" },
+                  ].map((opt) => {
+                    const selected = selectedPlanId === opt.priceId;
+                    return (
+                      <button
+                        type="button"
+                        key={opt.priceId}
+                        onClick={() => setSelectedPlanId(opt.priceId)}
+                        className={`qs-supporter-plan ${selected ? "qs-supporter-plan-selected" : ""} text-center`}
+                      >
+                        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--t2)]">{opt.label}</p>
+                        <p className="mt-1 text-base sm:text-lg font-black text-[var(--t1)]">{opt.price}</p>
+                        {opt.note && <p className="mt-0.5 text-[11px] font-bold" style={{ color: "#34d399" }}>{opt.note}</p>}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <p className="relative z-10 mt-4 text-center text-sm text-[var(--t2)]">
+                  Support the project & unlock the full experience.
+                </p>
+
+                <div className="relative z-10 mt-4 flex justify-center">
+                  <div className="qs-supporter-backers">
+                    <span className="qs-supporter-backers-dot" />
+                    <span>62 supporters back this project</span>
+                  </div>
+                </div>
+
+                <div className="relative z-10 mt-5 space-y-2.5">
+                  {[
+                    "Everything in Free",
+                    "Uninterrupted experience",
+                    "Soap operas — weekly",
+                    "LGBT series & movies",
+                    "GL Dramas subtitled",
                     "Early access content",
-                    "VIP Telegram channel with exclusive updates",
+                    "VIP Telegram channel",
                   ].map((item) => (
-                    <div key={item} className="qs-supporter-feature">
-                      <span className="qs-supporter-check">✓</span>
-                      <span className="text-[var(--t1)]">{item}</span>
+                    <div key={item} className="flex items-center gap-2.5">
+                      <span className="qs-supporter-check-min">✓</span>
+                      <span className="text-sm text-[var(--t1)]">{item}</span>
                     </div>
                   ))}
                 </div>
 
                 <div className="relative z-10 mt-6 space-y-3">
-                  <div>
-                    <label htmlFor="supporter-email" className="text-xs text-[var(--t2)] block mb-1.5 uppercase tracking-[0.16em] font-bold">
-                      Your email
-                    </label>
-                    <Input
-                      id="supporter-email"
-                      type="email"
-                      inputMode="email"
-                      autoComplete="email"
-                      placeholder="you@example.com"
-                      value={checkoutEmail}
-                      onChange={(e) => setCheckoutEmail(e.target.value)}
-                      className="qs-input"
-                    />
-                  </div>
+                  <label htmlFor="supporter-email" className="text-[11px] text-[var(--t2)] block uppercase tracking-[0.16em] font-bold">
+                    Your email (we'll send access here)
+                  </label>
+                  <Input
+                    id="supporter-email"
+                    type="email"
+                    inputMode="email"
+                    autoComplete="email"
+                    placeholder="your@email.com"
+                    value={checkoutEmail}
+                    onChange={(e) => setCheckoutEmail(e.target.value)}
+                    className="qs-input"
+                  />
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {[
-                      {
-                        label: "Monthly",
-                        price: "€9.99",
-                        period: "/month",
-                        note: "",
-                        tone: "pink",
-                        priceId: "price_1TdJouJ5xR4MDdjriK0vTZr3",
-                      },
-                      {
-                        label: "Quarterly",
-                        price: "€24.99",
-                        period: "/3 months",
-                        note: "save 17%",
-                        tone: "purple",
-                        priceId: "price_1TdJpxJ5xR4MDdjr6CYmpFZk",
-                      },
-                      {
-                        label: "Yearly",
-                        price: "€89.99",
-                        period: "/year",
-                        note: "save 25%",
-                        tone: "blue",
-                        priceId: "price_1TdJrtJ5xR4MDdjrEdxuGjSz",
-                      },
-                    ].map((opt) => {
-                      const loading = checkoutLoading === opt.priceId;
-                      return (
-                        <button
-                          type="button"
-                          key={opt.label}
-                          disabled={checkoutLoading !== null}
-                          onClick={() => startCheckout(opt.priceId)}
-                          className={`qs-supporter-plan qs-supporter-plan-${opt.tone} text-left disabled:opacity-60 disabled:cursor-wait`}
-                        >
-                          <div className="flex items-start justify-between gap-2">
-                            <div>
-                              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--t2)]">{opt.label}</p>
-                              <div className="mt-1">
-                                <span className="text-2xl font-black text-[var(--t1)]">{opt.price}</span>
-                                <span className="text-[11px] text-[var(--t2)] ml-1">{opt.period}</span>
-                              </div>
-                            </div>
-                            <Crown className="w-4 h-4 text-[var(--t1)] opacity-70" />
-                          </div>
-
-                          <div className="mt-4 flex items-end justify-between gap-2">
-                            <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--brand-pink)] min-h-[14px]">{opt.note}</span>
-                            <span className="text-xs font-semibold text-[var(--t1)]">{loading ? "Loading..." : "Choose plan"}</span>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  <p className="text-center text-[11px] text-[var(--t2)] mt-1">
-                    Secure checkout by Stripe • Cancel anytime
-                  </p>
-                  <a
-                    href="https://t.me/L7kznr"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="qs-supporter-help"
+                  <button
+                    type="button"
+                    disabled={checkoutLoading !== null}
+                    onClick={() => startCheckout(selectedPlanId)}
+                    className="qs-supporter-subscribe"
                   >
-                    💬 Need help choosing a plan? Talk to support on Telegram
-                  </a>
+                    <Crown className="w-4 h-4" />
+                    {checkoutLoading ? "Loading..." : "Subscribe"}
+                  </button>
+
+                  <p className="text-center text-[11px] text-[var(--t2)]">
+                    Secure checkout by Stripe · Cancel anytime
+                  </p>
+                  <div className="flex items-center justify-center gap-1.5 text-[12px] text-[var(--t2)]">
+                    <span>💬 Need help?</span>
+                    <a href="https://t.me/L7kznr" target="_blank" rel="noopener noreferrer" className="font-semibold" style={{ color: "#c084fc" }}>
+                      Talk to support on Telegram
+                    </a>
+                  </div>
                 </div>
               </div>
             </motion.div>
