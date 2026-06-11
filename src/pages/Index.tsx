@@ -715,16 +715,17 @@ const Index = () => {
       <section id="planos" className="py-16 sm:py-24 px-4">
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
-            <h2 className="text-2xl sm:text-5xl font-bold leading-tight">
-              Choose your <span className="rainbow-text">vibe</span>
+            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--t1)]">
+              Choose your <span className="italic font-extrabold" style={{ color: "#a855f7" }}>experience</span>
             </h2>
-            <p className="text-muted-foreground mt-3 text-sm sm:text-base max-w-xl mx-auto">
-              Start free or support the project and unlock everything.
+            <p className="text-[var(--t2)] mt-3 text-sm sm:text-base max-w-xl mx-auto">
+              Start free. Upgrade anytime.
             </p>
             {!showSubscribeActions && !authLoading && !profileLoading && (
-              <p className="text-secondary mt-3 text-sm font-medium">Your account already has Supporter access. 💜</p>
+              <p className="mt-3 text-sm font-medium" style={{ color: "#a855f7" }}>Your account already has Supporter access. 💜</p>
             )}
           </motion.div>
+
 
           {/* Free vs Supporter cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
