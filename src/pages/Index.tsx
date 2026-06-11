@@ -498,217 +498,78 @@ const Index = () => {
 
       {/* ABOUT */}
       <section className="relative py-16 sm:py-24 px-4 overflow-hidden">
-        {/* Soft radial gradient background (no hard square) */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse at 20% 10%, hsl(var(--primary) / 0.18), transparent 55%), radial-gradient(ellipse at 85% 90%, hsl(var(--secondary) / 0.14), transparent 60%)",
+              "radial-gradient(ellipse at 20% 10%, rgba(139,43,226,.18), transparent 55%), radial-gradient(ellipse at 85% 90%, rgba(37,99,235,.14), transparent 60%)",
           }}
         />
 
         <div className="relative max-w-3xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.4 }} transition={{ duration: 0.6 }} className="text-center mb-10">
-            <h2 className="text-2xl sm:text-5xl font-bold leading-tight">
-              <Film className="inline w-7 sm:w-10 h-7 sm:h-10 mr-2 text-primary" />
-              ABOUT <span className="neon-text-purple">QUEER SCENES</span>
+          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.4 }} transition={{ duration: 0.6 }} className="mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="h-px flex-1 max-w-[36px]" style={{ background: "rgba(217,70,168,.5)" }} />
+              <span className="qs-section-label" style={{ color: "#d946a8" }}>About Queer Scenes</span>
+            </div>
+            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--t1)] leading-tight">
+              See yourself<br />on screen — <span className="italic" style={{ color: "#d946a8" }}>finally.</span>
             </h2>
           </motion.div>
 
-          {(() => {
-            const lines: { emoji: string; html: React.ReactNode; cls: string }[] = [
-              {
-                emoji: "🌍",
-                cls: "text-base sm:text-xl text-foreground leading-relaxed font-medium",
-                html: (
-                  <>Queer Scenes was created so people <span className="neon-text-pink">all over the world</span> can finally watch titles where they see themselves on screen.</>
-                ),
-              },
-              {
-                emoji: "🎬",
-                cls: "text-sm sm:text-lg text-muted-foreground leading-relaxed",
-                html: <>Real LGBTQIA+ representation — in series, movies, soap operas and GL. Without filters, without limits.</>,
-              },
-              {
-                emoji: "✨",
-                cls: "text-base sm:text-xl text-foreground leading-relaxed font-medium",
-                html: (
-                  <>And the best part? There's a <span className="neon-text-purple font-bold">whole world of exclusive content</span> waiting for those who decide to support the project. 💜</>
-                ),
-              },
-            ];
-            return (
-              <div className="space-y-6 text-center">
-                {lines.map((l, i) => (
-                  <motion.p
-                    key={i}
-                    initial={{ opacity: 0, y: 14 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.5 }}
-                    transition={{ duration: 0.6, delay: i * 0.6, ease: "easeOut" }}
-                    className={l.cls}
-                  >
-                    <motion.span
-                      initial={{ scale: 0, rotate: -45, opacity: 0 }}
-                      whileInView={{ scale: 1, rotate: 0, opacity: 1 }}
-                      viewport={{ once: true, amount: 0.5 }}
-                      transition={{ duration: 0.5, delay: i * 0.6 + 0.1, type: "spring", stiffness: 220 }}
-                      className="inline-block mr-1.5"
-                    >
-                      {l.emoji}
-                    </motion.span>
-                    {l.html}
-                  </motion.p>
-                ))}
-
-                {/* Journey: each step appears one by one with its emoji */}
-                <motion.p
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, amount: 0.6 }}
-                  className="text-sm sm:text-base text-muted-foreground italic flex flex-wrap items-center justify-center gap-2 pt-2"
-                >
-                  {[
-                    { emoji: "🎥", text: "Watch free" },
-                    { emoji: "💖", text: "Fall in love" },
-                    { emoji: "👑", text: "Become a Supporter" },
-                  ].map((s, idx, arr) => (
-                    <motion.span
-                      key={idx}
-                      variants={{
-                        hidden: { opacity: 0, y: 10 },
-                        visible: { opacity: 1, y: 0 },
-                      }}
-                      transition={{ delay: 1.8 + idx * 0.55, duration: 0.5 }}
-                      className="inline-flex items-center gap-1"
-                    >
-                      <motion.span
-                        initial={{ scale: 0 }}
-                        whileInView={{ scale: 1 }}
-                        viewport={{ once: true, amount: 0.6 }}
-                        transition={{ delay: 1.8 + idx * 0.55, type: "spring", stiffness: 240 }}
-                      >
-                        {s.emoji}
-                      </motion.span>
-                      <span>{s.text}</span>
-                      {idx < arr.length - 1 && (
-                        <motion.span
-                          initial={{ opacity: 0 }}
-                          whileInView={{ opacity: 1 }}
-                          viewport={{ once: true, amount: 0.6 }}
-                          transition={{ delay: 1.8 + idx * 0.55 + 0.3 }}
-                          className="text-primary mx-1"
-                        >
-                          →
-                        </motion.span>
-                      )}
-                    </motion.span>
-                  ))}
-                </motion.p>
-              </div>
-            );
-          })()}
-
-          {/* What makes Queer Scenes different — bento cards */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-14"
-          >
-            <h3 className="text-center text-lg sm:text-2xl font-bold mb-2">
-              Why <span className="neon-text-purple">Queer Scenes</span> is different
-            </h3>
-            <p className="text-center text-muted-foreground text-xs sm:text-sm mb-8 max-w-xl mx-auto">
-              We're not just another streaming platform — every detail is crafted by hand, with you in mind.
+          <div className="space-y-4 text-[var(--t2)] text-base sm:text-lg leading-relaxed mb-8">
+            <p>
+              Queer Scenes exists so people <span className="font-semibold" style={{ color: "#a855f7" }}>all over the world</span> can watch titles that represent them — series, films, soap operas and GL, without filters or limits.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[
-                {
-                  icon: Subtitles,
-                  title: "Manually subtitled",
-                  text: "Every title is translated and reviewed by hand — no auto-translate, no shortcuts.",
-                  color: "text-primary",
-                  border: "neon-border-purple",
-                },
-                {
-                  icon: Sparkles,
-                  title: "Exclusive titles",
-                  text: "We bring queer films and series you won't find on any other streaming service.",
-                  color: "text-secondary",
-                  border: "neon-border-pink",
-                },
-                {
-                  icon: Wrench,
-                  title: "Handcrafted experience",
-                  text: "Each release is curated, tested and polished — built for the way you actually watch.",
-                  color: "text-accent",
-                  border: "neon-border-blue",
-                },
-                {
-                  icon: MessageCircle,
-                  title: "Human support",
-                  text: "Real people answer you on Telegram — no bots, no scripts. We never leave supporters hanging.",
-                  color: "text-primary",
-                  border: "neon-border-purple",
-                },
-                {
-                  icon: Zap,
-                  title: "Latest premieres",
-                  text: "We chase the newest releases of the moment so you always have something fresh to watch.",
-                  color: "text-secondary",
-                  border: "neon-border-pink",
-                },
-                {
-                  icon: ShieldCheck,
-                  title: "Made with care",
-                  text: "Quality-checked uploads with working players — focused entirely on user experience.",
-                  color: "text-accent",
-                  border: "neon-border-blue",
-                },
-              ].map((card, i) => {
-                const Icon = card.icon;
-                return (
-                  <motion.div
-                    key={card.title}
-                    initial={{ opacity: 0, y: 16 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.5, delay: i * 0.08 }}
-                    whileHover={{ y: -4 }}
-                    className={`rounded-xl bg-card/70 backdrop-blur-sm border border-border p-5 text-left ${card.border} hover:border-primary/40 transition-colors`}
-                  >
-                    <div className={`w-10 h-10 rounded-lg bg-background/60 flex items-center justify-center mb-3 ${card.color}`}>
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <h4 className="font-semibold text-foreground text-sm sm:text-base mb-1.5">{card.title}</h4>
-                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{card.text}</p>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </motion.div>
+            <p>
+              Start free. For those who want the full experience, a world of <span className="font-semibold" style={{ color: "#a855f7" }}>exclusive content</span> awaits Supporters. 💜
+            </p>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 14 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.6 }}
-            transition={{ duration: 0.6, delay: 3.6 }}
-            className="mt-10 flex justify-center"
-          >
-            <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}>
-              <Button
-                size="lg"
-                onClick={() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" })}
-                className="shine-cta rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple gap-2 shadow-lg shadow-primary/40"
-              >
-                <Heart className="w-4 h-4 animate-pulse" /> See how to support 💜
-              </Button>
-            </motion.div>
+          {/* Numbered inline steps */}
+          <div className="grid grid-cols-3 gap-4 mb-14">
+            {[
+              { n: "01", text: "Watch free" },
+              { n: "02", text: "Fall in love" },
+              { n: "03", text: "Support us" },
+            ].map((s) => (
+              <div key={s.n}>
+                <p className="text-[10px] font-bold tracking-widest mb-1" style={{ color: "#d946a8" }}>{s.n}</p>
+                <p className="text-sm font-semibold text-[var(--t1)]">{s.text}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* WHY WE'RE DIFFERENT */}
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.6 }}>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="h-px flex-1 max-w-[36px]" style={{ background: "rgba(217,70,168,.5)" }} />
+              <span className="qs-section-label" style={{ color: "#d946a8" }}>Why we're different</span>
+            </div>
+            <h3 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-[var(--t1)] leading-tight mb-8">
+              Crafted by hand,<br />for <span className="italic" style={{ color: "#a855f7" }}>you.</span>
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-7">
+              {[
+                { title: "Manual subtitles", text: "Translated & reviewed by hand. No auto-translate." },
+                { title: "Exclusive titles", text: "Films & series you won't find anywhere else." },
+                { title: "Handcrafted XP", text: "Every release curated, tested and polished." },
+                { title: "Human support", text: "Real people on Telegram. No bots, ever." },
+                { title: "Latest premieres", text: "Always fresh — newest releases always here." },
+                { title: "Made with care", text: "Quality uploads with working players inside." },
+              ].map((c) => (
+                <div key={c.title}>
+                  <div className="h-[2px] w-10 mb-3" style={{ background: "linear-gradient(90deg, #d946a8, transparent)" }} />
+                  <h4 className="font-bold text-[var(--t1)] text-sm sm:text-base mb-1.5">{c.title}</h4>
+                  <p className="text-xs sm:text-sm text-[var(--t2)] leading-relaxed">{c.text}</p>
+                </div>
+              ))}
+            </div>
           </motion.div>
         </div>
       </section>
+
+
 
 
       {/* PLANS */}
