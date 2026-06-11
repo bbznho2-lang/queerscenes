@@ -666,9 +666,11 @@ const Index = () => {
                   Support the project & unlock the full experience.
                 </p>
 
-                <div className="relative z-10 mt-4 mx-auto qs-supporter-backers">
-                  <span className="qs-supporter-backers-dot" />
-                  <span>62 supporters back this project</span>
+                <div className="relative z-10 mt-4 flex justify-center">
+                  <div className="qs-supporter-backers">
+                    <span className="qs-supporter-backers-dot" />
+                    <span>62 supporters back this project</span>
+                  </div>
                 </div>
 
                 <div className="relative z-10 mt-5 space-y-2.5">
