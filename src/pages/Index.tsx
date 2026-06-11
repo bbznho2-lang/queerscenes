@@ -405,7 +405,6 @@ const Index = () => {
                             </div>
                           )}
                           <div className="qs-top10-shade" />
-                          <h4 className="qs-top10-title-overlay">{item.title}</h4>
                         </div>
                         <div className="qs-top10-foot">
                           <span className="qs-top10-bignum" aria-hidden>{rank}</span>
