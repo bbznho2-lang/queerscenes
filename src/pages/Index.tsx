@@ -798,14 +798,15 @@ const Index = () => {
 
       {/* FAQ */}
       <section className="py-16 sm:py-24 px-4">
-        <div className="max-w-2xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="mb-8">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[var(--t1)] tracking-tight">FAQ</h2>
-            <p className="text-sm text-[var(--t2)] mt-1">Everything you need to know.</p>
+        <div className="max-w-3xl mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="mb-8 sm:mb-10 text-center">
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--brand-pink)]">Support</p>
+            <h2 className="mt-3 text-3xl sm:text-5xl font-black text-[var(--t1)] tracking-tight">FAQ</h2>
+            <p className="text-sm text-[var(--t2)] mt-3">Everything you need to know before you start watching.</p>
           </motion.div>
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
-            <Accordion type="single" collapsible className="space-y-2.5">
+            <Accordion type="single" collapsible className="space-y-3">
               {[
                 { q: "Is Queer Scenes free?", a: "Yes. We have free content available. We also offer Supporter plans with exclusive access for the full experience." },
                 { q: "How do I become a Supporter?", a: "Pick a Supporter plan, complete the secure checkout, and your account will be upgraded instantly." },
@@ -816,17 +817,18 @@ const Index = () => {
                 <AccordionItem
                   key={i}
                   value={`faq-${i}`}
-                  className="qs-card px-4 sm:px-5 border-b-0 data-[state=open]:border-[rgba(139,43,226,.45)] transition-colors"
+                  className="qs-faq-item border-b-0"
                 >
-                  <AccordionTrigger className="text-left hover:no-underline py-4 text-sm sm:text-base text-[var(--t1)] [&>svg]:text-[var(--t2)]">
-                    <span className="flex items-center gap-3 flex-1 min-w-0">
-                      <span className="text-xs font-bold text-[var(--brand-purple-light)] tabular-nums shrink-0">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      <span className="truncate">{item.q}</span>
+                  <AccordionTrigger className="qs-faq-trigger hover:no-underline py-5 px-5 sm:px-6 text-left [&>svg]:hidden">
+                    <span className="flex items-center gap-4 flex-1 min-w-0">
+                      <span className="qs-faq-index">{String(i + 1).padStart(2, "0")}</span>
+                      <span className="qs-faq-question">{item.q}</span>
                     </span>
+                    <span className="qs-faq-plus" aria-hidden>+</span>
                   </AccordionTrigger>
-                  <AccordionContent className="text-[var(--t2)] pb-4 text-sm pl-8">{item.a}</AccordionContent>
+                  <AccordionContent className="qs-faq-content px-5 sm:px-6 pb-5 sm:pb-6">
+                    <div className="pl-[56px] text-sm text-[var(--t2)] leading-relaxed">{item.a}</div>
+                  </AccordionContent>
                 </AccordionItem>
               ))}
             </Accordion>
