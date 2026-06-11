@@ -328,7 +328,7 @@ const Index = () => {
 
           <motion.div initial="hidden" animate="visible" variants={fade} custom={4} className="flex flex-col items-center gap-3 mx-auto" style={{ maxWidth: 290 }}>
             <button
-              onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() => setLoginOpen(true)}
               className="w-full flex items-center justify-center gap-2"
               style={{
                 padding: "16px",
