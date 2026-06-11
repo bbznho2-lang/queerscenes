@@ -892,8 +892,8 @@ const Index = () => {
                       💬 Need help choosing a plan? Talk to support on Telegram
                     </a>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </motion.div>
           </div>
         </div>
