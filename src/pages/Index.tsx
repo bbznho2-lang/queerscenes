@@ -379,47 +379,6 @@ const Index = () => {
             </motion.div>
           )}
 
-          {top10CatalogItems.length > 0 && (
-            <motion.div initial="hidden" animate="visible" variants={fade} custom={6} className="mt-10 sm:mt-12 w-full">
-              <div className="mb-5 sm:mb-6">
-                <h3 className="flex items-center gap-2 text-lg sm:text-xl font-black text-[var(--t1)] tracking-tight">
-                  <span>🔥</span>
-                  <span>Top 10</span>
-                  <span className="qs-top10-pill">THIS MONTH</span>
-                </h3>
-                <p className="mt-2 text-sm text-[var(--t2)]">Most watched titles right now.</p>
-              </div>
-
-              <div className="overflow-x-auto -mx-4 px-4 scroll-smooth" style={{ scrollbarWidth: "none" }}>
-                <div className="flex gap-4 sm:gap-5 pb-4" style={{ width: "max-content" }}>
-                  {top10CatalogItems.map((item, i) => {
-                    const rank = i + 1;
-                    return (
-                      <article key={`top10-${item.id}`} className="qs-top10-card flex-shrink-0" style={{ width: "clamp(155px, 32vw, 200px)" }}>
-                        <div className="qs-top10-poster">
-                          {item.banner_url ? (
-                            <img src={item.banner_url} alt={item.title} loading="lazy" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <Film className="w-8 h-8 text-[var(--t3)]" />
-                            </div>
-                          )}
-                          <div className="qs-top10-shade" />
-                        </div>
-                        <div className="qs-top10-foot">
-                          <span className="qs-top10-bignum" aria-hidden>{rank}</span>
-                          <div className="qs-top10-meta">
-                            <p className="qs-top10-fname">{item.title}</p>
-                            <p className="qs-top10-ftag">· {item.tag || "Title"}</p>
-                          </div>
-                        </div>
-                      </article>
-                    );
-                  })}
-                </div>
-              </div>
-            </motion.div>
-          )}
 
         </div>
       </section>
