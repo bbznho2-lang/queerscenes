@@ -379,37 +379,63 @@ const Index = () => {
           )}
 
           {top10CatalogItems.length > 0 && (
-            <motion.div initial="hidden" animate="visible" variants={fade} custom={6} className="mt-10 sm:mt-12 w-full overflow-hidden">
-              <p className="text-xs sm:text-sm text-muted-foreground/80 uppercase tracking-widest mb-4 sm:mb-5 flex items-center justify-center gap-2">
-                <TrendingUp className="w-4 h-4" /> <span className="rainbow-text font-bold">TOP 10</span> THIS MONTH
-              </p>
-              <div className="relative">
-                <div className="flex gap-3 sm:gap-5 animate-scroll-left" style={{ width: 'max-content' }}>
-                  {[...top10CatalogItems, ...top10CatalogItems].map((item, i) => {
-                    const rank = (i % top10CatalogItems.length) + 1;
+            <motion.div initial="hidden" animate="visible" variants={fade} custom={6} className="mt-10 sm:mt-12 w-full">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="flex items-center gap-2 text-base sm:text-lg font-bold text-[var(--t1)]">
+                  <span>🔥</span> Top 10
+                  <span
+                    className="ml-2 px-2 py-0.5 text-[9px] font-bold tracking-widest rounded-full"
+                    style={{ background: "rgba(217,70,168,.18)", color: "#f0abfc", border: "1px solid rgba(217,70,168,.35)" }}
+                  >
+                    THIS MONTH
+                  </span>
+                </h3>
+                <button
+                  onClick={() => navigate("/browse")}
+                  className="text-xs sm:text-sm font-semibold hover:underline"
+                  style={{ color: "#a855f7" }}
+                >
+                  See all
+                </button>
+              </div>
+              <div className="overflow-x-auto -mx-4 px-4 scroll-smooth" style={{ scrollbarWidth: "none" }}>
+                <div className="flex gap-4 sm:gap-6 pb-3" style={{ width: "max-content" }}>
+                  {top10CatalogItems.map((item, i) => {
+                    const rank = i + 1;
                     return (
-                      <div key={`top10-${item.id}-${i}`} className="flex-shrink-0 flex items-end gap-1 sm:gap-2">
-                        <span
-                          className="leading-none font-black select-none text-transparent"
-                          style={{
-                            fontFamily: "'Space Grotesk', sans-serif",
-                            fontSize: 'clamp(60px, 14vw, 140px)',
-                            WebkitTextStroke: '2px hsl(var(--primary))',
-                          }}
-                        >
-                          {rank}
-                        </span>
-                        <div className="w-24 sm:w-40 md:w-48 aspect-[2/3] rounded-md sm:rounded-lg overflow-hidden border border-border/40 bg-muted relative shadow-lg">
+                      <div key={`top10-${item.id}`} className="flex-shrink-0 flex flex-col gap-2" style={{ width: "clamp(120px, 28vw, 170px)" }}>
+                        <div className="aspect-[2/3] rounded-xl overflow-hidden relative shadow-lg" style={{ background: "var(--s2)" }}>
                           {item.banner_url ? (
                             <img src={item.banner_url} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-muted">
-                              <Film className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground/40" />
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Film className="w-8 h-8 text-[var(--t3)]" />
                             </div>
                           )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
-                          <div className="absolute bottom-1 left-1 right-1">
-                            <p className="text-[9px] sm:text-xs text-foreground font-medium truncate">{item.title}</p>
+                          <span
+                            className="absolute top-2 left-2 flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold"
+                            style={{ background: "rgba(139,43,226,.7)", color: "#fff", backdropFilter: "blur(6px)" }}
+                          >
+                            <Crown className="w-2.5 h-2.5" /> S
+                          </span>
+                          <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
+                            <p className="text-[11px] sm:text-xs font-semibold text-white truncate">{item.title}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="leading-none font-black select-none text-transparent"
+                            style={{
+                              fontFamily: "'Sora', sans-serif",
+                              fontSize: "clamp(40px, 9vw, 60px)",
+                              WebkitTextStroke: "1.5px rgba(168,85,247,.55)",
+                            }}
+                          >
+                            {rank}
+                          </span>
+                          <div className="min-w-0">
+                            <p className="text-xs sm:text-sm font-semibold text-[var(--t1)] truncate">{item.title}</p>
+                            <p className="text-[10px] sm:text-xs text-[var(--t2)] capitalize">{item.tag || "Title"}</p>
                           </div>
                         </div>
                       </div>
@@ -419,6 +445,7 @@ const Index = () => {
               </div>
             </motion.div>
           )}
+
         </div>
       </section>
 
@@ -498,286 +525,162 @@ const Index = () => {
 
       {/* ABOUT */}
       <section className="relative py-16 sm:py-24 px-4 overflow-hidden">
-        {/* Soft radial gradient background (no hard square) */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse at 20% 10%, hsl(var(--primary) / 0.18), transparent 55%), radial-gradient(ellipse at 85% 90%, hsl(var(--secondary) / 0.14), transparent 60%)",
+              "radial-gradient(ellipse at 20% 10%, rgba(139,43,226,.18), transparent 55%), radial-gradient(ellipse at 85% 90%, rgba(37,99,235,.14), transparent 60%)",
           }}
         />
 
         <div className="relative max-w-3xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.4 }} transition={{ duration: 0.6 }} className="text-center mb-10">
-            <h2 className="text-2xl sm:text-5xl font-bold leading-tight">
-              <Film className="inline w-7 sm:w-10 h-7 sm:h-10 mr-2 text-primary" />
-              ABOUT <span className="neon-text-purple">QUEER SCENES</span>
+          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.4 }} transition={{ duration: 0.6 }} className="mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="h-px flex-1 max-w-[36px]" style={{ background: "rgba(217,70,168,.5)" }} />
+              <span className="qs-section-label" style={{ color: "#d946a8" }}>About Queer Scenes</span>
+            </div>
+            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--t1)] leading-tight">
+              See yourself<br />on screen — <span className="italic" style={{ color: "#d946a8" }}>finally.</span>
             </h2>
           </motion.div>
 
-          {(() => {
-            const lines: { emoji: string; html: React.ReactNode; cls: string }[] = [
-              {
-                emoji: "🌍",
-                cls: "text-base sm:text-xl text-foreground leading-relaxed font-medium",
-                html: (
-                  <>Queer Scenes was created so people <span className="neon-text-pink">all over the world</span> can finally watch titles where they see themselves on screen.</>
-                ),
-              },
-              {
-                emoji: "🎬",
-                cls: "text-sm sm:text-lg text-muted-foreground leading-relaxed",
-                html: <>Real LGBTQIA+ representation — in series, movies, soap operas and GL. Without filters, without limits.</>,
-              },
-              {
-                emoji: "✨",
-                cls: "text-base sm:text-xl text-foreground leading-relaxed font-medium",
-                html: (
-                  <>And the best part? There's a <span className="neon-text-purple font-bold">whole world of exclusive content</span> waiting for those who decide to support the project. 💜</>
-                ),
-              },
-            ];
-            return (
-              <div className="space-y-6 text-center">
-                {lines.map((l, i) => (
-                  <motion.p
-                    key={i}
-                    initial={{ opacity: 0, y: 14 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.5 }}
-                    transition={{ duration: 0.6, delay: i * 0.6, ease: "easeOut" }}
-                    className={l.cls}
-                  >
-                    <motion.span
-                      initial={{ scale: 0, rotate: -45, opacity: 0 }}
-                      whileInView={{ scale: 1, rotate: 0, opacity: 1 }}
-                      viewport={{ once: true, amount: 0.5 }}
-                      transition={{ duration: 0.5, delay: i * 0.6 + 0.1, type: "spring", stiffness: 220 }}
-                      className="inline-block mr-1.5"
-                    >
-                      {l.emoji}
-                    </motion.span>
-                    {l.html}
-                  </motion.p>
-                ))}
-
-                {/* Journey: each step appears one by one with its emoji */}
-                <motion.p
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, amount: 0.6 }}
-                  className="text-sm sm:text-base text-muted-foreground italic flex flex-wrap items-center justify-center gap-2 pt-2"
-                >
-                  {[
-                    { emoji: "🎥", text: "Watch free" },
-                    { emoji: "💖", text: "Fall in love" },
-                    { emoji: "👑", text: "Become a Supporter" },
-                  ].map((s, idx, arr) => (
-                    <motion.span
-                      key={idx}
-                      variants={{
-                        hidden: { opacity: 0, y: 10 },
-                        visible: { opacity: 1, y: 0 },
-                      }}
-                      transition={{ delay: 1.8 + idx * 0.55, duration: 0.5 }}
-                      className="inline-flex items-center gap-1"
-                    >
-                      <motion.span
-                        initial={{ scale: 0 }}
-                        whileInView={{ scale: 1 }}
-                        viewport={{ once: true, amount: 0.6 }}
-                        transition={{ delay: 1.8 + idx * 0.55, type: "spring", stiffness: 240 }}
-                      >
-                        {s.emoji}
-                      </motion.span>
-                      <span>{s.text}</span>
-                      {idx < arr.length - 1 && (
-                        <motion.span
-                          initial={{ opacity: 0 }}
-                          whileInView={{ opacity: 1 }}
-                          viewport={{ once: true, amount: 0.6 }}
-                          transition={{ delay: 1.8 + idx * 0.55 + 0.3 }}
-                          className="text-primary mx-1"
-                        >
-                          →
-                        </motion.span>
-                      )}
-                    </motion.span>
-                  ))}
-                </motion.p>
-              </div>
-            );
-          })()}
-
-          {/* What makes Queer Scenes different — bento cards */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-14"
-          >
-            <h3 className="text-center text-lg sm:text-2xl font-bold mb-2">
-              Why <span className="neon-text-purple">Queer Scenes</span> is different
-            </h3>
-            <p className="text-center text-muted-foreground text-xs sm:text-sm mb-8 max-w-xl mx-auto">
-              We're not just another streaming platform — every detail is crafted by hand, with you in mind.
+          <div className="space-y-4 text-[var(--t2)] text-base sm:text-lg leading-relaxed mb-8">
+            <p>
+              Queer Scenes exists so people <span className="font-semibold" style={{ color: "#a855f7" }}>all over the world</span> can watch titles that represent them — series, films, soap operas and GL, without filters or limits.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[
-                {
-                  icon: Subtitles,
-                  title: "Manually subtitled",
-                  text: "Every title is translated and reviewed by hand — no auto-translate, no shortcuts.",
-                  color: "text-primary",
-                  border: "neon-border-purple",
-                },
-                {
-                  icon: Sparkles,
-                  title: "Exclusive titles",
-                  text: "We bring queer films and series you won't find on any other streaming service.",
-                  color: "text-secondary",
-                  border: "neon-border-pink",
-                },
-                {
-                  icon: Wrench,
-                  title: "Handcrafted experience",
-                  text: "Each release is curated, tested and polished — built for the way you actually watch.",
-                  color: "text-accent",
-                  border: "neon-border-blue",
-                },
-                {
-                  icon: MessageCircle,
-                  title: "Human support",
-                  text: "Real people answer you on Telegram — no bots, no scripts. We never leave supporters hanging.",
-                  color: "text-primary",
-                  border: "neon-border-purple",
-                },
-                {
-                  icon: Zap,
-                  title: "Latest premieres",
-                  text: "We chase the newest releases of the moment so you always have something fresh to watch.",
-                  color: "text-secondary",
-                  border: "neon-border-pink",
-                },
-                {
-                  icon: ShieldCheck,
-                  title: "Made with care",
-                  text: "Quality-checked uploads with working players — focused entirely on user experience.",
-                  color: "text-accent",
-                  border: "neon-border-blue",
-                },
-              ].map((card, i) => {
-                const Icon = card.icon;
-                return (
-                  <motion.div
-                    key={card.title}
-                    initial={{ opacity: 0, y: 16 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.5, delay: i * 0.08 }}
-                    whileHover={{ y: -4 }}
-                    className={`rounded-xl bg-card/70 backdrop-blur-sm border border-border p-5 text-left ${card.border} hover:border-primary/40 transition-colors`}
-                  >
-                    <div className={`w-10 h-10 rounded-lg bg-background/60 flex items-center justify-center mb-3 ${card.color}`}>
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <h4 className="font-semibold text-foreground text-sm sm:text-base mb-1.5">{card.title}</h4>
-                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{card.text}</p>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </motion.div>
+            <p>
+              Start free. For those who want the full experience, a world of <span className="font-semibold" style={{ color: "#a855f7" }}>exclusive content</span> awaits Supporters. 💜
+            </p>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 14 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.6 }}
-            transition={{ duration: 0.6, delay: 3.6 }}
-            className="mt-10 flex justify-center"
-          >
-            <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}>
-              <Button
-                size="lg"
-                onClick={() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" })}
-                className="shine-cta rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple gap-2 shadow-lg shadow-primary/40"
-              >
-                <Heart className="w-4 h-4 animate-pulse" /> See how to support 💜
-              </Button>
-            </motion.div>
+          {/* Numbered inline steps */}
+          <div className="grid grid-cols-3 gap-4 mb-14">
+            {[
+              { n: "01", text: "Watch free" },
+              { n: "02", text: "Fall in love" },
+              { n: "03", text: "Support us" },
+            ].map((s) => (
+              <div key={s.n}>
+                <p className="text-[10px] font-bold tracking-widest mb-1" style={{ color: "#d946a8" }}>{s.n}</p>
+                <p className="text-sm font-semibold text-[var(--t1)]">{s.text}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* WHY WE'RE DIFFERENT */}
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.6 }}>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="h-px flex-1 max-w-[36px]" style={{ background: "rgba(217,70,168,.5)" }} />
+              <span className="qs-section-label" style={{ color: "#d946a8" }}>Why we're different</span>
+            </div>
+            <h3 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-[var(--t1)] leading-tight mb-8">
+              Crafted by hand,<br />for <span className="italic" style={{ color: "#a855f7" }}>you.</span>
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-7">
+              {[
+                { title: "Manual subtitles", text: "Translated & reviewed by hand. No auto-translate." },
+                { title: "Exclusive titles", text: "Films & series you won't find anywhere else." },
+                { title: "Handcrafted XP", text: "Every release curated, tested and polished." },
+                { title: "Human support", text: "Real people on Telegram. No bots, ever." },
+                { title: "Latest premieres", text: "Always fresh — newest releases always here." },
+                { title: "Made with care", text: "Quality uploads with working players inside." },
+              ].map((c) => (
+                <div key={c.title}>
+                  <div className="h-[2px] w-10 mb-3" style={{ background: "linear-gradient(90deg, #d946a8, transparent)" }} />
+                  <h4 className="font-bold text-[var(--t1)] text-sm sm:text-base mb-1.5">{c.title}</h4>
+                  <p className="text-xs sm:text-sm text-[var(--t2)] leading-relaxed">{c.text}</p>
+                </div>
+              ))}
+            </div>
           </motion.div>
         </div>
       </section>
+
+
 
 
       {/* PLANS */}
       <section id="planos" className="py-16 sm:py-24 px-4">
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
-            <h2 className="text-2xl sm:text-5xl font-bold leading-tight">
-              Choose your <span className="rainbow-text">vibe</span>
+            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--t1)]">
+              Choose your <span className="italic font-extrabold" style={{ color: "#a855f7" }}>experience</span>
             </h2>
-            <p className="text-muted-foreground mt-3 text-sm sm:text-base max-w-xl mx-auto">
-              Start free or support the project and unlock everything.
+            <p className="text-[var(--t2)] mt-3 text-sm sm:text-base max-w-xl mx-auto">
+              Start free. Upgrade anytime.
             </p>
             {!showSubscribeActions && !authLoading && !profileLoading && (
-              <p className="text-secondary mt-3 text-sm font-medium">Your account already has Supporter access. 💜</p>
+              <p className="mt-3 text-sm font-medium" style={{ color: "#a855f7" }}>Your account already has Supporter access. 💜</p>
             )}
           </motion.div>
+
 
           {/* Free vs Supporter cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {/* FREE */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
-              <Card className="bg-card neon-border-pink h-full flex flex-col">
-                <CardHeader className="text-center pb-2">
+              <div className="qs-card-lg p-6 sm:p-7 h-full flex flex-col">
+                <div className="text-center pb-2">
                   <div className="text-4xl mb-1">🌈</div>
-                  <CardTitle className="text-2xl neon-text-pink">Free</CardTitle>
+                  <h3 className="text-xl font-bold text-[var(--t1)]">Free</h3>
                   <div className="mt-2">
-                    <span className="text-4xl sm:text-5xl font-bold text-foreground">€0</span>
+                    <span className="text-4xl sm:text-5xl font-extrabold text-[var(--t1)]">€0</span>
                   </div>
-                  <p className="text-muted-foreground text-sm mt-1">
+                  <p className="text-[var(--t2)] text-sm mt-2">
                     Join the community and explore general content for free.
                   </p>
-                </CardHeader>
-                <CardContent className="flex-1 flex flex-col">
+                </div>
+                <div className="flex-1 flex flex-col mt-4">
                   <ul className="space-y-2.5 text-sm flex-1">
-                    <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span><span className="text-foreground">Get a taste of our LGBTQIA+ universe</span></li>
-                    <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span><span className="text-foreground">Daily picks from the open catalog</span></li>
-                    <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span><span className="text-foreground">Join the conversation in the comments</span></li>
-                    <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span><span className="text-foreground">Hang out with the community on Telegram</span></li>
-                    <li className="flex items-start gap-2 opacity-60"><span className="text-destructive mt-0.5">✗</span><span className="text-muted-foreground line-through">International subtitled series & movies</span></li>
-                    <li className="flex items-start gap-2 opacity-60"><span className="text-destructive mt-0.5">✗</span><span className="text-muted-foreground line-through">Soap operas subtitled weekly</span></li>
-                    <li className="flex items-start gap-2 opacity-60"><span className="text-destructive mt-0.5">✗</span><span className="text-muted-foreground line-through">GL Dramas subtitled</span></li>
-                    <li className="flex items-start gap-2 opacity-60"><span className="text-destructive mt-0.5">✗</span><span className="text-muted-foreground line-through">Early access content</span></li>
+                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Get a taste of our LGBTQIA+ universe</span></li>
+                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Daily picks from the open catalog</span></li>
+                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Join the conversation in the comments</span></li>
+                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Hang out with the community on Telegram</span></li>
+                    <li className="flex items-start gap-2 opacity-50"><span className="text-[var(--t3)] mt-0.5">✗</span><span className="text-[var(--t3)] line-through">International subtitled series & movies</span></li>
+                    <li className="flex items-start gap-2 opacity-50"><span className="text-[var(--t3)] mt-0.5">✗</span><span className="text-[var(--t3)] line-through">Soap operas subtitled weekly</span></li>
+                    <li className="flex items-start gap-2 opacity-50"><span className="text-[var(--t3)] mt-0.5">✗</span><span className="text-[var(--t3)] line-through">GL Dramas subtitled</span></li>
+                    <li className="flex items-start gap-2 opacity-50"><span className="text-[var(--t3)] mt-0.5">✗</span><span className="text-[var(--t3)] line-through">Early access content</span></li>
                   </ul>
                   <Button
                     onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
-                    className="w-full mt-5 rounded-full bg-accent text-accent-foreground hover:bg-accent/90 glow-pink gap-2"
+                    className="qs-btn-primary w-full mt-5 h-11 gap-2"
                   >
                     <Play className="w-4 h-4" /> Join free
                   </Button>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </motion.div>
 
             {/* SUPPORTER */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2}>
-              <Card className="bg-card neon-border-purple neon-pulse h-full overflow-hidden relative flex flex-col">
-                <div className="absolute top-0 right-0 left-0">
-                  <span className="block w-full text-center py-1.5 text-xs font-semibold bg-primary text-primary-foreground">
-                    💜 MOST POPULAR
-                  </span>
-                </div>
-                <CardHeader className="text-center pb-2 pt-10">
+              <div
+                className="qs-card-lg p-6 sm:p-7 h-full flex flex-col relative overflow-hidden"
+                style={{ border: "1.5px solid rgba(139,43,226,.45)", boxShadow: "0 0 60px -10px rgba(139,43,226,.35)" }}
+              >
+                <span
+                  className="absolute top-3 left-1/2 -translate-x-1/2 px-3 py-1 text-[10px] font-bold tracking-wider rounded-full"
+                  style={{ background: "rgba(139,43,226,.25)", color: "#c084fc", border: "1px solid rgba(139,43,226,.4)" }}
+                >
+                  💜 MOST POPULAR
+                </span>
+                <div className="text-center pb-2 pt-8">
                   <div className="text-4xl mb-1">💜</div>
-                  <CardTitle className="text-2xl neon-text-purple">Supporter</CardTitle>
-                  <p className="text-muted-foreground text-sm mt-2">
+                  <h3 className="text-xl font-bold text-[var(--t1)]">Supporter</h3>
+                  <p className="text-[var(--t2)] text-sm mt-2">
                     Support the project and unlock the full experience.
                   </p>
-                </CardHeader>
-                <CardContent className="flex-1 flex flex-col">
+                </div>
+                <div className="flex-1 flex flex-col mt-4">
+                  <ul className="space-y-2.5 text-sm flex-1">
+                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Everything in the Free plan</span></li>
+                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Smooth, uninterrupted experience</span></li>
+                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Soap operas subtitled in English — every week</span></li>
+                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">LGBT series & movies from other countries, subtitled</span></li>
+                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">GL Dramas subtitled</span></li>
+                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Early access content</span></li>
+                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">VIP Telegram channel with exclusive news & updates</span></li>
+                  </ul>
+
                   <ul className="space-y-2.5 text-sm flex-1">
                     <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">Everything in the Free plan</span></li>
                     <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">Smooth, uninterrupted experience</span></li>
@@ -877,8 +780,8 @@ const Index = () => {
                       💬 Need help choosing a plan? Talk to support on Telegram
                     </a>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </motion.div>
           </div>
         </div>
@@ -915,36 +818,41 @@ const Index = () => {
       {/* FAQ */}
       <section className="py-16 sm:py-24 px-4">
         <div className="max-w-2xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
-            <h2 className="text-2xl sm:text-5xl font-bold">
-              <HelpCircle className="inline w-7 sm:w-10 h-7 sm:h-10 mr-2 text-secondary" />
-              <span className="neon-text-blue">FAQ</span>
-            </h2>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="mb-8">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[var(--t1)] tracking-tight">FAQ</h2>
+            <p className="text-sm text-[var(--t2)] mt-1">Everything you need to know.</p>
           </motion.div>
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
-            <Accordion type="single" collapsible className="space-y-3">
+            <Accordion type="single" collapsible className="space-y-2.5">
               {[
                 { q: "Is Queer Scenes free?", a: "Yes. We have free content available. We also offer Supporter plans with exclusive access for the full experience." },
-                { q: "Do I need to create an account?", a: "Yes. To access the content you need to create a login with email and password." },
+                { q: "How do I become a Supporter?", a: "Pick a Supporter plan, complete the secure checkout, and your account will be upgraded instantly." },
+                { q: "Can I cancel anytime?", a: "Yes. Cancellation can be done at any time, with no penalty." },
                 { q: "Is the content only LGBTQIA+?", a: "Yes. The platform's focus is exclusively on stories, scenes, and productions with LGBTQIA+ representation." },
-                { q: "Can I cancel the premium plan?", a: "Yes. Cancellation can be done at any time." },
                 { q: "Does it work on mobile?", a: "Yes. The platform is adapted for mobile, tablet, and desktop." },
               ].map((item, i) => (
-                <AccordionItem key={i} value={`faq-${i}`} className="bg-card border border-border rounded-xl px-4 sm:px-5 data-[state=open]:border-primary/40 transition-colors">
-                  <AccordionTrigger className="text-left text-foreground hover:no-underline py-4 text-sm sm:text-base">
-                    <span className="flex items-center gap-3">
-                      <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">{i + 1}</span>
-                      {item.q}
+                <AccordionItem
+                  key={i}
+                  value={`faq-${i}`}
+                  className="qs-card px-4 sm:px-5 border-b-0 data-[state=open]:border-[rgba(139,43,226,.45)] transition-colors"
+                >
+                  <AccordionTrigger className="text-left hover:no-underline py-4 text-sm sm:text-base text-[var(--t1)] [&>svg]:text-[var(--t2)]">
+                    <span className="flex items-center gap-3 flex-1 min-w-0">
+                      <span className="text-xs font-bold text-[var(--brand-purple-light)] tabular-nums shrink-0">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span className="truncate">{item.q}</span>
                     </span>
                   </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground pb-4 text-sm">{item.a}</AccordionContent>
+                  <AccordionContent className="text-[var(--t2)] pb-4 text-sm pl-8">{item.a}</AccordionContent>
                 </AccordionItem>
               ))}
             </Accordion>
           </motion.div>
         </div>
       </section>
+
 
       {/* FINAL CTA */}
       <section className="py-16 sm:py-24 px-4 text-center">
