@@ -1002,6 +1002,72 @@ const Index = () => {
       <footer className="border-t border-border py-6 sm:py-8 text-center text-xs sm:text-sm text-muted-foreground">
         <p>© 2026 Queer Scenes. All rights reserved. 🌈</p>
       </footer>
+
+      {/* Centered login modal — opened from "Start watching free" */}
+      <Dialog open={loginOpen} onOpenChange={setLoginOpen}>
+        <DialogContent className="qs-modal max-w-sm sm:max-w-md p-6 sm:p-7">
+          <div className="space-y-1 mb-5">
+            <h2 className="text-2xl font-bold text-[var(--t1)]">
+              {isForgot ? "Reset password" : isSignUp ? "Create account" : "Welcome back 👋"}
+            </h2>
+            <p className="text-sm text-[var(--t2)]">
+              {isForgot ? "Enter your email to receive a reset link" : isSignUp ? "Join the community" : "Sign in to continue watching"}
+            </p>
+          </div>
+          <form onSubmit={handleLogin} className="space-y-4">
+            {isSignUp && !isForgot && (
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold tracking-wider uppercase text-[var(--t2)]">First name</label>
+                  <Input type="text" placeholder="John" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="qs-input" required />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold tracking-wider uppercase text-[var(--t2)]">Last name</label>
+                  <Input type="text" placeholder="Doe" value={lastName} onChange={(e) => setLastName(e.target.value)} className="qs-input" required />
+                </div>
+              </div>
+            )}
+            <div className="space-y-1">
+              <label className="text-xs font-semibold tracking-wider uppercase text-[var(--t2)]">Email</label>
+              <Input type="email" placeholder="your@email.com" value={email} onChange={(e) => setEmail(e.target.value)} className="qs-input" required />
+            </div>
+            {!isForgot && (
+              <div className="space-y-1">
+                <label className="text-xs font-semibold tracking-wider uppercase text-[var(--t2)]">Password</label>
+                <div className="relative">
+                  <Input type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="qs-input pr-10" required />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--t2)] hover:text-[var(--t1)]">
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+            )}
+            <Button type="submit" disabled={loading} className="qs-btn-primary w-full h-11">
+              {loading ? "Please wait..." : isForgot ? "Send reset link" : isSignUp ? "Create account" : "Sign in"}
+            </Button>
+            {!isSignUp && !isForgot && (
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 text-xs text-[var(--t2)] cursor-pointer select-none">
+                  <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-4 h-4 rounded border-border bg-muted accent-[#8b2be2] cursor-pointer" />
+                  Remember me
+                </label>
+                <button type="button" onClick={() => setIsForgot(true)} className="text-xs font-semibold underline" style={{ color: "#a855f7" }}>
+                  Forgot password?
+                </button>
+              </div>
+            )}
+            <p className="text-center text-sm text-[var(--t2)]">
+              {isForgot ? (
+                <button type="button" onClick={() => setIsForgot(false)} className="font-semibold underline" style={{ color: "#a855f7" }}>Back to Sign in</button>
+              ) : isSignUp ? (
+                <>Already have an account? <button type="button" onClick={() => setIsSignUp(false)} className="font-semibold underline" style={{ color: "#a855f7" }}>Sign in</button></>
+              ) : (
+                <>Don't have an account? <button type="button" onClick={() => setIsSignUp(true)} className="font-semibold underline" style={{ color: "#a855f7" }}>Create one</button></>
+              )}
+            </p>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
