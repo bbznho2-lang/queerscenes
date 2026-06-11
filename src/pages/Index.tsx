@@ -380,65 +380,47 @@ const Index = () => {
 
           {top10CatalogItems.length > 0 && (
             <motion.div initial="hidden" animate="visible" variants={fade} custom={6} className="mt-10 sm:mt-12 w-full">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="flex items-center gap-2 text-base sm:text-lg font-bold text-[var(--t1)]">
-                  <span>🔥</span> Top 10
-                  <span
-                    className="ml-2 px-2 py-0.5 text-[9px] font-bold tracking-widest rounded-full"
-                    style={{ background: "rgba(217,70,168,.18)", color: "#f0abfc", border: "1px solid rgba(217,70,168,.35)" }}
-                  >
-                    THIS MONTH
-                  </span>
+              <div className="mb-5 sm:mb-6">
+                <h3 className="flex items-center gap-2 text-lg sm:text-xl font-black text-[var(--t1)] tracking-tight">
+                  <span>🔥</span>
+                  <span>Top 10</span>
+                  <span className="qs-top10-pill">THIS MONTH</span>
                 </h3>
-                <button
-                  onClick={() => navigate("/browse")}
-                  className="text-xs sm:text-sm font-semibold hover:underline"
-                  style={{ color: "#a855f7" }}
-                >
-                  See all
-                </button>
+                <p className="mt-2 text-sm text-[var(--t2)]">Most watched titles right now.</p>
               </div>
+
               <div className="overflow-x-auto -mx-4 px-4 scroll-smooth" style={{ scrollbarWidth: "none" }}>
-                <div className="flex gap-4 sm:gap-6 pb-3" style={{ width: "max-content" }}>
+                <div className="flex gap-4 sm:gap-5 pb-4" style={{ width: "max-content" }}>
                   {top10CatalogItems.map((item, i) => {
                     const rank = i + 1;
                     return (
-                      <div key={`top10-${item.id}`} className="flex-shrink-0 flex flex-col gap-2" style={{ width: "clamp(120px, 28vw, 170px)" }}>
-                        <div className="aspect-[2/3] rounded-xl overflow-hidden relative shadow-lg" style={{ background: "var(--s2)" }}>
-                          {item.banner_url ? (
-                            <img src={item.banner_url} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <Film className="w-8 h-8 text-[var(--t3)]" />
-                            </div>
-                          )}
-                          <span
-                            className="absolute top-2 left-2 flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold"
-                            style={{ background: "rgba(139,43,226,.7)", color: "#fff", backdropFilter: "blur(6px)" }}
-                          >
-                            <Crown className="w-2.5 h-2.5" /> S
-                          </span>
-                          <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
-                            <p className="text-[11px] sm:text-xs font-semibold text-white truncate">{item.title}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span
-                            className="leading-none font-black select-none text-transparent"
-                            style={{
-                              fontFamily: "'Sora', sans-serif",
-                              fontSize: "clamp(40px, 9vw, 60px)",
-                              WebkitTextStroke: "1.5px rgba(168,85,247,.55)",
-                            }}
-                          >
+                      <article key={`top10-${item.id}`} className="qs-top10-card flex-shrink-0" style={{ width: "clamp(165px, 34vw, 220px)" }}>
+                        <div className="relative pt-8 sm:pt-10">
+                          <span className="qs-top10-rank" aria-hidden>
                             {rank}
                           </span>
-                          <div className="min-w-0">
-                            <p className="text-xs sm:text-sm font-semibold text-[var(--t1)] truncate">{item.title}</p>
-                            <p className="text-[10px] sm:text-xs text-[var(--t2)] capitalize">{item.tag || "Title"}</p>
+
+                          <div className="qs-top10-poster">
+                            {item.banner_url ? (
+                              <img src={item.banner_url} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Film className="w-8 h-8 text-[var(--t3)]" />
+                              </div>
+                            )}
+
+                            <div className="qs-top10-overlay">
+                              <span className="qs-top10-badge">#{String(rank).padStart(2, "0")}</span>
+                              <span className="qs-top10-tag">{item.tag || "Title"}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
+
+                        <div className="mt-3 min-w-0">
+                          <p className="text-[11px] font-bold tracking-[0.18em] text-[var(--brand-pink)] uppercase">Trending now</p>
+                          <p className="mt-1 text-sm sm:text-base font-bold text-[var(--t1)] leading-tight line-clamp-2">{item.title}</p>
+                        </div>
+                      </article>
                     );
                   })}
                 </div>
@@ -653,124 +635,132 @@ const Index = () => {
 
             {/* SUPPORTER */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2}>
-              <div
-                className="qs-card-lg p-6 sm:p-7 h-full flex flex-col relative overflow-hidden"
-                style={{ border: "1.5px solid rgba(139,43,226,.45)", boxShadow: "0 0 60px -10px rgba(139,43,226,.35)" }}
-              >
-                <span
-                  className="absolute top-3 left-1/2 -translate-x-1/2 px-3 py-1 text-[10px] font-bold tracking-wider rounded-full"
-                  style={{ background: "rgba(139,43,226,.25)", color: "#c084fc", border: "1px solid rgba(139,43,226,.4)" }}
-                >
-                  💜 MOST POPULAR
-                </span>
-                <div className="text-center pb-2 pt-8">
-                  <div className="text-4xl mb-1">💜</div>
-                  <h3 className="text-xl font-bold text-[var(--t1)]">Supporter</h3>
-                  <p className="text-[var(--t2)] text-sm mt-2">
-                    Support the project and unlock the full experience.
-                  </p>
-                </div>
-                <div className="flex-1 flex flex-col mt-4">
-                  <ul className="space-y-2.5 text-sm flex-1">
-                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Everything in the Free plan</span></li>
-                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Smooth, uninterrupted experience</span></li>
-                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Soap operas subtitled in English — every week</span></li>
-                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">LGBT series & movies from other countries, subtitled</span></li>
-                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">GL Dramas subtitled</span></li>
-                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Early access content</span></li>
-                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">VIP Telegram channel with exclusive news & updates</span></li>
-                  </ul>
+              <div className="qs-supporter-panel p-5 sm:p-6 h-full flex flex-col relative overflow-hidden">
+                <div className="qs-supporter-glow" aria-hidden />
 
-                  <div className="mt-5 mb-2 flex items-center justify-center gap-2 rounded-full bg-primary/10 border border-primary/30 px-3 py-1.5 text-xs font-semibold text-foreground">
-                    <span aria-hidden>💜</span>
-                    <span>62 supporters already back the project</span>
-                  </div>
-
-                  {/* Email + plan picker */}
-                  <div className="mt-5 space-y-3">
-                    <div>
-                      <label htmlFor="supporter-email" className="text-xs text-muted-foreground block mb-1">
-                        Your email (we'll send your access here)
-                      </label>
-                      <Input
-                        id="supporter-email"
-                        type="email"
-                        inputMode="email"
-                        autoComplete="email"
-                        placeholder="you@example.com"
-                        value={checkoutEmail}
-                        onChange={(e) => setCheckoutEmail(e.target.value)}
-                        className="bg-muted/50 border-border"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      {[
-                        {
-                          label: "Monthly",
-                          price: "€9.99",
-                          period: "/month",
-                          note: "",
-                          color: "neon-text-pink",
-                          border: "neon-border-pink",
-                          btn: "bg-accent text-accent-foreground hover:bg-accent/90 glow-pink",
-                          priceId: "price_1TdJouJ5xR4MDdjriK0vTZr3",
-                        },
-                        {
-                          label: "Quarterly",
-                          price: "€24.99",
-                          period: "/3 months",
-                          note: "save 17%",
-                          color: "neon-text-purple",
-                          border: "neon-border-purple",
-                          btn: "bg-primary text-primary-foreground hover:bg-primary/90 glow-purple",
-                          priceId: "price_1TdJpxJ5xR4MDdjr6CYmpFZk",
-                        },
-                        {
-                          label: "Yearly",
-                          price: "€89.99",
-                          period: "/year",
-                          note: "save 25%",
-                          color: "neon-text-blue",
-                          border: "border-secondary/40",
-                          btn: "bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-blue",
-                          priceId: "price_1TdJrtJ5xR4MDdjrEdxuGjSz",
-                        },
-                      ].map((opt) => {
-                        const loading = checkoutLoading === opt.priceId;
-                        return (
-                          <button
-                            type="button"
-                            key={opt.label}
-                            disabled={checkoutLoading !== null}
-                            onClick={() => startCheckout(opt.priceId)}
-                            className={`text-left rounded-xl bg-card border p-3 transition-all hover:scale-[1.02] disabled:opacity-60 disabled:cursor-wait ${opt.border}`}
-                          >
-                            <p className={`text-xs font-semibold ${opt.color}`}>{opt.label}</p>
-                            <div className="mt-0.5">
-                              <span className="text-xl font-bold text-foreground">{opt.price}</span>
-                              <span className="text-[11px] text-muted-foreground ml-1">{opt.period}</span>
-                            </div>
-                            {opt.note && <p className="text-[10px] text-secondary mt-0.5">{opt.note}</p>}
-                            <div className={`mt-2 inline-flex items-center justify-center w-full rounded-full px-3 py-1.5 text-xs font-semibold ${opt.btn}`}>
-                              <Crown className="w-3 h-3 mr-1" /> {loading ? "Loading..." : "Subscribe"}
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                    <p className="text-center text-[11px] text-muted-foreground mt-1">
-                      Secure checkout by Stripe • Cancel anytime
+                <div className="relative z-10 flex items-start justify-between gap-4">
+                  <div>
+                    <span className="qs-supporter-pill">MOST POPULAR</span>
+                    <h3 className="mt-4 text-2xl sm:text-3xl font-black tracking-tight text-[var(--t1)]">Supporter</h3>
+                    <p className="mt-2 text-sm text-[var(--t2)] max-w-sm">
+                      Support the project and unlock the full experience with exclusive releases, weekly updates and premium access.
                     </p>
-                    <a
-                      href="https://t.me/L7kznr"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-3 flex items-center justify-center gap-2 w-full py-2 rounded-full neon-border-blue text-secondary hover:bg-secondary/10 transition-colors text-xs font-medium"
-                    >
-                      💬 Need help choosing a plan? Talk to support on Telegram
-                    </a>
                   </div>
+
+                  <div className="qs-supporter-icon shrink-0">
+                    <Crown className="w-5 h-5" />
+                  </div>
+                </div>
+
+                <div className="relative z-10 mt-5 qs-supporter-stat">
+                  <span className="text-lg">💜</span>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.18em] text-[var(--brand-pink)] font-bold">Community</p>
+                    <p className="text-sm font-semibold text-[var(--t1)]">62 supporters already back the project</p>
+                  </div>
+                </div>
+
+                <div className="relative z-10 mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                  {[
+                    "Everything in the Free plan",
+                    "Smooth, uninterrupted experience",
+                    "Soap operas subtitled in English every week",
+                    "International LGBTQIA+ series and movies subtitled",
+                    "GL dramas subtitled",
+                    "Early access content",
+                    "VIP Telegram channel with exclusive updates",
+                  ].map((item) => (
+                    <div key={item} className="qs-supporter-feature">
+                      <span className="qs-supporter-check">✓</span>
+                      <span className="text-[var(--t1)]">{item}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="relative z-10 mt-6 space-y-3">
+                  <div>
+                    <label htmlFor="supporter-email" className="text-xs text-[var(--t2)] block mb-1.5 uppercase tracking-[0.16em] font-bold">
+                      Your email
+                    </label>
+                    <Input
+                      id="supporter-email"
+                      type="email"
+                      inputMode="email"
+                      autoComplete="email"
+                      placeholder="you@example.com"
+                      value={checkoutEmail}
+                      onChange={(e) => setCheckoutEmail(e.target.value)}
+                      className="qs-input"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {[
+                      {
+                        label: "Monthly",
+                        price: "€9.99",
+                        period: "/month",
+                        note: "",
+                        tone: "pink",
+                        priceId: "price_1TdJouJ5xR4MDdjriK0vTZr3",
+                      },
+                      {
+                        label: "Quarterly",
+                        price: "€24.99",
+                        period: "/3 months",
+                        note: "save 17%",
+                        tone: "purple",
+                        priceId: "price_1TdJpxJ5xR4MDdjr6CYmpFZk",
+                      },
+                      {
+                        label: "Yearly",
+                        price: "€89.99",
+                        period: "/year",
+                        note: "save 25%",
+                        tone: "blue",
+                        priceId: "price_1TdJrtJ5xR4MDdjrEdxuGjSz",
+                      },
+                    ].map((opt) => {
+                      const loading = checkoutLoading === opt.priceId;
+                      return (
+                        <button
+                          type="button"
+                          key={opt.label}
+                          disabled={checkoutLoading !== null}
+                          onClick={() => startCheckout(opt.priceId)}
+                          className={`qs-supporter-plan qs-supporter-plan-${opt.tone} text-left disabled:opacity-60 disabled:cursor-wait`}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--t2)]">{opt.label}</p>
+                              <div className="mt-1">
+                                <span className="text-2xl font-black text-[var(--t1)]">{opt.price}</span>
+                                <span className="text-[11px] text-[var(--t2)] ml-1">{opt.period}</span>
+                              </div>
+                            </div>
+                            <Crown className="w-4 h-4 text-[var(--t1)] opacity-70" />
+                          </div>
+
+                          <div className="mt-4 flex items-end justify-between gap-2">
+                            <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--brand-pink)] min-h-[14px]">{opt.note}</span>
+                            <span className="text-xs font-semibold text-[var(--t1)]">{loading ? "Loading..." : "Choose plan"}</span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <p className="text-center text-[11px] text-[var(--t2)] mt-1">
+                    Secure checkout by Stripe • Cancel anytime
+                  </p>
+                  <a
+                    href="https://t.me/L7kznr"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="qs-supporter-help"
+                  >
+                    💬 Need help choosing a plan? Talk to support on Telegram
+                  </a>
                 </div>
               </div>
             </motion.div>
