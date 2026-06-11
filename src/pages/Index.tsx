@@ -379,37 +379,63 @@ const Index = () => {
           )}
 
           {top10CatalogItems.length > 0 && (
-            <motion.div initial="hidden" animate="visible" variants={fade} custom={6} className="mt-10 sm:mt-12 w-full overflow-hidden">
-              <p className="text-xs sm:text-sm text-muted-foreground/80 uppercase tracking-widest mb-4 sm:mb-5 flex items-center justify-center gap-2">
-                <TrendingUp className="w-4 h-4" /> <span className="rainbow-text font-bold">TOP 10</span> THIS MONTH
-              </p>
-              <div className="relative">
-                <div className="flex gap-3 sm:gap-5 animate-scroll-left" style={{ width: 'max-content' }}>
-                  {[...top10CatalogItems, ...top10CatalogItems].map((item, i) => {
-                    const rank = (i % top10CatalogItems.length) + 1;
+            <motion.div initial="hidden" animate="visible" variants={fade} custom={6} className="mt-10 sm:mt-12 w-full">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="flex items-center gap-2 text-base sm:text-lg font-bold text-[var(--t1)]">
+                  <span>🔥</span> Top 10
+                  <span
+                    className="ml-2 px-2 py-0.5 text-[9px] font-bold tracking-widest rounded-full"
+                    style={{ background: "rgba(217,70,168,.18)", color: "#f0abfc", border: "1px solid rgba(217,70,168,.35)" }}
+                  >
+                    THIS MONTH
+                  </span>
+                </h3>
+                <button
+                  onClick={() => navigate("/browse")}
+                  className="text-xs sm:text-sm font-semibold hover:underline"
+                  style={{ color: "#a855f7" }}
+                >
+                  See all
+                </button>
+              </div>
+              <div className="overflow-x-auto -mx-4 px-4 scroll-smooth" style={{ scrollbarWidth: "none" }}>
+                <div className="flex gap-4 sm:gap-6 pb-3" style={{ width: "max-content" }}>
+                  {top10CatalogItems.map((item, i) => {
+                    const rank = i + 1;
                     return (
-                      <div key={`top10-${item.id}-${i}`} className="flex-shrink-0 flex items-end gap-1 sm:gap-2">
-                        <span
-                          className="leading-none font-black select-none text-transparent"
-                          style={{
-                            fontFamily: "'Space Grotesk', sans-serif",
-                            fontSize: 'clamp(60px, 14vw, 140px)',
-                            WebkitTextStroke: '2px hsl(var(--primary))',
-                          }}
-                        >
-                          {rank}
-                        </span>
-                        <div className="w-24 sm:w-40 md:w-48 aspect-[2/3] rounded-md sm:rounded-lg overflow-hidden border border-border/40 bg-muted relative shadow-lg">
+                      <div key={`top10-${item.id}`} className="flex-shrink-0 flex flex-col gap-2" style={{ width: "clamp(120px, 28vw, 170px)" }}>
+                        <div className="aspect-[2/3] rounded-xl overflow-hidden relative shadow-lg" style={{ background: "var(--s2)" }}>
                           {item.banner_url ? (
                             <img src={item.banner_url} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-muted">
-                              <Film className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground/40" />
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Film className="w-8 h-8 text-[var(--t3)]" />
                             </div>
                           )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
-                          <div className="absolute bottom-1 left-1 right-1">
-                            <p className="text-[9px] sm:text-xs text-foreground font-medium truncate">{item.title}</p>
+                          <span
+                            className="absolute top-2 left-2 flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold"
+                            style={{ background: "rgba(139,43,226,.7)", color: "#fff", backdropFilter: "blur(6px)" }}
+                          >
+                            <Crown className="w-2.5 h-2.5" /> S
+                          </span>
+                          <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
+                            <p className="text-[11px] sm:text-xs font-semibold text-white truncate">{item.title}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="leading-none font-black select-none text-transparent"
+                            style={{
+                              fontFamily: "'Sora', sans-serif",
+                              fontSize: "clamp(40px, 9vw, 60px)",
+                              WebkitTextStroke: "1.5px rgba(168,85,247,.55)",
+                            }}
+                          >
+                            {rank}
+                          </span>
+                          <div className="min-w-0">
+                            <p className="text-xs sm:text-sm font-semibold text-[var(--t1)] truncate">{item.title}</p>
+                            <p className="text-[10px] sm:text-xs text-[var(--t2)] capitalize">{item.tag || "Title"}</p>
                           </div>
                         </div>
                       </div>
@@ -419,6 +445,7 @@ const Index = () => {
               </div>
             </motion.div>
           )}
+
         </div>
       </section>
 
