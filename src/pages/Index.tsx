@@ -915,36 +915,41 @@ const Index = () => {
       {/* FAQ */}
       <section className="py-16 sm:py-24 px-4">
         <div className="max-w-2xl mx-auto">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
-            <h2 className="text-2xl sm:text-5xl font-bold">
-              <HelpCircle className="inline w-7 sm:w-10 h-7 sm:h-10 mr-2 text-secondary" />
-              <span className="neon-text-blue">FAQ</span>
-            </h2>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="mb-8">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[var(--t1)] tracking-tight">FAQ</h2>
+            <p className="text-sm text-[var(--t2)] mt-1">Everything you need to know.</p>
           </motion.div>
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
-            <Accordion type="single" collapsible className="space-y-3">
+            <Accordion type="single" collapsible className="space-y-2.5">
               {[
                 { q: "Is Queer Scenes free?", a: "Yes. We have free content available. We also offer Supporter plans with exclusive access for the full experience." },
-                { q: "Do I need to create an account?", a: "Yes. To access the content you need to create a login with email and password." },
+                { q: "How do I become a Supporter?", a: "Pick a Supporter plan, complete the secure checkout, and your account will be upgraded instantly." },
+                { q: "Can I cancel anytime?", a: "Yes. Cancellation can be done at any time, with no penalty." },
                 { q: "Is the content only LGBTQIA+?", a: "Yes. The platform's focus is exclusively on stories, scenes, and productions with LGBTQIA+ representation." },
-                { q: "Can I cancel the premium plan?", a: "Yes. Cancellation can be done at any time." },
                 { q: "Does it work on mobile?", a: "Yes. The platform is adapted for mobile, tablet, and desktop." },
               ].map((item, i) => (
-                <AccordionItem key={i} value={`faq-${i}`} className="bg-card border border-border rounded-xl px-4 sm:px-5 data-[state=open]:border-primary/40 transition-colors">
-                  <AccordionTrigger className="text-left text-foreground hover:no-underline py-4 text-sm sm:text-base">
-                    <span className="flex items-center gap-3">
-                      <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">{i + 1}</span>
-                      {item.q}
+                <AccordionItem
+                  key={i}
+                  value={`faq-${i}`}
+                  className="qs-card px-4 sm:px-5 border-b-0 data-[state=open]:border-[rgba(139,43,226,.45)] transition-colors"
+                >
+                  <AccordionTrigger className="text-left hover:no-underline py-4 text-sm sm:text-base text-[var(--t1)] [&>svg]:text-[var(--t2)]">
+                    <span className="flex items-center gap-3 flex-1 min-w-0">
+                      <span className="text-xs font-bold text-[var(--brand-purple-light)] tabular-nums shrink-0">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span className="truncate">{item.q}</span>
                     </span>
                   </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground pb-4 text-sm">{item.a}</AccordionContent>
+                  <AccordionContent className="text-[var(--t2)] pb-4 text-sm pl-8">{item.a}</AccordionContent>
                 </AccordionItem>
               ))}
             </Accordion>
           </motion.div>
         </div>
       </section>
+
 
       {/* FINAL CTA */}
       <section className="py-16 sm:py-24 px-4 text-center">
