@@ -731,54 +731,68 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {/* FREE */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
-              <Card className="bg-card neon-border-pink h-full flex flex-col">
-                <CardHeader className="text-center pb-2">
+              <div className="qs-card-lg p-6 sm:p-7 h-full flex flex-col">
+                <div className="text-center pb-2">
                   <div className="text-4xl mb-1">🌈</div>
-                  <CardTitle className="text-2xl neon-text-pink">Free</CardTitle>
+                  <h3 className="text-xl font-bold text-[var(--t1)]">Free</h3>
                   <div className="mt-2">
-                    <span className="text-4xl sm:text-5xl font-bold text-foreground">€0</span>
+                    <span className="text-4xl sm:text-5xl font-extrabold text-[var(--t1)]">€0</span>
                   </div>
-                  <p className="text-muted-foreground text-sm mt-1">
+                  <p className="text-[var(--t2)] text-sm mt-2">
                     Join the community and explore general content for free.
                   </p>
-                </CardHeader>
-                <CardContent className="flex-1 flex flex-col">
+                </div>
+                <div className="flex-1 flex flex-col mt-4">
                   <ul className="space-y-2.5 text-sm flex-1">
-                    <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span><span className="text-foreground">Get a taste of our LGBTQIA+ universe</span></li>
-                    <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span><span className="text-foreground">Daily picks from the open catalog</span></li>
-                    <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span><span className="text-foreground">Join the conversation in the comments</span></li>
-                    <li className="flex items-start gap-2"><span className="text-primary mt-0.5">✓</span><span className="text-foreground">Hang out with the community on Telegram</span></li>
-                    <li className="flex items-start gap-2 opacity-60"><span className="text-destructive mt-0.5">✗</span><span className="text-muted-foreground line-through">International subtitled series & movies</span></li>
-                    <li className="flex items-start gap-2 opacity-60"><span className="text-destructive mt-0.5">✗</span><span className="text-muted-foreground line-through">Soap operas subtitled weekly</span></li>
-                    <li className="flex items-start gap-2 opacity-60"><span className="text-destructive mt-0.5">✗</span><span className="text-muted-foreground line-through">GL Dramas subtitled</span></li>
-                    <li className="flex items-start gap-2 opacity-60"><span className="text-destructive mt-0.5">✗</span><span className="text-muted-foreground line-through">Early access content</span></li>
+                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Get a taste of our LGBTQIA+ universe</span></li>
+                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Daily picks from the open catalog</span></li>
+                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Join the conversation in the comments</span></li>
+                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Hang out with the community on Telegram</span></li>
+                    <li className="flex items-start gap-2 opacity-50"><span className="text-[var(--t3)] mt-0.5">✗</span><span className="text-[var(--t3)] line-through">International subtitled series & movies</span></li>
+                    <li className="flex items-start gap-2 opacity-50"><span className="text-[var(--t3)] mt-0.5">✗</span><span className="text-[var(--t3)] line-through">Soap operas subtitled weekly</span></li>
+                    <li className="flex items-start gap-2 opacity-50"><span className="text-[var(--t3)] mt-0.5">✗</span><span className="text-[var(--t3)] line-through">GL Dramas subtitled</span></li>
+                    <li className="flex items-start gap-2 opacity-50"><span className="text-[var(--t3)] mt-0.5">✗</span><span className="text-[var(--t3)] line-through">Early access content</span></li>
                   </ul>
                   <Button
                     onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
-                    className="w-full mt-5 rounded-full bg-accent text-accent-foreground hover:bg-accent/90 glow-pink gap-2"
+                    className="qs-btn-primary w-full mt-5 h-11 gap-2"
                   >
                     <Play className="w-4 h-4" /> Join free
                   </Button>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </motion.div>
 
             {/* SUPPORTER */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2}>
-              <Card className="bg-card neon-border-purple neon-pulse h-full overflow-hidden relative flex flex-col">
-                <div className="absolute top-0 right-0 left-0">
-                  <span className="block w-full text-center py-1.5 text-xs font-semibold bg-primary text-primary-foreground">
-                    💜 MOST POPULAR
-                  </span>
-                </div>
-                <CardHeader className="text-center pb-2 pt-10">
+              <div
+                className="qs-card-lg p-6 sm:p-7 h-full flex flex-col relative overflow-hidden"
+                style={{ border: "1.5px solid rgba(139,43,226,.45)", boxShadow: "0 0 60px -10px rgba(139,43,226,.35)" }}
+              >
+                <span
+                  className="absolute top-3 left-1/2 -translate-x-1/2 px-3 py-1 text-[10px] font-bold tracking-wider rounded-full"
+                  style={{ background: "rgba(139,43,226,.25)", color: "#c084fc", border: "1px solid rgba(139,43,226,.4)" }}
+                >
+                  💜 MOST POPULAR
+                </span>
+                <div className="text-center pb-2 pt-8">
                   <div className="text-4xl mb-1">💜</div>
-                  <CardTitle className="text-2xl neon-text-purple">Supporter</CardTitle>
-                  <p className="text-muted-foreground text-sm mt-2">
+                  <h3 className="text-xl font-bold text-[var(--t1)]">Supporter</h3>
+                  <p className="text-[var(--t2)] text-sm mt-2">
                     Support the project and unlock the full experience.
                   </p>
-                </CardHeader>
-                <CardContent className="flex-1 flex flex-col">
+                </div>
+                <div className="flex-1 flex flex-col mt-4">
+                  <ul className="space-y-2.5 text-sm flex-1">
+                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Everything in the Free plan</span></li>
+                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Smooth, uninterrupted experience</span></li>
+                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Soap operas subtitled in English — every week</span></li>
+                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">LGBT series & movies from other countries, subtitled</span></li>
+                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">GL Dramas subtitled</span></li>
+                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Early access content</span></li>
+                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">VIP Telegram channel with exclusive news & updates</span></li>
+                  </ul>
+
                   <ul className="space-y-2.5 text-sm flex-1">
                     <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">Everything in the Free plan</span></li>
                     <li className="flex items-start gap-2"><span className="text-secondary mt-0.5">✓</span><span className="text-foreground">Smooth, uninterrupted experience</span></li>
