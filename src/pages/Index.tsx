@@ -380,7 +380,7 @@ const Index = () => {
 
           {top10CatalogItems.length > 0 && (
             <motion.div initial="hidden" animate="visible" variants={fade} custom={6} className="mt-10 sm:mt-12 w-full">
-              <div className="flex items-center mb-4">
+              <div className="flex items-center justify-between mb-4">
                 <h3 className="flex items-center gap-2 text-base sm:text-lg font-bold text-[var(--t1)]">
                   <span>🔥</span> Top 10
                   <span
@@ -390,28 +390,21 @@ const Index = () => {
                     THIS MONTH
                   </span>
                 </h3>
+                <button
+                  onClick={() => navigate("/browse")}
+                  className="text-xs sm:text-sm font-semibold hover:underline"
+                  style={{ color: "#a855f7" }}
+                >
+                  See all
+                </button>
               </div>
               <div className="overflow-x-auto -mx-4 px-4 scroll-smooth" style={{ scrollbarWidth: "none" }}>
-                <div className="flex gap-2 sm:gap-3 pb-3 items-end" style={{ width: "max-content" }}>
+                <div className="flex gap-4 sm:gap-6 pb-3" style={{ width: "max-content" }}>
                   {top10CatalogItems.map((item, i) => {
                     const rank = i + 1;
                     return (
-                      <div key={`top10-${item.id}`} className="flex-shrink-0 flex items-end" style={{ height: "clamp(180px, 42vw, 260px)" }}>
-                        <span
-                          className="leading-[0.78] font-black select-none text-transparent -mr-4 sm:-mr-6 relative z-0"
-                          style={{
-                            fontFamily: "'Sora', sans-serif",
-                            fontSize: "clamp(140px, 34vw, 220px)",
-                            WebkitTextStroke: "2px rgba(168,85,247,.85)",
-                            textShadow: "0 0 40px rgba(139,43,226,.35)",
-                          }}
-                        >
-                          {rank}
-                        </span>
-                        <div
-                          className="aspect-[2/3] h-full rounded-xl overflow-hidden relative shadow-2xl z-10"
-                          style={{ background: "var(--s2)", border: "1px solid rgba(255,255,255,.06)" }}
-                        >
+                      <div key={`top10-${item.id}`} className="flex-shrink-0 flex flex-col gap-2" style={{ width: "clamp(120px, 28vw, 170px)" }}>
+                        <div className="aspect-[2/3] rounded-xl overflow-hidden relative shadow-lg" style={{ background: "var(--s2)" }}>
                           {item.banner_url ? (
                             <img src={item.banner_url} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
                           ) : (
@@ -420,13 +413,29 @@ const Index = () => {
                             </div>
                           )}
                           <span
-                            className="absolute top-2 right-2 flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold"
+                            className="absolute top-2 left-2 flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold"
                             style={{ background: "rgba(139,43,226,.7)", color: "#fff", backdropFilter: "blur(6px)" }}
                           >
                             <Crown className="w-2.5 h-2.5" /> S
                           </span>
-                          <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/85 to-transparent">
+                          <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
                             <p className="text-[11px] sm:text-xs font-semibold text-white truncate">{item.title}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="leading-none font-black select-none text-transparent"
+                            style={{
+                              fontFamily: "'Sora', sans-serif",
+                              fontSize: "clamp(40px, 9vw, 60px)",
+                              WebkitTextStroke: "1.5px rgba(168,85,247,.55)",
+                            }}
+                          >
+                            {rank}
+                          </span>
+                          <div className="min-w-0">
+                            <p className="text-xs sm:text-sm font-semibold text-[var(--t1)] truncate">{item.title}</p>
+                            <p className="text-[10px] sm:text-xs text-[var(--t2)] capitalize">{item.tag || "Title"}</p>
                           </div>
                         </div>
                       </div>
