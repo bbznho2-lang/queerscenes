@@ -49,45 +49,18 @@ interface AggregatedUserClick {
 
 
 const AdminStatsCards = ({ totalUsers, premiumUsers, totalClicks }: { totalUsers: number; premiumUsers: number; totalClicks: number }) => (
-  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-      <Card className="bg-card border-border">
-        <CardContent className="flex items-center gap-4 p-5">
-          <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center">
-            <Users className="w-5 h-5 text-primary" />
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-foreground">{totalUsers}</p>
-            <p className="text-xs text-muted-foreground">Total users</p>
-          </div>
-        </CardContent>
-      </Card>
+  <div className="grid grid-cols-3 gap-3">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="qs-card p-4">
+      <p className="text-3xl sm:text-4xl qs-stat-users leading-none">{totalUsers}</p>
+      <p className="text-[11px] mt-2 text-[var(--t2)]">Total users</p>
     </motion.div>
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-      <Card className="bg-card border-border">
-        <CardContent className="flex items-center gap-4 p-5">
-          <div className="w-11 h-11 rounded-xl bg-secondary/10 flex items-center justify-center">
-            <Crown className="w-5 h-5 text-secondary" />
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-foreground">{premiumUsers}</p>
-            <p className="text-xs text-muted-foreground">Supporters</p>
-          </div>
-        </CardContent>
-      </Card>
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="qs-card p-4">
+      <p className="text-3xl sm:text-4xl qs-stat-supporters leading-none">{premiumUsers}</p>
+      <p className="text-[11px] mt-2 text-[var(--t2)]">Supporters</p>
     </motion.div>
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-      <Card className="bg-card border-border">
-        <CardContent className="flex items-center gap-4 p-5">
-          <div className="w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center">
-            <Eye className="w-5 h-5 text-accent" />
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-foreground">{totalClicks}</p>
-            <p className="text-xs text-muted-foreground">Total clicks</p>
-          </div>
-        </CardContent>
-      </Card>
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="qs-card p-4">
+      <p className="text-3xl sm:text-4xl qs-stat-clicks leading-none">{totalClicks}</p>
+      <p className="text-[11px] mt-2 text-[var(--t2)]">Clicks</p>
     </motion.div>
   </div>
 );
