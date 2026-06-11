@@ -394,9 +394,8 @@ const Index = () => {
                 <div className="flex gap-4 sm:gap-5 pb-4" style={{ width: "max-content" }}>
                   {top10CatalogItems.map((item, i) => {
                     const rank = i + 1;
-                    const tint = i % 3;
                     return (
-                      <article key={`top10-${item.id}`} className={`qs-top10-card qs-top10-tint-${tint} flex-shrink-0`} style={{ width: "clamp(155px, 32vw, 200px)" }}>
+                      <article key={`top10-${item.id}`} className="qs-top10-card flex-shrink-0" style={{ width: "clamp(155px, 32vw, 200px)" }}>
                         <div className="qs-top10-poster">
                           {item.banner_url ? (
                             <img src={item.banner_url} alt={item.title} loading="lazy" />
@@ -406,7 +405,6 @@ const Index = () => {
                             </div>
                           )}
                           <div className="qs-top10-shade" />
-                          <span className="qs-top10-crown">👑 S</span>
                           <h4 className="qs-top10-title-overlay">{item.title}</h4>
                         </div>
                         <div className="qs-top10-foot">
