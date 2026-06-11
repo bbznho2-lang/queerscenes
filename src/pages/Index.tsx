@@ -55,6 +55,7 @@ const Index = () => {
   const [top10Ids, setTop10Ids] = useState<string[]>([]);
   const [checkoutEmail, setCheckoutEmail] = useState("");
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [selectedPlanId, setSelectedPlanId] = useState<string>("price_1TdJouJ5xR4MDdjriK0vTZr3");
   
   const navigate = useNavigate();
   const { user, loading: authLoading, isAdmin, signIn, signUp } = useAuth();
