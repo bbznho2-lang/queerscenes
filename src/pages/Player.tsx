@@ -522,12 +522,21 @@ const Player = () => {
               )}
 
               {user && (
-                <button
-                  onClick={() => goToPlans("paywall_premium_content")}
-                  className="shine-cta w-full max-w-sm rounded-full bg-primary text-primary-foreground font-semibold py-2.5 text-sm flex items-center justify-center gap-2 hover:bg-primary/90 mb-3 glow-purple"
-                >
-                  <Crown className="w-4 h-4" /> {userExpired ? "Renew my Supporter plan" : "Yes, I want to become a Supporter"}
-                </button>
+                <div className="w-full max-w-sm flex flex-col gap-2.5">
+                  <button
+                    onClick={() => goToPlans("paywall_premium_content")}
+                    className="shine-cta w-full rounded-full text-white font-semibold py-3 text-sm flex items-center justify-center gap-2 border-0 shadow-[0_0_30px_rgba(168,85,247,0.45)] hover:opacity-95"
+                    style={{ background: "linear-gradient(90deg, #ec4899 0%, #a855f7 50%, #6366f1 100%)" }}
+                  >
+                    <Crown className="w-4 h-4" /> {userExpired ? "Renew my Supporter plan" : "Yes, become a Supporter"}
+                  </button>
+                  <button
+                    onClick={() => navigate(-1)}
+                    className="w-full rounded-full bg-transparent border border-white/15 text-foreground/90 hover:bg-white/5 transition-colors py-2.5 text-sm font-medium"
+                  >
+                    Not now
+                  </button>
+                </div>
               )}
 
               {!user && (
