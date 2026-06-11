@@ -62,7 +62,7 @@ const AdminStatsCards = ({ totalUsers, premiumUsers, totalClicks }: { totalUsers
             <CardContent className="p-4 sm:p-5">
               <p
                 className="font-extrabold leading-none tracking-tight"
-                style={{ color: it.color, fontSize: "clamp(28px, 6vw, 40px)", fontFamily: "'Space Grotesk', system-ui, sans-serif" }}
+                style={{ color: it.color, fontSize: "clamp(28px, 6vw, 40px)", fontFamily: "'Sora', system-ui, sans-serif" }}
               >
                 {it.value}
               </p>
@@ -428,7 +428,7 @@ const Admin = () => {
                     <div key={item.key} className="rounded-xl border border-border bg-card px-4 py-3">
                       <p
                         className="font-extrabold leading-none tracking-tight"
-                        style={{ color: item.color, fontSize: "clamp(24px, 5vw, 34px)", fontFamily: "'Space Grotesk', system-ui, sans-serif" }}
+                        style={{ color: item.color, fontSize: "clamp(24px, 5vw, 34px)", fontFamily: "'Sora', system-ui, sans-serif" }}
                       >
                         {totals[item.key] || 0}
                       </p>
