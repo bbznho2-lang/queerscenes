@@ -48,49 +48,32 @@ interface AggregatedUserClick {
 }
 
 
-const AdminStatsCards = ({ totalUsers, premiumUsers, totalClicks }: { totalUsers: number; premiumUsers: number; totalClicks: number }) => (
-  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-      <Card className="bg-card border-border">
-        <CardContent className="flex items-center gap-4 p-5">
-          <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center">
-            <Users className="w-5 h-5 text-primary" />
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-foreground">{totalUsers}</p>
-            <p className="text-xs text-muted-foreground">Total users</p>
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-      <Card className="bg-card border-border">
-        <CardContent className="flex items-center gap-4 p-5">
-          <div className="w-11 h-11 rounded-xl bg-secondary/10 flex items-center justify-center">
-            <Crown className="w-5 h-5 text-secondary" />
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-foreground">{premiumUsers}</p>
-            <p className="text-xs text-muted-foreground">Supporters</p>
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-      <Card className="bg-card border-border">
-        <CardContent className="flex items-center gap-4 p-5">
-          <div className="w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center">
-            <Eye className="w-5 h-5 text-accent" />
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-foreground">{totalClicks}</p>
-            <p className="text-xs text-muted-foreground">Total clicks</p>
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
-  </div>
-);
+const AdminStatsCards = ({ totalUsers, premiumUsers, totalClicks }: { totalUsers: number; premiumUsers: number; totalClicks: number }) => {
+  const items = [
+    { value: totalUsers, label: "Total users", color: "#ec4899" }, // pink
+    { value: premiumUsers, label: "Supporters", color: "#2dd4bf" }, // teal
+    { value: totalClicks, label: "Clicks", color: "#f59e0b" }, // amber
+  ];
+  return (
+    <div className="grid grid-cols-3 gap-3 sm:gap-4">
+      {items.map((it, idx) => (
+        <motion.div key={it.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.08 }}>
+          <Card className="bg-card border-border">
+            <CardContent className="p-4 sm:p-5">
+              <p
+                className="font-extrabold leading-none tracking-tight"
+                style={{ color: it.color, fontSize: "clamp(28px, 6vw, 40px)", fontFamily: "'Space Grotesk', system-ui, sans-serif" }}
+              >
+                {it.value}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1.5">{it.label}</p>
+            </CardContent>
+          </Card>
+        </motion.div>
+      ))}
+    </div>
+  );
+};
 
 const Admin = () => {
   const { user, isAdmin, loading } = useAuth();
