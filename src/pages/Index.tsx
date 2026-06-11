@@ -426,111 +426,72 @@ const Index = () => {
       <section id="login" className="relative py-16 sm:py-20 px-4">
         <div className="max-w-sm sm:max-w-md mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0}>
-            <Card className="bg-card neon-border-pink overflow-hidden">
-              <CardHeader className="text-center pb-2">
-                <div className="mx-auto w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mb-3">
-                  <Lock className="w-5 h-5 text-accent" />
-                </div>
-                <CardTitle className="text-xl sm:text-2xl neon-text-pink">{isForgot ? "RESET PASSWORD" : "LOGIN"}</CardTitle>
-                <p className="text-muted-foreground text-sm mt-1">{isForgot ? "Enter your email to receive a reset link" : "Sign in to continue"}</p>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <form onSubmit={handleLogin} className="space-y-4">
-                  {showNameFields && !isForgot && (
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-2">
-                        <label className="text-sm text-muted-foreground">First Name</label>
-                        <Input
-                          type="text"
-                          placeholder="John"
-                          value={firstName}
-                          onChange={(e) => setFirstName(e.target.value)}
-                          className="bg-muted border-border focus:border-primary"
-                          required={isSignUp}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm text-muted-foreground">Last Name</label>
-                        <Input
-                          type="text"
-                          placeholder="Doe"
-                          value={lastName}
-                          onChange={(e) => setLastName(e.target.value)}
-                          className="bg-muted border-border focus:border-primary"
-                          required={isSignUp}
-                        />
-                      </div>
+            <div className="qs-modal p-6 sm:p-7">
+              <div className="space-y-1 mb-5">
+                <h2 className="text-2xl font-bold text-[var(--t1)]">
+                  {isForgot ? "Reset password" : isSignUp ? "Create account" : "Welcome back 👋"}
+                </h2>
+                <p className="text-sm text-[var(--t2)]">
+                  {isForgot ? "Enter your email to receive a reset link" : isSignUp ? "Join the community" : "Sign in to continue watching"}
+                </p>
+              </div>
+              <form onSubmit={handleLogin} className="space-y-4">
+                {showNameFields && !isForgot && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold tracking-wider uppercase text-[var(--t2)]">First name</label>
+                      <Input type="text" placeholder="John" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="qs-input" required={isSignUp} />
                     </div>
-                  )}
-                  <div className="space-y-2">
-                    <label className="text-sm text-muted-foreground">Email</label>
-                    <Input
-                      type="email"
-                      placeholder="your@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="bg-muted border-border focus:border-primary"
-                      required
-                    />
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold tracking-wider uppercase text-[var(--t2)]">Last name</label>
+                      <Input type="text" placeholder="Doe" value={lastName} onChange={(e) => setLastName(e.target.value)} className="qs-input" required={isSignUp} />
+                    </div>
                   </div>
-                  {!isForgot && (
-                    <div className="space-y-2">
-                      <label className="text-sm text-muted-foreground">Password</label>
-                      <div className="relative">
-                        <Input
-                          type={showPassword ? "text" : "password"}
-                          placeholder="••••••••"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          className="bg-muted border-border focus:border-primary pr-10"
-                          required
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </button>
-                      </div>
+                )}
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold tracking-wider uppercase text-[var(--t2)]">Email</label>
+                  <Input type="email" placeholder="your@email.com" value={email} onChange={(e) => setEmail(e.target.value)} className="qs-input" required />
+                </div>
+                {!isForgot && (
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold tracking-wider uppercase text-[var(--t2)]">Password</label>
+                    <div className="relative">
+                      <Input type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="qs-input pr-10" required />
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--t2)] hover:text-[var(--t1)]">
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
                     </div>
+                  </div>
+                )}
+                <Button type="submit" disabled={loading} className="qs-btn-primary w-full h-11">
+                  {loading ? "Please wait..." : isForgot ? "Send reset link" : isSignUp ? "Create account" : "Sign in"}
+                </Button>
+                {!isSignUp && !isForgot && (
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center gap-2 text-xs text-[var(--t2)] cursor-pointer select-none">
+                      <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-4 h-4 rounded border-border bg-muted accent-[#8b2be2] cursor-pointer" />
+                      Remember me
+                    </label>
+                    <button type="button" onClick={() => setIsForgot(true)} className="text-xs font-semibold underline" style={{ color: "#a855f7" }}>
+                      Forgot password?
+                    </button>
+                  </div>
+                )}
+                <p className="text-center text-sm text-[var(--t2)]">
+                  {isForgot ? (
+                    <button type="button" onClick={() => setIsForgot(false)} className="font-semibold underline" style={{ color: "#a855f7" }}>Back to Sign in</button>
+                  ) : isSignUp ? (
+                    <>Already have an account? <button type="button" onClick={() => setIsSignUp(false)} className="font-semibold underline" style={{ color: "#a855f7" }}>Sign in</button></>
+                  ) : (
+                    <>Don't have an account? <button type="button" onClick={() => setIsSignUp(true)} className="font-semibold underline" style={{ color: "#a855f7" }}>Create one</button></>
                   )}
-                   <Button type="submit" disabled={loading} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full glow-purple">
-                     {loading ? "Please wait..." : isForgot ? "SEND RESET LINK" : isSignUp ? "CREATE ACCOUNT" : "SIGN IN"}
-                   </Button>
-                   {!isSignUp && !isForgot && (
-                     <div className="flex items-center justify-between">
-                       <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer select-none">
-                         <input
-                           type="checkbox"
-                           checked={rememberMe}
-                           onChange={(e) => setRememberMe(e.target.checked)}
-                           className="w-4 h-4 rounded border-border bg-muted accent-primary cursor-pointer"
-                         />
-                         Remember me
-                       </label>
-                       <button type="button" onClick={() => setIsForgot(true)} className="text-xs text-muted-foreground hover:text-secondary hover:underline">
-                         Forgot your password?
-                       </button>
-                     </div>
-                   )}
-                   <p className="text-center text-sm text-muted-foreground">
-                     {isForgot ? (
-                       <button type="button" onClick={() => setIsForgot(false)} className="text-secondary hover:underline font-medium">
-                         Back to Sign in
-                       </button>
-                     ) : isSignUp ? (
-                       <>Already have an account? <button type="button" onClick={() => setIsSignUp(false)} className="text-secondary hover:underline font-medium">Sign in</button></>
-                     ) : (
-                       <>Don't have an account? <button type="button" onClick={() => setIsSignUp(true)} className="text-secondary hover:underline font-medium">Create account</button></>
-                     )}
-                   </p>
-                </form>
-              </CardContent>
-            </Card>
+                </p>
+              </form>
+            </div>
           </motion.div>
         </div>
       </section>
+
 
 
 
