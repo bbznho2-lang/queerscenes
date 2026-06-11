@@ -446,11 +446,8 @@
 }
 .qs-top10-shade {
   position: absolute; inset: 0; z-index: 1;
-  background: linear-gradient(180deg, rgba(6,6,16,0) 30%, rgba(6,6,16,.85) 100%);
+  background: linear-gradient(180deg, rgba(6,6,16,0) 35%, rgba(6,6,16,.9) 100%);
 }
-.qs-top10-tint-0 .qs-top10-shade { background: linear-gradient(180deg, rgba(88,28,135,.55) 0%, rgba(15,4,40,.92) 100%); mix-blend-mode: normal; }
-.qs-top10-tint-1 .qs-top10-shade { background: linear-gradient(180deg, rgba(127,9,30,.55) 0%, rgba(30,4,12,.92) 100%); }
-.qs-top10-tint-2 .qs-top10-shade { background: linear-gradient(180deg, rgba(14,52,99,.6) 0%, rgba(4,12,30,.92) 100%); }
 
 .qs-top10-crown {
   position: absolute; top: .55rem; left: .55rem; z-index: 2;
