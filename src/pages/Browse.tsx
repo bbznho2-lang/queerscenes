@@ -643,50 +643,62 @@ const Browse = () => {
 
       {/* Premium Upgrade Popup */}
       <Dialog open={premiumPopupOpen} onOpenChange={setPremiumPopupOpen}>
-        <DialogContent className="sm:max-w-md bg-card border-primary/30">
+        <DialogContent className="sm:max-w-md bg-[#0f0f17] border border-white/10 rounded-2xl">
           <DialogHeader className="text-center items-center">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-              <Crown className="w-8 h-8 text-primary" />
+            <div
+              className="w-16 h-16 rounded-full flex items-center justify-center mb-2 shadow-[0_0_30px_rgba(217,70,239,0.45)]"
+              style={{ background: "linear-gradient(135deg, #ec4899 0%, #a855f7 100%)" }}
+            >
+              <Crown className="w-8 h-8 text-white" />
             </div>
-            <DialogTitle className="text-2xl neon-text-purple">Become a Supporter! 💜</DialogTitle>
-            <DialogDescription className="text-muted-foreground text-sm mt-2">
+            <DialogTitle className="text-2xl font-extrabold text-white">Become a Supporter 💜</DialogTitle>
+            <DialogDescription className="text-muted-foreground text-sm mt-2 max-w-xs">
               Support the project and unlock exclusive content made for our community.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-3 mt-2">
+
+          <div className="h-px bg-white/10 my-2" />
+
+          <div className="space-y-3">
             {[
-              { icon: Sparkles, text: "All Supporter content unlocked" },
-              { icon: Play, text: "Early releases & exclusives" },
-              { icon: Crown, text: "Request what you want to watch" },
+              { emoji: "⭐", bg: "rgba(250,204,21,0.12)", text: "All Supporter content unlocked instantly" },
+              { emoji: "🎬", bg: "rgba(244,114,182,0.12)", text: "Early releases & exclusive titles" },
+              { emoji: "📬", bg: "rgba(56,189,248,0.12)", text: "Request what you want to watch" },
             ].map((item, i) => (
-              <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-muted/50">
-                <item.icon className="w-4 h-4 text-primary shrink-0" />
-                <span className="text-sm text-foreground">{item.text}</span>
+              <div key={i} className="flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0 border border-white/5"
+                  style={{ background: item.bg }}
+                >
+                  {item.emoji}
+                </div>
+                <span className="text-sm text-foreground/90">{item.text}</span>
               </div>
             ))}
           </div>
-          <a
-            href="https://t.me/QueerScenesTv"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-3 flex items-center justify-center gap-2 w-full py-2 rounded-full neon-border-purple text-primary hover:bg-primary/10 transition-colors text-xs font-medium"
-          >
-            📣 Join our Telegram community for updates & news
-          </a>
-          <div className="flex flex-col gap-2 mt-4">
+
+          <div className="flex flex-col gap-2.5 mt-5">
+            <a
+              href="https://t.me/QueerScenesTv"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full bg-white/5 border border-white/10 text-foreground hover:bg-white/10 transition-colors text-sm font-medium"
+            >
+              ✈️ Join our Telegram community
+            </a>
             <Button
               onClick={() => { setPremiumPopupOpen(false); navigate("/"); setTimeout(() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" }), 300); }}
-              className="shine-cta w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple"
+              className="shine-cta w-full rounded-full text-white font-semibold py-2.5 border-0 shadow-[0_0_30px_rgba(168,85,247,0.45)] hover:opacity-95"
+              style={{ background: "linear-gradient(90deg, #ec4899 0%, #a855f7 50%, #6366f1 100%)" }}
             >
-              <Crown className="w-4 h-4 mr-2" /> Become a Supporter
+              👑 Become a Supporter
             </Button>
-            <Button
-              variant="ghost"
+            <button
               onClick={() => setPremiumPopupOpen(false)}
-              className="w-full text-muted-foreground text-sm"
+              className="w-full text-muted-foreground text-sm hover:text-foreground transition-colors py-1"
             >
               Maybe later
-            </Button>
+            </button>
           </div>
         </DialogContent>
       </Dialog>
