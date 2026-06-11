@@ -689,6 +689,60 @@ const Index = () => {
         </div>
       </section>
 
+      {/* TOP 10 THIS MONTH */}
+      {top10CatalogItems.length > 0 && (
+        <section className="py-12 sm:py-20 px-4">
+          <div className="max-w-6xl mx-auto">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-6 sm:mb-8">
+              <h3 className="inline-flex items-center justify-center gap-2 text-xl sm:text-2xl font-black text-[var(--t1)] tracking-tight">
+                <span>🔥</span>
+                <span>Top 10</span>
+                <span className="qs-top10-pill">THIS MONTH</span>
+              </h3>
+              <p className="mt-2 text-sm text-[var(--t2)]">Most watched titles right now.</p>
+            </motion.div>
+
+            <div
+              className="overflow-x-auto -mx-4 px-4 scroll-smooth"
+              style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
+            >
+              <div className="flex gap-3 sm:gap-5 pb-4" style={{ width: "max-content" }}>
+                {top10CatalogItems.map((item, i) => {
+                  const rank = i + 1;
+                  return (
+                    <article
+                      key={`top10-${item.id}`}
+                      className="qs-top10-card flex-shrink-0"
+                      style={{ width: "clamp(130px, 38vw, 200px)" }}
+                    >
+                      <div className="qs-top10-poster">
+                        {item.banner_url ? (
+                          <img src={item.banner_url} alt={item.title} loading="lazy" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Film className="w-8 h-8 text-[var(--t3)]" />
+                          </div>
+                        )}
+                        <div className="qs-top10-shade" />
+                      </div>
+                      <div className="qs-top10-foot">
+                        <span className="qs-top10-bignum" aria-hidden>{rank}</span>
+                        <div className="qs-top10-meta">
+                          <p className="qs-top10-fname">{item.title}</p>
+                          <p className="qs-top10-ftag">· {item.tag || "Title"}</p>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+
+
 
       {/* DEVICES */}
       <section className="py-16 sm:py-24 px-4">
