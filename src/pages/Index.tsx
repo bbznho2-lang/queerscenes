@@ -693,27 +693,27 @@ const Index = () => {
       {top10CatalogItems.length > 0 && (
         <section className="py-12 sm:py-20 px-4">
           <div className="max-w-6xl mx-auto">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-6 sm:mb-8">
+            <div className="text-center mb-6 sm:mb-8">
               <h3 className="inline-flex items-center justify-center gap-2 text-xl sm:text-2xl font-black text-[var(--t1)] tracking-tight">
                 <span>🔥</span>
                 <span>Top 10</span>
                 <span className="qs-top10-pill">THIS MONTH</span>
               </h3>
               <p className="mt-2 text-sm text-[var(--t2)]">Most watched titles right now.</p>
-            </motion.div>
+            </div>
 
             <div
-              className="overflow-x-auto -mx-4 px-4 scroll-smooth"
+              className="overflow-x-auto -mx-4 px-4 scroll-smooth snap-x snap-mandatory"
               style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
             >
-              <div className="flex gap-3 sm:gap-5 pb-4" style={{ width: "max-content" }}>
+              <div className="flex gap-4 sm:gap-6 pb-4" style={{ width: "max-content" }}>
                 {top10CatalogItems.map((item, i) => {
                   const rank = i + 1;
                   return (
                     <article
                       key={`top10-${item.id}`}
-                      className="qs-top10-card flex-shrink-0"
-                      style={{ width: "clamp(130px, 38vw, 200px)" }}
+                      className="qs-top10-card flex-shrink-0 snap-start"
+                      style={{ width: "clamp(160px, 44vw, 220px)" }}
                     >
                       <div className="qs-top10-poster">
                         {item.banner_url ? (
@@ -737,9 +737,11 @@ const Index = () => {
                 })}
               </div>
             </div>
+            <p className="text-center text-[11px] text-[var(--t2)] mt-1 sm:hidden">← Swipe to see all 10 →</p>
           </div>
         </section>
       )}
+
 
 
 
