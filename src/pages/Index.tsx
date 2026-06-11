@@ -330,7 +330,7 @@ const Index = () => {
               className="w-full flex items-center justify-center gap-2"
               style={{
                 padding: "16px",
-                borderRadius: "20px",
+                borderRadius: "9999px",
                 background: "linear-gradient(135deg, #8b2be2 0%, #d946a8 50%, #2563eb 100%)",
                 color: "#fff",
                 fontSize: "14px",
@@ -341,14 +341,14 @@ const Index = () => {
               }}
             >
               <Play className="w-4 h-4" />
-              START WATCHING FREE
+              Start watching free
             </button>
             <button
               onClick={() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" })}
               className="w-full flex items-center justify-center gap-2 backdrop-blur-md"
               style={{
                 padding: "15px",
-                borderRadius: "20px",
+                borderRadius: "9999px",
                 background: "rgba(255,255,255,.07)",
                 color: "#eeeaff",
                 fontSize: "14px",
