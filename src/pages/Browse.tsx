@@ -464,7 +464,7 @@ const Browse = () => {
                           <div className="qs-top10-shade" />
                         </div>
                         <div className="qs-top10-foot">
-                          <span className="qs-top10-bignum" aria-hidden>{rank}</span>
+                          <span className="qs-top10-bignum qs-top10-bignum-rainbow" aria-hidden>{rank}</span>
                           <div className="qs-top10-meta">
                             <p className="qs-top10-fname">{item.title}</p>
                             <p className="qs-top10-ftag">{item.year} · {item.type === "serie" ? "Series" : item.type === "novela" ? "Soap Opera" : "Movie"}</p>
