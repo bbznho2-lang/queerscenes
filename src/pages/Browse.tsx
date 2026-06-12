@@ -669,7 +669,7 @@ const Browse = () => {
         {/* MY LIST */}
         <section id="minha-lista" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-xl sm:text-2xl font-black mb-6 flex items-center gap-2 neon-text-pink">
+            <h2 className="text-xl sm:text-2xl font-black mb-6 flex items-center gap-2 neon-text-cyan">
               <Bookmark className="w-5 h-5 sm:w-6 sm:h-6" /> My List
             </h2>
             {watchlistItems.length > 0 ? (
