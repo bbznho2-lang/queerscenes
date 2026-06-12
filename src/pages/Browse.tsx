@@ -445,7 +445,6 @@ const Browse = () => {
                   <span>🔥</span>
                   <span className="rainbow-text">Top 10</span>
                 </h2>
-                <Link to="/catalog" className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 transition-colors">See all</Link>
               </div>
               <div
                 className="overflow-x-auto -mx-4 px-4 scroll-smooth snap-x snap-mandatory"
