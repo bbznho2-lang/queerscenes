@@ -436,23 +436,47 @@ const Browse = () => {
 
         <SiteNoteBanner />
 
-        {/* TOP 10 - Manual scroll */}
+        {/* TOP 10 - Netflix-style ranking */}
         {top10Items.length > 0 && (
           <section className="py-10 sm:py-16 px-4">
             <div className="max-w-7xl mx-auto">
-              <h2 className="text-2xl sm:text-3xl font-bold mb-6 flex items-center gap-2">
-                🔥 <span className="rainbow-text">Top 10</span>
-              </h2>
-              <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide" style={{ scrollbarWidth: "none" }}>
-                {top10Items.map((item, index) => (
-                  <div key={`top10-${item.id}`} className="flex-shrink-0 w-[45vw] sm:w-[200px] relative">
-                    <div className="absolute -left-1 -top-1 z-20 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm shadow-lg">
-                      {index + 1}
-                    </div>
-                    <ContentCard item={item} isAdmin={isAdmin} onEdit={() => handleEdit(item)} onDelete={() => handleDelete(item.id)} onClickTrack={() => trackClick(item.id)} isInWatchlist={watchlistIds.has(item.id)} onToggleWatchlist={() => toggleWatchlist(item.id)} userIsPremium={userIsPremium} />
-                  </div>
-                ))}
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-xl sm:text-2xl font-black text-[var(--t1)] flex items-center gap-2">
+                  <span>🔥</span> <span>Top 10</span>
+                </h2>
+                <Link to="/catalog" className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 transition-colors">See all</Link>
               </div>
+              <div
+                className="overflow-x-auto -mx-4 px-4 scroll-smooth snap-x snap-mandatory"
+                style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
+              >
+                <div className="flex gap-4 sm:gap-6 pb-4" style={{ width: "max-content" }}>
+                  {top10Items.map((item, i) => {
+                    const rank = i + 1;
+                    return (
+                      <article
+                        key={`top10-${item.id}`}
+                        className="qs-top10-card flex-shrink-0 snap-start cursor-pointer"
+                        style={{ width: "clamp(160px, 44vw, 220px)" }}
+                        onClick={() => { trackClick(item.id); navigate(`/player/${item.id}`); }}
+                      >
+                        <div className="qs-top10-poster">
+                          <img src={item.banner_url || "/placeholder.svg"} alt={item.title} loading="lazy" />
+                          <div className="qs-top10-shade" />
+                        </div>
+                        <div className="qs-top10-foot">
+                          <span className="qs-top10-bignum" aria-hidden>{rank}</span>
+                          <div className="qs-top10-meta">
+                            <p className="qs-top10-fname">{item.title}</p>
+                            <p className="qs-top10-ftag">{item.year} · {item.type === "serie" ? "Series" : item.type === "novela" ? "Soap Opera" : "Movie"}</p>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              </div>
+              <p className="text-center text-[11px] text-[var(--t2)] mt-1 sm:hidden">← Swipe to see all 10 →</p>
             </div>
           </section>
         )}
@@ -465,13 +489,18 @@ const Browse = () => {
         {/* SERIES */}
         <section id="séries" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl sm:text-3xl font-bold neon-text-purple">Trending Queer Series</h2>
-              {isAdmin && (
-                <button onClick={() => handleNew("series", "serie")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add series">
-                  <Plus className="w-5 h-5 text-primary" />
-                </button>
-              )}
+            <div className="flex items-center justify-between mb-6 gap-3">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-pink flex items-center gap-2">
+                <span>🎭</span> Trending Queer Series
+              </h2>
+              <div className="flex items-center gap-2">
+                <Link to="/catalog" className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 transition-colors">See all</Link>
+                {isAdmin && (
+                  <button onClick={() => handleNew("series", "serie")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add series">
+                    <Plus className="w-5 h-5 text-primary" />
+                  </button>
+                )}
+              </div>
             </div>
             {series.length > 0 ? (
               <AutoScrollRow>
@@ -492,13 +521,18 @@ const Browse = () => {
         {/* MOVIES */}
         <section id="filmes" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl sm:text-3xl font-bold neon-text-blue">Iconic Movies</h2>
-              {isAdmin && (
-                <button onClick={() => handleNew("filmes", "filme")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add movie">
-                  <Plus className="w-5 h-5 text-primary" />
-                </button>
-              )}
+            <div className="flex items-center justify-between mb-6 gap-3">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-pink flex items-center gap-2">
+                <span>🎬</span> Iconic Movies
+              </h2>
+              <div className="flex items-center gap-2">
+                <Link to="/catalog" className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 transition-colors">See all</Link>
+                {isAdmin && (
+                  <button onClick={() => handleNew("filmes", "filme")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add movie">
+                    <Plus className="w-5 h-5 text-primary" />
+                  </button>
+                )}
+              </div>
             </div>
             {filmes.length > 0 ? (
               <AutoScrollRow>
@@ -519,13 +553,18 @@ const Browse = () => {
         {/* SOAP OPERAS */}
         <section id="novelas" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl sm:text-3xl font-bold neon-text-purple">Queer Soap Operas</h2>
-              {isAdmin && (
-                <button onClick={() => handleNew("novelas", "novela")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add soap opera">
-                  <Plus className="w-5 h-5 text-primary" />
-                </button>
-              )}
+            <div className="flex items-center justify-between mb-6 gap-3">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-pink flex items-center gap-2">
+                <span>🌶️</span> Queer Soap Operas
+              </h2>
+              <div className="flex items-center gap-2">
+                <Link to="/catalog" className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 transition-colors">See all</Link>
+                {isAdmin && (
+                  <button onClick={() => handleNew("novelas", "novela")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add soap opera">
+                    <Plus className="w-5 h-5 text-primary" />
+                  </button>
+                )}
+              </div>
             </div>
             {novelas.length > 0 ? (
               <AutoScrollRow>
@@ -547,18 +586,23 @@ const Browse = () => {
         {/* GL DRAMAS */}
         <section id="gl" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl sm:text-3xl font-bold neon-text-pink">GL Dramas</h2>
-              {isAdmin && (
-                <div className="flex items-center gap-2">
-                  <button onClick={() => handleNew("gl", "serie")} className="h-9 px-3 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center gap-1.5 transition-colors text-xs font-medium text-primary" title="Add GL Series">
-                    <Plus className="w-3.5 h-3.5" /> Series
-                  </button>
-                  <button onClick={() => handleNew("gl", "filme")} className="h-9 px-3 rounded-full bg-secondary/10 hover:bg-secondary/20 flex items-center gap-1.5 transition-colors text-xs font-medium text-secondary" title="Add GL Movie">
-                    <Plus className="w-3.5 h-3.5" /> Movie
-                  </button>
-                </div>
-              )}
+            <div className="flex items-center justify-between mb-6 gap-3">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-pink flex items-center gap-2">
+                <span>💜</span> GL Dramas
+              </h2>
+              <div className="flex items-center gap-2">
+                <Link to="/catalog" className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 transition-colors">See all</Link>
+                {isAdmin && (
+                  <>
+                    <button onClick={() => handleNew("gl", "serie")} className="h-9 px-3 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center gap-1.5 transition-colors text-xs font-medium text-primary" title="Add GL Series">
+                      <Plus className="w-3.5 h-3.5" /> Series
+                    </button>
+                    <button onClick={() => handleNew("gl", "filme")} className="h-9 px-3 rounded-full bg-secondary/10 hover:bg-secondary/20 flex items-center gap-1.5 transition-colors text-xs font-medium text-secondary" title="Add GL Movie">
+                      <Plus className="w-3.5 h-3.5" /> Movie
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
             {gl.length > 0 ? (
               <AutoScrollRow>
@@ -580,20 +624,23 @@ const Browse = () => {
         {/* EXCLUSIVES */}
         <section id="exclusivos" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl sm:text-3xl font-bold">
-                <span className="rainbow-text">Queer Scenes Exclusives</span>
+            <div className="flex items-center justify-between mb-6 gap-3">
+              <h2 className="text-xl sm:text-2xl font-black flex items-center gap-2">
+                <span>⭐</span> <span className="rainbow-text">Queer Scenes Exclusives</span>
               </h2>
-              {isAdmin && (
-                <div className="flex items-center gap-2">
-                  <button onClick={() => setAddExistingOpen(true)} className="h-9 px-3 rounded-full bg-secondary/10 hover:bg-secondary/20 flex items-center gap-1.5 transition-colors text-xs font-medium text-secondary" title="Adicionar título existente">
-                    <Search className="w-3.5 h-3.5" /> Existente
-                  </button>
-                  <button onClick={() => handleNew("exclusivos", "filme")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Criar novo exclusivo">
-                    <Plus className="w-5 h-5 text-primary" />
-                  </button>
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                <Link to="/catalog" className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 transition-colors">See all</Link>
+                {isAdmin && (
+                  <>
+                    <button onClick={() => setAddExistingOpen(true)} className="h-9 px-3 rounded-full bg-secondary/10 hover:bg-secondary/20 flex items-center gap-1.5 transition-colors text-xs font-medium text-secondary" title="Adicionar título existente">
+                      <Search className="w-3.5 h-3.5" /> Existente
+                    </button>
+                    <button onClick={() => handleNew("exclusivos", "filme")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Criar novo exclusivo">
+                      <Plus className="w-5 h-5 text-primary" />
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
             {exclusivos.length > 0 ? (
               <AutoScrollRow>
@@ -614,8 +661,8 @@ const Browse = () => {
         {/* MY LIST */}
         <section id="minha-lista" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-6 flex items-center gap-2">
-              <Bookmark className="w-6 h-6 text-secondary" /> My List
+            <h2 className="text-xl sm:text-2xl font-black mb-6 flex items-center gap-2 neon-text-pink">
+              <Bookmark className="w-5 h-5 sm:w-6 sm:h-6" /> My List
             </h2>
             {watchlistItems.length > 0 ? (
               <AutoScrollRow>
