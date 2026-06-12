@@ -521,7 +521,7 @@ const Browse = () => {
         <section id="filmes" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6 gap-3">
-              <h2 className="text-xl sm:text-2xl font-black neon-text-pink flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-orange flex items-center gap-2">
                 <span>🎬</span> Iconic Movies
               </h2>
               <div className="flex items-center gap-2">
