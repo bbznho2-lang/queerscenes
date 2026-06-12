@@ -142,6 +142,11 @@
   text-shadow: 0 0 6px hsl(180 70% 50% / 0.22), 0 0 14px hsl(180 70% 50% / 0.1);
 }
 
+.neon-text-dark-blue {
+  color: hsl(220 70% 55%);
+  text-shadow: 0 0 6px hsl(220 70% 40% / 0.25), 0 0 14px hsl(220 70% 40% / 0.12);
+}
+
 /* LGBTQIA+ rainbow neon letters */
 .lgbtq-rainbow-letters {
   display: inline;

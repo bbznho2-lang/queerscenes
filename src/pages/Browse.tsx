@@ -491,7 +491,7 @@ const Browse = () => {
         <section id="séries" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6 gap-3">
-              <h2 className="text-xl sm:text-2xl font-black neon-text-purple flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-dark-blue flex items-center gap-2">
                 <span>🎭</span> Trending Queer Series
               </h2>
               <div className="flex items-center gap-2">
@@ -523,7 +523,7 @@ const Browse = () => {
         <section id="filmes" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6 gap-3">
-              <h2 className="text-xl sm:text-2xl font-black neon-text-pink flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-dark-blue flex items-center gap-2">
                 <span>🎬</span> Iconic Movies
               </h2>
               <div className="flex items-center gap-2">
@@ -555,7 +555,7 @@ const Browse = () => {
         <section id="novelas" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6 gap-3">
-              <h2 className="text-xl sm:text-2xl font-black neon-text-blue flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-dark-blue flex items-center gap-2">
                 <span>🌶️</span> Queer Soap Operas
               </h2>
               <div className="flex items-center gap-2">
@@ -588,7 +588,7 @@ const Browse = () => {
         <section id="gl" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6 gap-3">
-              <h2 className="text-xl sm:text-2xl font-black neon-text-purple flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-dark-blue flex items-center gap-2">
                 <span>💜</span> GL Dramas
               </h2>
               <div className="flex items-center gap-2">
@@ -662,7 +662,7 @@ const Browse = () => {
         {/* MY LIST */}
         <section id="minha-lista" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-xl sm:text-2xl font-black mb-6 flex items-center gap-2 neon-text-pink">
+            <h2 className="text-xl sm:text-2xl font-black mb-6 flex items-center gap-2 neon-text-dark-blue">
               <Bookmark className="w-5 h-5 sm:w-6 sm:h-6" /> My List
             </h2>
             {watchlistItems.length > 0 ? (
