@@ -476,7 +476,7 @@ const Browse = () => {
                   })}
                 </div>
               </div>
-              <p className="text-center text-[11px] text-[var(--t2)] mt-1 sm:hidden">← Swipe to see all 10 →</p>
+              
             </div>
           </section>
         )}
