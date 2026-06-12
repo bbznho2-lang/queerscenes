@@ -436,23 +436,47 @@ const Browse = () => {
 
         <SiteNoteBanner />
 
-        {/* TOP 10 - Manual scroll */}
+        {/* TOP 10 - Netflix-style ranking */}
         {top10Items.length > 0 && (
           <section className="py-10 sm:py-16 px-4">
             <div className="max-w-7xl mx-auto">
-              <h2 className="text-2xl sm:text-3xl font-bold mb-6 flex items-center gap-2">
-                🔥 <span className="rainbow-text">Top 10</span>
-              </h2>
-              <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide" style={{ scrollbarWidth: "none" }}>
-                {top10Items.map((item, index) => (
-                  <div key={`top10-${item.id}`} className="flex-shrink-0 w-[45vw] sm:w-[200px] relative">
-                    <div className="absolute -left-1 -top-1 z-20 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm shadow-lg">
-                      {index + 1}
-                    </div>
-                    <ContentCard item={item} isAdmin={isAdmin} onEdit={() => handleEdit(item)} onDelete={() => handleDelete(item.id)} onClickTrack={() => trackClick(item.id)} isInWatchlist={watchlistIds.has(item.id)} onToggleWatchlist={() => toggleWatchlist(item.id)} userIsPremium={userIsPremium} />
-                  </div>
-                ))}
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-xl sm:text-2xl font-black text-[var(--t1)] flex items-center gap-2">
+                  <span>🔥</span> <span>Top 10</span>
+                </h2>
+                <Link to="/catalog" className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 transition-colors">See all</Link>
               </div>
+              <div
+                className="overflow-x-auto -mx-4 px-4 scroll-smooth snap-x snap-mandatory"
+                style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
+              >
+                <div className="flex gap-4 sm:gap-6 pb-4" style={{ width: "max-content" }}>
+                  {top10Items.map((item, i) => {
+                    const rank = i + 1;
+                    return (
+                      <article
+                        key={`top10-${item.id}`}
+                        className="qs-top10-card flex-shrink-0 snap-start cursor-pointer"
+                        style={{ width: "clamp(160px, 44vw, 220px)" }}
+                        onClick={() => { trackClick(item.id); navigate(`/player/${item.id}`); }}
+                      >
+                        <div className="qs-top10-poster">
+                          <img src={item.banner_url || "/placeholder.svg"} alt={item.title} loading="lazy" />
+                          <div className="qs-top10-shade" />
+                        </div>
+                        <div className="qs-top10-foot">
+                          <span className="qs-top10-bignum" aria-hidden>{rank}</span>
+                          <div className="qs-top10-meta">
+                            <p className="qs-top10-fname">{item.title}</p>
+                            <p className="qs-top10-ftag">{item.year} · {item.type === "serie" ? "Series" : item.type === "novela" ? "Soap Opera" : "Movie"}</p>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              </div>
+              <p className="text-center text-[11px] text-[var(--t2)] mt-1 sm:hidden">← Swipe to see all 10 →</p>
             </div>
           </section>
         )}
