@@ -586,18 +586,23 @@ const Browse = () => {
         {/* GL DRAMAS */}
         <section id="gl" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl sm:text-3xl font-bold neon-text-pink">GL Dramas</h2>
-              {isAdmin && (
-                <div className="flex items-center gap-2">
-                  <button onClick={() => handleNew("gl", "serie")} className="h-9 px-3 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center gap-1.5 transition-colors text-xs font-medium text-primary" title="Add GL Series">
-                    <Plus className="w-3.5 h-3.5" /> Series
-                  </button>
-                  <button onClick={() => handleNew("gl", "filme")} className="h-9 px-3 rounded-full bg-secondary/10 hover:bg-secondary/20 flex items-center gap-1.5 transition-colors text-xs font-medium text-secondary" title="Add GL Movie">
-                    <Plus className="w-3.5 h-3.5" /> Movie
-                  </button>
-                </div>
-              )}
+            <div className="flex items-center justify-between mb-6 gap-3">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-pink flex items-center gap-2">
+                <span>💜</span> GL Dramas
+              </h2>
+              <div className="flex items-center gap-2">
+                <Link to="/catalog" className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 transition-colors">See all</Link>
+                {isAdmin && (
+                  <>
+                    <button onClick={() => handleNew("gl", "serie")} className="h-9 px-3 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center gap-1.5 transition-colors text-xs font-medium text-primary" title="Add GL Series">
+                      <Plus className="w-3.5 h-3.5" /> Series
+                    </button>
+                    <button onClick={() => handleNew("gl", "filme")} className="h-9 px-3 rounded-full bg-secondary/10 hover:bg-secondary/20 flex items-center gap-1.5 transition-colors text-xs font-medium text-secondary" title="Add GL Movie">
+                      <Plus className="w-3.5 h-3.5" /> Movie
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
             {gl.length > 0 ? (
               <AutoScrollRow>
