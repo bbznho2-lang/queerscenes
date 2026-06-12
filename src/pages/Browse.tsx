@@ -491,11 +491,10 @@ const Browse = () => {
         <section id="séries" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6 gap-3">
-              <h2 className="text-xl sm:text-2xl font-black neon-text-dark-blue flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-purple flex items-center gap-2">
                 <span>🎭</span> Trending Queer Series
               </h2>
               <div className="flex items-center gap-2">
-                <Link to="/catalog" className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 transition-colors">See all</Link>
                 {isAdmin && (
                   <button onClick={() => handleNew("series", "serie")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add series">
                     <Plus className="w-5 h-5 text-primary" />
