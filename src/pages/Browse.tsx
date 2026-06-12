@@ -457,7 +457,7 @@ const Browse = () => {
                       <article
                         key={`top10-${item.id}`}
                         className="qs-top10-card flex-shrink-0 snap-start cursor-pointer"
-                        style={{ width: "clamp(160px, 44vw, 220px)" }}
+                        style={{ width: "clamp(130px, 38vw, 220px)" }}
                         onClick={() => { trackClick(item.id); navigate(`/player/${item.id}`); }}
                       >
                         <div className="qs-top10-poster">
