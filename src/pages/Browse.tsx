@@ -445,7 +445,6 @@ const Browse = () => {
                   <span>🔥</span>
                   <span className="rainbow-text">Top 10</span>
                 </h2>
-                <Link to="/catalog" className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 transition-colors">See all</Link>
               </div>
               <div
                 className="overflow-x-auto -mx-4 px-4 scroll-smooth snap-x snap-mandatory"
@@ -491,11 +490,10 @@ const Browse = () => {
         <section id="séries" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6 gap-3">
-              <h2 className="text-xl sm:text-2xl font-black neon-text-dark-blue flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-purple flex items-center gap-2">
                 <span>🎭</span> Trending Queer Series
               </h2>
               <div className="flex items-center gap-2">
-                <Link to="/catalog" className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 transition-colors">See all</Link>
                 {isAdmin && (
                   <button onClick={() => handleNew("series", "serie")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add series">
                     <Plus className="w-5 h-5 text-primary" />
@@ -523,11 +521,10 @@ const Browse = () => {
         <section id="filmes" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6 gap-3">
-              <h2 className="text-xl sm:text-2xl font-black neon-text-dark-blue flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-pink flex items-center gap-2">
                 <span>🎬</span> Iconic Movies
               </h2>
               <div className="flex items-center gap-2">
-                <Link to="/catalog" className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 transition-colors">See all</Link>
                 {isAdmin && (
                   <button onClick={() => handleNew("filmes", "filme")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add movie">
                     <Plus className="w-5 h-5 text-primary" />
@@ -555,11 +552,10 @@ const Browse = () => {
         <section id="novelas" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6 gap-3">
-              <h2 className="text-xl sm:text-2xl font-black neon-text-dark-blue flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-blue flex items-center gap-2">
                 <span>🌶️</span> Queer Soap Operas
               </h2>
               <div className="flex items-center gap-2">
-                <Link to="/catalog" className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 transition-colors">See all</Link>
                 {isAdmin && (
                   <button onClick={() => handleNew("novelas", "novela")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add soap opera">
                     <Plus className="w-5 h-5 text-primary" />
@@ -588,11 +584,10 @@ const Browse = () => {
         <section id="gl" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6 gap-3">
-              <h2 className="text-xl sm:text-2xl font-black neon-text-dark-blue flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-purple flex items-center gap-2">
                 <span>💜</span> GL Dramas
               </h2>
               <div className="flex items-center gap-2">
-                <Link to="/catalog" className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 transition-colors">See all</Link>
                 {isAdmin && (
                   <>
                     <button onClick={() => handleNew("gl", "serie")} className="h-9 px-3 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center gap-1.5 transition-colors text-xs font-medium text-primary" title="Add GL Series">
@@ -630,7 +625,6 @@ const Browse = () => {
                 <span>⭐</span> <span className="rainbow-text">Queer Scenes Exclusives</span>
               </h2>
               <div className="flex items-center gap-2">
-                <Link to="/catalog" className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 transition-colors">See all</Link>
                 {isAdmin && (
                   <>
                     <button onClick={() => setAddExistingOpen(true)} className="h-9 px-3 rounded-full bg-secondary/10 hover:bg-secondary/20 flex items-center gap-1.5 transition-colors text-xs font-medium text-secondary" title="Adicionar título existente">
@@ -662,7 +656,7 @@ const Browse = () => {
         {/* MY LIST */}
         <section id="minha-lista" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-xl sm:text-2xl font-black mb-6 flex items-center gap-2 neon-text-dark-blue">
+            <h2 className="text-xl sm:text-2xl font-black mb-6 flex items-center gap-2 neon-text-pink">
               <Bookmark className="w-5 h-5 sm:w-6 sm:h-6" /> My List
             </h2>
             {watchlistItems.length > 0 ? (
