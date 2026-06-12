@@ -96,45 +96,50 @@
   }
 }
 
-/* Neon utilities */
+/* Neon utilities — softer glow */
 .neon-text-purple {
-  color: hsl(274 76% 60%);
-  text-shadow: 0 0 10px hsl(274 76% 53% / 0.5), 0 0 30px hsl(274 76% 53% / 0.3);
+  color: hsl(274 76% 65%);
+  text-shadow: 0 0 6px hsl(274 76% 53% / 0.25), 0 0 14px hsl(274 76% 53% / 0.12);
 }
 
 .neon-text-blue {
-  color: hsl(224 83% 60%);
-  text-shadow: 0 0 10px hsl(224 83% 53% / 0.5), 0 0 30px hsl(224 83% 53% / 0.3);
+  color: hsl(210 90% 65%);
+  text-shadow: 0 0 6px hsl(210 90% 55% / 0.25), 0 0 14px hsl(210 90% 55% / 0.12);
 }
 
 .neon-text-pink {
-  color: hsl(322 67% 60%);
-  text-shadow: 0 0 10px hsl(322 67% 56% / 0.5), 0 0 30px hsl(322 67% 56% / 0.3);
+  color: hsl(330 70% 65%);
+  text-shadow: 0 0 6px hsl(330 70% 56% / 0.25), 0 0 14px hsl(330 70% 56% / 0.12);
 }
 
 .neon-text-bi-blue {
-  color: hsl(224 83% 60%);
-  text-shadow: 0 0 10px hsl(224 83% 53% / 0.5), 0 0 30px hsl(224 83% 53% / 0.3);
+  color: hsl(224 83% 65%);
+  text-shadow: 0 0 6px hsl(224 83% 53% / 0.25), 0 0 14px hsl(224 83% 53% / 0.12);
 }
 
 .neon-text-red {
-  color: hsl(0 90% 55%);
-  text-shadow: 0 0 10px hsl(0 90% 55% / 0.5), 0 0 30px hsl(0 90% 55% / 0.3);
+  color: hsl(0 80% 65%);
+  text-shadow: 0 0 6px hsl(0 80% 55% / 0.22), 0 0 14px hsl(0 80% 55% / 0.1);
 }
 
 .neon-text-orange {
-  color: hsl(30 95% 55%);
-  text-shadow: 0 0 10px hsl(30 95% 55% / 0.5), 0 0 30px hsl(30 95% 55% / 0.3);
+  color: hsl(28 90% 62%);
+  text-shadow: 0 0 6px hsl(28 90% 55% / 0.22), 0 0 14px hsl(28 90% 55% / 0.1);
 }
 
 .neon-text-yellow {
-  color: hsl(55 95% 55%);
-  text-shadow: 0 0 10px hsl(55 95% 55% / 0.5), 0 0 30px hsl(55 95% 55% / 0.3);
+  color: hsl(48 90% 62%);
+  text-shadow: 0 0 6px hsl(48 90% 55% / 0.22), 0 0 14px hsl(48 90% 55% / 0.1);
 }
 
 .neon-text-green {
-  color: hsl(120 70% 50%);
-  text-shadow: 0 0 10px hsl(120 70% 50% / 0.5), 0 0 30px hsl(120 70% 50% / 0.3);
+  color: hsl(140 60% 58%);
+  text-shadow: 0 0 6px hsl(140 60% 50% / 0.22), 0 0 14px hsl(140 60% 50% / 0.1);
+}
+
+.neon-text-cyan {
+  color: hsl(180 70% 60%);
+  text-shadow: 0 0 6px hsl(180 70% 50% / 0.22), 0 0 14px hsl(180 70% 50% / 0.1);
 }
 
 /* LGBTQIA+ rainbow neon letters */
