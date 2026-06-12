@@ -457,7 +457,7 @@ const Browse = () => {
                       <article
                         key={`top10-${item.id}`}
                         className="qs-top10-card flex-shrink-0 snap-start cursor-pointer"
-                        style={{ width: "clamp(160px, 44vw, 220px)" }}
+                        style={{ width: "clamp(130px, 38vw, 220px)" }}
                         onClick={() => { trackClick(item.id); navigate(`/player/${item.id}`); }}
                       >
                         <div className="qs-top10-poster">
@@ -476,7 +476,7 @@ const Browse = () => {
                   })}
                 </div>
               </div>
-              <p className="text-center text-[11px] text-[var(--t2)] mt-1 sm:hidden">← Swipe to see all 10 →</p>
+              
             </div>
           </section>
         )}
@@ -521,7 +521,7 @@ const Browse = () => {
         <section id="filmes" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6 gap-3">
-              <h2 className="text-xl sm:text-2xl font-black neon-text-pink flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-dark-blue flex items-center gap-2">
                 <span>🎬</span> Iconic Movies
               </h2>
               <div className="flex items-center gap-2">
@@ -552,7 +552,7 @@ const Browse = () => {
         <section id="novelas" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6 gap-3">
-              <h2 className="text-xl sm:text-2xl font-black neon-text-blue flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-pink flex items-center gap-2">
                 <span>🌶️</span> Queer Soap Operas
               </h2>
               <div className="flex items-center gap-2">
