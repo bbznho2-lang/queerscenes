@@ -441,8 +441,16 @@ const Browse = () => {
           <section className="py-10 sm:py-16 px-4">
             <div className="max-w-7xl mx-auto">
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-xl sm:text-2xl font-black text-[var(--t1)] flex items-center gap-2">
-                  <span>🔥</span> <span>Top 10</span>
+                <h2 className="text-xl sm:text-2xl font-black flex items-center gap-2">
+                  <span>🔥</span>
+                  <span className="lgbtq-rainbow-letters" aria-label="Top 10">
+                    <span className="neon-text-red">T</span>
+                    <span className="neon-text-orange">O</span>
+                    <span className="neon-text-yellow">P</span>
+                    <span>&nbsp;</span>
+                    <span className="neon-text-green">1</span>
+                    <span className="neon-text-blue">0</span>
+                  </span>
                 </h2>
                 <Link to="/catalog" className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 transition-colors">See all</Link>
               </div>
