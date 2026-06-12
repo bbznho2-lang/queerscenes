@@ -287,7 +287,7 @@ const Browse = () => {
             {menuOpen ? <X className="w-5 h-5 text-foreground" /> : <Menu className="w-5 h-5 text-foreground" />}
           </button>
 
-          <Link to="/" className="absolute left-1/2 -translate-x-1/2" style={{ fontFamily: "'Sora', sans-serif", fontSize: "13px", fontWeight: 700, letterSpacing: ".14em", color: "#a855f7", textShadow: "0 0 16px rgba(168,85,247,.4)" }}>
+          <Link to="/" className="absolute left-1/2 -translate-x-1/2" style={{ fontFamily: "'Sora', sans-serif", fontSize: "13px", fontWeight: 800, letterSpacing: ".14em", color: "#a855f7", textShadow: "0 0 6px rgba(168,85,247,.18)" }}>
             QUEER SCENES
           </Link>
 
@@ -444,7 +444,6 @@ const Browse = () => {
                 <h2 className="text-xl sm:text-2xl font-black text-[var(--t1)] flex items-center gap-2">
                   <span>🔥</span> <span>Top 10</span>
                 </h2>
-                <Link to="/catalog" className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 transition-colors">See all</Link>
               </div>
               <div
                 className="overflow-x-auto -mx-4 px-4 scroll-smooth snap-x snap-mandatory"
@@ -465,7 +464,7 @@ const Browse = () => {
                           <div className="qs-top10-shade" />
                         </div>
                         <div className="qs-top10-foot">
-                          <span className="qs-top10-bignum" aria-hidden>{rank}</span>
+                          <span className="qs-top10-bignum qs-top10-bignum-rainbow" aria-hidden>{rank}</span>
                           <div className="qs-top10-meta">
                             <p className="qs-top10-fname">{item.title}</p>
                             <p className="qs-top10-ftag">{item.year} · {item.type === "serie" ? "Series" : item.type === "novela" ? "Soap Opera" : "Movie"}</p>
@@ -490,7 +489,7 @@ const Browse = () => {
         <section id="séries" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6 gap-3">
-              <h2 className="text-xl sm:text-2xl font-black neon-text-pink flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-blue flex items-center gap-2">
                 <span>🎭</span> Trending Queer Series
               </h2>
               <div className="flex items-center gap-2">
@@ -522,7 +521,7 @@ const Browse = () => {
         <section id="filmes" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6 gap-3">
-              <h2 className="text-xl sm:text-2xl font-black neon-text-pink flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-orange flex items-center gap-2">
                 <span>🎬</span> Iconic Movies
               </h2>
               <div className="flex items-center gap-2">
@@ -554,7 +553,7 @@ const Browse = () => {
         <section id="novelas" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6 gap-3">
-              <h2 className="text-xl sm:text-2xl font-black neon-text-pink flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-green flex items-center gap-2">
                 <span>🌶️</span> Queer Soap Operas
               </h2>
               <div className="flex items-center gap-2">
@@ -587,7 +586,7 @@ const Browse = () => {
         <section id="gl" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6 gap-3">
-              <h2 className="text-xl sm:text-2xl font-black neon-text-pink flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-purple flex items-center gap-2">
                 <span>💜</span> GL Dramas
               </h2>
               <div className="flex items-center gap-2">
