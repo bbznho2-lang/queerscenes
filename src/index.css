@@ -444,7 +444,7 @@
 
 .qs-top10-poster {
   position: relative;
-  aspect-ratio: 0.72;
+  aspect-ratio: 0.65;
   overflow: hidden;
   border-radius: 1.1rem;
   border: 1px solid rgba(255,255,255,.08);
@@ -481,7 +481,7 @@
 }
 .qs-top10-bignum {
   position: absolute; left: -6px; top: 50%; transform: translateY(-50%);
-  font-size: clamp(80px, 18vw, 130px);
+  font-size: clamp(60px, 15vw, 110px);
   font-weight: 900;
   line-height: .8;
   color: transparent;
