@@ -166,15 +166,6 @@ const Index = () => {
     void run();
   }, [user]);
 
-  // Rotate hero banners
-  useEffect(() => {
-    if (heroBanners.length <= 1) return;
-    const interval = setInterval(() => {
-      setCurrentBanner((prev) => (prev + 1) % heroBanners.length);
-    }, 6000);
-    return () => clearInterval(interval);
-  }, [heroBanners.length]);
-
   const top10CatalogItems = buildUniqueTopContent(catalogTitles, top10Ids, 10);
 
   const showNameFields = isSignUp;
