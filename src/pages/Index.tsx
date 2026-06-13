@@ -259,10 +259,10 @@ const Index = () => {
               src={heroBanners[currentBanner]?.banner_url || "/placeholder.svg"}
               alt=""
               className="absolute inset-0 w-full h-full object-cover"
-              initial={{ opacity: 0, scale: 1.05 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 1.2 }}
+              transition={{ duration: 0.8 }}
             />
           )}
         </AnimatePresence>
