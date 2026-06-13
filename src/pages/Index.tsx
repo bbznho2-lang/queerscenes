@@ -407,7 +407,7 @@ const Index = () => {
                     <article
                       key={`top10-${item.id}`}
                       className="qs-top10-card flex-shrink-0 snap-start"
-                      style={{ width: "clamp(160px, 44vw, 220px)" }}
+                      style={{ width: "clamp(120px, 34vw, 220px)" }}
                     >
                       <div className="qs-top10-poster">
                         {item.banner_url ? (
