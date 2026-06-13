@@ -448,6 +448,13 @@
   align-self: flex-start;
 }
 
+.qs-top10-card-landing {
+  width: 188px !important;
+  min-width: 188px;
+  max-width: 188px;
+  flex: 0 0 188px;
+}
+
 .qs-top10-poster {
   position: relative;
   aspect-ratio: 0.65;
@@ -491,6 +498,22 @@
 @media (max-width: 640px) {
   .qs-top10-card {
     width: clamp(112px, 32vw, 160px) !important;
+  }
+
+  .qs-top10-card-landing {
+    width: 128px !important;
+    min-width: 128px;
+    max-width: 128px;
+    flex-basis: 128px;
+  }
+}
+
+@media (max-width: 1024px) and (min-width: 641px) {
+  .qs-top10-card-landing {
+    width: 168px !important;
+    min-width: 168px;
+    max-width: 168px;
+    flex-basis: 168px;
   }
 }
 .qs-top10-bignum {

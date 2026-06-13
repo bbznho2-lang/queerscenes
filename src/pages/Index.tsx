@@ -406,8 +406,7 @@ const Index = () => {
                   return (
                     <article
                       key={`top10-${item.id}`}
-                      className="qs-top10-card flex-shrink-0 snap-start"
-                      style={{ width: "clamp(120px, 34vw, 220px)" }}
+                       className="qs-top10-card qs-top10-card-landing flex-shrink-0 snap-start"
                     >
                       <div className="qs-top10-poster">
                         {item.banner_url ? (
