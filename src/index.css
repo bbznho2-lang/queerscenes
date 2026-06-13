@@ -484,36 +484,13 @@
 .qs-top10-foot {
   position: relative;
   margin-top: .35rem;
-  height: clamp(64px, 13vw, 88px);
+  height: 60px;
   flex: 0 0 auto;
 }
 
 @media (max-width: 640px) {
   .qs-top10-card {
     width: clamp(112px, 32vw, 160px) !important;
-  }
-
-  .qs-top10-foot {
-    height: 60px;
-  }
-
-  .qs-top10-bignum {
-    left: -2px;
-    font-size: clamp(48px, 13vw, 72px);
-    -webkit-text-stroke: 1.5px rgba(120,120,180,.35);
-  }
-
-  .qs-top10-meta {
-    left: 42px;
-  }
-
-  .qs-top10-fname {
-    font-size: .78rem;
-  }
-
-  .qs-top10-ftag {
-    font-size: .68rem;
-    line-height: 1.15;
   }
 }
 .qs-top10-bignum {
