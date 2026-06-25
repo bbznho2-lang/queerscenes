@@ -173,8 +173,11 @@ const Index = () => {
 
   const startCheckout = async (priceId: string) => {
     if (!user) {
-      toast.error("Please sign in to become a supporter.");
-      document.getElementById("login-form")?.scrollIntoView({ behavior: "smooth" });
+      toast.error("Please sign in first to become a Supporter.");
+      if (checkoutEmail) setEmail(checkoutEmail);
+      setIsSignUp(false);
+      setIsForgot(false);
+      document.getElementById("login")?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
     setCheckoutLoading(priceId);
@@ -187,7 +190,8 @@ const Index = () => {
       if (!url) throw new Error("Missing checkout URL");
       window.location.href = url;
     } catch (err: any) {
-      toast.error(err.message || "Could not start checkout. Please try again.");
+      console.error("startCheckout error", err);
+      toast.error(err?.message || "Could not start checkout. Please try again.");
       setCheckoutLoading(null);
     }
   };
