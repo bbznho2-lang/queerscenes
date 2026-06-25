@@ -397,6 +397,42 @@ const Admin = () => {
       <main className="pt-20 px-4 pb-12 max-w-7xl mx-auto space-y-8">
         <AdminStatsCards totalUsers={totalUsers} premiumUsers={premiumUsers} totalClicks={totalClicks} />
 
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between gap-2 text-foreground">
+              <span className="flex items-center gap-2">
+                <Calendar className="w-5 h-5" style={{ color: "#2dd4bf" }} />
+                New users — last 14 days
+              </span>
+              <span className="text-xs font-normal text-muted-foreground">
+                {newUsersTotal14d} new {newUsersTotal14d === 1 ? "signup" : "signups"}
+              </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1.5">
+              {newUsersByDay.map((d) => (
+                <div key={d.key} className="flex items-center gap-3 text-xs">
+                  <span className="w-14 shrink-0 text-muted-foreground tabular-nums">{d.label}</span>
+                  <div className="flex-1 h-5 rounded-md bg-muted/40 overflow-hidden">
+                    <div
+                      className="h-full rounded-md transition-all"
+                      style={{
+                        width: `${(d.count / maxNewUsers) * 100}%`,
+                        background: "linear-gradient(90deg, #ec4899, #a855f7, #2dd4bf)",
+                        minWidth: d.count > 0 ? "6px" : "0",
+                      }}
+                    />
+                  </div>
+                  <span className="w-8 shrink-0 text-right font-semibold tabular-nums" style={{ color: d.count > 0 ? "#f59e0b" : "hsl(var(--muted-foreground))" }}>
+                    {d.count}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
         <SiteNoteAdmin />
         <FeaturedEpisodesAdmin />
 
