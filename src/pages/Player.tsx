@@ -418,6 +418,15 @@ const Player = () => {
                       ) : (
                         <iframe
                           src={getEmbedUrl(prev)}
+                          className="absolute inset-0 w-full h-full border-0"
+                          allowFullScreen
+                          allow="autoplay; fullscreen; accelerometer; encrypted-media; gyroscope; picture-in-picture"
+                          style={{ border: 0 }}
+                        />
+                      )}
+                    </div>
+                  );
+                })()}
 
                   {(() => {
                     const names = [
