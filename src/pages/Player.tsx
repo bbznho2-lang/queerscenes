@@ -24,6 +24,7 @@ interface ContentItem {
   position: number;
   is_premium: boolean;
   supporter_player_enabled?: boolean;
+preview_video_url?: string | null;
 }
 
 interface Episode {
@@ -67,7 +68,7 @@ const Player = () => {
     if (authLoading) return; // wait for auth to settle to avoid double-fetch
     const contentPromise = supabase
       .from("contents")
-      .select("id, title, year, tag, type, banner_url, section, position, is_premium, supporter_player_enabled, synopsis")
+      .select("id, title, year, tag, type, banner_url, section, position, is_premium, supporter_player_enabled, synopsis preview_video_url")
       .eq("id", id)
       .single();
     const profilePromise = user
@@ -209,13 +210,12 @@ const Player = () => {
   const selectLink = (idx: number) => {
     const lnk = episodeLinks[idx];
     if (!lnk) return;
-    if (links.length === 0) {
     setSelectedLinkIdx(idx);
     if (lnk.type === "embed") {
       setRawPlayerUrl(lnk.url);
     } else {
       setRawPlayerUrl("");
-    }
+      }
   };
 
   const getEmbedUrl = (url: string) => {
@@ -397,7 +397,27 @@ const Player = () => {
                   </div>
                   <h2 className="text-xl sm:text-2xl font-extrabold mb-1.5">
                     {currentEp ? `“${normalizeEpisodeLabel(currentEp.title, currentEp.episode_number)}” is waiting for you` : `“${content?.title ?? "This title"}” is waiting for you`}
-                  </h2>
+                  </h2> 
+                  {content?.preview_video_url && (() => {
+                  const prev = content.preview_video_url!.trim();
+                  const isHtml = prev.toLowerCase().startsWith("<iframe");
+                  return (
+                    <div className="relative w-full overflow-hidden rounded-xl bg-black mb-4"
+                      style={{ paddingBottom: "56.25%", height: 0 }}>
+                      {isHtml ? (
+                        <div
+                          className="absolute inset-0 [&>iframe]:absolute [&>iframe]:inset-0 [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0"
+                          dangerouslySetInnerHTML={{
+                            __html: DOMPurify.sanitize(prev, {
+                              ALLOWED_TAGS: ["iframe"],
+                              ALLOWED_ATTR: ["src", "allow", "allowfullscreen", "width", "height", "frameborder", "referrerpolicy", "title", "loading"],
+                              ADD_ATTR: ["allowfullscreen"],
+                            }),
+                          }}
+                        />
+                      ) : (
+                        <iframe
+                          src={getEmbedUrl(prev)}
 
                   {(() => {
                     const names = [
