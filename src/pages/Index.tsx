@@ -172,9 +172,21 @@ const Index = () => {
   const showSubscribeActions = !authLoading && !profileLoading && !isAdmin && !isPremiumUser;
 
   const startCheckout = async (priceId: string) => {
+    const trimmedEmail = checkoutEmail.trim();
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail);
+    if (!trimmedEmail) {
+      toast.error("Please enter your email to continue.");
+      document.getElementById("supporter-email")?.focus();
+      return;
+    }
+    if (!emailValid) {
+      toast.error("Please enter a valid email address.");
+      document.getElementById("supporter-email")?.focus();
+      return;
+    }
     if (!user) {
       toast.error("Please sign in first to become a Supporter.");
-      if (checkoutEmail) setEmail(checkoutEmail);
+      setEmail(trimmedEmail);
       setIsSignUp(false);
       setIsForgot(false);
       document.getElementById("login")?.scrollIntoView({ behavior: "smooth", block: "start" });
