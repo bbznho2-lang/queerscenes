@@ -145,9 +145,8 @@ const Player = () => {
   };
 
   useEffect(() => {
-    fetchContent();
-  }, [id, user?.id, isAdmin, authLoading]);
-
+  fetchContent();
+}, [id, user?.id, isAdmin, authLoading]);
 
   const episodePremiumBlocked = currentEp?.is_premium && !userIsPremium && !isAdmin;
   const isBlocked = premiumBlocked || episodePremiumBlocked;
@@ -207,6 +206,7 @@ const Player = () => {
   const selectLink = (idx: number) => {
     const lnk = episodeLinks[idx];
     if (!lnk) return;
+    if (links.length === 0) {
     setSelectedLinkIdx(idx);
     if (lnk.type === "embed") {
       setRawPlayerUrl(lnk.url);
