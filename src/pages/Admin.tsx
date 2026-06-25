@@ -124,8 +124,20 @@ const Admin = () => {
       )
       .subscribe();
 
+    const profilesChannel = supabase
+      .channel("admin-profiles-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "profiles" },
+        () => {
+          fetchData();
+        }
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(clicksChannel);
+      supabase.removeChannel(profilesChannel);
     };
   }, [isAdmin]);
 
