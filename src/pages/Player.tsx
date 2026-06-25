@@ -176,8 +176,11 @@ const Player = () => {
           if (cancelled) return;
           setEpisodeLinks(url ? [{ title: "Watch on site", type: "embed", url }] : []);
         }
-        setSelectedLinkIdx(-1);
-        setRawPlayerUrl("");
+  if (!links || links.length === 0) {   
+  setSelectedLinkIdx(-1);
+  setRawPlayerUrl("");
+  return;
+}
       } else if (content?.id) {
         const { data } = await (supabase.rpc as any)("get_content_links", { _content_id: content.id });
         const links = Array.isArray(data) ? (data as EpisodeLink[]) : [];
