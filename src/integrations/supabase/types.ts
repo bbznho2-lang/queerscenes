@@ -147,6 +147,7 @@ export type Database = {
           links: Json
           player_url: string | null
           position: number
+          preview_video_url: string | null
           section: string
           supporter_player_enabled: boolean
           synopsis: string | null
@@ -165,6 +166,7 @@ export type Database = {
           links?: Json
           player_url?: string | null
           position?: number
+          preview_video_url?: string | null
           section?: string
           supporter_player_enabled?: boolean
           synopsis?: string | null
@@ -183,6 +185,7 @@ export type Database = {
           links?: Json
           player_url?: string | null
           position?: number
+          preview_video_url?: string | null
           section?: string
           supporter_player_enabled?: boolean
           synopsis?: string | null
