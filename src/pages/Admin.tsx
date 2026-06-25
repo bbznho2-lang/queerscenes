@@ -348,6 +348,32 @@ const Admin = () => {
   const premiumUsers = profiles.filter((p) => p.is_premium).length;
   const totalClicks = clickStats.reduce((a, b) => a + b.clicks, 0);
 
+  // New users per day — last 14 days
+  const newUsersByDay = (() => {
+    const days: { key: string; label: string; count: number }[] = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      days.push({
+        key,
+        label: d.toLocaleDateString("en-US", { month: "short", day: "2-digit" }),
+        count: 0,
+      });
+    }
+    const idx: Record<string, number> = {};
+    days.forEach((d, i) => { idx[d.key] = i; });
+    profiles.forEach((p) => {
+      const k = new Date(p.created_at).toISOString().slice(0, 10);
+      if (k in idx) days[idx[k]].count += 1;
+    });
+    return days;
+  })();
+  const maxNewUsers = Math.max(1, ...newUsersByDay.map((d) => d.count));
+  const newUsersTotal14d = newUsersByDay.reduce((a, b) => a + b.count, 0);
+
   const isExpired = (date: string | null) => {
     if (!date) return false;
     return new Date(date) < new Date();
@@ -370,6 +396,42 @@ const Admin = () => {
 
       <main className="pt-20 px-4 pb-12 max-w-7xl mx-auto space-y-8">
         <AdminStatsCards totalUsers={totalUsers} premiumUsers={premiumUsers} totalClicks={totalClicks} />
+
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between gap-2 text-foreground">
+              <span className="flex items-center gap-2">
+                <Calendar className="w-5 h-5" style={{ color: "#2dd4bf" }} />
+                New users — last 14 days
+              </span>
+              <span className="text-xs font-normal text-muted-foreground">
+                {newUsersTotal14d} new {newUsersTotal14d === 1 ? "signup" : "signups"}
+              </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1.5">
+              {newUsersByDay.map((d) => (
+                <div key={d.key} className="flex items-center gap-3 text-xs">
+                  <span className="w-14 shrink-0 text-muted-foreground tabular-nums">{d.label}</span>
+                  <div className="flex-1 h-5 rounded-md bg-muted/40 overflow-hidden">
+                    <div
+                      className="h-full rounded-md transition-all"
+                      style={{
+                        width: `${(d.count / maxNewUsers) * 100}%`,
+                        background: "linear-gradient(90deg, #ec4899, #a855f7, #2dd4bf)",
+                        minWidth: d.count > 0 ? "6px" : "0",
+                      }}
+                    />
+                  </div>
+                  <span className="w-8 shrink-0 text-right font-semibold tabular-nums" style={{ color: d.count > 0 ? "#f59e0b" : "hsl(var(--muted-foreground))" }}>
+                    {d.count}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         <SiteNoteAdmin />
         <FeaturedEpisodesAdmin />
