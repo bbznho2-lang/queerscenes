@@ -20,7 +20,8 @@ interface ContentItem {
   position: number;
   is_premium: boolean;
   is_archived?: boolean;
-  supporter_player_enabled?: boolean;
+supporter_player_enabled?: boolean;
+  preview_video_url?: string | null;
 }
 
 type EpisodeLink = { title: string; type: "embed" | "redirect"; url: string };
