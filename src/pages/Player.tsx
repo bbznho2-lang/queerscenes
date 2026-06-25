@@ -68,7 +68,7 @@ const Player = () => {
     if (authLoading) return; // wait for auth to settle to avoid double-fetch
     const contentPromise = supabase
       .from("contents")
-      .select("id, title, year, tag, type, banner_url, section, position, is_premium, supporter_player_enabled, synopsis preview_video_url")
+      .select("id, title, year, tag, type, banner_url, section, position, is_premium, supporter_player_enabled, synopsis, preview_video_url")
       .eq("id", id)
       .single();
     const profilePromise = user
