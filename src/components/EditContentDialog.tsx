@@ -57,6 +57,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
   const [isPremium, setIsPremium] = useState(false);
   const [isArchived, setIsArchived] = useState(false);
   const [synopsis, setSynopsis] = useState("");
+  const [previewVideoUrl, setPreviewVideoUrl] = useState("");
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [movieLinks, setMovieLinks] = useState<EpisodeLink[]>([]);
   const [saving, setSaving] = useState(false);
@@ -90,6 +91,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setIsPremium(content.is_premium || false);
       setIsArchived(content.is_archived || false);
       setSynopsis((content as any).synopsis || "");
+      setPreviewVideoUrl((content as any).preview_video_url || "");
       supabase
         .rpc("admin_get_episodes", { _content_id: content.id })
         .then(({ data }) => {
@@ -114,6 +116,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setIsPremium(false);
       setIsArchived(false);
       setSynopsis("");
+      setPreviewVideoUrl("");
       setEpisodes([]);
       setMovieLinks([]);
     }
@@ -168,7 +171,8 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         is_premium: isPremium,
         is_archived: isArchived,
         supporter_player_enabled: false,
-        synopsis: synopsis || null,
+        synopsis: synopsis || null, 
+        preview_video_url: previewVideoUrl || null,
       };
 
 
@@ -437,6 +441,18 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
               <img src={bannerPreview} alt="preview" className="mt-2 rounded-lg h-32 w-full object-cover" />
             )}
           </div>
+          <div>
+  <label className="text-sm text-muted-foreground">Preview Video (shown on paywall)</label>
+  <p className="text-[10px] text-muted-foreground/60 mb-1">
+    Short clip (15s–1min) shown to non-supporters before they unlock. Paste a video URL or an &lt;iframe&gt; embed.
+  </p>
+  <Input
+    value={previewVideoUrl}
+    onChange={(e) => setPreviewVideoUrl(e.target.value)}
+    placeholder="https://... or <iframe src=...></iframe>"
+    className="bg-muted border-border"
+  />
+</div>
 
           {(type === "serie" || type === "novela" || type === "anime") && (
             <div className="space-y-3 border-t border-border pt-4">
