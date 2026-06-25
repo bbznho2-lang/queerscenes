@@ -348,6 +348,32 @@ const Admin = () => {
   const premiumUsers = profiles.filter((p) => p.is_premium).length;
   const totalClicks = clickStats.reduce((a, b) => a + b.clicks, 0);
 
+  // New users per day — last 14 days
+  const newUsersByDay = (() => {
+    const days: { key: string; label: string; count: number }[] = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      days.push({
+        key,
+        label: d.toLocaleDateString("en-US", { month: "short", day: "2-digit" }),
+        count: 0,
+      });
+    }
+    const idx: Record<string, number> = {};
+    days.forEach((d, i) => { idx[d.key] = i; });
+    profiles.forEach((p) => {
+      const k = new Date(p.created_at).toISOString().slice(0, 10);
+      if (k in idx) days[idx[k]].count += 1;
+    });
+    return days;
+  })();
+  const maxNewUsers = Math.max(1, ...newUsersByDay.map((d) => d.count));
+  const newUsersTotal14d = newUsersByDay.reduce((a, b) => a + b.count, 0);
+
   const isExpired = (date: string | null) => {
     if (!date) return false;
     return new Date(date) < new Date();
