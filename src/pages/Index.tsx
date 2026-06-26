@@ -55,7 +55,7 @@ const Index = () => {
   const [top10Ids, setTop10Ids] = useState<string[]>([]);
   const [checkoutEmail, setCheckoutEmail] = useState("");
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
-  const [selectedPlanId, setSelectedPlanId] = useState<string>("price_1TdJouJ5xR4MDdjriK0vTZr3");
+  const [selectedPlanId, setSelectedPlanId] = useState<string>("price_1TmNFHJ5xR4MDdjr5915HBR2");
   
   const navigate = useNavigate();
   const { user, loading: authLoading, isAdmin, signIn, signUp } = useAuth();
@@ -655,9 +655,9 @@ const Index = () => {
                 {/* Plan selector */}
                 <div className="relative z-10 mt-5 grid grid-cols-3 gap-2.5">
                   {[
-                    { label: "Monthly", price: "€9.99", note: "", priceId: "price_1TdJouJ5xR4MDdjriK0vTZr3" },
-                    { label: "Quarterly", price: "€24.99", note: "Save 17%", priceId: "price_1TdJpxJ5xR4MDdjr6CYmpFZk" },
-                    { label: "Yearly", price: "€89.99", note: "Save 25%", priceId: "price_1TdJrtJ5xR4MDdjrEdxuGjSz" },
+                    { label: "Monthly", price: "€11.90", note: "", priceId: "price_1TmNFHJ5xR4MDdjr5915HBR2" },
+                    { label: "Quarterly", price: "€29.90", note: "Save 16%", priceId: "price_1TmNGNJ5xR4MDdjrsxC9bhtx" },
+                    { label: "Yearly", price: "€106.90", note: "Save 25%", priceId: "price_1TmNHMJ5xR4MDdjrTnNTQAHV" },
                   ].map((opt) => {
                     const selected = selectedPlanId === opt.priceId;
                     return (

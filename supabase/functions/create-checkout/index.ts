@@ -7,10 +7,14 @@ const corsHeaders = {
 };
 
 const ALLOWED_PRICE_IDS = new Set([
-  "price_1TdJouJ5xR4MDdjriK0vTZr3", // monthly €9.99
-  "price_1TdJpxJ5xR4MDdjr6CYmpFZk", // quarterly €24.99
-  "price_1TdJrtJ5xR4MDdjrEdxuGjSz", // yearly €89.99
-  // legacy price IDs (kept for backward compat)
+  // current prices
+  "price_1TmNFHJ5xR4MDdjr5915HBR2", // monthly €11.90
+  "price_1TmNGNJ5xR4MDdjrsxC9bhtx", // quarterly €29.90
+  "price_1TmNHMJ5xR4MDdjrTnNTQAHV", // yearly €106.90
+  // legacy
+  "price_1TdJouJ5xR4MDdjriK0vTZr3",
+  "price_1TdJpxJ5xR4MDdjr6CYmpFZk",
+  "price_1TdJrtJ5xR4MDdjrEdxuGjSz",
   "price_1TcrpkJ5xR4MDdjr0jHKThue",
   "price_1TcrrpJ5xR4MDdjrEx4LeBub",
   "price_1TcrtPJ5xR4MDdjrM2sTnTPr",
