@@ -131,11 +131,12 @@ const Index = () => {
     let attempts = 0;
     const maxAttempts = 40; // ~4s
     const tryScroll = () => {
-      const el = document.getElementById("planos");
+      const el = document.getElementById("planos-cards") || document.getElementById("planos");
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "start" });
         return;
       }
+
       if (attempts++ < maxAttempts) {
         window.setTimeout(tryScroll, 100);
       }
@@ -337,7 +338,7 @@ const Index = () => {
           >
             Want the full experience?{" "}
             <button
-              onClick={() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() => document.getElementById("planos-cards")?.scrollIntoView({ behavior: "smooth" })}
               style={{ color: "#a855f7", background: "none", border: "none", padding: 0, cursor: "pointer", fontWeight: 600 }}
             >
               Become a Supporter
@@ -365,7 +366,7 @@ const Index = () => {
               Start watching free
             </button>
             <button
-              onClick={() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() => document.getElementById("planos-cards")?.scrollIntoView({ behavior: "smooth" })}
               className="w-full flex items-center justify-center gap-2 backdrop-blur-md"
               style={{
                 padding: "15px",
@@ -604,11 +605,12 @@ const Index = () => {
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
             <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--t1)]">
-              Choose your <span className="italic font-extrabold" style={{ color: "#a855f7" }}>experience</span>
+              Unlock this title and our entire <span className="italic font-extrabold" style={{ color: "#a855f7" }}>rare collection.</span>
             </h2>
             <p className="text-[var(--t2)] mt-3 text-sm sm:text-base max-w-xl mx-auto">
               Start free. Upgrade anytime.
             </p>
+
             {!showSubscribeActions && !authLoading && !profileLoading && (
               <p className="mt-3 text-sm font-medium" style={{ color: "#a855f7" }}>Your account already has Supporter access. 💜</p>
             )}
@@ -616,7 +618,7 @@ const Index = () => {
 
 
           {/* Free vs Supporter cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <div id="planos-cards" className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto scroll-mt-24">
             {/* FREE */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
               <div className="qs-card-lg p-6 sm:p-7 h-full flex flex-col">
