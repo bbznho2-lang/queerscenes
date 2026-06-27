@@ -119,7 +119,7 @@ const Admin = () => {
           table: "content_clicks",
         },
         () => {
-          fetchData();
+          fetchData(false);
         }
       )
       .subscribe();
@@ -130,7 +130,7 @@ const Admin = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "profiles" },
         () => {
-          fetchData();
+          fetchData(false);
         }
       )
       .subscribe();
@@ -142,8 +142,8 @@ const Admin = () => {
   }, [isAdmin]);
 
 
-  const fetchData = async () => {
-    setLoadingData(true);
+  const fetchData = async (showLoading = true) => {
+    if (showLoading) setLoadingData(true);
     // Supabase caps rows at 1000 per request — paginate to fetch every profile.
     const allProfiles: Profile[] = [];
     const PAGE = 1000;
@@ -242,22 +242,45 @@ const Admin = () => {
       .limit(500) as any;
     setSupporterEvents((events as any) || []);
 
-    setLoadingData(false);
+    if (showLoading) setLoadingData(false);
 
+  };
+
+  const applyPremiumUpdate = async (
+    profile: Profile,
+    isPremium: boolean,
+    premiumPlan: string | null,
+    premiumExpiresAt: string | null
+  ) => {
+    const { data, error } = await (supabase.rpc as any)("admin_set_profile_premium", {
+      _profile_id: profile.id,
+      _is_premium: isPremium,
+      _premium_plan: premiumPlan,
+      _premium_expires_at: premiumExpiresAt,
+    });
+
+    if (error) throw error;
+    const updated = Array.isArray(data) ? data[0] : data;
+    if (!updated) throw new Error("Profile not found");
+
+    setProfiles((current) => current.map((p) => p.id === profile.id ? { ...p, ...updated } : p));
+    return updated as Profile;
   };
 
 
   const togglePremium = async (profile: Profile) => {
     const newPremium = !profile.is_premium;
-    const updateData: any = { is_premium: newPremium };
-    if (!newPremium) {
-      updateData.premium_plan = null;
-      updateData.premium_expires_at = null;
+    try {
+      await applyPremiumUpdate(
+        profile,
+        newPremium,
+        newPremium ? (profile.premium_plan || "lifetime") : null,
+        newPremium ? profile.premium_expires_at : null
+      );
+      toast.success(newPremium ? "Supporter activated" : "Supporter removed");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Error updating");
     }
-    const { error } = await supabase.from("profiles").update(updateData).eq("id", profile.id);
-    if (error) { toast.error("Error updating"); return; }
-    toast.success(newPremium ? "Supporter activated" : "Supporter removed");
-    setProfiles(profiles.map((p) => p.id === profile.id ? { ...p, ...updateData } : p));
   };
 
   const updatePremiumPlan = async (profile: Profile, plan: string) => {
@@ -270,22 +293,23 @@ const Admin = () => {
     } else {
       expiresAt = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
     }
-    const { error } = await supabase
-      .from("profiles")
-      .update({ is_premium: true, premium_plan: plan, premium_expires_at: expiresAt.toISOString() })
-      .eq("id", profile.id);
-    if (error) { toast.error("Error updating plan"); return; }
-    const planLabels: Record<string, string> = { monthly: "Monthly €11.90", quarterly: "Quarterly €29.90", annual: "Annual €106.90" };
-    toast.success(`Plan set to ${planLabels[plan] || plan}`);
-    setProfiles(profiles.map((p) => p.id === profile.id ? { ...p, is_premium: true, premium_plan: plan, premium_expires_at: expiresAt.toISOString() } : p));
+    try {
+      await applyPremiumUpdate(profile, true, plan, expiresAt.toISOString());
+      const planLabels: Record<string, string> = { monthly: "Monthly €11.90", quarterly: "Quarterly €29.90", annual: "Annual €106.90" };
+      toast.success(`Plan set to ${planLabels[plan] || plan}`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Error updating plan");
+    }
   };
 
   const updateExpirationDate = async (profile: Profile, dateStr: string) => {
     if (!dateStr) return;
-    const { error } = await supabase.from("profiles").update({ premium_expires_at: new Date(dateStr).toISOString() }).eq("id", profile.id);
-    if (error) { toast.error("Error updating date"); return; }
-    toast.success("Expiration date updated");
-    setProfiles(profiles.map((p) => p.id === profile.id ? { ...p, premium_expires_at: new Date(dateStr).toISOString() } : p));
+    try {
+      await applyPremiumUpdate(profile, true, profile.premium_plan || "monthly", new Date(dateStr).toISOString());
+      toast.success("Expiration date updated");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Error updating date");
+    }
   };
 
   const grantPremiumByEmail = async () => {
@@ -296,11 +320,12 @@ const Admin = () => {
       const { data: profile, error } = await supabase.from("profiles").select("*").ilike("email", emailTrimmed).maybeSingle();
       if (error) { toast.error("Error searching for user"); return; }
       if (!profile) { toast.error("No user found with this email."); return; }
-      const { error: updateError } = await supabase.from("profiles").update({ is_premium: true, premium_plan: "lifetime", premium_expires_at: null }).eq("id", profile.id);
-      if (updateError) { toast.error("Error granting premium"); return; }
+      await applyPremiumUpdate(profile as Profile, true, "lifetime", null);
       toast.success(`Supporter access granted to ${emailTrimmed}!`);
       setPremiumEmail("");
-      fetchData();
+      fetchData(false);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Error granting premium");
     } finally {
       setAddingPremium(false);
     }
@@ -766,7 +791,7 @@ const Admin = () => {
                             <div className="space-y-1.5">
                               <label className="text-xs text-muted-foreground">Status</label>
                               <div className={`h-9 flex items-center px-3 rounded-md text-xs font-medium ${!p.is_premium ? 'bg-muted text-muted-foreground' : expired ? 'bg-destructive/10 text-destructive' : 'bg-secondary/10 text-secondary'}`}>
-                                {!p.is_premium ? "Free" : expired ? "Expired" : `Active until ${new Date(p.premium_expires_at!).toLocaleDateString("en-US")}`}
+                                {!p.is_premium ? "Free" : expired ? "Expired" : p.premium_expires_at ? `Active until ${new Date(p.premium_expires_at).toLocaleDateString("en-US")}` : "Lifetime supporter"}
                               </div>
                             </div>
                           </div>
