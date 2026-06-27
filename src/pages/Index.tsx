@@ -60,6 +60,18 @@ const Index = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, isAdmin, signIn, signUp } = useAuth();
 
+  const scrollToPlanCards = useCallback(() => {
+    if (typeof window === "undefined") return false;
+    const el = document.getElementById("planos-cards") || document.getElementById("planos");
+    if (!el) return false;
+
+    const rect = el.getBoundingClientRect();
+    const centerOffset = Math.max(24, (window.innerHeight - Math.min(rect.height, 520)) / 2);
+    const targetTop = window.scrollY + rect.top - centerOffset;
+    window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+    return true;
+  }, []);
+
   useEffect(() => {
     const loadCatalog = async () => {
       const { data, error } = await supabase
@@ -124,16 +136,14 @@ const Index = () => {
     };
   }, [user]);
 
-  // Scroll to plans section if URL hash is #planos
+  // Scroll to plans cards if URL hash is #planos / #planos-cards
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (window.location.hash !== "#planos" && window.location.hash !== "#planos-cards") return;
     let attempts = 0;
     const maxAttempts = 40; // ~4s
     const tryScroll = () => {
-      const el = document.getElementById("planos-cards") || document.getElementById("planos");
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (scrollToPlanCards()) {
         return;
       }
 
@@ -143,7 +153,7 @@ const Index = () => {
     };
     const timeout = window.setTimeout(tryScroll, 50);
     return () => clearTimeout(timeout);
-  }, []);
+  }, [scrollToPlanCards]);
 
 
   // Pre-fill checkout email
@@ -338,7 +348,7 @@ const Index = () => {
           >
             Want the full experience?{" "}
             <button
-              onClick={() => document.getElementById("planos-cards")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={scrollToPlanCards}
               style={{ color: "#a855f7", background: "none", border: "none", padding: 0, cursor: "pointer", fontWeight: 600 }}
             >
               Become a Supporter
@@ -366,7 +376,7 @@ const Index = () => {
               Start watching free
             </button>
             <button
-              onClick={() => document.getElementById("planos-cards")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={scrollToPlanCards}
               className="w-full flex items-center justify-center gap-2 backdrop-blur-md"
               style={{
                 padding: "15px",
