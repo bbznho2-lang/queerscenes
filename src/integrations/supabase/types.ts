@@ -752,6 +752,25 @@ export type Database = {
           title: string
         }[]
       }
+      admin_set_profile_premium: {
+        Args: {
+          _is_premium: boolean
+          _premium_expires_at?: string
+          _premium_plan?: string
+          _profile_id: string
+        }
+        Returns: {
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          is_premium: boolean
+          last_name: string
+          premium_expires_at: string
+          premium_plan: string
+          user_id: string
+        }[]
+      }
       claim_supporter_for_current_user: { Args: never; Returns: Json }
       count_unread_direct_messages: { Args: never; Returns: number }
       current_user_can_play_premium: { Args: never; Returns: boolean }
