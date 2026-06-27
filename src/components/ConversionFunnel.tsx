@@ -192,8 +192,22 @@ const ConversionFunnel = () => {
                 </div>
               </div>
             ))}
-            <p className="text-[11px] text-muted-foreground pt-2 leading-relaxed">
-              Big drops between two steps reveal where leads abandon. A low % between "Submitted signup" and "Completed checkout" usually means Stripe friction (card declined, price shock, abandoned tab).
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-2 text-[11px] text-muted-foreground">
+              <span>
+                Total Stripe payments in range:{" "}
+                <span className="font-semibold text-foreground tabular-nums">{paidTotalStripe}</span>
+              </span>
+              {paidUnlinked > 0 && (
+                <span>
+                  Unlinked (legacy / no metadata):{" "}
+                  <span className="font-semibold tabular-nums" style={{ color: "#f87171" }}>
+                    {paidUnlinked}
+                  </span>
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              The funnel now matches Stripe checkouts to a specific user via <code>metadata.user_id</code>. "Unlinked" pagamentos são webhooks antigos (antes desta correção) ou pagos por e-mails sem conta no app — eles continuam ativando o supporter normalmente.
             </p>
           </div>
         )}
