@@ -66,8 +66,7 @@ const Index = () => {
     if (!el) return false;
 
     const rect = el.getBoundingClientRect();
-    const centerOffset = Math.max(24, (window.innerHeight - Math.min(rect.height, 520)) / 2);
-    const targetTop = window.scrollY + rect.top - centerOffset;
+    const targetTop = window.scrollY + rect.top - 16;
     window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
     return true;
   }, []);
@@ -142,17 +141,22 @@ const Index = () => {
     if (window.location.hash !== "#planos" && window.location.hash !== "#planos-cards") return;
     let attempts = 0;
     const maxAttempts = 40; // ~4s
+    let retryTimer: number | undefined;
     const tryScroll = () => {
-      if (scrollToPlanCards()) {
+      const didScroll = scrollToPlanCards();
+      if (didScroll && attempts++ >= maxAttempts) {
         return;
       }
 
-      if (attempts++ < maxAttempts) {
-        window.setTimeout(tryScroll, 100);
+      if (attempts < maxAttempts) {
+        retryTimer = window.setTimeout(tryScroll, 100);
       }
     };
     const timeout = window.setTimeout(tryScroll, 50);
-    return () => clearTimeout(timeout);
+    return () => {
+      clearTimeout(timeout);
+      if (retryTimer) clearTimeout(retryTimer);
+    };
   }, [scrollToPlanCards]);
 
 
