@@ -617,7 +617,7 @@ const Index = () => {
 
 
           {/* Free vs Supporter cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <div id="planos-cards" className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto scroll-mt-24">
             {/* FREE */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
               <div className="qs-card-lg p-6 sm:p-7 h-full flex flex-col">
