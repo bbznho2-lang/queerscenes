@@ -40,7 +40,8 @@ Deno.serve(async (req) => {
     });
     const { data: userResult, error: userErr } = await supabase.auth.getUser(jwt);
     const authedEmail = userResult?.user?.email?.toLowerCase();
-    if (userErr || !authedEmail) {
+    const authedUserId = userResult?.user?.id;
+    if (userErr || !authedEmail || !authedUserId) {
       return new Response(JSON.stringify({ error: "Authentication required" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -67,19 +68,41 @@ Deno.serve(async (req) => {
     const rawOrigin = req.headers.get("origin") || "";
     const origin = ALLOWED_ORIGINS.has(rawOrigin) ? rawOrigin : "https://queerscenes.lovable.app";
 
+    const metadata = {
+      user_id: authedUserId,
+      email: authedEmail,
+      price_id: priceId,
+    };
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       payment_method_types: ["card"],
       line_items: [{ price: priceId, quantity: 1 }],
       customer_email: authedEmail,
+      client_reference_id: authedUserId,
       success_url: `${origin}/?supporter=success&email=${encodeURIComponent(authedEmail)}`,
       cancel_url: `${origin}/#planos`,
       allow_promotion_codes: true,
-      metadata: { email: authedEmail, price_id: priceId },
-      subscription_data: {
-        metadata: { email: authedEmail, price_id: priceId },
-      },
+      metadata,
+      subscription_data: { metadata },
     });
+
+    // Track funnel step: user was redirected to Stripe checkout.
+    // Use service role so we always record, even if the user closes the tab.
+    try {
+      const admin = createClient(
+        supabaseUrl,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      );
+      await admin.from("supporter_events").insert({
+        user_id: authedUserId,
+        event_type: "checkout_session_created",
+        source: "create-checkout",
+        metadata: { price_id: priceId, session_id: session.id, email: authedEmail },
+      });
+    } catch (e) {
+      console.error("[create-checkout] funnel insert failed", e);
+    }
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
