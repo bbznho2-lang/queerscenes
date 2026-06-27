@@ -63,13 +63,14 @@ const Index = () => {
   const scrollToPlanCards = useCallback(() => {
     if (typeof window === "undefined") return false;
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
-    const el = isMobile
-      ? document.getElementById("planos") || document.getElementById("planos-cards")
-      : document.getElementById("planos-cards") || document.getElementById("planos");
+    const el = document.getElementById("planos-cards") || document.getElementById("planos");
     if (!el) return false;
 
     const rect = el.getBoundingClientRect();
-    const targetTop = window.scrollY + rect.top - (isMobile ? 10 : 16);
+    // On mobile, leave room above for the "Unlock this title…" heading so the Free card
+    // sits comfortably below it (matches the reference screenshot).
+    const offset = isMobile ? 150 : 16;
+    const targetTop = window.scrollY + rect.top - offset;
     window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
     return true;
   }, []);
