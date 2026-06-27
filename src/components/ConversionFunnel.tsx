@@ -112,6 +112,19 @@ const ConversionFunnel = () => {
           <span className="flex items-center gap-2">
             <TrendingDown className="w-5 h-5" style={{ color: "#f59e0b" }} />
             Conversion funnel
+            <span
+              className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded"
+              style={{
+                background: liveStatus === "live" ? "rgba(45,212,191,0.15)" : "rgba(245,158,11,0.15)",
+                color: liveStatus === "live" ? "#2dd4bf" : "#f59e0b",
+              }}
+            >
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${liveStatus === "live" ? "animate-pulse" : ""}`}
+                style={{ background: liveStatus === "live" ? "#2dd4bf" : "#f59e0b" }}
+              />
+              {liveStatus === "live" ? "Live" : liveStatus === "connecting" ? "Connecting" : "Polling"}
+            </span>
           </span>
           <div className="flex items-center gap-2">
             <span className="text-xs font-normal text-muted-foreground">
