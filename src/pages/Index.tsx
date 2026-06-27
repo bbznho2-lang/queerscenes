@@ -62,11 +62,14 @@ const Index = () => {
 
   const scrollToPlanCards = useCallback(() => {
     if (typeof window === "undefined") return false;
-    const el = document.getElementById("planos-cards") || document.getElementById("planos");
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    const el = isMobile
+      ? document.getElementById("planos") || document.getElementById("planos-cards")
+      : document.getElementById("planos-cards") || document.getElementById("planos");
     if (!el) return false;
 
     const rect = el.getBoundingClientRect();
-    const targetTop = window.scrollY + rect.top - 16;
+    const targetTop = window.scrollY + rect.top - (isMobile ? 10 : 16);
     window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
     return true;
   }, []);
@@ -666,6 +669,10 @@ const Index = () => {
                 </div>
               </div>
             </motion.div>
+
+            <div className="md:hidden -mt-1 mb-1 text-center text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "#c084fc" }}>
+              Scroll down to see Supporter ↓
+            </div>
 
             {/* SUPPORTER */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2}>
