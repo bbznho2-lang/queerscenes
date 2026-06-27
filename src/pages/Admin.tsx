@@ -20,6 +20,7 @@ import {
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import SiteNoteAdmin from "@/components/SiteNoteAdmin";
 import FeaturedEpisodesAdmin from "@/components/FeaturedEpisodesAdmin";
+import ConversionFunnel from "@/components/ConversionFunnel";
 
 interface Profile {
   id: string;
