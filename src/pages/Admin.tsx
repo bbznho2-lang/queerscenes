@@ -144,12 +144,21 @@ const Admin = () => {
 
   const fetchData = async () => {
     setLoadingData(true);
-    const { data: profilesData } = await supabase
-      .from("profiles")
-      .select("*")
-      .order("created_at", { ascending: false });
-    const allProfiles = (profilesData as Profile[]) || [];
+    // Supabase caps rows at 1000 per request — paginate to fetch every profile.
+    const allProfiles: Profile[] = [];
+    const PAGE = 1000;
+    for (let from = 0; ; from += PAGE) {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .range(from, from + PAGE - 1);
+      if (error || !data || data.length === 0) break;
+      allProfiles.push(...(data as Profile[]));
+      if (data.length < PAGE) break;
+    }
     setProfiles(allProfiles);
+
 
     const { data: clicks } = await supabase
       .from("content_clicks")
