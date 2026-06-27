@@ -128,11 +128,22 @@ const Index = () => {
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (window.location.hash !== "#planos") return;
-    const timeout = setTimeout(() => {
-      document.getElementById("planos")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 100);
+    let attempts = 0;
+    const maxAttempts = 40; // ~4s
+    const tryScroll = () => {
+      const el = document.getElementById("planos");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+      if (attempts++ < maxAttempts) {
+        window.setTimeout(tryScroll, 100);
+      }
+    };
+    const timeout = window.setTimeout(tryScroll, 50);
     return () => clearTimeout(timeout);
   }, []);
+
 
   // Pre-fill checkout email
   useEffect(() => {
