@@ -604,11 +604,12 @@ const Index = () => {
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
             <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--t1)]">
-              Choose your <span className="italic font-extrabold" style={{ color: "#a855f7" }}>experience</span>
+              Unlock this title and our entire <span className="italic font-extrabold" style={{ color: "#a855f7" }}>rare collection.</span>
             </h2>
             <p className="text-[var(--t2)] mt-3 text-sm sm:text-base max-w-xl mx-auto">
               Start free. Upgrade anytime.
             </p>
+
             {!showSubscribeActions && !authLoading && !profileLoading && (
               <p className="mt-3 text-sm font-medium" style={{ color: "#a855f7" }}>Your account already has Supporter access. 💜</p>
             )}
