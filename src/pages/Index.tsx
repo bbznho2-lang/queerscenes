@@ -131,11 +131,12 @@ const Index = () => {
     let attempts = 0;
     const maxAttempts = 40; // ~4s
     const tryScroll = () => {
-      const el = document.getElementById("planos");
+      const el = document.getElementById("planos-cards") || document.getElementById("planos");
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "start" });
         return;
       }
+
       if (attempts++ < maxAttempts) {
         window.setTimeout(tryScroll, 100);
       }
