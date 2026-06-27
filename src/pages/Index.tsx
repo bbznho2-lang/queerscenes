@@ -338,7 +338,7 @@ const Index = () => {
           >
             Want the full experience?{" "}
             <button
-              onClick={() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() => document.getElementById("planos-cards")?.scrollIntoView({ behavior: "smooth" })}
               style={{ color: "#a855f7", background: "none", border: "none", padding: 0, cursor: "pointer", fontWeight: 600 }}
             >
               Become a Supporter
@@ -366,7 +366,7 @@ const Index = () => {
               Start watching free
             </button>
             <button
-              onClick={() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() => document.getElementById("planos-cards")?.scrollIntoView({ behavior: "smooth" })}
               className="w-full flex items-center justify-center gap-2 backdrop-blur-md"
               style={{
                 padding: "15px",
