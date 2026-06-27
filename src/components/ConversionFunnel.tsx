@@ -75,23 +75,26 @@ const ConversionFunnel = () => {
     };
   }, [range]);
 
-  const steps = useMemo(() => {
+  const { steps, paidTotalStripe, paidUnlinked } = useMemo(() => {
     const count = (t: string) => events.filter((e) => e.event_type === t).length;
     const lockedView = count("locked_content_view") + count("paywall_view");
     const becomeClick = count("become_supporter_click");
     const signupClick = count("paywall_signup_click");
     const signupSubmit = count("paywall_signup_submit");
-    const checkouts = pending.filter((p) => p.status === "paid" || p.status === "claimed").length;
+    const redirected = count("checkout_session_created");
+    const completedLinked = count("checkout_completed");
+    const totalStripe = pending.filter((p) => p.status === "paid" || p.status === "claimed").length;
 
     const base = [
       { key: "view", label: "Saw paywall / locked content", value: lockedView, color: "#ec4899" },
       { key: "become", label: "Clicked “Become a Supporter”", value: becomeClick, color: "#a855f7" },
       { key: "signup_click", label: "Started signup form", value: signupClick, color: "#6366f1" },
-      { key: "signup_submit", label: "Submitted signup", value: signupSubmit, color: "#2dd4bf" },
-      { key: "paid", label: "Completed checkout (paid)", value: checkouts, color: "#f59e0b" },
+      { key: "signup_submit", label: "Submitted signup", value: signupSubmit, color: "#22d3ee" },
+      { key: "redirected", label: "Redirected to Stripe checkout", value: redirected, color: "#2dd4bf" },
+      { key: "paid", label: "Completed checkout (linked to user)", value: completedLinked, color: "#f59e0b" },
     ];
     const top = Math.max(1, base[0].value);
-    return base.map((s, i) => {
+    const steps = base.map((s, i) => {
       const prev = i === 0 ? s.value : base[i - 1].value;
       const dropRate = i === 0 || prev === 0 ? 0 : 1 - s.value / prev;
       return {
@@ -101,6 +104,11 @@ const ConversionFunnel = () => {
         conversionFromPrev: prev === 0 ? 0 : s.value / prev,
       };
     });
+    return {
+      steps,
+      paidTotalStripe: totalStripe,
+      paidUnlinked: Math.max(0, totalStripe - completedLinked),
+    };
   }, [events, pending]);
 
   const overall = steps.length > 1 && steps[0].value > 0 ? steps[steps.length - 1].value / steps[0].value : 0;
@@ -184,8 +192,22 @@ const ConversionFunnel = () => {
                 </div>
               </div>
             ))}
-            <p className="text-[11px] text-muted-foreground pt-2 leading-relaxed">
-              Big drops between two steps reveal where leads abandon. A low % between "Submitted signup" and "Completed checkout" usually means Stripe friction (card declined, price shock, abandoned tab).
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-2 text-[11px] text-muted-foreground">
+              <span>
+                Total Stripe payments in range:{" "}
+                <span className="font-semibold text-foreground tabular-nums">{paidTotalStripe}</span>
+              </span>
+              {paidUnlinked > 0 && (
+                <span>
+                  Unlinked (legacy / no metadata):{" "}
+                  <span className="font-semibold tabular-nums" style={{ color: "#f87171" }}>
+                    {paidUnlinked}
+                  </span>
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              The funnel now matches Stripe checkouts to a specific user via <code>metadata.user_id</code>. "Unlinked" pagamentos são webhooks antigos (antes desta correção) ou pagos por e-mails sem conta no app — eles continuam ativando o supporter normalmente.
             </p>
           </div>
         )}

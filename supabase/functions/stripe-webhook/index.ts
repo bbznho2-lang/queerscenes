@@ -133,11 +133,47 @@ Deno.serve(async (req) => {
     }
   }
 
+  async function recordFunnelCompletion(opts: {
+    userId: string | null;
+    email: string | null;
+    priceId: string | null;
+    sessionId: string | null;
+    subscriptionId: string | null;
+  }) {
+    try {
+      let userId = opts.userId;
+      // Fallback: resolve user_id by email so legacy/no-metadata payments still link.
+      if (!userId && opts.email) {
+        const { data: prof } = await supabase
+          .from("profiles")
+          .select("user_id")
+          .ilike("email", opts.email)
+          .maybeSingle();
+        userId = prof?.user_id ?? null;
+      }
+      await supabase.from("supporter_events").insert({
+        user_id: userId,
+        event_type: "checkout_completed",
+        source: "stripe-webhook",
+        metadata: {
+          email: opts.email,
+          price_id: opts.priceId,
+          session_id: opts.sessionId,
+          subscription_id: opts.subscriptionId,
+          linked_by: opts.userId ? "metadata" : userId ? "email" : "none",
+        },
+      });
+    } catch (e) {
+      console.error("[stripe-webhook] funnel insert failed", e);
+    }
+  }
+
   try {
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
       const email = session.customer_email || (session.customer_details?.email ?? "");
       const priceId = (session.metadata?.price_id as string) || "";
+      const metaUserId = (session.metadata?.user_id as string) || session.client_reference_id || null;
       let periodEnd: number | null = null;
       let subId: string | null = null;
 
@@ -146,12 +182,20 @@ Deno.serve(async (req) => {
         const sub = await stripe.subscriptions.retrieve(subId);
         periodEnd = (sub as any).current_period_end ?? null;
         if (!priceId && sub.items.data[0]?.price?.id) {
+          const resolvedPrice = sub.items.data[0].price.id;
           await applySupporter({
             email,
-            priceId: sub.items.data[0].price.id,
+            priceId: resolvedPrice,
             customerId: typeof session.customer === "string" ? session.customer : session.customer?.id,
             subscriptionId: subId,
             periodEnd,
+          });
+          await recordFunnelCompletion({
+            userId: metaUserId,
+            email: email || null,
+            priceId: resolvedPrice,
+            sessionId: session.id,
+            subscriptionId: subId,
           });
           return new Response(JSON.stringify({ received: true }), {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -168,6 +212,13 @@ Deno.serve(async (req) => {
           periodEnd,
         });
       }
+      await recordFunnelCompletion({
+        userId: metaUserId,
+        email: email || null,
+        priceId: priceId || null,
+        sessionId: session.id,
+        subscriptionId: subId,
+      });
     } else if (event.type === "invoice.paid") {
       const invoice = event.data.object as Stripe.Invoice;
       const email = invoice.customer_email || "";
