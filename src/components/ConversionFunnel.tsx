@@ -20,11 +20,12 @@ const ConversionFunnel = () => {
   const [events, setEvents] = useState<EventRow[]>([]);
   const [pending, setPending] = useState<PendingRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [liveStatus, setLiveStatus] = useState<"connecting" | "live" | "polling">("connecting");
 
   useEffect(() => {
     let active = true;
-    const load = async () => {
-      setLoading(true);
+    const load = async (showLoading = true) => {
+      if (showLoading) setLoading(true);
       const sinceIso = range === "all"
         ? null
         : new Date(Date.now() - parseInt(range, 10) * 86400000).toISOString();
@@ -48,9 +49,29 @@ const ConversionFunnel = () => {
       setPending((pd as PendingRow[]) ?? []);
       setLoading(false);
     };
-    void load();
+    void load(true);
+
+    const channel = supabase
+      .channel("conversion-funnel")
+      .on("postgres_changes", { event: "*", schema: "public", table: "supporter_events" }, () => {
+        void load(false);
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "pending_supporters" }, () => {
+        void load(false);
+      })
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") setLiveStatus("live");
+        else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") setLiveStatus("polling");
+      });
+
+    const poll = window.setInterval(() => {
+      if (active) void load(false);
+    }, 15000);
+
     return () => {
       active = false;
+      supabase.removeChannel(channel);
+      window.clearInterval(poll);
     };
   }, [range]);
 
