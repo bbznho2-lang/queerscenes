@@ -127,7 +127,7 @@ const Index = () => {
   // Scroll to plans section if URL hash is #planos
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (window.location.hash !== "#planos") return;
+    if (window.location.hash !== "#planos" && window.location.hash !== "#planos-cards") return;
     let attempts = 0;
     const maxAttempts = 40; // ~4s
     const tryScroll = () => {
