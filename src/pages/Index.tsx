@@ -629,6 +629,10 @@ const Index = () => {
               Start free. Upgrade anytime.
             </p>
 
+            <div className="md:hidden mt-3 text-center text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "#c084fc" }}>
+              Scroll down to see Supporter ↓
+            </div>
+
             {!showSubscribeActions && !authLoading && !profileLoading && (
               <p className="mt-3 text-sm font-medium" style={{ color: "#a855f7" }}>Your account already has Supporter access. 💜</p>
             )}
@@ -671,9 +675,6 @@ const Index = () => {
               </div>
             </motion.div>
 
-            <div className="md:hidden -mt-1 mb-1 text-center text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "#c084fc" }}>
-              Scroll down to see Supporter ↓
-            </div>
 
             {/* SUPPORTER */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2}>
