@@ -235,8 +235,10 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
         media_type = file.type || "application/octet-stream";
         media_name = file.name;
       }
-      if (recipientId === "all") {
-        const targetIds = audienceProfiles.map((p) => p.user_id);
+      if (composeMode === "broadcast") {
+        const targetIds = broadcastAudience === "supporters"
+          ? supporters.map((p) => p.user_id)
+          : await fetchAllUserIds();
         if (!targetIds.length) throw new Error("No recipients to send to");
         const rows = targetIds.map((rid) => ({
           sender_id: userId,
@@ -248,7 +250,7 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
         }));
         const { error } = await (supabase as any).from("direct_messages").insert(rows);
         if (error) throw error;
-        toast.success(`Sent to ${targetIds.length} ${audience === "supporters" ? "supporters" : "users"}`);
+        toast.success(`Sent to ${targetIds.length} ${broadcastAudience === "supporters" ? "supporters" : "users"}`);
       } else {
         const { error } = await (supabase as any).from("direct_messages").insert({
           sender_id: userId,
