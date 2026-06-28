@@ -10,7 +10,14 @@ type EventRow = {
   user_id: string | null;
   metadata: Record<string, unknown> | null;
 };
-type PendingRow = { id?: string; created_at: string; status: string; email: string | null };
+type PendingRow = {
+  id?: string;
+  created_at: string;
+  updated_at: string | null;
+  claimed_at: string | null;
+  status: string;
+  email: string | null;
+};
 
 type FunnelStep = {
   key: string;
@@ -53,9 +60,13 @@ const ConversionFunnel = () => {
 
       let pendQ = supabase
         .from("pending_supporters")
-        .select("id, created_at, status, email")
+        .select("id, created_at, updated_at, claimed_at, status, email")
         .limit(5000);
-      if (sinceIso) pendQ = pendQ.gte("created_at", sinceIso);
+
+      // Payment rows are often created before payment is completed and only get
+      // updated/claimed later, so fetch paid records first and apply the active
+      // date range with the real completion timestamp below.
+      pendQ = pendQ.in("status", ["paid", "claimed"]);
 
       const [{ data: ev }, { data: pd }] = await Promise.all([evQ, pendQ]);
       if (!active) return;
@@ -90,6 +101,15 @@ const ConversionFunnel = () => {
   }, [range]);
 
   const { steps, paidTotalStripe, paidUnlinked } = useMemo(() => {
+    const sinceTime = range === "all" ? null : Date.now() - parseInt(range, 10) * 86400000;
+    const inActiveRange = (value?: string | null) => {
+      if (!sinceTime) return true;
+      if (!value) return false;
+      const time = new Date(value).getTime();
+      return Number.isFinite(time) && time >= sinceTime;
+    };
+    const completionDateForPayment = (payment: PendingRow) => payment.claimed_at || payment.updated_at || payment.created_at;
+    const paidInRange = pending.filter((p) => (p.status === "paid" || p.status === "claimed") && inActiveRange(completionDateForPayment(p)));
     const identityFor = (event: EventRow) => {
       const visitorId = typeof event.metadata?.visitor_id === "string" ? event.metadata.visitor_id : null;
       const email = typeof event.metadata?.email === "string" ? event.metadata.email.toLowerCase() : null;
@@ -103,8 +123,7 @@ const ConversionFunnel = () => {
     };
 
     const identitiesForPayments = () => new Set(
-      pending
-        .filter((p) => p.status === "paid" || p.status === "claimed")
+      paidInRange
         .map((p) => p.email?.trim().toLowerCase() || `legacy-payment:${p.id ?? p.created_at}`),
     );
 
@@ -132,7 +151,7 @@ const ConversionFunnel = () => {
     const becameSupporterIds = union(becomeClickIds, startedSignupIds);
     const viewedIds = union(lockedViewIds, becameSupporterIds);
 
-    const totalStripe = pending.filter((p) => p.status === "paid" || p.status === "claimed").length;
+    const totalStripe = paidInRange.length;
 
     const base: FunnelStep[] = [
       { key: "view", label: "Unique users who saw paywall / locked content", value: viewedIds.size, identities: viewedIds, color: "#ec4899" },
@@ -158,7 +177,7 @@ const ConversionFunnel = () => {
       paidTotalStripe: totalStripe,
       paidUnlinked: Math.max(0, totalStripeIds.size - completedLinkedIds.size),
     };
-  }, [events, pending]);
+  }, [events, pending, range]);
 
   const overall = steps.length > 1 && steps[0].value > 0 ? steps[steps.length - 1].value / steps[0].value : 0;
 
@@ -208,6 +227,9 @@ const ConversionFunnel = () => {
           <div className="text-sm text-muted-foreground">Loading…</div>
         ) : (
           <div className="space-y-3">
+            <div className="text-[11px] text-muted-foreground">
+              Showing data for: <span className="font-semibold text-foreground">{RANGES.find((r) => r.key === range)?.label}</span>
+            </div>
             {steps.map((s, i) => (
               <div key={s.key} className="space-y-1">
                 <div className="flex items-center justify-between gap-2 text-xs">
