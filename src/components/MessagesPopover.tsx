@@ -26,6 +26,7 @@ interface ProfileLite {
   email: string | null;
   first_name: string | null;
   last_name: string | null;
+  is_premium?: boolean | null;
 }
 
 interface Props {
@@ -114,9 +115,10 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
     if (!isAdmin) return;
     const { data } = await supabase
       .from("profiles")
-      .select("user_id,email,first_name,last_name")
+      .select("user_id,email,first_name,last_name,is_premium")
+      .eq("is_premium", true)
       .order("created_at", { ascending: false })
-      .limit(500);
+      .limit(1000);
     setProfiles((data as ProfileLite[]) || []);
   }, [isAdmin]);
 
@@ -200,16 +202,32 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
         media_type = file.type || "application/octet-stream";
         media_name = file.name;
       }
-      const { error } = await (supabase as any).from("direct_messages").insert({
-        sender_id: userId,
-        recipient_id: recipientId === "all" ? null : recipientId,
-        body: body.trim(),
-        media_url,
-        media_type,
-        media_name,
-      });
-      if (error) throw error;
-      toast.success(recipientId === "all" ? "Sent to all users" : "Message sent");
+      if (recipientId === "all") {
+        const supporterIds = profiles.map((p) => p.user_id);
+        if (!supporterIds.length) throw new Error("No supporters to send to");
+        const rows = supporterIds.map((rid) => ({
+          sender_id: userId,
+          recipient_id: rid,
+          body: body.trim(),
+          media_url,
+          media_type,
+          media_name,
+        }));
+        const { error } = await (supabase as any).from("direct_messages").insert(rows);
+        if (error) throw error;
+        toast.success(`Sent to ${supporterIds.length} supporters`);
+      } else {
+        const { error } = await (supabase as any).from("direct_messages").insert({
+          sender_id: userId,
+          recipient_id: recipientId,
+          body: body.trim(),
+          media_url,
+          media_type,
+          media_name,
+        });
+        if (error) throw error;
+        toast.success("Message sent");
+      }
       setBody("");
       setFile(null);
       if (fileRef.current) fileRef.current.value = "";
@@ -386,7 +404,7 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
                       : "border-border text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  All users
+                  Supporters
                 </button>
                 {recipientId !== "all" && (
                   <span className="text-[11px] text-foreground truncate">
@@ -401,7 +419,7 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
                 <Input
                   value={userSearch}
                   onChange={(e) => setUserSearch(e.target.value)}
-                  placeholder="Search user by email or name..."
+                  placeholder="Search supporter by email or name..."
                   className="pl-7 h-8 text-xs bg-muted/50 border-border"
                 />
               </div>
