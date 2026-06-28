@@ -202,16 +202,32 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
         media_type = file.type || "application/octet-stream";
         media_name = file.name;
       }
-      const { error } = await (supabase as any).from("direct_messages").insert({
-        sender_id: userId,
-        recipient_id: recipientId === "all" ? null : recipientId,
-        body: body.trim(),
-        media_url,
-        media_type,
-        media_name,
-      });
-      if (error) throw error;
-      toast.success(recipientId === "all" ? "Sent to all users" : "Message sent");
+      if (recipientId === "all") {
+        const supporterIds = profiles.map((p) => p.user_id);
+        if (!supporterIds.length) throw new Error("No supporters to send to");
+        const rows = supporterIds.map((rid) => ({
+          sender_id: userId,
+          recipient_id: rid,
+          body: body.trim(),
+          media_url,
+          media_type,
+          media_name,
+        }));
+        const { error } = await (supabase as any).from("direct_messages").insert(rows);
+        if (error) throw error;
+        toast.success(`Sent to ${supporterIds.length} supporters`);
+      } else {
+        const { error } = await (supabase as any).from("direct_messages").insert({
+          sender_id: userId,
+          recipient_id: recipientId,
+          body: body.trim(),
+          media_url,
+          media_type,
+          media_name,
+        });
+        if (error) throw error;
+        toast.success("Message sent");
+      }
       setBody("");
       setFile(null);
       if (fileRef.current) fileRef.current.value = "";
