@@ -428,78 +428,103 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
 
         {tab === "compose" && isAdmin && (
           <div className="p-3 space-y-2">
-            <div>
-              <p className="text-[11px] font-medium text-foreground mb-1">Audience</p>
-              <div className="flex items-center gap-1 mb-2">
-                <button
-                  onClick={() => { setAudience("all_users"); setRecipientId("all"); }}
-                  className={`px-2 py-1 rounded text-[11px] border transition-colors ${
-                    audience === "all_users"
-                      ? "bg-primary/20 border-primary text-primary"
-                      : "border-border text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  All users ({profiles.length})
-                </button>
-                <button
-                  onClick={() => { setAudience("supporters"); setRecipientId("all"); }}
-                  className={`px-2 py-1 rounded text-[11px] border transition-colors ${
-                    audience === "supporters"
-                      ? "bg-primary/20 border-primary text-primary"
-                      : "border-border text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  Supporters ({profiles.filter((p) => p.is_premium).length})
-                </button>
-              </div>
-              <p className="text-[11px] font-medium text-foreground mb-1">To</p>
-              <div className="flex items-center gap-2 mb-2">
-                <button
-                  onClick={() => setRecipientId("all")}
-                  className={`px-2 py-1 rounded text-[11px] border transition-colors ${
-                    recipientId === "all"
-                      ? "bg-primary/20 border-primary text-primary"
-                      : "border-border text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  Send to everyone
-                </button>
-                {recipientId !== "all" && (
-                  <span className="text-[11px] text-foreground truncate">
-                    {profiles.find((p) => p.user_id === recipientId)
-                      ? profileLabel(profiles.find((p) => p.user_id === recipientId)!)
-                      : "Select user"}
-                  </span>
-                )}
-              </div>
-              <div className="relative">
-                <Search className="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  value={userSearch}
-                  onChange={(e) => setUserSearch(e.target.value)}
-                  placeholder={`Search ${audience === "supporters" ? "supporter" : "user"} by email or name...`}
-                  className="pl-7 h-8 text-xs bg-muted/50 border-border"
-                />
-              </div>
-              <div className="max-h-32 overflow-y-auto mt-1 border border-border rounded">
-                {filteredProfiles.length === 0 ? (
-                  <p className="text-[11px] text-muted-foreground p-2 text-center">No users</p>
-                ) : (
-                  filteredProfiles.map((p) => (
-                    <button
-                      key={p.user_id}
-                      onClick={() => setRecipientId(p.user_id)}
-                      className={`w-full text-left px-2 py-1.5 text-[11px] hover:bg-primary/10 ${
-                        recipientId === p.user_id ? "bg-primary/15 text-primary" : "text-foreground"
-                      }`}
-                    >
-                      <div className="truncate">{profileLabel(p)}</div>
-                      {p.email && <div className="text-[10px] text-muted-foreground truncate">{p.email}</div>}
-                    </button>
-                  ))
-                )}
-              </div>
+            {/* Mode tabs */}
+            <div className="grid grid-cols-2 gap-1.5">
+              <button
+                onClick={() => { setComposeMode("single"); setRecipientId(""); }}
+                className={`rounded-lg border px-2 py-2 text-left transition-colors ${
+                  composeMode === "single"
+                    ? "bg-primary/15 border-primary text-primary"
+                    : "border-border text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <div className="text-[11px] font-semibold">Send to one person</div>
+                <div className="text-[10px] opacity-80">Search any user</div>
+              </button>
+              <button
+                onClick={() => { setComposeMode("broadcast"); setRecipientId("all"); }}
+                className={`rounded-lg border px-2 py-2 text-left transition-colors ${
+                  composeMode === "broadcast"
+                    ? "bg-primary/15 border-primary text-primary"
+                    : "border-border text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <div className="text-[11px] font-semibold">Broadcast</div>
+                <div className="text-[10px] opacity-80">All users or supporters</div>
+              </button>
             </div>
+
+            {composeMode === "single" ? (
+              <div>
+                <p className="text-[11px] font-medium text-foreground mb-1">
+                  To {recipientId && recipientId !== "all" && (
+                    <span className="text-primary">
+                      · {profiles.concat(supporters).find((p) => p.user_id === recipientId)
+                        ? profileLabel(profiles.concat(supporters).find((p) => p.user_id === recipientId)!)
+                        : "Selected"}
+                    </span>
+                  )}
+                </p>
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={userSearch}
+                    onChange={(e) => { setUserSearch(e.target.value); void runUserSearch(e.target.value); }}
+                    placeholder="Search user by email or name..."
+                    className="pl-7 h-8 text-xs bg-muted/50 border-border"
+                  />
+                </div>
+                <div className="max-h-40 overflow-y-auto mt-1 border border-border rounded">
+                  {(userSearch.trim() ? profiles : supporters).length === 0 ? (
+                    <p className="text-[11px] text-muted-foreground p-2 text-center">
+                      {userSearch.trim() ? "No users found" : "Type to search any user"}
+                    </p>
+                  ) : (
+                    (userSearch.trim() ? profiles : supporters).map((p) => (
+                      <button
+                        key={p.user_id}
+                        onClick={() => setRecipientId(p.user_id)}
+                        className={`w-full text-left px-2 py-1.5 text-[11px] hover:bg-primary/10 ${
+                          recipientId === p.user_id ? "bg-primary/15 text-primary" : "text-foreground"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="truncate">{profileLabel(p)}</span>
+                          {p.is_premium && <span className="text-[9px] text-amber-400">SUPPORTER</span>}
+                        </div>
+                        {p.email && <div className="text-[10px] text-muted-foreground truncate">{p.email}</div>}
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div>
+                <p className="text-[11px] font-medium text-foreground mb-1">Audience</p>
+                <div className="grid grid-cols-2 gap-1.5">
+                  <button
+                    onClick={() => setBroadcastAudience("all_users")}
+                    className={`px-2 py-2 rounded border text-[11px] transition-colors ${
+                      broadcastAudience === "all_users"
+                        ? "bg-primary/20 border-primary text-primary"
+                        : "border-border text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    All users ({totalUsers})
+                  </button>
+                  <button
+                    onClick={() => setBroadcastAudience("supporters")}
+                    className={`px-2 py-2 rounded border text-[11px] transition-colors ${
+                      broadcastAudience === "supporters"
+                        ? "bg-primary/20 border-primary text-primary"
+                        : "border-border text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    Supporters ({supporters.length})
+                  </button>
+                </div>
+              </div>
+            )}
 
             <Textarea
               value={body}
