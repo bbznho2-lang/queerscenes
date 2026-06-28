@@ -196,22 +196,22 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
     }
   }, [open, tab, messages]);
 
-  const audienceProfiles = useMemo(
-    () => (audience === "supporters" ? profiles.filter((p) => p.is_premium) : profiles),
-    [profiles, audience],
-  );
-
-  const filteredProfiles = useMemo(() => {
-    const q = userSearch.trim().toLowerCase();
-    if (!q) return audienceProfiles.slice(0, 50);
-    return audienceProfiles
-      .filter((p) =>
-        [p.email, p.first_name, p.last_name]
-          .filter(Boolean)
-          .some((s) => s!.toLowerCase().includes(q)),
-      )
-      .slice(0, 50);
-  }, [audienceProfiles, userSearch]);
+  const fetchAllUserIds = useCallback(async (): Promise<string[]> => {
+    const all: string[] = [];
+    const pageSize = 1000;
+    let from = 0;
+    while (true) {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("user_id")
+        .range(from, from + pageSize - 1);
+      if (error || !data?.length) break;
+      all.push(...data.map((r: any) => r.user_id));
+      if (data.length < pageSize) break;
+      from += pageSize;
+    }
+    return all;
+  }, []);
 
   const handleSend = async () => {
     if (!body.trim() && !file) {
