@@ -26,6 +26,7 @@ interface ProfileLite {
   email: string | null;
   first_name: string | null;
   last_name: string | null;
+  is_premium?: boolean | null;
 }
 
 interface Props {
