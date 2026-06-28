@@ -298,8 +298,8 @@ const Player = () => {
     if (signupSubmitting) return;
     setSignupSubmitting(true);
     const visitorId = getFunnelVisitorId();
-    void trackEvent("paywall_signup_submit", "paywall_inline_form", { visitor_id: visitorId, email });
     const email = signupEmail.trim().toLowerCase();
+    void trackEvent("paywall_signup_submit", "paywall_inline_form", { visitor_id: visitorId, email });
     const redirectPath = `/player/${id}`;
     const authAction = paywallMode === "login"
       ? supabase.auth.signInWithPassword({ email, password: signupPassword })
