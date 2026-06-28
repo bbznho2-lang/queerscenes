@@ -16,6 +16,7 @@ import RecentUpdatesSection from "@/components/RecentUpdatesSection";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { buildUniqueTopContent, fetchTopContentRanking, getUniqueItemsByTitle } from "@/lib/top-content";
+import { trackSupporterClick } from "@/lib/supporter-tracking";
 import { toast } from "sonner";
 
 interface ContentItem {
@@ -264,6 +265,14 @@ const Browse = () => {
     }
   };
 
+  const goToPlans = (source: string) => {
+    void trackSupporterClick(supabase, {
+      source,
+      user_id: user?.id ?? null,
+    });
+    navigate("/#planos-cards");
+  };
+
   const menuItems = [
     { label: "Home", icon: "🏠", action: () => { setMenuOpen(false); window.scrollTo({ top: 0, behavior: "smooth" }); } },
     { label: "Series", icon: "📺", action: () => { setMenuOpen(false); document.getElementById("séries")?.scrollIntoView({ behavior: "smooth" }); } },
@@ -272,7 +281,7 @@ const Browse = () => {
     { label: "GL Dramas", icon: "🌸", action: () => { setMenuOpen(false); document.getElementById("gl")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Exclusives", icon: "⭐", action: () => { setMenuOpen(false); document.getElementById("exclusivos")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "My List", icon: "🔖", action: () => { setMenuOpen(false); document.getElementById("minha-lista")?.scrollIntoView({ behavior: "smooth" }); } },
-    ...(!isAdmin && !userIsPremium ? [{ label: "Become a Supporter", icon: "👑", action: () => { setMenuOpen(false); navigate("/#planos"); }, premium: true }] : []),
+    ...(!isAdmin && !userIsPremium ? [{ label: "Become a Supporter", icon: "👑", action: () => { setMenuOpen(false); goToPlans("browse_sidebar"); }, premium: true }] : []),
     { label: "Telegram Community", icon: "📣", action: () => { setMenuOpen(false); window.open("https://t.me/QueerScenesTv", "_blank", "noopener,noreferrer"); } },
     { label: "Support", icon: "💬", action: () => { setMenuOpen(false); window.open("https://t.me/L7kznr", "_blank", "noopener,noreferrer"); } },
     { label: "Profile", icon: "👤", action: () => { setMenuOpen(false); setProfileOpen(true); } },
@@ -730,7 +739,7 @@ const Browse = () => {
               ✈️ Join our Telegram community
             </a>
             <Button
-              onClick={() => { setPremiumPopupOpen(false); navigate("/"); setTimeout(() => document.getElementById("planos")?.scrollIntoView({ behavior: "smooth" }), 300); }}
+              onClick={() => { setPremiumPopupOpen(false); goToPlans("browse_supporter_popup"); }}
               className="shine-cta w-full rounded-full text-white font-semibold py-2.5 border-0 shadow-[0_0_30px_rgba(168,85,247,0.45)] hover:opacity-95"
               style={{ background: "linear-gradient(90deg, #ec4899 0%, #a855f7 50%, #6366f1 100%)" }}
             >
