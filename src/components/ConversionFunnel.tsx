@@ -3,7 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
-type EventRow = { event_type: string; created_at: string; user_id: string | null };
+type EventRow = {
+  id?: string;
+  event_type: string;
+  created_at: string;
+  user_id: string | null;
+  metadata: Record<string, unknown> | null;
+};
 type PendingRow = { created_at: string; status: string };
 
 const RANGES = [
@@ -32,7 +38,7 @@ const ConversionFunnel = () => {
 
       let evQ = supabase
         .from("supporter_events")
-        .select("event_type, created_at, user_id")
+        .select("id, event_type, created_at, user_id, metadata")
         .order("created_at", { ascending: false })
         .limit(20000);
       if (sinceIso) evQ = evQ.gte("created_at", sinceIso);
@@ -76,22 +82,33 @@ const ConversionFunnel = () => {
   }, [range]);
 
   const { steps, paidTotalStripe, paidUnlinked } = useMemo(() => {
-    const count = (t: string) => events.filter((e) => e.event_type === t).length;
-    const lockedView = count("locked_content_view") + count("paywall_view");
-    const becomeClick = count("become_supporter_click");
-    const signupClick = count("paywall_signup_click");
-    const signupSubmit = count("paywall_signup_submit");
-    const redirected = count("checkout_session_created");
-    const completedLinked = count("checkout_completed");
+    const identityFor = (event: EventRow) => {
+      const visitorId = typeof event.metadata?.visitor_id === "string" ? event.metadata.visitor_id : null;
+      const email = typeof event.metadata?.email === "string" ? event.metadata.email.toLowerCase() : null;
+      // Prefer stable user_id, then visitor_id. For old anonymous rows with no identity,
+      // count the row once so old signup/click data does not incorrectly show as zero.
+      return event.user_id || visitorId || email || `legacy:${event.id ?? event.event_type + event.created_at}`;
+    };
+    const unique = (...types: string[]) => {
+      const wanted = new Set(types);
+      return new Set(events.filter((e) => wanted.has(e.event_type)).map(identityFor)).size;
+    };
+
+    const lockedView = unique("locked_content_view", "paywall_view");
+    const becomeClick = unique("become_supporter_click");
+    const signupClick = unique("paywall_signup_click");
+    const signupSubmit = unique("paywall_signup_submit");
+    const redirected = unique("checkout_session_created");
+    const completedLinked = unique("checkout_completed");
     const totalStripe = pending.filter((p) => p.status === "paid" || p.status === "claimed").length;
 
     const base = [
-      { key: "view", label: "Saw paywall / locked content", value: lockedView, color: "#ec4899" },
-      { key: "become", label: "Clicked “Become a Supporter”", value: becomeClick, color: "#a855f7" },
-      { key: "signup_click", label: "Started signup form", value: signupClick, color: "#6366f1" },
-      { key: "signup_submit", label: "Submitted signup", value: signupSubmit, color: "#22d3ee" },
-      { key: "redirected", label: "Redirected to Stripe checkout", value: redirected, color: "#2dd4bf" },
-      { key: "paid", label: "Completed checkout (linked to user)", value: completedLinked, color: "#f59e0b" },
+      { key: "view", label: "Unique users who saw paywall / locked content", value: lockedView, color: "#ec4899" },
+      { key: "become", label: "Unique users who clicked “Become a Supporter”", value: becomeClick, color: "#a855f7" },
+      { key: "signup_click", label: "Unique users who started signup form", value: signupClick, color: "#6366f1" },
+      { key: "signup_submit", label: "Unique users who submitted signup", value: signupSubmit, color: "#22d3ee" },
+      { key: "redirected", label: "Unique users redirected to Stripe checkout", value: redirected, color: "#2dd4bf" },
+      { key: "paid", label: "Unique users with completed checkout", value: completedLinked, color: "#f59e0b" },
     ];
     const top = Math.max(1, base[0].value);
     const steps = base.map((s, i) => {
@@ -176,7 +193,7 @@ const ConversionFunnel = () => {
                           color: s.dropRate > 0.5 ? "#f87171" : "#2dd4bf",
                         }}
                       >
-                        {(s.conversionFromPrev * 100).toFixed(1)}% from prev
+                        {(s.conversionFromPrev * 100).toFixed(1)}% of previous
                       </span>
                     )}
                   </span>
@@ -207,7 +224,7 @@ const ConversionFunnel = () => {
               )}
             </div>
             <p className="text-[11px] text-muted-foreground leading-relaxed">
-              The funnel now matches Stripe checkouts to a specific user via <code>metadata.user_id</code>. "Unlinked" pagamentos são webhooks antigos (antes desta correção) ou pagos por e-mails sem conta no app — eles continuam ativando o supporter normalmente.
+              Counts are unique users, not repeated clicks. New anonymous steps are linked by visitor ID until the user logs in; old anonymous rows without IDs are counted once each so they do not disappear.
             </p>
           </div>
         )}
