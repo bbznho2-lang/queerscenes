@@ -517,8 +517,8 @@
   }
 }
 .qs-top10-bignum {
-  position: absolute; left: -6px; top: 50%; transform: translateY(-50%);
-  font-size: clamp(60px, 15vw, 110px);
+  position: absolute; left: 4px; top: 50%; transform: translateY(-50%);
+  font-size: clamp(48px, 13vw, 96px);
   font-weight: 900;
   line-height: .8;
   color: transparent;
@@ -527,7 +527,7 @@
   font-family: ui-sans-serif, system-ui, sans-serif;
 }
 .qs-top10-meta {
-  position: absolute; left: clamp(52px, 11vw, 80px); right: 0; top: 50%; transform: translateY(-50%);
+  position: absolute; left: clamp(46px, 11vw, 80px); right: 0; top: 50%; transform: translateY(-50%);
   min-width: 0;
 }
 .qs-top10-fname {
