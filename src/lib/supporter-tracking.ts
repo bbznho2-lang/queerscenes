@@ -22,11 +22,26 @@ export interface TrackSupporterEventParams {
 export function getFunnelVisitorId(): string | null {
   if (typeof window === "undefined") return null;
   const key = "qs_funnel_visitor_id";
-  const existing = window.localStorage.getItem(key);
-  if (existing) return existing;
+  const legacyKey = "qs_visitor_id";
+  const existing = window.localStorage.getItem(key) || window.localStorage.getItem(legacyKey);
+  if (existing) {
+    window.localStorage.setItem(key, existing);
+    return existing;
+  }
   const generated = crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   window.localStorage.setItem(key, generated);
+  window.localStorage.setItem(legacyKey, generated);
   return generated;
+}
+
+export function trackSupporterClick(
+  supabase: Pick<SupabaseClient, "from">,
+  params: Omit<TrackSupporterEventParams, "event_type">,
+) {
+  return trackSupporterEvent(supabase, {
+    ...params,
+    event_type: "become_supporter_click",
+  });
 }
 
 /**
@@ -40,12 +55,14 @@ export async function trackSupporterEvent(
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const visitorId = getFunnelVisitorId();
+    const metadata = { ...(params.metadata ?? {}) };
+    if (visitorId) metadata.visitor_id = visitorId;
     const result = await (supabase.from as any)("supporter_events").insert({
       user_id: params.user_id ?? null,
       content_id: params.content_id ?? null,
       event_type: params.event_type,
       source: params.source,
-      metadata: { ...(params.metadata ?? {}), visitor_id: visitorId },
+      metadata,
     });
     if (result && (result as { error?: unknown }).error) {
       return { ok: false, error: (result as { error?: unknown }).error };
