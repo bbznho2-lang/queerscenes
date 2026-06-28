@@ -10,7 +10,15 @@ type EventRow = {
   user_id: string | null;
   metadata: Record<string, unknown> | null;
 };
-type PendingRow = { created_at: string; status: string };
+type PendingRow = { id?: string; created_at: string; status: string; email: string | null };
+
+type FunnelStep = {
+  key: string;
+  label: string;
+  value: number;
+  identities: Set<string>;
+  color: string;
+};
 
 const RANGES = [
   { key: "7", label: "7d" },
@@ -45,7 +53,7 @@ const ConversionFunnel = () => {
 
       let pendQ = supabase
         .from("pending_supporters")
-        .select("created_at, status")
+        .select("id, created_at, status, email")
         .limit(5000);
       if (sinceIso) pendQ = pendQ.gte("created_at", sinceIso);
 
@@ -89,26 +97,50 @@ const ConversionFunnel = () => {
       // count the row once so old signup/click data does not incorrectly show as zero.
       return event.user_id || visitorId || email || `legacy:${event.id ?? event.event_type + event.created_at}`;
     };
-    const unique = (...types: string[]) => {
+    const identitiesForEvents = (...types: string[]) => {
       const wanted = new Set(types);
-      return new Set(events.filter((e) => wanted.has(e.event_type)).map(identityFor)).size;
+      return new Set(events.filter((e) => wanted.has(e.event_type)).map(identityFor));
     };
 
-    const lockedView = unique("locked_content_view", "paywall_view");
-    const becomeClick = unique("become_supporter_click");
-    const signupClick = unique("paywall_signup_click");
-    const signupSubmit = unique("paywall_signup_submit");
-    const redirected = unique("checkout_session_created");
-    const completedLinked = unique("checkout_completed");
+    const identitiesForPayments = () => new Set(
+      pending
+        .filter((p) => p.status === "paid" || p.status === "claimed")
+        .map((p) => p.email?.trim().toLowerCase() || `legacy-payment:${p.id ?? p.created_at}`),
+    );
+
+    const union = (...sets: Set<string>[]) => {
+      const result = new Set<string>();
+      sets.forEach((set) => set.forEach((value) => result.add(value)));
+      return result;
+    };
+
+    const lockedViewIds = identitiesForEvents("locked_content_view", "paywall_view");
+    const becomeClickIds = identitiesForEvents("become_supporter_click");
+    const signupClickIds = identitiesForEvents("paywall_signup_click");
+    const signupSubmitIds = identitiesForEvents("paywall_signup_submit");
+    const redirectedIds = identitiesForEvents("checkout_session_created");
+    const completedLinkedIds = identitiesForEvents("checkout_completed");
+    const totalStripeIds = identitiesForPayments();
+
+    const paidIds = union(completedLinkedIds, totalStripeIds);
+
+    // Show each funnel step as a cumulative audience. A later backend event should never
+    // make the visible count look like it went down; it means that user reached that step
+    // and therefore also belongs to the earlier intent steps.
+    const submittedIds = union(signupSubmitIds, redirectedIds, paidIds);
+    const startedSignupIds = union(signupClickIds, submittedIds);
+    const becameSupporterIds = union(becomeClickIds, startedSignupIds);
+    const viewedIds = union(lockedViewIds, becameSupporterIds);
+
     const totalStripe = pending.filter((p) => p.status === "paid" || p.status === "claimed").length;
 
-    const base = [
-      { key: "view", label: "Unique users who saw paywall / locked content", value: lockedView, color: "#ec4899" },
-      { key: "become", label: "Unique users who clicked “Become a Supporter”", value: becomeClick, color: "#a855f7" },
-      { key: "signup_click", label: "Unique users who started signup form", value: signupClick, color: "#6366f1" },
-      { key: "signup_submit", label: "Unique users who submitted signup", value: signupSubmit, color: "#22d3ee" },
-      { key: "redirected", label: "Unique users redirected to Stripe checkout", value: redirected, color: "#2dd4bf" },
-      { key: "paid", label: "Unique users with completed checkout", value: completedLinked, color: "#f59e0b" },
+    const base: FunnelStep[] = [
+      { key: "view", label: "Unique users who saw paywall / locked content", value: viewedIds.size, identities: viewedIds, color: "#ec4899" },
+      { key: "become", label: "Unique users who clicked “Become a Supporter”", value: becameSupporterIds.size, identities: becameSupporterIds, color: "#a855f7" },
+      { key: "signup_click", label: "Unique users who started signup form", value: startedSignupIds.size, identities: startedSignupIds, color: "#6366f1" },
+      { key: "signup_submit", label: "Unique users who submitted signup", value: submittedIds.size, identities: submittedIds, color: "#22d3ee" },
+      { key: "redirected", label: "Unique users redirected to Stripe checkout", value: union(redirectedIds, paidIds).size, identities: union(redirectedIds, paidIds), color: "#2dd4bf" },
+      { key: "paid", label: "Unique users with completed checkout", value: paidIds.size, identities: paidIds, color: "#f59e0b" },
     ];
     const top = Math.max(1, base[0].value);
     const steps = base.map((s, i) => {
@@ -124,7 +156,7 @@ const ConversionFunnel = () => {
     return {
       steps,
       paidTotalStripe: totalStripe,
-      paidUnlinked: Math.max(0, totalStripe - completedLinked),
+      paidUnlinked: Math.max(0, totalStripeIds.size - completedLinkedIds.size),
     };
   }, [events, pending]);
 
