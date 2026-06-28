@@ -11,7 +11,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useAuth } from "@/hooks/useAuth";
 import { getResetPasswordRedirectUrl } from "@/lib/auth-urls";
 import { buildUniqueTopContent, fetchTopContentRanking, getUniqueItemsByTitle } from "@/lib/top-content";
-import { getFunnelVisitorId } from "@/lib/supporter-tracking";
+import { getFunnelVisitorId, trackSupporterClick } from "@/lib/supporter-tracking";
 import { toast } from "sonner";
 
 const fade = {
@@ -202,6 +202,14 @@ const Index = () => {
   const showNameFields = isSignUp;
   const showSubscribeActions = !authLoading && !profileLoading && !isAdmin && !isPremiumUser;
 
+  const handleBecomeSupporterClick = useCallback((source: string) => {
+    void trackSupporterClick(supabase, {
+      source,
+      user_id: user?.id ?? null,
+    });
+    scrollToPlanCards();
+  }, [scrollToPlanCards, user?.id]);
+
   const startCheckout = async (priceId: string) => {
     const trimmedEmail = checkoutEmail.trim();
     const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail);
@@ -358,7 +366,7 @@ const Index = () => {
           >
             Want the full experience?{" "}
             <button
-              onClick={scrollToPlanCards}
+              onClick={() => handleBecomeSupporterClick("landing_hero_text")}
               style={{ color: "#a855f7", background: "none", border: "none", padding: 0, cursor: "pointer", fontWeight: 600 }}
             >
               Become a Supporter
@@ -386,7 +394,7 @@ const Index = () => {
               Start watching free
             </button>
             <button
-              onClick={scrollToPlanCards}
+              onClick={() => handleBecomeSupporterClick("landing_hero_button")}
               className="w-full flex items-center justify-center gap-2 backdrop-blur-md"
               style={{
                 padding: "15px",
