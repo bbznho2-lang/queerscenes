@@ -399,6 +399,29 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
         {tab === "compose" && isAdmin && (
           <div className="p-3 space-y-2">
             <div>
+              <p className="text-[11px] font-medium text-foreground mb-1">Audience</p>
+              <div className="flex items-center gap-1 mb-2">
+                <button
+                  onClick={() => { setAudience("all_users"); setRecipientId("all"); }}
+                  className={`px-2 py-1 rounded text-[11px] border transition-colors ${
+                    audience === "all_users"
+                      ? "bg-primary/20 border-primary text-primary"
+                      : "border-border text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  All users ({profiles.length})
+                </button>
+                <button
+                  onClick={() => { setAudience("supporters"); setRecipientId("all"); }}
+                  className={`px-2 py-1 rounded text-[11px] border transition-colors ${
+                    audience === "supporters"
+                      ? "bg-primary/20 border-primary text-primary"
+                      : "border-border text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Supporters ({profiles.filter((p) => p.is_premium).length})
+                </button>
+              </div>
               <p className="text-[11px] font-medium text-foreground mb-1">To</p>
               <div className="flex items-center gap-2 mb-2">
                 <button
@@ -409,7 +432,7 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
                       : "border-border text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  Supporters
+                  Send to everyone
                 </button>
                 {recipientId !== "all" && (
                   <span className="text-[11px] text-foreground truncate">
@@ -424,7 +447,7 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
                 <Input
                   value={userSearch}
                   onChange={(e) => setUserSearch(e.target.value)}
-                  placeholder="Search supporter by email or name..."
+                  placeholder={`Search ${audience === "supporters" ? "supporter" : "user"} by email or name...`}
                   className="pl-7 h-8 text-xs bg-muted/50 border-border"
                 />
               </div>
