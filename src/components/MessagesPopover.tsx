@@ -218,6 +218,10 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
       toast.error("Type a message or attach a file");
       return;
     }
+    if (composeMode === "single" && (!recipientId || recipientId === "all")) {
+      toast.error("Select a user to send to");
+      return;
+    }
     setSending(true);
     try {
       let media_url: string | null = null;
@@ -225,7 +229,7 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
       let media_name: string | null = null;
       if (file) {
         const ext = file.name.split(".").pop() || "bin";
-        const path = `${recipientId === "all" ? "broadcast" : recipientId}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
+        const path = `${composeMode === "broadcast" ? "broadcast" : recipientId}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
         const { error: upErr } = await supabase.storage.from("dm-media").upload(path, file, {
           contentType: file.type || undefined,
           upsert: false,
