@@ -48,9 +48,12 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
   const [mediaUrls, setMediaUrls] = useState<Record<string, string>>({});
 
   // Compose state (admin)
+  const [composeMode, setComposeMode] = useState<"single" | "broadcast">("single");
   const [recipientId, setRecipientId] = useState<string | "all">("all");
-  const [audience, setAudience] = useState<"all_users" | "supporters">("supporters");
+  const [broadcastAudience, setBroadcastAudience] = useState<"all_users" | "supporters">("supporters");
   const [profiles, setProfiles] = useState<ProfileLite[]>([]);
+  const [supporters, setSupporters] = useState<ProfileLite[]>([]);
+  const [totalUsers, setTotalUsers] = useState(0);
   const [userSearch, setUserSearch] = useState("");
   const [body, setBody] = useState("");
   const [file, setFile] = useState<File | null>(null);
