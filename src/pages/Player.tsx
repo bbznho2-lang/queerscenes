@@ -8,7 +8,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
 import EditContentDialog from "@/components/EditContentDialog";
 import CommentsSection from "@/components/CommentsSection";
-import { trackSupporterEvent, type SupporterEventType } from "@/lib/supporter-tracking";
+import { getFunnelVisitorId, trackSupporterEvent, type SupporterEventType } from "@/lib/supporter-tracking";
 import { getEmailRedirectUrl } from "@/lib/auth-urls";
 
 
@@ -297,7 +297,8 @@ const Player = () => {
     e.preventDefault();
     if (signupSubmitting) return;
     setSignupSubmitting(true);
-    void trackEvent("paywall_signup_submit", "paywall_inline_form");
+    const visitorId = getFunnelVisitorId();
+    void trackEvent("paywall_signup_submit", "paywall_inline_form", { visitor_id: visitorId, email });
     const email = signupEmail.trim().toLowerCase();
     const redirectPath = `/player/${id}`;
     const authAction = paywallMode === "login"
