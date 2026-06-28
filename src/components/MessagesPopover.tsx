@@ -419,7 +419,7 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
                 <Input
                   value={userSearch}
                   onChange={(e) => setUserSearch(e.target.value)}
-                  placeholder="Search user by email or name..."
+                  placeholder="Search supporter by email or name..."
                   className="pl-7 h-8 text-xs bg-muted/50 border-border"
                 />
               </div>
