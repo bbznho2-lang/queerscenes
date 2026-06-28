@@ -49,6 +49,7 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
 
   // Compose state (admin)
   const [recipientId, setRecipientId] = useState<string | "all">("all");
+  const [audience, setAudience] = useState<"all_users" | "supporters">("supporters");
   const [profiles, setProfiles] = useState<ProfileLite[]>([]);
   const [userSearch, setUserSearch] = useState("");
   const [body, setBody] = useState("");
