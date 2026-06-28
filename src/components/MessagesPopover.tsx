@@ -404,7 +404,7 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
                       : "border-border text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  All users
+                  Supporters
                 </button>
                 {recipientId !== "all" && (
                   <span className="text-[11px] text-foreground truncate">
