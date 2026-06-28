@@ -168,17 +168,22 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
     }
   }, [open, tab, messages]);
 
+  const audienceProfiles = useMemo(
+    () => (audience === "supporters" ? profiles.filter((p) => p.is_premium) : profiles),
+    [profiles, audience],
+  );
+
   const filteredProfiles = useMemo(() => {
     const q = userSearch.trim().toLowerCase();
-    if (!q) return profiles.slice(0, 50);
-    return profiles
+    if (!q) return audienceProfiles.slice(0, 50);
+    return audienceProfiles
       .filter((p) =>
         [p.email, p.first_name, p.last_name]
           .filter(Boolean)
           .some((s) => s!.toLowerCase().includes(q)),
       )
       .slice(0, 50);
-  }, [profiles, userSearch]);
+  }, [audienceProfiles, userSearch]);
 
   const handleSend = async () => {
     if (!body.trim() && !file) {
