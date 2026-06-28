@@ -117,13 +117,38 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
 
   const fetchProfiles = useCallback(async () => {
     if (!isAdmin) return;
+    // Supporters: small set, fetch all
+    const { data: sup } = await supabase
+      .from("profiles")
+      .select("user_id,email,first_name,last_name,is_premium")
+      .eq("is_premium", true)
+      .order("created_at", { ascending: false })
+      .limit(2000);
+    setSupporters((sup as ProfileLite[]) || []);
+
+    // Total user count
+    const { count } = await supabase
+      .from("profiles")
+      .select("user_id", { count: "exact", head: true });
+    setTotalUsers(count || 0);
+  }, [isAdmin]);
+
+  // Server-side search across all users (admin only)
+  const runUserSearch = useCallback(async (q: string) => {
+    if (!isAdmin) return;
+    const term = q.trim();
+    if (!term) {
+      setProfiles(supporters);
+      return;
+    }
+    const like = `%${term}%`;
     const { data } = await supabase
       .from("profiles")
       .select("user_id,email,first_name,last_name,is_premium")
-      .order("created_at", { ascending: false })
-      .limit(2000);
+      .or(`email.ilike.${like},first_name.ilike.${like},last_name.ilike.${like}`)
+      .limit(50);
     setProfiles((data as ProfileLite[]) || []);
-  }, [isAdmin]);
+  }, [isAdmin, supporters]);
 
   useEffect(() => {
     void fetchUnread();
