@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { priceId } = await req.json();
+    const { priceId, visitorId } = await req.json();
     if (!priceId || !ALLOWED_PRICE_IDS.has(priceId)) {
       return new Response(JSON.stringify({ error: "Invalid priceId" }), {
         status: 400,
@@ -72,6 +72,7 @@ Deno.serve(async (req) => {
       user_id: authedUserId,
       email: authedEmail,
       price_id: priceId,
+      visitor_id: typeof visitorId === "string" ? visitorId.slice(0, 100) : "",
     };
 
     const session = await stripe.checkout.sessions.create({
@@ -98,7 +99,7 @@ Deno.serve(async (req) => {
         user_id: authedUserId,
         event_type: "checkout_session_created",
         source: "create-checkout",
-        metadata: { price_id: priceId, session_id: session.id, email: authedEmail },
+        metadata: { price_id: priceId, session_id: session.id, email: authedEmail, visitor_id: metadata.visitor_id },
       });
     } catch (e) {
       console.error("[create-checkout] funnel insert failed", e);

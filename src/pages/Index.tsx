@@ -11,6 +11,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useAuth } from "@/hooks/useAuth";
 import { getResetPasswordRedirectUrl } from "@/lib/auth-urls";
 import { buildUniqueTopContent, fetchTopContentRanking, getUniqueItemsByTitle } from "@/lib/top-content";
+import { getFunnelVisitorId } from "@/lib/supporter-tracking";
 import { toast } from "sonner";
 
 const fade = {
@@ -224,8 +225,9 @@ const Index = () => {
     }
     setCheckoutLoading(priceId);
     try {
+      const visitorId = getFunnelVisitorId();
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { priceId },
+        body: { priceId, visitorId },
       });
       if (error) throw error;
       const url = (data as any)?.url;
