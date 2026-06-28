@@ -137,6 +137,7 @@ Deno.serve(async (req) => {
     userId: string | null;
     email: string | null;
     priceId: string | null;
+    visitorId: string | null;
     sessionId: string | null;
     subscriptionId: string | null;
   }) {
@@ -158,6 +159,7 @@ Deno.serve(async (req) => {
         metadata: {
           email: opts.email,
           price_id: opts.priceId,
+          visitor_id: opts.visitorId,
           session_id: opts.sessionId,
           subscription_id: opts.subscriptionId,
           linked_by: opts.userId ? "metadata" : userId ? "email" : "none",
@@ -174,6 +176,7 @@ Deno.serve(async (req) => {
       const email = session.customer_email || (session.customer_details?.email ?? "");
       const priceId = (session.metadata?.price_id as string) || "";
       const metaUserId = (session.metadata?.user_id as string) || session.client_reference_id || null;
+      const visitorId = (session.metadata?.visitor_id as string) || null;
       let periodEnd: number | null = null;
       let subId: string | null = null;
 
@@ -194,6 +197,7 @@ Deno.serve(async (req) => {
             userId: metaUserId,
             email: email || null,
             priceId: resolvedPrice,
+            visitorId,
             sessionId: session.id,
             subscriptionId: subId,
           });
@@ -216,6 +220,7 @@ Deno.serve(async (req) => {
         userId: metaUserId,
         email: email || null,
         priceId: priceId || null,
+        visitorId,
         sessionId: session.id,
         subscriptionId: subId,
       });
