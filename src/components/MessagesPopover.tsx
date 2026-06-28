@@ -116,9 +116,8 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
     const { data } = await supabase
       .from("profiles")
       .select("user_id,email,first_name,last_name,is_premium")
-      .eq("is_premium", true)
       .order("created_at", { ascending: false })
-      .limit(1000);
+      .limit(2000);
     setProfiles((data as ProfileLite[]) || []);
   }, [isAdmin]);
 
