@@ -163,22 +163,33 @@ const Index = () => {
     const wantsPlans = hash === "#planos" || hash === "#planos-cards";
     if (!wantsSupporter && !wantsPlans) return;
 
-    let attempts = 0;
-    const maxAttempts = 40; // ~4s
+    // Try once after mount, and retry only until the target element exists
+    // (then stop). This prevents the page from fighting the user's manual scroll.
+    let cancelled = false;
     let retryTimer: number | undefined;
+    let attempts = 0;
     const tryScroll = () => {
+      if (cancelled) return;
       const didScroll = scrollToPlanCards(wantsSupporter ? "supporter" : "plans");
-      if (didScroll && attempts++ >= maxAttempts) {
-        return;
-      }
-      if (attempts < maxAttempts) {
+      if (didScroll) return; // done — do NOT keep re-scrolling
+      if (++attempts < 30) {
         retryTimer = window.setTimeout(tryScroll, 100);
       }
     };
+    // Stop retrying as soon as the user interacts with the page.
+    const stop = () => { cancelled = true; if (retryTimer) clearTimeout(retryTimer); };
+    window.addEventListener("wheel", stop, { passive: true, once: true });
+    window.addEventListener("touchstart", stop, { passive: true, once: true });
+    window.addEventListener("keydown", stop, { once: true });
+
     const timeout = window.setTimeout(tryScroll, 50);
     return () => {
+      cancelled = true;
       clearTimeout(timeout);
       if (retryTimer) clearTimeout(retryTimer);
+      window.removeEventListener("wheel", stop);
+      window.removeEventListener("touchstart", stop);
+      window.removeEventListener("keydown", stop);
     };
   }, [scrollToPlanCards]);
 
