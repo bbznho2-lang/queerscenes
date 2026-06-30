@@ -290,7 +290,7 @@ const Player = () => {
 
   const goToPlans = (source: string) => {
     void trackEvent("become_supporter_click", source);
-    navigate("/#planos-cards");
+    navigate("/?highlight=supporter#supporter-card");
   };
 
   const handleSupporterSignup = async (e: React.FormEvent) => {
