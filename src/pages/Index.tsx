@@ -61,15 +61,27 @@ const Index = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, isAdmin, signIn, signUp } = useAuth();
 
-  const scrollToPlanCards = useCallback(() => {
+  const scrollToPlanCards = useCallback((target?: "supporter" | "plans") => {
     if (typeof window === "undefined") return false;
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
+
+    // If caller wants the supporter card specifically (and we're on mobile),
+    // scroll directly to it so users who clicked "Yes, become a Supporter"
+    // see the Supporter offer first instead of the Free card.
+    if (target === "supporter" && isMobile) {
+      const sup = document.getElementById("supporter-card");
+      if (sup) {
+        const rect = sup.getBoundingClientRect();
+        const targetTop = window.scrollY + rect.top - 16;
+        window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+        return true;
+      }
+    }
+
     const el = document.getElementById("planos-cards") || document.getElementById("planos");
     if (!el) return false;
 
     const rect = el.getBoundingClientRect();
-    // On mobile, leave room above for the "Unlock this title…" heading so the Free card
-    // sits comfortably below it (matches the reference screenshot).
     const offset = isMobile ? 150 : 16;
     const targetTop = window.scrollY + rect.top - offset;
     window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
