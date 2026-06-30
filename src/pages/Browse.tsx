@@ -259,6 +259,18 @@ const Browse = () => {
     else { toast.success("Deleted!"); fetchContents(); }
   };
 
+  const handleRemoveFromExclusives = async (item: ContentItem) => {
+    if (!confirm("Remove from Exclusives? The title will stay in the catalog.")) return;
+    const fallbackSection =
+      item.type === "filme" ? "filmes" : item.type === "novela" ? "novelas" : "series";
+    const { error } = await supabase
+      .from("contents")
+      .update({ section: fallbackSection })
+      .eq("id", item.id);
+    if (error) toast.error(error.message);
+    else { toast.success("Removed from Exclusives"); fetchContents(); }
+  };
+
   const handleEdit = (item: ContentItem) => {
     setEditingContent(item);
     setEditOpen(true);
