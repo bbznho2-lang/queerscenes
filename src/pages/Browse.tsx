@@ -674,7 +674,7 @@ const Browse = () => {
               <AutoScrollRow>
                 {exclusivos.map((e) => (
                   <div key={e.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={e} isAdmin={isAdmin} onEdit={() => handleEdit(e)} onDelete={() => handleDelete(e.id)} onClickTrack={() => trackClick(e.id)} isInWatchlist={watchlistIds.has(e.id)} onToggleWatchlist={() => toggleWatchlist(e.id)} userIsPremium={userIsPremium} />
+                    <ContentCard item={e} isAdmin={isAdmin} onEdit={() => handleEdit(e)} onDelete={() => handleDelete(e.id)} onClickTrack={() => trackClick(e.id)} isInWatchlist={watchlistIds.has(e.id)} onToggleWatchlist={() => toggleWatchlist(e.id)} userIsPremium={userIsPremium} onRemoveFromExclusives={() => handleRemoveFromExclusives(e)} />
                   </div>
                 ))}
               </AutoScrollRow>
