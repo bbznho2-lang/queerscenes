@@ -118,10 +118,12 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
   const fetchProfiles = useCallback(async () => {
     if (!isAdmin) return;
     // Supporters: small set, fetch all
+    const nowIso = new Date().toISOString();
     const { data: sup } = await supabase
       .from("profiles")
-      .select("user_id,email,first_name,last_name,is_premium")
+      .select("user_id,email,first_name,last_name,is_premium,premium_expires_at")
       .eq("is_premium", true)
+      .or(`premium_expires_at.is.null,premium_expires_at.gt.${nowIso}`)
       .order("created_at", { ascending: false })
       .limit(2000);
     setSupporters((sup as ProfileLite[]) || []);
