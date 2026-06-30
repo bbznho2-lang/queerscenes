@@ -108,6 +108,15 @@ const ContentCard = ({
       </div>
       {isAdmin && (
         <div className="absolute top-2 right-2 flex gap-1 z-10">
+          {onRemoveFromExclusives && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onRemoveFromExclusives(); }}
+              className="w-8 h-8 rounded-full bg-card/90 flex items-center justify-center hover:bg-amber-500/20 transition-colors shadow-md"
+              title="Remove from Exclusives (keeps in catalog)"
+            >
+              <StarOff className="w-3.5 h-3.5 text-amber-400" />
+            </button>
+          )}
           <button
             onClick={(e) => { e.stopPropagation(); onEdit(); }}
             className="w-8 h-8 rounded-full bg-card/90 flex items-center justify-center hover:bg-primary/20 transition-colors shadow-md"
