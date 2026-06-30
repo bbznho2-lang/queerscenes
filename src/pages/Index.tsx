@@ -688,7 +688,7 @@ const Index = () => {
 
             {/* SUPPORTER */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2}>
-              <div className="qs-supporter-panel p-6 sm:p-7 h-full flex flex-col relative overflow-visible">
+              <div id="supporter-card" className="qs-supporter-panel p-6 sm:p-7 h-full flex flex-col relative overflow-visible scroll-mt-20">
                 <div className="qs-supporter-glow" aria-hidden />
 
                 <span className="qs-supporter-pill">✦ MOST POPULAR</span>
