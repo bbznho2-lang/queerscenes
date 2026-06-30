@@ -44,6 +44,7 @@ const ContentCard = ({
   isInWatchlist,
   onToggleWatchlist,
   userIsPremium,
+  onRemoveFromExclusives,
 }: {
   item: ContentItem;
   isAdmin: boolean;
@@ -53,6 +54,7 @@ const ContentCard = ({
   isInWatchlist: boolean;
   onToggleWatchlist: () => void;
   userIsPremium: boolean;
+  onRemoveFromExclusives?: () => void;
 }) => {
   const navigate = useNavigate();
   const handleClick = () => {
