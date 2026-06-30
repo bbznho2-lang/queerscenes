@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Plus, Menu, X, Search, Bookmark, LogOut, Pencil, Trash2, Crown, Settings, Sparkles, Instagram, Youtube, Facebook, Music2 } from "lucide-react";
+import { Play, Plus, Menu, X, Search, Bookmark, LogOut, Pencil, Trash2, Crown, Settings, Sparkles, Instagram, Youtube, Facebook, Music2, StarOff } from "lucide-react";
 import { XIcon } from "@/components/icons/XIcon";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -44,6 +44,7 @@ const ContentCard = ({
   isInWatchlist,
   onToggleWatchlist,
   userIsPremium,
+  onRemoveFromExclusives,
 }: {
   item: ContentItem;
   isAdmin: boolean;
@@ -53,6 +54,7 @@ const ContentCard = ({
   isInWatchlist: boolean;
   onToggleWatchlist: () => void;
   userIsPremium: boolean;
+  onRemoveFromExclusives?: () => void;
 }) => {
   const navigate = useNavigate();
   const handleClick = () => {
@@ -106,6 +108,15 @@ const ContentCard = ({
       </div>
       {isAdmin && (
         <div className="absolute top-2 right-2 flex gap-1 z-10">
+          {onRemoveFromExclusives && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onRemoveFromExclusives(); }}
+              className="w-8 h-8 rounded-full bg-card/90 flex items-center justify-center hover:bg-amber-500/20 transition-colors shadow-md"
+              title="Remove from Exclusives (keeps in catalog)"
+            >
+              <StarOff className="w-3.5 h-3.5 text-amber-400" />
+            </button>
+          )}
           <button
             onClick={(e) => { e.stopPropagation(); onEdit(); }}
             className="w-8 h-8 rounded-full bg-card/90 flex items-center justify-center hover:bg-primary/20 transition-colors shadow-md"
@@ -246,6 +257,18 @@ const Browse = () => {
     const { error } = await supabase.from("contents").delete().eq("id", id);
     if (error) toast.error(error.message);
     else { toast.success("Deleted!"); fetchContents(); }
+  };
+
+  const handleRemoveFromExclusives = async (item: ContentItem) => {
+    if (!confirm("Remove from Exclusives? The title will stay in the catalog.")) return;
+    const fallbackSection =
+      item.type === "filme" ? "filmes" : item.type === "novela" ? "novelas" : "series";
+    const { error } = await supabase
+      .from("contents")
+      .update({ section: fallbackSection })
+      .eq("id", item.id);
+    if (error) toast.error(error.message);
+    else { toast.success("Removed from Exclusives"); fetchContents(); }
   };
 
   const handleEdit = (item: ContentItem) => {
@@ -651,7 +674,7 @@ const Browse = () => {
               <AutoScrollRow>
                 {exclusivos.map((e) => (
                   <div key={e.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={e} isAdmin={isAdmin} onEdit={() => handleEdit(e)} onDelete={() => handleDelete(e.id)} onClickTrack={() => trackClick(e.id)} isInWatchlist={watchlistIds.has(e.id)} onToggleWatchlist={() => toggleWatchlist(e.id)} userIsPremium={userIsPremium} />
+                    <ContentCard item={e} isAdmin={isAdmin} onEdit={() => handleEdit(e)} onDelete={() => handleDelete(e.id)} onClickTrack={() => trackClick(e.id)} isInWatchlist={watchlistIds.has(e.id)} onToggleWatchlist={() => toggleWatchlist(e.id)} userIsPremium={userIsPremium} onRemoveFromExclusives={() => handleRemoveFromExclusives(e)} />
                   </div>
                 ))}
               </AutoScrollRow>
