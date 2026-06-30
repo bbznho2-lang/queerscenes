@@ -152,19 +152,25 @@ const Index = () => {
     };
   }, [user]);
 
-  // Scroll to plans cards if URL hash is #planos / #planos-cards
+  // Scroll to plans cards if URL hash is #planos / #planos-cards / #supporter-card
+  // or query param ?highlight=supporter (used by the Player paywall CTA on mobile).
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (window.location.hash !== "#planos" && window.location.hash !== "#planos-cards") return;
+    const hash = window.location.hash;
+    const params = new URLSearchParams(window.location.search);
+    const highlight = params.get("highlight");
+    const wantsSupporter = highlight === "supporter" || hash === "#supporter-card";
+    const wantsPlans = hash === "#planos" || hash === "#planos-cards";
+    if (!wantsSupporter && !wantsPlans) return;
+
     let attempts = 0;
     const maxAttempts = 40; // ~4s
     let retryTimer: number | undefined;
     const tryScroll = () => {
-      const didScroll = scrollToPlanCards();
+      const didScroll = scrollToPlanCards(wantsSupporter ? "supporter" : "plans");
       if (didScroll && attempts++ >= maxAttempts) {
         return;
       }
-
       if (attempts < maxAttempts) {
         retryTimer = window.setTimeout(tryScroll, 100);
       }
