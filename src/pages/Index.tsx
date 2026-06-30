@@ -61,15 +61,27 @@ const Index = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, isAdmin, signIn, signUp } = useAuth();
 
-  const scrollToPlanCards = useCallback(() => {
+  const scrollToPlanCards = useCallback((target?: "supporter" | "plans") => {
     if (typeof window === "undefined") return false;
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
+
+    // If caller wants the supporter card specifically (and we're on mobile),
+    // scroll directly to it so users who clicked "Yes, become a Supporter"
+    // see the Supporter offer first instead of the Free card.
+    if (target === "supporter" && isMobile) {
+      const sup = document.getElementById("supporter-card");
+      if (sup) {
+        const rect = sup.getBoundingClientRect();
+        const targetTop = window.scrollY + rect.top - 16;
+        window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+        return true;
+      }
+    }
+
     const el = document.getElementById("planos-cards") || document.getElementById("planos");
     if (!el) return false;
 
     const rect = el.getBoundingClientRect();
-    // On mobile, leave room above for the "Unlock this title…" heading so the Free card
-    // sits comfortably below it (matches the reference screenshot).
     const offset = isMobile ? 150 : 16;
     const targetTop = window.scrollY + rect.top - offset;
     window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
@@ -140,19 +152,25 @@ const Index = () => {
     };
   }, [user]);
 
-  // Scroll to plans cards if URL hash is #planos / #planos-cards
+  // Scroll to plans cards if URL hash is #planos / #planos-cards / #supporter-card
+  // or query param ?highlight=supporter (used by the Player paywall CTA on mobile).
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (window.location.hash !== "#planos" && window.location.hash !== "#planos-cards") return;
+    const hash = window.location.hash;
+    const params = new URLSearchParams(window.location.search);
+    const highlight = params.get("highlight");
+    const wantsSupporter = highlight === "supporter" || hash === "#supporter-card";
+    const wantsPlans = hash === "#planos" || hash === "#planos-cards";
+    if (!wantsSupporter && !wantsPlans) return;
+
     let attempts = 0;
     const maxAttempts = 40; // ~4s
     let retryTimer: number | undefined;
     const tryScroll = () => {
-      const didScroll = scrollToPlanCards();
+      const didScroll = scrollToPlanCards(wantsSupporter ? "supporter" : "plans");
       if (didScroll && attempts++ >= maxAttempts) {
         return;
       }
-
       if (attempts < maxAttempts) {
         retryTimer = window.setTimeout(tryScroll, 100);
       }
@@ -688,7 +706,7 @@ const Index = () => {
 
             {/* SUPPORTER */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2}>
-              <div className="qs-supporter-panel p-6 sm:p-7 h-full flex flex-col relative overflow-visible">
+              <div id="supporter-card" className="qs-supporter-panel p-6 sm:p-7 h-full flex flex-col relative overflow-visible scroll-mt-20">
                 <div className="qs-supporter-glow" aria-hidden />
 
                 <span className="qs-supporter-pill">✦ MOST POPULAR</span>
