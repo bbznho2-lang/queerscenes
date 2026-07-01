@@ -868,6 +868,7 @@ const Index = () => {
                 { q: "Can I cancel anytime?", a: "Yes. Cancellation can be done at any time, with no penalty." },
                 { q: "Is the content only LGBTQIA+?", a: "Yes. The platform's focus is exclusively on stories, scenes, and productions with LGBTQIA+ representation." },
                 { q: "Does it work on mobile?", a: "Yes. The platform is adapted for mobile, tablet, and desktop." },
+                { q: "Can I become a Supporter from outside Europe?", a: "Yes. Anyone in the world can become a Supporter, even though the plans are priced in Euros (EUR). Checkout is handled by Stripe, which automatically converts the charge to your local currency using your card's exchange rate — no European address or bank account required." },
               ].map((item, i) => (
                 <AccordionItem
                   key={i}
