@@ -49,7 +49,7 @@ export function trackSupporterClick(
  * so analytics never block the UI.
  */
 export async function trackSupporterEvent(
-  supabase: Pick<SupabaseClient, "from">,
+  supabase: Pick<SupabaseClient, "from"> & { rpc?: SupabaseClient["rpc"] },
   params: TrackSupporterEventParams,
 ): Promise<{ ok: boolean; error?: unknown }> {
   try {
