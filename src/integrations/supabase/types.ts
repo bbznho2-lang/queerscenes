@@ -818,6 +818,15 @@ export type Database = {
           sender_role: string
         }[]
       }
+      log_supporter_event: {
+        Args: {
+          _content_id?: string
+          _event_type: string
+          _metadata?: Json
+          _source: string
+        }
+        Returns: undefined
+      }
       move_to_dlq: {
         Args: {
           dlq_name: string

@@ -49,20 +49,19 @@ export function trackSupporterClick(
  * so analytics never block the UI.
  */
 export async function trackSupporterEvent(
-  supabase: Pick<SupabaseClient, "from">,
+  supabase: Pick<SupabaseClient, "from"> & { rpc?: SupabaseClient["rpc"] },
   params: TrackSupporterEventParams,
 ): Promise<{ ok: boolean; error?: unknown }> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const visitorId = getFunnelVisitorId();
     const metadata = { ...(params.metadata ?? {}) };
     if (visitorId) metadata.visitor_id = visitorId;
-    const result = await (supabase.from as any)("supporter_events").insert({
-      user_id: params.user_id ?? null,
-      content_id: params.content_id ?? null,
-      event_type: params.event_type,
-      source: params.source,
-      metadata,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = await ((supabase as any).rpc as any)("log_supporter_event", {
+      _event_type: params.event_type,
+      _source: params.source,
+      _content_id: params.content_id ?? null,
+      _metadata: metadata,
     });
     if (result && (result as { error?: unknown }).error) {
       return { ok: false, error: (result as { error?: unknown }).error };
