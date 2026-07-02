@@ -10,6 +10,7 @@ import EditContentDialog from "@/components/EditContentDialog";
 import CommentsSection from "@/components/CommentsSection";
 import { getFunnelVisitorId, trackSupporterEvent, type SupporterEventType } from "@/lib/supporter-tracking";
 import { getEmailRedirectUrl } from "@/lib/auth-urls";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 
 interface ContentItem {
@@ -61,6 +62,7 @@ const Player = () => {
   const [signupSubmitting, setSignupSubmitting] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
   const [paywallMode, setPaywallMode] = useState<"signup" | "login">("login");
+  const [telegramPopupOpen, setTelegramPopupOpen] = useState(false);
 
 
   const fetchContent = async () => {
@@ -564,7 +566,7 @@ const Player = () => {
                     <Crown className="w-4 h-4" /> {userExpired ? "Renew my Supporter plan" : "Yes, become a Supporter"}
                   </button>
                   <button
-                    onClick={() => navigate(-1)}
+                    onClick={() => setTelegramPopupOpen(true)}
                     className="w-full rounded-full bg-transparent border border-white/15 text-foreground/90 hover:bg-white/5 transition-colors py-2.5 text-sm font-medium"
                   >
                     Not now
@@ -794,6 +796,47 @@ const Player = () => {
 
 
       {content && <EditContentDialog open={editOpen} onOpenChange={setEditOpen} content={content} onSaved={fetchContent} />}
+
+      <Dialog
+        open={telegramPopupOpen}
+        onOpenChange={(open) => {
+          setTelegramPopupOpen(open);
+          if (!open) navigate(-1);
+        }}
+      >
+        <DialogContent className="max-w-sm bg-[#0B0B0F] border border-purple-500/30 text-foreground shadow-[0_0_40px_rgba(168,85,247,0.25)] rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-center">Stay in the loop 💜</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground text-center pt-1">
+              Don't miss new titles and releases — join our official Telegram channel for free.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-3 pt-2">
+            <a
+              href="https://t.me/QueerScenesTv"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                setTelegramPopupOpen(false);
+                setTimeout(() => navigate(-1), 100);
+              }}
+              className="w-full text-center rounded-full text-white font-semibold py-3 text-sm shadow-[0_0_25px_rgba(168,85,247,0.4)] hover:opacity-95 transition-opacity"
+              style={{ background: "linear-gradient(90deg, #ec4899 0%, #a855f7 50%, #6366f1 100%)" }}
+            >
+              Join the community
+            </a>
+            <button
+              onClick={() => {
+                setTelegramPopupOpen(false);
+                navigate(-1);
+              }}
+              className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2"
+            >
+              No thanks
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
