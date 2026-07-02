@@ -566,7 +566,7 @@ const Player = () => {
                     <Crown className="w-4 h-4" /> {userExpired ? "Renew my Supporter plan" : "Yes, become a Supporter"}
                   </button>
                   <button
-                    onClick={() => navigate(-1)}
+                    onClick={() => setTelegramPopupOpen(true)}
                     className="w-full rounded-full bg-transparent border border-white/15 text-foreground/90 hover:bg-white/5 transition-colors py-2.5 text-sm font-medium"
                   >
                     Not now
