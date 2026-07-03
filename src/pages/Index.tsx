@@ -811,7 +811,15 @@ const Index = () => {
                     className="qs-supporter-subscribe"
                   >
                     <Crown className="w-4 h-4" />
-                    {checkoutLoading ? "Loading..." : "Subscribe"}
+                    {checkoutLoading ? "Loading..." : (() => {
+                      const map: Record<string, { label: string; price: string }> = {
+                        price_1TmNFHJ5xR4MDdjr5915HBR2: { label: "Monthly", price: "€11.90" },
+                        price_1TmNGNJ5xR4MDdjrsxC9bhtx: { label: "Quarterly", price: "€29.90" },
+                        price_1TmNHMJ5xR4MDdjrTnNTQAHV: { label: "Yearly", price: "€106.90" },
+                      };
+                      const p = map[selectedPlanId];
+                      return p ? `Subscribe ${p.label} — ${p.price}` : "Subscribe";
+                    })()}
                   </button>
 
                   <p className="text-center text-[11px] text-[var(--t2)]">
