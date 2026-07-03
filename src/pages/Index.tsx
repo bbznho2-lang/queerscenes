@@ -739,9 +739,20 @@ const Index = () => {
                       <button
                         type="button"
                         key={opt.priceId}
+                        role="radio"
+                        aria-checked={selected}
                         onClick={() => setSelectedPlanId(opt.priceId)}
-                        className={`qs-supporter-plan ${selected ? "qs-supporter-plan-selected" : ""} text-center`}
+                        className={`qs-supporter-plan ${selected ? "qs-supporter-plan-selected" : ""} text-center relative`}
                       >
+                        {selected && (
+                          <span
+                            aria-hidden
+                            className="absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-black text-white shadow-lg"
+                            style={{ background: "linear-gradient(135deg,#a855f7,#ec4899)" }}
+                          >
+                            ✓
+                          </span>
+                        )}
                         <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--t2)]">{opt.label}</p>
                         <p className="mt-1 text-base sm:text-lg font-black text-[var(--t1)]">{opt.price}</p>
                         {opt.note && <p className="mt-0.5 text-[11px] font-bold" style={{ color: "#34d399" }}>{opt.note}</p>}
@@ -800,7 +811,15 @@ const Index = () => {
                     className="qs-supporter-subscribe"
                   >
                     <Crown className="w-4 h-4" />
-                    {checkoutLoading ? "Loading..." : "Subscribe"}
+                    {checkoutLoading ? "Loading..." : (() => {
+                      const map: Record<string, { label: string; price: string }> = {
+                        price_1TmNFHJ5xR4MDdjr5915HBR2: { label: "Monthly", price: "€11.90" },
+                        price_1TmNGNJ5xR4MDdjrsxC9bhtx: { label: "Quarterly", price: "€29.90" },
+                        price_1TmNHMJ5xR4MDdjrTnNTQAHV: { label: "Yearly", price: "€106.90" },
+                      };
+                      const p = map[selectedPlanId];
+                      return p ? `Subscribe ${p.label} — ${p.price}` : "Subscribe";
+                    })()}
                   </button>
 
                   <p className="text-center text-[11px] text-[var(--t2)]">
