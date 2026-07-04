@@ -499,7 +499,7 @@ const Admin = () => {
                       }}
                     />
                   </div>
-                  <span className="w-8 shrink-0 text-right font-semibold tabular-nums" style={{ color: d.count > 0 ? "#f59e0b" : "hsl(var(--muted-foreground))" }}>
+                  <span className="w-12 shrink-0 text-right font-semibold tabular-nums" style={{ color: d.count > 0 ? "#f59e0b" : "hsl(var(--muted-foreground))" }}>
                     {d.count}
                   </span>
                 </div>
