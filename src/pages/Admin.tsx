@@ -91,6 +91,9 @@ const Admin = () => {
   const [clicksPage, setClicksPage] = useState(1);
   const [supporterEvents, setSupporterEvents] = useState<Array<{ id: string; event_type: string; source: string | null; user_id: string | null; content_id: string | null; created_at: string; metadata: any }>>([]);
   const [eventsPage, setEventsPage] = useState(1);
+  // Independent signup timestamps for the "last 14 days" chart. Kept separate from
+  // the paginated `profiles` list so realtime re-fetch races cannot truncate it.
+  const [recentSignupDates, setRecentSignupDates] = useState<string[]>([]);
   const EVENTS_PER_PAGE = 15;
 
   const USERS_PER_PAGE = 20;
@@ -145,6 +148,29 @@ const Admin = () => {
 
   const fetchData = async (showLoading = true) => {
     if (showLoading) setLoadingData(true);
+
+    // Dedicated fetch for the "last 14 days" chart. Paginated to bypass the
+    // 1000-row PostgREST cap and independent of the full `profiles` list so
+    // realtime re-fetches never truncate the chart.
+    const since14 = new Date();
+    since14.setUTCDate(since14.getUTCDate() - 14);
+    since14.setUTCHours(0, 0, 0, 0);
+    const signupDates: string[] = [];
+    const SIGNUP_PAGE = 1000;
+    for (let from = 0; ; from += SIGNUP_PAGE) {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("created_at")
+        .gte("created_at", since14.toISOString())
+        .order("created_at", { ascending: false })
+        .range(from, from + SIGNUP_PAGE - 1);
+      if (error) { console.error("recent signups fetch error", error); break; }
+      if (!data || data.length === 0) break;
+      signupDates.push(...data.map((r: { created_at: string }) => r.created_at));
+      if (data.length < SIGNUP_PAGE) break;
+    }
+    setRecentSignupDates(signupDates);
+
     // Supabase caps rows at 1000 per request — paginate to fetch every profile.
     const allProfiles: Profile[] = [];
     const PAGE = 1000;
@@ -412,8 +438,8 @@ const Admin = () => {
     }
     const idx: Record<string, number> = {};
     days.forEach((d, i) => { idx[d.key] = i; });
-    profiles.forEach((p) => {
-      const k = new Date(p.created_at).toISOString().slice(0, 10);
+    recentSignupDates.forEach((createdAt) => {
+      const k = new Date(createdAt).toISOString().slice(0, 10);
       if (k in idx) days[idx[k]].count += 1;
     });
     return days;
@@ -473,7 +499,7 @@ const Admin = () => {
                       }}
                     />
                   </div>
-                  <span className="w-8 shrink-0 text-right font-semibold tabular-nums" style={{ color: d.count > 0 ? "#f59e0b" : "hsl(var(--muted-foreground))" }}>
+                  <span className="w-12 shrink-0 text-right font-semibold tabular-nums" style={{ color: d.count > 0 ? "#f59e0b" : "hsl(var(--muted-foreground))" }}>
                     {d.count}
                   </span>
                 </div>
