@@ -472,16 +472,16 @@ const Player = () => {
                   })()}
 
                   <p className="text-foreground/90 text-xs sm:text-sm mb-5 max-w-md">
-                    Don't stop now — the next scene is just one click away. Join our Supporters and pick up exactly where you left off.
+                    This title was hand-subtitled by our team and carefully chosen for this community. Supporters get exclusive access to rare queer titles, cinema premieres, and new releases every month — a catalog built by fans, for fans.
                   </p>
                 </>
               )}
 
               <div className="grid grid-cols-3 gap-2 sm:gap-3 max-w-md w-full mb-5">
                 {[
-                  { icon: "▶️", title: "Keep watching" },
-                  { icon: "🔥", title: "Full catalog" },
-                  { icon: "⚡", title: "Instant access" },
+                  { icon: "▶️", title: "Watch this title right now" },
+                  { icon: "💜", title: "Full access to our exclusive catalog" },
+                  { icon: "✨", title: "New titles added every month" },
                 ].map((perk) => (
                   <div key={perk.title} className="rounded-lg bg-card/70 border border-border px-2 py-3 text-center backdrop-blur-sm">
                     <div className="text-lg leading-none mb-1">{perk.icon}</div>
