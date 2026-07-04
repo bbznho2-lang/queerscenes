@@ -470,7 +470,7 @@ const Admin = () => {
       <main className="pt-20 px-4 pb-12 max-w-7xl mx-auto space-y-8">
         <AdminStatsCards totalUsers={totalUsers} premiumUsers={premiumUsers} totalClicks={totalClicks} />
 
-        <ConversionFunnel />
+
 
         <Card className="bg-card border-border">
           <CardHeader>
