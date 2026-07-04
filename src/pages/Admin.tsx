@@ -438,8 +438,8 @@ const Admin = () => {
     }
     const idx: Record<string, number> = {};
     days.forEach((d, i) => { idx[d.key] = i; });
-    profiles.forEach((p) => {
-      const k = new Date(p.created_at).toISOString().slice(0, 10);
+    recentSignupDates.forEach((createdAt) => {
+      const k = new Date(createdAt).toISOString().slice(0, 10);
       if (k in idx) days[idx[k]].count += 1;
     });
     return days;
