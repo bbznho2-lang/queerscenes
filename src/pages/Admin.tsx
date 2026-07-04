@@ -148,6 +148,29 @@ const Admin = () => {
 
   const fetchData = async (showLoading = true) => {
     if (showLoading) setLoadingData(true);
+
+    // Dedicated fetch for the "last 14 days" chart. Paginated to bypass the
+    // 1000-row PostgREST cap and independent of the full `profiles` list so
+    // realtime re-fetches never truncate the chart.
+    const since14 = new Date();
+    since14.setUTCDate(since14.getUTCDate() - 14);
+    since14.setUTCHours(0, 0, 0, 0);
+    const signupDates: string[] = [];
+    const SIGNUP_PAGE = 1000;
+    for (let from = 0; ; from += SIGNUP_PAGE) {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("created_at")
+        .gte("created_at", since14.toISOString())
+        .order("created_at", { ascending: false })
+        .range(from, from + SIGNUP_PAGE - 1);
+      if (error) { console.error("recent signups fetch error", error); break; }
+      if (!data || data.length === 0) break;
+      signupDates.push(...data.map((r: { created_at: string }) => r.created_at));
+      if (data.length < SIGNUP_PAGE) break;
+    }
+    setRecentSignupDates(signupDates);
+
     // Supabase caps rows at 1000 per request — paginate to fetch every profile.
     const allProfiles: Profile[] = [];
     const PAGE = 1000;
