@@ -148,7 +148,7 @@ const Browse = () => {
   const [watchlistIds, setWatchlistIds] = useState<Set<string>>(new Set());
   const [userIsPremium, setUserIsPremium] = useState(false);
   const [addExistingOpen, setAddExistingOpen] = useState(false);
-  const [premiumPopupOpen, setPremiumPopupOpen] = useState(false);
+  
   const [top10Ids, setTop10Ids] = useState<string[]>([]);
   const [currentBanner, setCurrentBanner] = useState(0);
   const { user, isAdmin, signOut } = useAuth();
@@ -708,67 +708,6 @@ const Browse = () => {
       <EditContentDialog open={editOpen} onOpenChange={setEditOpen} content={editingContent} onSaved={fetchContents} defaults={newDefaults} />
       <AddExistingContentDialog open={addExistingOpen} onOpenChange={setAddExistingOpen} targetSection="exclusivos" onSaved={fetchContents} />
 
-      {/* Premium Upgrade Popup */}
-      <Dialog open={premiumPopupOpen} onOpenChange={setPremiumPopupOpen}>
-        <DialogContent className="sm:max-w-md bg-[#0f0f17] border border-white/10 rounded-2xl">
-          <DialogHeader className="text-center items-center">
-            <div
-              className="w-16 h-16 rounded-full flex items-center justify-center mb-2 shadow-[0_0_30px_rgba(217,70,239,0.45)]"
-              style={{ background: "linear-gradient(135deg, #ec4899 0%, #a855f7 100%)" }}
-            >
-              <Crown className="w-8 h-8 text-white" />
-            </div>
-            <DialogTitle className="text-2xl font-extrabold text-white">Become a Supporter 💜</DialogTitle>
-            <DialogDescription className="text-muted-foreground text-sm mt-2 max-w-xs">
-              Support the project and unlock exclusive content made for our community.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="h-px bg-white/10 my-2" />
-
-          <div className="space-y-3">
-            {[
-              { emoji: "⭐", bg: "rgba(250,204,21,0.12)", text: "All Supporter content unlocked instantly" },
-              { emoji: "🎬", bg: "rgba(244,114,182,0.12)", text: "Early releases & exclusive titles" },
-              { emoji: "📬", bg: "rgba(56,189,248,0.12)", text: "Request what you want to watch" },
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div
-                  className="w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0 border border-white/5"
-                  style={{ background: item.bg }}
-                >
-                  {item.emoji}
-                </div>
-                <span className="text-sm text-foreground/90">{item.text}</span>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex flex-col gap-2.5 mt-5">
-            <a
-              href="https://t.me/QueerScenesTv"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full bg-white/5 border border-white/10 text-foreground hover:bg-white/10 transition-colors text-sm font-medium"
-            >
-              ✈️ Join our Telegram community
-            </a>
-            <Button
-              onClick={() => { setPremiumPopupOpen(false); goToPlans("browse_supporter_popup"); }}
-              className="shine-cta w-full rounded-full text-white font-semibold py-2.5 border-0 shadow-[0_0_30px_rgba(168,85,247,0.45)] hover:opacity-95"
-              style={{ background: "linear-gradient(90deg, #ec4899 0%, #a855f7 50%, #6366f1 100%)" }}
-            >
-              👑 Become a Supporter
-            </Button>
-            <button
-              onClick={() => setPremiumPopupOpen(false)}
-              className="w-full text-muted-foreground text-sm hover:text-foreground transition-colors py-1"
-            >
-              Maybe later
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
