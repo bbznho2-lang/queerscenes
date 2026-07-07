@@ -106,7 +106,12 @@ const Admin = () => {
   }, [user, isAdmin, loading, navigate]);
 
   useEffect(() => {
-    if (isAdmin) fetchData();
+    if (!isAdmin) return;
+    fetchData();
+    // Poll every 30s so the "today" bar keeps growing even if a realtime
+    // event is missed (WebSocket drops, tab throttling, RLS delays, etc.).
+    const t = window.setInterval(() => { fetchData(false); }, 30_000);
+    return () => window.clearInterval(t);
   }, [isAdmin]);
 
   // Realtime for new clicks
