@@ -152,8 +152,10 @@ const Admin = () => {
     // Dedicated fetch for the "last 14 days" chart. Paginated to bypass the
     // 1000-row PostgREST cap and independent of the full `profiles` list so
     // realtime re-fetches never truncate the chart.
+    // Use a 16-day cutoff so viewers in any timezone always include the full
+    // local "today" bucket even when the browser is ahead of/behind UTC.
     const since14 = new Date();
-    since14.setUTCDate(since14.getUTCDate() - 14);
+    since14.setUTCDate(since14.getUTCDate() - 16);
     since14.setUTCHours(0, 0, 0, 0);
     const signupDates: string[] = [];
     const SIGNUP_PAGE = 1000;
