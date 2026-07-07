@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Play, Plus, Menu, X, Search, Bookmark, LogOut, Pencil, Trash2, Crown, Settings, Sparkles, Instagram, Youtube, Facebook, Music2, StarOff } from "lucide-react";
 import { XIcon } from "@/components/icons/XIcon";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+
 import ProfileDialog from "@/components/ProfileDialog";
 import MessagesPopover from "@/components/MessagesPopover";
 import TitlesTicker from "@/components/TitlesTicker";
