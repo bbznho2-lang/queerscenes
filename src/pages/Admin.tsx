@@ -421,7 +421,14 @@ const Admin = () => {
   const premiumUsers = profiles.filter((p) => p.is_premium).length;
   const totalClicks = clickStats.reduce((a, b) => a + b.clicks, 0);
 
-  // New users per day — last 14 days
+  // New users per day — last 14 days (use LOCAL calendar days so "today"
+  // matches the viewer's timezone and doesn't get bucketed into yesterday.)
+  const localDayKey = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
   const newUsersByDay = (() => {
     const days: { key: string; label: string; count: number }[] = [];
     const today = new Date();
@@ -429,9 +436,8 @@ const Admin = () => {
     for (let i = 13; i >= 0; i--) {
       const d = new Date(today);
       d.setDate(today.getDate() - i);
-      const key = d.toISOString().slice(0, 10);
       days.push({
-        key,
+        key: localDayKey(d),
         label: d.toLocaleDateString("en-US", { month: "short", day: "2-digit" }),
         count: 0,
       });
@@ -439,13 +445,14 @@ const Admin = () => {
     const idx: Record<string, number> = {};
     days.forEach((d, i) => { idx[d.key] = i; });
     recentSignupDates.forEach((createdAt) => {
-      const k = new Date(createdAt).toISOString().slice(0, 10);
+      const k = localDayKey(new Date(createdAt));
       if (k in idx) days[idx[k]].count += 1;
     });
     return days;
   })();
   const maxNewUsers = Math.max(1, ...newUsersByDay.map((d) => d.count));
   const newUsersTotal14d = newUsersByDay.reduce((a, b) => a + b.count, 0);
+
 
   const isExpired = (date: string | null) => {
     if (!date) return false;
