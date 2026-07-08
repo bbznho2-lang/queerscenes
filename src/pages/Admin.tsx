@@ -524,7 +524,9 @@ const Admin = () => {
         </Card>
 
         <SiteNoteAdmin />
+        <PaywallCustomizationsAdmin />
         <FeaturedEpisodesAdmin />
+
 
         <Card className="bg-card border-border">
           <CardHeader>
