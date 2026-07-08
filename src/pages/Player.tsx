@@ -553,26 +553,6 @@ const Player = () => {
                 ))}
               </div>
 
-              {paywallCustom?.testimonials && paywallCustom.testimonials.length > 0 && (
-                <div className="w-full max-w-md mb-5">
-                  <h3 className="text-xs sm:text-sm font-bold text-foreground mb-2 text-center">
-                    What our Supporters are saying 💜
-                  </h3>
-                  <div className="flex flex-col gap-2">
-                    {paywallCustom.testimonials.map((t, i) => (
-                      <div key={i} className="rounded-lg bg-card/70 border border-primary/30 px-3 py-2 text-left backdrop-blur-sm">
-                        <div className="flex items-center gap-0.5 mb-1">
-                          {Array.from({ length: 5 }).map((_, s) => (
-                            <Star key={s} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                          ))}
-                        </div>
-                        <p className="text-[11px] sm:text-xs font-bold text-foreground leading-snug mb-0.5">"{t.quote}"</p>
-                        <p className="text-[10px] sm:text-[11px] font-bold text-primary">— {t.name}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
 
 
 
