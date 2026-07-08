@@ -154,6 +154,30 @@ const Player = () => {
   fetchContent();
 }, [id, user?.id, isAdmin, authLoading]);
 
+  useEffect(() => {
+    if (!content?.id) { setPaywallCustom(null); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await (supabase as any)
+        .from("paywall_customizations")
+        .select("custom_text, testimonials")
+        .eq("content_id", content.id)
+        .maybeSingle();
+      if (cancelled) return;
+      if (data) {
+        const raw = Array.isArray(data.testimonials) ? data.testimonials : [];
+        const testimonials = raw
+          .map((t: any) => ({ name: String(t?.name ?? "").trim(), quote: String(t?.quote ?? "").trim() }))
+          .filter((t: any) => t.name && t.quote);
+        setPaywallCustom({ custom_text: data.custom_text ?? null, testimonials });
+      } else {
+        setPaywallCustom(null);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [content?.id]);
+
+
   const episodePremiumBlocked = currentEp?.is_premium && !userIsPremium && !isAdmin;
   const isBlocked = premiumBlocked || episodePremiumBlocked;
 
