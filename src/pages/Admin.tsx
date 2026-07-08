@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import SiteNoteAdmin from "@/components/SiteNoteAdmin";
+import PaywallCustomizationsAdmin from "@/components/PaywallCustomizationsAdmin";
 import FeaturedEpisodesAdmin from "@/components/FeaturedEpisodesAdmin";
 
 
@@ -523,7 +524,9 @@ const Admin = () => {
         </Card>
 
         <SiteNoteAdmin />
+        <PaywallCustomizationsAdmin />
         <FeaturedEpisodesAdmin />
+
 
         <Card className="bg-card border-border">
           <CardHeader>

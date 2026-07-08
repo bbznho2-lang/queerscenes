@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Play, Pencil, Crown, Lock, Sparkles, Loader2, Maximize, ExternalLink } from "lucide-react";
+import { ArrowLeft, Play, Pencil, Crown, Lock, Sparkles, Loader2, Maximize, ExternalLink, Star } from "lucide-react";
 import DOMPurify from "dompurify";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -63,6 +63,9 @@ const Player = () => {
   const [signupSuccess, setSignupSuccess] = useState(false);
   const [paywallMode, setPaywallMode] = useState<"signup" | "login">("login");
   const [telegramPopupOpen, setTelegramPopupOpen] = useState(false);
+  const [paywallCustom, setPaywallCustom] = useState<{ custom_text: string | null; testimonials: { name: string; quote: string }[] } | null>(null);
+
+
 
 
   const fetchContent = async () => {
@@ -150,6 +153,30 @@ const Player = () => {
   useEffect(() => {
   fetchContent();
 }, [id, user?.id, isAdmin, authLoading]);
+
+  useEffect(() => {
+    if (!content?.id) { setPaywallCustom(null); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await (supabase as any)
+        .from("paywall_customizations")
+        .select("custom_text, testimonials")
+        .eq("content_id", content.id)
+        .maybeSingle();
+      if (cancelled) return;
+      if (data) {
+        const raw = Array.isArray(data.testimonials) ? data.testimonials : [];
+        const testimonials = raw
+          .map((t: any) => ({ name: String(t?.name ?? "").trim(), quote: String(t?.quote ?? "").trim() }))
+          .filter((t: any) => t.name && t.quote);
+        setPaywallCustom({ custom_text: data.custom_text ?? null, testimonials });
+      } else {
+        setPaywallCustom(null);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [content?.id]);
+
 
   const episodePremiumBlocked = currentEp?.is_premium && !userIsPremium && !isAdmin;
   const isBlocked = premiumBlocked || episodePremiumBlocked;
@@ -471,8 +498,8 @@ const Player = () => {
                     );
                   })()}
 
-                  <p className="text-foreground text-xs sm:text-sm mb-5 max-w-md font-bold">
-                    You just found something rare. This title was hand-subtitled by our team and it doesn't exist anywhere else on the internet. Supporters get exclusive access to rare queer titles, cinema premieres, and new releases every month — a catalog built by fans, for fans. The only way to watch it is here.
+                  <p className="text-foreground text-xs sm:text-sm mb-5 max-w-md font-bold whitespace-pre-wrap">
+                    {paywallCustom?.custom_text?.trim() || "You just found something rare. This title was hand-subtitled by our team and it doesn't exist anywhere else on the internet. Supporters get exclusive access to rare queer titles, cinema premieres, and new releases every month — a catalog built by fans, for fans. The only way to watch it is here."}
                   </p>
                 </>
               )}
@@ -489,6 +516,38 @@ const Player = () => {
                   </div>
                 ))}
               </div>
+
+              {(() => {
+                const defaults = [
+                  { name: "Sarah Mitchell", quote: "I signed up recently to watch the film and I'm loving the quality and the subtitles." },
+                  { name: "Léa Kaufmann", quote: "So glad I finally found this here couldn't find it anywhere else and the quality is great." },
+                  { name: "Noor Ahmadi", quote: "I joined just for this film but they keep bringing new content totally worth staying in the community 💜" },
+                ];
+                const testimonials = paywallCustom?.testimonials && paywallCustom.testimonials.length > 0
+                  ? paywallCustom.testimonials
+                  : defaults;
+                return (
+                  <div className="w-full max-w-md mb-5">
+                    <h3 className="text-xs sm:text-sm font-bold text-foreground mb-2 text-center">
+                      What our Supporters are saying 💜
+                    </h3>
+                    <div className="flex flex-col gap-2">
+                      {testimonials.map((t, i) => (
+                        <div key={i} className="rounded-lg bg-card/70 border border-primary/30 px-3 py-2 text-left backdrop-blur-sm">
+                          <div className="flex items-center gap-0.5 mb-1">
+                            {Array.from({ length: 5 }).map((_, s) => (
+                              <Star key={s} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                            ))}
+                          </div>
+                          <p className="text-[11px] sm:text-xs font-bold text-foreground leading-snug mb-0.5">"{t.quote}"</p>
+                          <p className="text-[10px] sm:text-[11px] font-bold text-primary">— {t.name}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+
 
               {!user && !signupSuccess && (
                 <form onSubmit={handleSupporterSignup} className="w-full max-w-sm space-y-2 mb-3 text-left" aria-label="Supporter signup">
