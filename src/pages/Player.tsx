@@ -150,16 +150,35 @@ const Player = () => {
     }
   };
 
+  // Clear stale state immediately when switching to a different title so the
+  // previous paywall/testimonials don't flash before the new content loads.
+  useEffect(() => {
+    setContent(null);
+    setEpisodes([]);
+    setCurrentEp(null);
+    setPaywallCustom(null);
+    setPremiumBlocked(false);
+    setEpisodeLinks([]);
+    setSelectedLinkIdx(-1);
+    setRawPlayerUrl("");
+  }, [id]);
+
   useEffect(() => {
   fetchContent();
 }, [id, user?.id, isAdmin, authLoading]);
 
-  // Re-check supporter/premium status when the tab regains focus (e.g. after returning from Stripe/Telegram checkout)
+  // Re-check supporter status only for signed-in users (e.g. after returning
+  // from Stripe checkout). Skip for signed-out visitors so the paywall doesn't
+  // flicker every time the tab regains focus.
   useEffect(() => {
+    if (!user?.id) return;
+    let lastRun = 0;
     const refresh = () => {
-      if (document.visibilityState === "visible" && !authLoading) {
-        void fetchContent();
-      }
+      if (document.visibilityState !== "visible" || authLoading) return;
+      const now = Date.now();
+      if (now - lastRun < 3000) return; // throttle
+      lastRun = now;
+      void fetchContent();
     };
     document.addEventListener("visibilitychange", refresh);
     window.addEventListener("focus", refresh);
@@ -168,6 +187,7 @@ const Player = () => {
       window.removeEventListener("focus", refresh);
     };
   }, [id, user?.id, isAdmin, authLoading]);
+
 
 
   useEffect(() => {
