@@ -154,6 +154,22 @@ const Player = () => {
   fetchContent();
 }, [id, user?.id, isAdmin, authLoading]);
 
+  // Re-check supporter/premium status when the tab regains focus (e.g. after returning from Stripe/Telegram checkout)
+  useEffect(() => {
+    const refresh = () => {
+      if (document.visibilityState === "visible" && !authLoading) {
+        void fetchContent();
+      }
+    };
+    document.addEventListener("visibilitychange", refresh);
+    window.addEventListener("focus", refresh);
+    return () => {
+      document.removeEventListener("visibilitychange", refresh);
+      window.removeEventListener("focus", refresh);
+    };
+  }, [id, user?.id, isAdmin, authLoading]);
+
+
   useEffect(() => {
     if (!content?.id) { setPaywallCustom(null); return; }
     let cancelled = false;
