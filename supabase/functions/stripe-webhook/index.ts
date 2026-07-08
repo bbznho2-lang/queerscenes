@@ -128,8 +128,39 @@ Deno.serve(async (req) => {
         .update({ status: "claimed", claimed_at: new Date().toISOString() })
         .ilike("email", email)
         .eq("status", "paid");
+
+      await sendWelcomeDM(existing.user_id);
     } else {
       console.log("[stripe-webhook] no profile yet for", email, "— will be claimed at next login");
+    }
+  }
+
+  const ADMIN_SENDER_ID = "97109920-d00e-4242-8374-6d774914bd26";
+  const WELCOME_DM_BODY = `Welcome to Queer Scenes 💜\n\nHii!! Some titles are available to watch directly on Telegram — we store them there because it's safer and provides a better viewing experience.\n\nAs a supporter, you also have access to our VIP group, where you'll receive news, updates, exclusive content, and new releases before anyone else.\n\nJoin the VIP group here: https://t.me/+36rmaWJhLU1kMjlh`;
+
+  async function sendWelcomeDM(userId: string) {
+    try {
+      // Avoid duplicates: skip if a welcome DM already exists for this recipient.
+      const { data: existingDm } = await supabase
+        .from("direct_messages")
+        .select("id")
+        .eq("recipient_id", userId)
+        .eq("sender_id", ADMIN_SENDER_ID)
+        .ilike("body", "Welcome to Queer Scenes%")
+        .maybeSingle();
+      if (existingDm?.id) {
+        console.log("[stripe-webhook] welcome DM already sent to", userId);
+        return;
+      }
+      const { error } = await supabase.from("direct_messages").insert({
+        sender_id: ADMIN_SENDER_ID,
+        recipient_id: userId,
+        body: WELCOME_DM_BODY,
+      });
+      if (error) console.error("[stripe-webhook] welcome DM insert error", error);
+      else console.log("[stripe-webhook] welcome DM sent to", userId);
+    } catch (e) {
+      console.error("[stripe-webhook] welcome DM failed", e);
     }
   }
 
