@@ -63,6 +63,9 @@ const Player = () => {
   const [signupSuccess, setSignupSuccess] = useState(false);
   const [paywallMode, setPaywallMode] = useState<"signup" | "login">("login");
   const [telegramPopupOpen, setTelegramPopupOpen] = useState(false);
+  const [paywallCustom, setPaywallCustom] = useState<{ custom_text: string | null; testimonials: { name: string; quote: string }[] } | null>(null);
+
+
 
 
   const fetchContent = async () => {
