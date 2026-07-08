@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Play, Pencil, Crown, Lock, Sparkles, Loader2, Maximize, ExternalLink } from "lucide-react";
+import { ArrowLeft, Play, Pencil, Crown, Lock, Sparkles, Loader2, Maximize, ExternalLink, Star } from "lucide-react";
 import DOMPurify from "dompurify";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
