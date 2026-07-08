@@ -437,41 +437,6 @@ export type Database = {
         }
         Relationships: []
       }
-      paywall_customizations: {
-        Row: {
-          content_id: string
-          created_at: string
-          custom_text: string | null
-          id: string
-          testimonials: Json
-          updated_at: string
-        }
-        Insert: {
-          content_id: string
-          created_at?: string
-          custom_text?: string | null
-          id?: string
-          testimonials?: Json
-          updated_at?: string
-        }
-        Update: {
-          content_id?: string
-          created_at?: string
-          custom_text?: string | null
-          id?: string
-          testimonials?: Json
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "paywall_customizations_content_id_fkey"
-            columns: ["content_id"]
-            isOneToOne: true
-            referencedRelation: "contents"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       pending_supporters: {
         Row: {
           claimed_at: string | null
