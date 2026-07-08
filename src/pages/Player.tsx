@@ -460,7 +460,7 @@ const Player = () => {
                     const others = Math.min(62, 53 + (growthBucket % 4) * 2);
                     return (
                       <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-green-500/15 border border-green-500/40 text-green-400 px-2.5 py-1 text-[11px] font-semibold">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-green-500/15 border border-green-500/40 text-green-400 px-2.5 py-1 text-[11px] font-bold">
                           <span className="relative flex h-2 w-2">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
                             <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
@@ -471,8 +471,8 @@ const Player = () => {
                     );
                   })()}
 
-                  <p className="text-foreground/90 text-xs sm:text-sm mb-5 max-w-md">
-                    This title was hand-subtitled by our team and carefully chosen for this community. Supporters get exclusive access to rare queer titles, cinema premieres, and new releases every month — a catalog built by fans, for fans.
+                  <p className="text-foreground text-xs sm:text-sm mb-5 max-w-md font-bold">
+                    You just found something rare. This title was hand-subtitled by our team and it doesn't exist anywhere else on the internet. Supporters get exclusive access to rare queer titles, cinema premieres, and new releases every month — a catalog built by fans, for fans. The only way to watch it is here.
                   </p>
                 </>
               )}
@@ -485,7 +485,7 @@ const Player = () => {
                 ].map((perk) => (
                   <div key={perk.title} className="rounded-lg bg-card/70 border border-border px-2 py-3 text-center backdrop-blur-sm">
                     <div className="text-lg leading-none mb-1">{perk.icon}</div>
-                    <div className="text-[11px] sm:text-xs font-semibold text-foreground leading-tight">{perk.title}</div>
+                    <div className="text-[11px] sm:text-xs font-bold text-foreground leading-tight">{perk.title}</div>
                   </div>
                 ))}
               </div>
