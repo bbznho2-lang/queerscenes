@@ -169,8 +169,44 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
               </div>
             );
           })()}
+
+          <div className="pt-4 border-t border-white/5">
+            <Button
+              variant="outline"
+              onClick={() => setConfirmDelete(true)}
+              className="w-full border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete account permanently
+            </Button>
+            <p className="text-[11px] text-muted-foreground mt-2 text-center">
+              You can sign up again later with the same email.
+            </p>
+          </div>
         </div>
       </DialogContent>
+
+      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete your account?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete your account, profile, watchlist and activity.
+              This action cannot be undone. You can sign up again later with the same email ({email}).
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteAccount}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? "Deleting..." : "Yes, delete forever"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 };
