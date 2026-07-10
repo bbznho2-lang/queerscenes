@@ -26,6 +26,23 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
   const [isPremium, setIsPremium] = useState(false);
   const [premiumPlan, setPremiumPlan] = useState<string | null>(null);
   const [premiumExpiresAt, setPremiumExpiresAt] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    try {
+      const { error } = await supabase.functions.invoke("delete-my-account");
+      if (error) throw error;
+      toast.success("Account deleted. You can sign up again with the same email.");
+      await supabase.auth.signOut();
+      onOpenChange(false);
+      window.location.href = "/";
+    } catch (e: any) {
+      toast.error(e?.message || "Failed to delete account");
+      setDeleting(false);
+    }
+  };
 
   useEffect(() => {
     if (!open) return;
