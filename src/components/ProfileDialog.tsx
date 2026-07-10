@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera } from "lucide-react";
+import { Camera, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -22,6 +26,23 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
   const [isPremium, setIsPremium] = useState(false);
   const [premiumPlan, setPremiumPlan] = useState<string | null>(null);
   const [premiumExpiresAt, setPremiumExpiresAt] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    try {
+      const { error } = await supabase.functions.invoke("delete-my-account");
+      if (error) throw error;
+      toast.success("Account deleted. You can sign up again with the same email.");
+      await supabase.auth.signOut();
+      onOpenChange(false);
+      window.location.href = "/";
+    } catch (e: any) {
+      toast.error(e?.message || "Failed to delete account");
+      setDeleting(false);
+    }
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -148,8 +169,44 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
               </div>
             );
           })()}
+
+          <div className="pt-4 border-t border-white/5">
+            <Button
+              variant="outline"
+              onClick={() => setConfirmDelete(true)}
+              className="w-full border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete account permanently
+            </Button>
+            <p className="text-[11px] text-muted-foreground mt-2 text-center">
+              You can sign up again later with the same email.
+            </p>
+          </div>
         </div>
       </DialogContent>
+
+      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete your account?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete your account, profile, watchlist and activity.
+              This action cannot be undone. You can sign up again later with the same email ({email}).
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteAccount}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? "Deleting..." : "Yes, delete forever"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 };
