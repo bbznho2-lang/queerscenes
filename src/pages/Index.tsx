@@ -65,15 +65,22 @@ const Index = () => {
     if (typeof window === "undefined") return false;
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
 
-    // If caller wants the supporter card specifically (and we're on mobile),
-    // scroll directly to it so users who clicked "Yes, become a Supporter"
-    // see the Supporter offer first instead of the Free card.
-    if (target === "supporter" && isMobile) {
+    const performScroll = (el: HTMLElement, offset: number) => {
+      const run = () => {
+        const rect = el.getBoundingClientRect();
+        const targetTop = window.scrollY + rect.top - offset;
+        window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+      };
+      // Defer until layout/animations settle so we land on the card, not above it.
+      requestAnimationFrame(() => requestAnimationFrame(run));
+    };
+
+    // If caller wants the supporter card specifically, scroll directly to it
+    // so users see the Supporter offer first instead of the Free card.
+    if (target === "supporter") {
       const sup = document.getElementById("supporter-card");
       if (sup) {
-        const rect = sup.getBoundingClientRect();
-        const targetTop = window.scrollY + rect.top - 16;
-        window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+        performScroll(sup, isMobile ? 80 : 24);
         return true;
       }
     }
@@ -81,10 +88,7 @@ const Index = () => {
     const el = document.getElementById("planos-cards") || document.getElementById("planos");
     if (!el) return false;
 
-    const rect = el.getBoundingClientRect();
-    const offset = isMobile ? 150 : 16;
-    const targetTop = window.scrollY + rect.top - offset;
-    window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+    performScroll(el, isMobile ? 80 : 16);
     return true;
   }, []);
 
