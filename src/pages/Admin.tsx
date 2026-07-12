@@ -765,8 +765,18 @@ const Admin = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              <Input
+                value={userSearch}
+                onChange={(e) => setUserSearch(e.target.value)}
+                placeholder="Search supporters by name or email..."
+                className="pl-9"
+              />
+            </div>
             {profiles.length > 0 ? (
               <div className="space-y-1">
+
                 <div className="hidden sm:grid grid-cols-[1fr_120px_80px_80px_50px] gap-4 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
                   <span>User</span>
                   <span>Plan</span>
