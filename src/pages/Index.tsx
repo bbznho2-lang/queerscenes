@@ -679,7 +679,7 @@ const Index = () => {
           </motion.div>
 
 
-          {/* Free vs Supporter cards — Supporter first on mobile */}
+          {/* Free vs Supporter cards — Free first */}
           <div id="planos-cards" className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto scroll-mt-24">
 
             {/* FREE */}
