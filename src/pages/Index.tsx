@@ -236,7 +236,7 @@ const Index = () => {
       url.searchParams.delete("supporter");
       url.searchParams.delete("email");
       window.history.replaceState({}, "", url.toString());
-      document.getElementById("login")?.scrollIntoView({ behavior: "smooth" });
+      scrollToLogin();
     };
     void run();
   }, [user]);
@@ -272,7 +272,7 @@ const Index = () => {
       setEmail(trimmedEmail);
       setIsSignUp(false);
       setIsForgot(false);
-      document.getElementById("login")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      scrollToLogin();
       return;
     }
     setCheckoutLoading(priceId);
@@ -420,7 +420,7 @@ const Index = () => {
 
           <motion.div initial="hidden" animate="visible" variants={fade} custom={4} className="flex flex-col items-center gap-3 mx-auto" style={{ maxWidth: 290 }}>
             <button
-              onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() => scrollToLogin()}
               className="w-full flex items-center justify-center gap-2"
               style={{
                 padding: "16px",
@@ -720,7 +720,7 @@ const Index = () => {
                     <li className="flex items-start gap-2 opacity-50"><span className="text-[var(--t3)] mt-0.5">✗</span><span className="text-[var(--t3)] line-through">Early access content</span></li>
                   </ul>
                   <Button
-                    onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
+                    onClick={() => scrollToLogin()}
                     className="qs-btn-primary w-full mt-5 h-11 gap-2"
                   >
                     <Play className="w-4 h-4" /> Join free
@@ -933,7 +933,7 @@ const Index = () => {
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0}>
           <Button
             size="lg"
-            onClick={() => document.getElementById("login")?.scrollIntoView({ behavior: "smooth" })}
+            onClick={() => scrollToLogin()}
             className="text-base sm:text-lg px-10 py-6 sm:py-7 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 glow-purple gap-3"
           >
             ACCESS QUEER SCENES
