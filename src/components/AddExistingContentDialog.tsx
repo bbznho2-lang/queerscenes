@@ -77,11 +77,24 @@ const AddExistingContentDialog = ({ open, onOpenChange, targetSection, onSaved }
       if (fetchErr) throw fetchErr;
 
       for (const item of (items as any[]) || []) {
-        const { id: _id, ...rest } = item;
-        const { error } = await supabase
+        const { id: originalId, ...rest } = item;
+        const { data: inserted, error } = await supabase
           .from("contents")
-          .insert({ ...rest, section: targetSection });
+          .insert({ ...rest, section: targetSection })
+          .select("id")
+          .single();
         if (error) throw error;
+
+        // Duplicate episodes for series/soap operas so the player works
+        const { data: eps } = await (supabase.rpc as any)("admin_get_episodes", { _content_id: originalId });
+        if (Array.isArray(eps) && eps.length > 0 && inserted?.id) {
+          const rows = eps.map((ep: any) => {
+            const { id: _epId, content_id: _cid, created_at: _c, ...epRest } = ep;
+            return { ...epRest, content_id: inserted.id };
+          });
+          const { error: epErr } = await supabase.from("episodes").insert(rows);
+          if (epErr) throw epErr;
+        }
       }
       toast.success(`${selected.size} título(s) adicionado(s) aos Exclusivos!`);
       onSaved();
