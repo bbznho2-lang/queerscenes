@@ -80,7 +80,7 @@ const Index = () => {
     if (target === "supporter") {
       const sup = document.getElementById("supporter-card");
       if (sup) {
-        performScroll(sup, isMobile ? 80 : 24);
+        performScroll(sup, isMobile ? 140 : 40);
         return true;
       }
     }
