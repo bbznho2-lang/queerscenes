@@ -711,7 +711,7 @@ const Index = () => {
 
 
             {/* SUPPORTER */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2}>
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2} className="order-1 md:order-2">
               <div id="supporter-card" className="qs-supporter-panel p-6 sm:p-7 h-full flex flex-col relative overflow-visible scroll-mt-20">
                 <div className="qs-supporter-glow" aria-hidden />
 
