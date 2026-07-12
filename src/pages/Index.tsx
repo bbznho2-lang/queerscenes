@@ -83,9 +83,9 @@ const Index = () => {
         if (isMobile) {
           const plans = document.getElementById("planos");
           const anchor = plans || sup;
-          [0, 90, 220, 450, 800, 1250, 1800].forEach((delay) => {
-            window.setTimeout(() => performScroll(anchor, 0, "auto"), delay);
-          });
+          // Single smooth scroll, then one silent correction after images settle.
+          performScroll(anchor, 0, "smooth");
+          window.setTimeout(() => performScroll(anchor, 0, "auto"), 900);
         } else {
           performScroll(sup, 40);
         }
