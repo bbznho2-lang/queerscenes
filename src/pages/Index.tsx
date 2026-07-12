@@ -65,11 +65,11 @@ const Index = () => {
     if (typeof window === "undefined") return false;
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
 
-    const performScroll = (el: HTMLElement, offset: number) => {
+    const performScroll = (el: HTMLElement, offset: number, scrollBehavior: ScrollBehavior = behavior) => {
       const run = () => {
         const rect = el.getBoundingClientRect();
         const targetTop = window.scrollY + rect.top - offset;
-        window.scrollTo({ top: Math.max(0, targetTop), behavior });
+        window.scrollTo({ top: Math.max(0, targetTop), behavior: scrollBehavior });
       };
       // Defer until layout/animations settle so we land on the card, not above it.
       requestAnimationFrame(() => requestAnimationFrame(run));
@@ -82,7 +82,10 @@ const Index = () => {
       if (sup) {
         if (isMobile) {
           const plans = document.getElementById("planos");
-          performScroll(plans || sup, 0);
+          const anchor = plans || sup;
+          [0, 90, 220, 450, 800, 1250, 1800].forEach((delay) => {
+            window.setTimeout(() => performScroll(anchor, 0, "auto"), delay);
+          });
         } else {
           performScroll(sup, 40);
         }
