@@ -11,6 +11,7 @@ import CommentsSection from "@/components/CommentsSection";
 import { getFunnelVisitorId, trackSupporterEvent, type SupporterEventType } from "@/lib/supporter-tracking";
 import { getEmailRedirectUrl } from "@/lib/auth-urls";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { DEFAULT_PAYWALL_TEXT } from "@/components/PaywallCustomizationsAdmin";
 
 
 interface ContentItem {
@@ -535,7 +536,7 @@ const Player = () => {
                   })()}
 
                   <p className="text-foreground text-xs sm:text-sm mb-5 max-w-md font-bold whitespace-pre-wrap">
-                    {paywallCustom?.custom_text?.trim() || "You just found something rare. This title was hand-subtitled by our team and it doesn't exist anywhere else on the internet. Supporters get exclusive access to rare queer titles, cinema premieres, and new releases every month — a catalog built by fans, for fans. The only way to watch it is here."}
+                    {paywallCustom?.custom_text?.trim() || DEFAULT_PAYWALL_TEXT}
                   </p>
                 </>
               )}
