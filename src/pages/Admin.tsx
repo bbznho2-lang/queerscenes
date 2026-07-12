@@ -383,7 +383,7 @@ const Admin = () => {
     }
   };
 
-  const totalPages = Math.max(1, Math.ceil(profiles.length / USERS_PER_PAGE));
+  
   const sortedProfiles = useMemo(() => {
     // Priority: 2 = expired supporter (top), 1 = active supporter, 0 = free
     const supporterPriority = (p: Profile) => {
