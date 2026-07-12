@@ -679,11 +679,11 @@ const Index = () => {
           </motion.div>
 
 
-          {/* Free vs Supporter cards — Supporter first on mobile */}
+          {/* Free vs Supporter cards — Free first */}
           <div id="planos-cards" className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto scroll-mt-24">
 
             {/* FREE */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1} className="order-2 md:order-1">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
 
               <div className="qs-card-lg p-6 sm:p-7 h-full flex flex-col">
                 <div className="text-center pb-2">
@@ -719,7 +719,7 @@ const Index = () => {
 
 
             {/* SUPPORTER */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2} className="order-1 md:order-2">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2}>
               <div id="supporter-card" className="qs-supporter-panel p-6 sm:p-7 h-full flex flex-col relative overflow-visible scroll-mt-20">
                 <div className="qs-supporter-glow" aria-hidden />
 
