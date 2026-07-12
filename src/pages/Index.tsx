@@ -75,12 +75,18 @@ const Index = () => {
       requestAnimationFrame(() => requestAnimationFrame(run));
     };
 
-    // If caller wants the supporter card specifically, scroll directly to it
-    // so users see the Supporter offer first instead of the Free card.
+    // Center the supporter card vertically in the viewport on mobile so it
+    // doesn't stick to the very top (which hid the pill/header).
     if (target === "supporter") {
       const sup = document.getElementById("supporter-card");
       if (sup) {
-        performScroll(sup, isMobile ? 140 : 40);
+        if (isMobile) {
+          const rect = sup.getBoundingClientRect();
+          const centerOffset = Math.max(16, (window.innerHeight - rect.height) / 2);
+          performScroll(sup, centerOffset);
+        } else {
+          performScroll(sup, 40);
+        }
         return true;
       }
     }
@@ -91,6 +97,7 @@ const Index = () => {
     performScroll(el, isMobile ? 80 : 16);
     return true;
   }, []);
+
 
   const scrollToLogin = useCallback(() => {
     if (typeof window === "undefined") return;
