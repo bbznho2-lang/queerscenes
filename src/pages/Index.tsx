@@ -71,7 +71,7 @@ const Index = () => {
         const targetTop = window.scrollY + rect.top - offset;
         window.scrollTo({ top: Math.max(0, targetTop), behavior: scrollBehavior });
       };
-      // Defer until layout/animations settle so we land on the card, not above it.
+      // Defer until the current paint settles, then scroll exactly once.
       requestAnimationFrame(() => requestAnimationFrame(run));
     };
 
@@ -83,9 +83,8 @@ const Index = () => {
         if (isMobile) {
           const plans = document.getElementById("planos");
           const anchor = plans || sup;
-          // Single smooth scroll, then one silent correction after images settle.
+          // One smooth scroll only; no delayed correction to avoid the final flicker.
           performScroll(anchor, 0, "smooth");
-          window.setTimeout(() => performScroll(anchor, 0, "auto"), 900);
         } else {
           performScroll(sup, 40);
         }
