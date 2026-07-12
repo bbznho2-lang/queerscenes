@@ -88,6 +88,7 @@ const Admin = () => {
   const [premiumEmail, setPremiumEmail] = useState("");
   const [addingPremium, setAddingPremium] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [userSearch, setUserSearch] = useState("");
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [clicksPage, setClicksPage] = useState(1);
   const [supporterEvents, setSupporterEvents] = useState<Array<{ id: string; event_type: string; source: string | null; user_id: string | null; content_id: string | null; created_at: string; metadata: any }>>([]);
