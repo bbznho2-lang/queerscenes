@@ -642,41 +642,7 @@ const Browse = () => {
         </section>
 
 
-        {/* EXCLUSIVES */}
-        <section id="exclusivos" className="py-10 sm:py-16 px-4">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-6 gap-3">
-              <h2 className="text-xl sm:text-2xl font-black flex items-center gap-2">
-                <span>⭐</span> <span className="rainbow-text">Queer Scenes Exclusives</span>
-              </h2>
-              <div className="flex items-center gap-2">
-                {isAdmin && (
-                  <>
-                    <button onClick={() => setAddExistingOpen(true)} className="h-9 px-3 rounded-full bg-secondary/10 hover:bg-secondary/20 flex items-center gap-1.5 transition-colors text-xs font-medium text-secondary" title="Adicionar título existente">
-                      <Search className="w-3.5 h-3.5" /> Existente
-                    </button>
-                    <button onClick={() => handleNew("exclusivos", "filme")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Criar novo exclusivo">
-                      <Plus className="w-5 h-5 text-primary" />
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-            {exclusivos.length > 0 ? (
-              <AutoScrollRow>
-                {exclusivos.map((e) => (
-                  <div key={e.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={e} isAdmin={isAdmin} onEdit={() => handleEdit(e)} onDelete={() => handleDelete(e.id)} onClickTrack={() => trackClick(e.id)} isInWatchlist={watchlistIds.has(e.id)} onToggleWatchlist={() => toggleWatchlist(e.id)} userIsPremium={userIsPremium} onRemoveFromExclusives={() => handleRemoveFromExclusives(e)} />
-                  </div>
-                ))}
-              </AutoScrollRow>
-            ) : (
-              <p className="text-muted-foreground text-center py-8">
-                {isAdmin ? "Click + to add exclusives" : "New content coming soon!"}
-              </p>
-            )}
-          </div>
-        </section>
+
 
         {/* MY LIST */}
         <section id="minha-lista" className="py-10 sm:py-16 px-4">
