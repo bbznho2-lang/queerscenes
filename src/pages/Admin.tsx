@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Users, BarChart3, Crown, Mail, Eye, Calendar, CreditCard, Trash2, ChevronLeft, ChevronRight, MessageCircle, MousePointerClick, Send, X } from "lucide-react";
+import { ArrowLeft, Users, BarChart3, Crown, Mail, Eye, Calendar, CreditCard, Trash2, ChevronLeft, ChevronRight, MessageCircle, MousePointerClick, Send, X, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -88,6 +88,7 @@ const Admin = () => {
   const [premiumEmail, setPremiumEmail] = useState("");
   const [addingPremium, setAddingPremium] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [userSearch, setUserSearch] = useState("");
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [clicksPage, setClicksPage] = useState(1);
   const [supporterEvents, setSupporterEvents] = useState<Array<{ id: string; event_type: string; source: string | null; user_id: string | null; content_id: string | null; created_at: string; metadata: any }>>([]);
@@ -382,7 +383,7 @@ const Admin = () => {
     }
   };
 
-  const totalPages = Math.max(1, Math.ceil(profiles.length / USERS_PER_PAGE));
+  
   const sortedProfiles = useMemo(() => {
     // Priority: 2 = expired supporter (top), 1 = active supporter, 0 = free
     const supporterPriority = (p: Profile) => {
@@ -402,10 +403,24 @@ const Admin = () => {
     });
   }, [profiles]);
 
+  const filteredProfiles = useMemo(() => {
+    const q = userSearch.trim().toLowerCase();
+    if (!q) return sortedProfiles;
+    return sortedProfiles.filter((p) => {
+      const name = `${p.first_name || ""} ${p.last_name || ""}`.toLowerCase();
+      return (p.email || "").toLowerCase().includes(q) || name.includes(q);
+    });
+  }, [sortedProfiles, userSearch]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredProfiles.length / USERS_PER_PAGE));
+
+  useEffect(() => { setCurrentPage(1); }, [userSearch]);
+
   const paginatedProfiles = useMemo(() => {
     const start = (currentPage - 1) * USERS_PER_PAGE;
-    return sortedProfiles.slice(start, start + USERS_PER_PAGE);
-  }, [sortedProfiles, currentPage]);
+    return filteredProfiles.slice(start, start + USERS_PER_PAGE);
+  }, [filteredProfiles, currentPage]);
+
 
   const totalClickPages = Math.max(1, Math.ceil(aggregatedClicks.length / CLICKS_PER_PAGE));
   const paginatedClicks = useMemo(() => {
@@ -750,8 +765,18 @@ const Admin = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              <Input
+                value={userSearch}
+                onChange={(e) => setUserSearch(e.target.value)}
+                placeholder="Search supporters by name or email..."
+                className="pl-9"
+              />
+            </div>
             {profiles.length > 0 ? (
               <div className="space-y-1">
+
                 <div className="hidden sm:grid grid-cols-[1fr_120px_80px_80px_50px] gap-4 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
                   <span>User</span>
                   <span>Plan</span>
@@ -867,7 +892,7 @@ const Admin = () => {
                 })}
                 {totalPages > 1 && (
                   <div className="flex items-center justify-between pt-4 border-t border-border mt-2">
-                    <span className="text-xs text-muted-foreground">Page {currentPage} of {totalPages} ({profiles.length} users)</span>
+                    <span className="text-xs text-muted-foreground">Page {currentPage} of {totalPages} ({filteredProfiles.length} {userSearch ? `of ${profiles.length}` : ""} users)</span>
                     <div className="flex items-center gap-2">
                       <Button variant="outline" size="sm" disabled={currentPage <= 1} onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}><ChevronLeft className="w-4 h-4" /></Button>
                       <Button variant="outline" size="sm" disabled={currentPage >= totalPages} onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}><ChevronRight className="w-4 h-4" /></Button>
