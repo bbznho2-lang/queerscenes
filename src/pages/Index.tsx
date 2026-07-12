@@ -61,7 +61,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, isAdmin, signIn, signUp } = useAuth();
 
-  const scrollToPlanCards = useCallback((target?: "supporter" | "plans") => {
+  const scrollToPlanCards = useCallback((target?: "supporter" | "plans", behavior: ScrollBehavior = "smooth") => {
     if (typeof window === "undefined") return false;
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
 
@@ -69,7 +69,7 @@ const Index = () => {
       const run = () => {
         const rect = el.getBoundingClientRect();
         const targetTop = window.scrollY + rect.top - offset;
-        window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+        window.scrollTo({ top: Math.max(0, targetTop), behavior });
       };
       // Defer until layout/animations settle so we land on the card, not above it.
       requestAnimationFrame(() => requestAnimationFrame(run));
@@ -182,33 +182,11 @@ const Index = () => {
     const wantsPlans = hash === "#planos" || hash === "#planos-cards";
     if (!wantsSupporter && !wantsPlans) return;
 
-    // Keep re-anchoring the scroll for a short window so late-loading content
-    // above (images, banners) that pushes the target down doesn't leave the
-    // user looking at the wrong card. Stops on any user interaction.
-    let cancelled = false;
-    let retryTimer: number | undefined;
-    const startedAt = Date.now();
-    const MAX_MS = 2500;
-    const tryScroll = () => {
-      if (cancelled) return;
-      scrollToPlanCards(wantsSupporter ? "supporter" : "plans");
-      if (Date.now() - startedAt < MAX_MS) {
-        retryTimer = window.setTimeout(tryScroll, 200);
-      }
-    };
-    const stop = () => { cancelled = true; if (retryTimer) clearTimeout(retryTimer); };
-    window.addEventListener("wheel", stop, { passive: true, once: true });
-    window.addEventListener("touchstart", stop, { passive: true, once: true });
-    window.addEventListener("keydown", stop, { once: true });
-
-    const timeout = window.setTimeout(tryScroll, 50);
+    const timeout = window.setTimeout(() => {
+      scrollToPlanCards(wantsSupporter ? "supporter" : "plans", "auto");
+    }, 350);
     return () => {
-      cancelled = true;
       clearTimeout(timeout);
-      if (retryTimer) clearTimeout(retryTimer);
-      window.removeEventListener("wheel", stop);
-      window.removeEventListener("touchstart", stop);
-      window.removeEventListener("keydown", stop);
     };
   }, [scrollToPlanCards]);
 
@@ -255,7 +233,7 @@ const Index = () => {
       source,
       user_id: user?.id ?? null,
     });
-    scrollToPlanCards();
+    scrollToPlanCards("supporter");
   }, [scrollToPlanCards, user?.id]);
 
   const startCheckout = async (priceId: string) => {
