@@ -88,6 +88,21 @@ const Index = () => {
     return true;
   }, []);
 
+  const scrollToLogin = useCallback(() => {
+    if (typeof window === "undefined") return;
+    const doScroll = () => {
+      const el = document.getElementById("login");
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const isMobile = window.matchMedia("(max-width: 767px)").matches;
+      const offset = isMobile ? 80 : 16;
+      const targetTop = window.scrollY + rect.top - offset;
+      window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+    };
+    // Defer so any in-flight layout/animation settles before we measure.
+    requestAnimationFrame(() => requestAnimationFrame(doScroll));
+  }, []);
+
   useEffect(() => {
     const loadCatalog = async () => {
       const { data, error } = await supabase
