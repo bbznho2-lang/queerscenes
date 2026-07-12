@@ -182,20 +182,20 @@ const Index = () => {
     const wantsPlans = hash === "#planos" || hash === "#planos-cards";
     if (!wantsSupporter && !wantsPlans) return;
 
-    // Try once after mount, and retry only until the target element exists
-    // (then stop). This prevents the page from fighting the user's manual scroll.
+    // Keep re-anchoring the scroll for a short window so late-loading content
+    // above (images, banners) that pushes the target down doesn't leave the
+    // user looking at the wrong card. Stops on any user interaction.
     let cancelled = false;
     let retryTimer: number | undefined;
-    let attempts = 0;
+    const startedAt = Date.now();
+    const MAX_MS = 2500;
     const tryScroll = () => {
       if (cancelled) return;
-      const didScroll = scrollToPlanCards(wantsSupporter ? "supporter" : "plans");
-      if (didScroll) return; // done — do NOT keep re-scrolling
-      if (++attempts < 30) {
-        retryTimer = window.setTimeout(tryScroll, 100);
+      scrollToPlanCards(wantsSupporter ? "supporter" : "plans");
+      if (Date.now() - startedAt < MAX_MS) {
+        retryTimer = window.setTimeout(tryScroll, 200);
       }
     };
-    // Stop retrying as soon as the user interacts with the page.
     const stop = () => { cancelled = true; if (retryTimer) clearTimeout(retryTimer); };
     window.addEventListener("wheel", stop, { passive: true, once: true });
     window.addEventListener("touchstart", stop, { passive: true, once: true });
