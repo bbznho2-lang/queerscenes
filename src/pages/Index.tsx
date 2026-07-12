@@ -75,15 +75,14 @@ const Index = () => {
       requestAnimationFrame(() => requestAnimationFrame(run));
     };
 
-    // Center the supporter card vertically in the viewport on mobile so it
-    // doesn't stick to the very top (which hid the pill/header).
+    // On mobile, land on the plans heading so the Supporter card appears in
+    // the same framed position as the user expects instead of sticking to top.
     if (target === "supporter") {
       const sup = document.getElementById("supporter-card");
       if (sup) {
         if (isMobile) {
-          const rect = sup.getBoundingClientRect();
-          const centerOffset = Math.max(16, (window.innerHeight - rect.height) / 2);
-          performScroll(sup, centerOffset);
+          const plans = document.getElementById("planos");
+          performScroll(plans || sup, 0);
         } else {
           performScroll(sup, 40);
         }
