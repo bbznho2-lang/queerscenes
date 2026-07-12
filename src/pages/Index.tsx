@@ -75,19 +75,12 @@ const Index = () => {
       requestAnimationFrame(() => requestAnimationFrame(run));
     };
 
-    // On mobile, land on the plans heading so the Supporter card appears in
-    // the same framed position as the user expects instead of sticking to top.
+    // For the Supporter CTA, always land directly on the Supporter card.
+    // Mobile uses an instant jump to avoid smooth-scroll bounce/layout flicker.
     if (target === "supporter") {
       const sup = document.getElementById("supporter-card");
       if (sup) {
-        if (isMobile) {
-          const plans = document.getElementById("planos");
-          const anchor = plans || sup;
-          // One smooth scroll only; no delayed correction to avoid the final flicker.
-          performScroll(anchor, 0, "smooth");
-        } else {
-          performScroll(sup, 40);
-        }
+        performScroll(sup, isMobile ? 14 : 40, isMobile ? "auto" : behavior);
         return true;
       }
     }
