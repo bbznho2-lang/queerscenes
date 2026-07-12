@@ -403,10 +403,24 @@ const Admin = () => {
     });
   }, [profiles]);
 
+  const filteredProfiles = useMemo(() => {
+    const q = userSearch.trim().toLowerCase();
+    if (!q) return sortedProfiles;
+    return sortedProfiles.filter((p) => {
+      const name = `${p.first_name || ""} ${p.last_name || ""}`.toLowerCase();
+      return (p.email || "").toLowerCase().includes(q) || name.includes(q);
+    });
+  }, [sortedProfiles, userSearch]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredProfiles.length / USERS_PER_PAGE));
+
+  useEffect(() => { setCurrentPage(1); }, [userSearch]);
+
   const paginatedProfiles = useMemo(() => {
     const start = (currentPage - 1) * USERS_PER_PAGE;
-    return sortedProfiles.slice(start, start + USERS_PER_PAGE);
-  }, [sortedProfiles, currentPage]);
+    return filteredProfiles.slice(start, start + USERS_PER_PAGE);
+  }, [filteredProfiles, currentPage]);
+
 
   const totalClickPages = Math.max(1, Math.ceil(aggregatedClicks.length / CLICKS_PER_PAGE));
   const paginatedClicks = useMemo(() => {
