@@ -665,20 +665,18 @@ const Index = () => {
               Start free. Upgrade anytime.
             </p>
 
-            <div className="md:hidden mt-3 text-center text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "#c084fc" }}>
-              Scroll down to see Supporter ↓
-            </div>
-
             {!showSubscribeActions && !authLoading && !profileLoading && (
               <p className="mt-3 text-sm font-medium" style={{ color: "#a855f7" }}>Your account already has Supporter access. 💜</p>
             )}
           </motion.div>
 
 
-          {/* Free vs Supporter cards */}
+          {/* Free vs Supporter cards — Supporter first on mobile */}
           <div id="planos-cards" className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto scroll-mt-24">
+
             {/* FREE */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1} className="order-2 md:order-1">
+
               <div className="qs-card-lg p-6 sm:p-7 h-full flex flex-col">
                 <div className="text-center pb-2">
                   <div className="text-4xl mb-1">🌈</div>
@@ -713,7 +711,7 @@ const Index = () => {
 
 
             {/* SUPPORTER */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2}>
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2} className="order-1 md:order-2">
               <div id="supporter-card" className="qs-supporter-panel p-6 sm:p-7 h-full flex flex-col relative overflow-visible scroll-mt-20">
                 <div className="qs-supporter-glow" aria-hidden />
 
