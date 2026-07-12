@@ -892,7 +892,7 @@ const Admin = () => {
                 })}
                 {totalPages > 1 && (
                   <div className="flex items-center justify-between pt-4 border-t border-border mt-2">
-                    <span className="text-xs text-muted-foreground">Page {currentPage} of {totalPages} ({profiles.length} users)</span>
+                    <span className="text-xs text-muted-foreground">Page {currentPage} of {totalPages} ({filteredProfiles.length} {userSearch ? `of ${profiles.length}` : ""} users)</span>
                     <div className="flex items-center gap-2">
                       <Button variant="outline" size="sm" disabled={currentPage <= 1} onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}><ChevronLeft className="w-4 h-4" /></Button>
                       <Button variant="outline" size="sm" disabled={currentPage >= totalPages} onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}><ChevronRight className="w-4 h-4" /></Button>
