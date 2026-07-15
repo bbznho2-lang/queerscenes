@@ -93,19 +93,21 @@ const Index = () => {
   }, []);
 
 
-  const scrollToLogin = useCallback(() => {
+  const scrollToLogin = useCallback((behavior: ScrollBehavior = "smooth") => {
     if (typeof window === "undefined") return;
-    const doScroll = () => {
+    const doScroll = (scrollBehavior: ScrollBehavior = behavior) => {
       const el = document.getElementById("login");
       if (!el) return;
       const rect = el.getBoundingClientRect();
       const isMobile = window.matchMedia("(max-width: 767px)").matches;
       const offset = isMobile ? 80 : 16;
       const targetTop = window.scrollY + rect.top - offset;
-      window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+      window.scrollTo({ top: Math.max(0, targetTop), behavior: scrollBehavior });
     };
-    // Defer so any in-flight layout/animation settles before we measure.
-    requestAnimationFrame(() => requestAnimationFrame(doScroll));
+    // Re-measure after the landing rows/images settle so the CTA doesn't stop on the banner rows.
+    requestAnimationFrame(() => requestAnimationFrame(() => doScroll(behavior)));
+    window.setTimeout(() => doScroll("auto"), 350);
+    window.setTimeout(() => doScroll("auto"), 900);
   }, []);
 
   useEffect(() => {
