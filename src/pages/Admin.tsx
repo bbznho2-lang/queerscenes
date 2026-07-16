@@ -281,6 +281,14 @@ const Admin = () => {
       .limit(500) as any;
     setSupporterEvents((events as any) || []);
 
+    // Fetch account deletion log
+    const { data: dels } = await supabase
+      .from("account_deletions" as any)
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(500) as any;
+    setDeletions((dels as any) || []);
+
     if (showLoading) setLoadingData(false);
 
   };
