@@ -65,6 +65,13 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Snapshot profile before wiping so we can log the deletion
+    const { data: profileSnap } = await adminClient
+      .from("profiles")
+      .select("email, first_name, last_name, is_premium, premium_plan, premium_expires_at")
+      .eq("user_id", user_id)
+      .maybeSingle();
+
     const cleanupTargets = [
       adminClient.from("content_clicks").delete().eq("user_id", user_id),
       adminClient.from("watchlist").delete().eq("user_id", user_id),
@@ -82,6 +89,18 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    await adminClient.from("account_deletions").insert({
+      deleted_user_id: user_id,
+      email: profileSnap?.email ?? null,
+      first_name: profileSnap?.first_name ?? null,
+      last_name: profileSnap?.last_name ?? null,
+      was_premium: Boolean(profileSnap?.is_premium),
+      premium_plan: profileSnap?.premium_plan ?? null,
+      premium_expires_at: profileSnap?.premium_expires_at ?? null,
+      deleted_by: "admin",
+      deleted_by_user_id: caller.id,
+    });
 
     const { error } = await adminClient.auth.admin.deleteUser(user_id);
     if (error && !error.message.toLowerCase().includes("not found")) {
