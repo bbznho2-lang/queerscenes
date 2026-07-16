@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_deletions: {
+        Row: {
+          created_at: string
+          deleted_by: string
+          deleted_by_user_id: string | null
+          deleted_user_id: string
+          email: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          premium_expires_at: string | null
+          premium_plan: string | null
+          was_premium: boolean
+        }
+        Insert: {
+          created_at?: string
+          deleted_by?: string
+          deleted_by_user_id?: string | null
+          deleted_user_id: string
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          premium_expires_at?: string | null
+          premium_plan?: string | null
+          was_premium?: boolean
+        }
+        Update: {
+          created_at?: string
+          deleted_by?: string
+          deleted_by_user_id?: string | null
+          deleted_user_id?: string
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          premium_expires_at?: string | null
+          premium_plan?: string | null
+          was_premium?: boolean
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           chat_id: string

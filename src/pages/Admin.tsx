@@ -93,6 +93,9 @@ const Admin = () => {
   const [clicksPage, setClicksPage] = useState(1);
   const [supporterEvents, setSupporterEvents] = useState<Array<{ id: string; event_type: string; source: string | null; user_id: string | null; content_id: string | null; created_at: string; metadata: any }>>([]);
   const [eventsPage, setEventsPage] = useState(1);
+  const [deletions, setDeletions] = useState<Array<{ id: string; deleted_user_id: string; email: string | null; first_name: string | null; last_name: string | null; was_premium: boolean; premium_plan: string | null; premium_expires_at: string | null; deleted_by: string; created_at: string }>>([]);
+  const [deletionsPage, setDeletionsPage] = useState(1);
+  const DELETIONS_PER_PAGE = 10;
   // Independent signup timestamps for the "last 14 days" chart. Kept separate from
   // the paginated `profiles` list so realtime re-fetch races cannot truncate it.
   const [recentSignupDates, setRecentSignupDates] = useState<string[]>([]);
@@ -277,6 +280,14 @@ const Admin = () => {
       .order("created_at", { ascending: false })
       .limit(500) as any;
     setSupporterEvents((events as any) || []);
+
+    // Fetch account deletion log
+    const { data: dels } = await supabase
+      .from("account_deletions" as any)
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(500) as any;
+    setDeletions((dels as any) || []);
 
     if (showLoading) setLoadingData(false);
 
@@ -658,7 +669,71 @@ const Admin = () => {
           );
         })()}
 
+        {/* Account Deletions Log */}
+        {(() => {
+          const totalDelPages = Math.max(1, Math.ceil(deletions.length / DELETIONS_PER_PAGE));
+          const start = (deletionsPage - 1) * DELETIONS_PER_PAGE;
+          const pageDels = deletions.slice(start, start + DELETIONS_PER_PAGE);
+          return (
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-foreground">
+                  <Trash2 className="w-5 h-5 text-destructive" />
+                  Account Deletions
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {deletions.length > 0 ? (
+                  <div className="space-y-1">
+                    <div className="hidden sm:grid grid-cols-[1.5fr_1fr_110px_110px_150px] gap-3 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
+                      <span>Email</span>
+                      <span>Name</span>
+                      <span>Was supporter</span>
+                      <span>Deleted by</span>
+                      <span className="text-right">When</span>
+                    </div>
+                    {pageDels.map((d) => {
+                      const name = [d.first_name, d.last_name].filter(Boolean).join(" ") || "—";
+                      return (
+                        <div key={d.id} className="grid grid-cols-1 sm:grid-cols-[1.5fr_1fr_110px_110px_150px] gap-1 sm:gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/30 transition-colors border-b border-border/30 last:border-0">
+                          <span className="text-sm text-foreground truncate">{d.email || "—"}</span>
+                          <span className="text-sm text-muted-foreground truncate">{name}</span>
+                          <span className={`text-xs font-medium ${d.was_premium ? "text-secondary" : "text-muted-foreground"}`}>
+                            {d.was_premium ? `Yes${d.premium_plan ? ` · ${d.premium_plan}` : ""}` : "No"}
+                          </span>
+                          <span className="text-xs text-muted-foreground capitalize">{d.deleted_by}</span>
+                          <span className="text-xs text-muted-foreground sm:text-right">
+                            {new Date(d.created_at).toLocaleString(undefined, { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                          </span>
+                        </div>
+                      );
+                    })}
+                    {totalDelPages > 1 && (
+                      <div className="flex items-center justify-between pt-4 border-t border-border mt-2">
+                        <span className="text-xs text-muted-foreground">
+                          Page {deletionsPage} of {totalDelPages} ({deletions.length} deletions)
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <Button variant="outline" size="sm" disabled={deletionsPage <= 1} onClick={() => setDeletionsPage((p) => Math.max(1, p - 1))}>
+                            <ChevronLeft className="w-4 h-4" />
+                          </Button>
+                          <Button variant="outline" size="sm" disabled={deletionsPage >= totalDelPages} onClick={() => setDeletionsPage((p) => Math.min(totalDelPages, p + 1))}>
+                            <ChevronRight className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-center py-6 text-sm">No account deletions yet.</p>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })()}
+
         {/* User Click Details - Aggregated */}
+
 
         <Card className="bg-card border-border">
           <CardHeader>

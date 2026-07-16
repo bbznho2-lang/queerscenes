@@ -36,6 +36,13 @@ Deno.serve(async (req) => {
 
     const adminClient = createClient(supabaseUrl, serviceRoleKey);
 
+    // Snapshot profile before wiping so we can log the deletion
+    const { data: profileSnap } = await adminClient
+      .from("profiles")
+      .select("email, first_name, last_name, is_premium, premium_plan, premium_expires_at")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
     const cleanupResults = await Promise.all([
       adminClient.from("content_clicks").delete().eq("user_id", user.id),
       adminClient.from("watchlist").delete().eq("user_id", user.id),
@@ -50,6 +57,18 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    await adminClient.from("account_deletions").insert({
+      deleted_user_id: user.id,
+      email: profileSnap?.email ?? user.email ?? null,
+      first_name: profileSnap?.first_name ?? null,
+      last_name: profileSnap?.last_name ?? null,
+      was_premium: Boolean(profileSnap?.is_premium),
+      premium_plan: profileSnap?.premium_plan ?? null,
+      premium_expires_at: profileSnap?.premium_expires_at ?? null,
+      deleted_by: "self",
+      deleted_by_user_id: user.id,
+    });
 
     const { error } = await adminClient.auth.admin.deleteUser(user.id);
     if (error && !error.message.toLowerCase().includes("not found")) {
