@@ -93,6 +93,9 @@ const Admin = () => {
   const [clicksPage, setClicksPage] = useState(1);
   const [supporterEvents, setSupporterEvents] = useState<Array<{ id: string; event_type: string; source: string | null; user_id: string | null; content_id: string | null; created_at: string; metadata: any }>>([]);
   const [eventsPage, setEventsPage] = useState(1);
+  const [deletions, setDeletions] = useState<Array<{ id: string; deleted_user_id: string; email: string | null; first_name: string | null; last_name: string | null; was_premium: boolean; premium_plan: string | null; premium_expires_at: string | null; deleted_by: string; created_at: string }>>([]);
+  const [deletionsPage, setDeletionsPage] = useState(1);
+  const DELETIONS_PER_PAGE = 10;
   // Independent signup timestamps for the "last 14 days" chart. Kept separate from
   // the paginated `profiles` list so realtime re-fetch races cannot truncate it.
   const [recentSignupDates, setRecentSignupDates] = useState<string[]>([]);
