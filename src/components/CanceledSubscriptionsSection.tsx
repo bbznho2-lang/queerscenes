@@ -194,7 +194,7 @@ export default function CanceledSubscriptionsSection() {
           <p className="text-muted-foreground text-center py-6 text-sm">Loading...</p>
         ) : rows.length > 0 ? (
           <div className="space-y-1">
-            <div className="hidden sm:grid grid-cols-[1.5fr_1fr_100px_130px_40px] gap-3 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
+            <div className="hidden sm:grid grid-cols-[1.5fr_1fr_100px_120px_80px] gap-3 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
               <span>Email</span>
               <span>Name</span>
               <span>Plan</span>
@@ -202,7 +202,7 @@ export default function CanceledSubscriptionsSection() {
               <span />
             </div>
             {pageRows.map((r) => (
-              <div key={r.id} className="grid grid-cols-1 sm:grid-cols-[1.5fr_1fr_100px_130px_40px] gap-1 sm:gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/30 transition-colors border-b border-border/30 last:border-0 items-center">
+              <div key={r.id} className="grid grid-cols-1 sm:grid-cols-[1.5fr_1fr_100px_120px_80px] gap-1 sm:gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/30 transition-colors border-b border-border/30 last:border-0 items-center">
                 <span className="text-sm text-foreground truncate" title={r.email}>{r.email}</span>
                 <span className="text-sm text-muted-foreground truncate">{r.name || "—"}</span>
                 <span className="text-xs capitalize text-muted-foreground">{r.plan || "—"}</span>
