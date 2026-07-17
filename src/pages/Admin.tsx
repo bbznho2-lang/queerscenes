@@ -21,6 +21,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import SiteNoteAdmin from "@/components/SiteNoteAdmin";
 import PaywallCustomizationsAdmin from "@/components/PaywallCustomizationsAdmin";
 import FeaturedEpisodesAdmin from "@/components/FeaturedEpisodesAdmin";
+import CanceledSubscriptionsSection from "@/components/CanceledSubscriptionsSection";
 
 
 interface Profile {
@@ -731,6 +732,10 @@ const Admin = () => {
             </Card>
           );
         })()}
+
+        <CanceledSubscriptionsSection />
+
+
 
         {/* User Click Details - Aggregated */}
 

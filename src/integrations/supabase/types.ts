@@ -56,6 +56,42 @@ export type Database = {
         }
         Relationships: []
       }
+      canceled_subscriptions: {
+        Row: {
+          canceled_at: string
+          created_at: string
+          email: string
+          id: string
+          name: string | null
+          notes: string | null
+          plan: string | null
+          previous_expires_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          canceled_at?: string
+          created_at?: string
+          email: string
+          id?: string
+          name?: string | null
+          notes?: string | null
+          plan?: string | null
+          previous_expires_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          canceled_at?: string
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string | null
+          notes?: string | null
+          plan?: string | null
+          previous_expires_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           chat_id: string
