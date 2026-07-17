@@ -206,7 +206,7 @@ export default function CanceledSubscriptionsSection() {
                 <span className="text-sm text-foreground truncate" title={r.email}>{r.email}</span>
                 <span className="text-sm text-muted-foreground truncate">{r.name || "—"}</span>
                 <span className="text-xs capitalize text-muted-foreground">{r.plan || "—"}</span>
-                <span className="text-xs text-muted-foreground sm:text-right">
+                <span className="text-xs text-muted-foreground sm:text-right whitespace-nowrap">
                   {new Date(r.canceled_at).toLocaleDateString(undefined, { day: "2-digit", month: "2-digit", year: "numeric" })}
                 </span>
                 <div className="sm:justify-self-end flex items-center gap-1">
