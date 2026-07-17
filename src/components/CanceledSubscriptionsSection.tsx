@@ -209,16 +209,32 @@ export default function CanceledSubscriptionsSection() {
                 <span className="text-xs text-muted-foreground sm:text-right">
                   {new Date(r.canceled_at).toLocaleDateString(undefined, { day: "2-digit", month: "2-digit", year: "numeric" })}
                 </span>
-                <div className="sm:justify-self-end">
+                <div className="sm:justify-self-end flex items-center gap-1">
+                  <Button size="icon" variant="ghost" onClick={() => startEdit(r)} className="h-8 w-8 text-muted-foreground hover:text-foreground" title="Edit reason">
+                    <Pencil className="w-4 h-4" />
+                  </Button>
                   <Button size="icon" variant="ghost" onClick={() => handleDelete(r.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
-                {r.notes && (
+                {editingId === r.id ? (
+                  <div className="col-span-full flex items-center gap-2 pt-1">
+                    <Input
+                      autoFocus
+                      value={editingNotes}
+                      onChange={(e) => setEditingNotes(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter") saveEdit(); if (e.key === "Escape") setEditingId(null); }}
+                      placeholder="Cancellation reason"
+                      className="bg-background h-8 text-xs"
+                    />
+                    <Button size="sm" onClick={saveEdit} className="h-8">Save</Button>
+                    <Button size="sm" variant="ghost" onClick={() => setEditingId(null)} className="h-8">Cancel</Button>
+                  </div>
+                ) : r.notes ? (
                   <span className="col-span-full text-xs text-muted-foreground italic pl-0 sm:pl-1">
                     {r.notes}
                   </span>
-                )}
+                ) : null}
               </div>
             ))}
             {totalPages > 1 && (
