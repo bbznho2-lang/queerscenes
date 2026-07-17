@@ -112,6 +112,27 @@ export default function CanceledSubscriptionsSection() {
     else { toast.success("Entry removed"); load(); }
   };
 
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingNotes, setEditingNotes] = useState("");
+
+  const startEdit = (r: CanceledRow) => {
+    setEditingId(r.id);
+    setEditingNotes(r.notes || "");
+  };
+
+  const saveEdit = async () => {
+    if (!editingId) return;
+    const { error } = await (supabase as any)
+      .from("canceled_subscriptions")
+      .update({ notes: editingNotes.trim() || null })
+      .eq("id", editingId);
+    if (error) { toast.error("Failed to update"); return; }
+    toast.success("Reason updated");
+    setEditingId(null);
+    setEditingNotes("");
+    load();
+  };
+
   const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
   const pageRows = rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
