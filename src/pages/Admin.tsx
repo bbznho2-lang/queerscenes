@@ -733,6 +733,10 @@ const Admin = () => {
           );
         })()}
 
+        <CanceledSubscriptionsSection />
+
+
+
         {/* User Click Details - Aggregated */}
 
 
