@@ -201,13 +201,22 @@ const TitlePage = () => {
           )}
         </div>
 
-        {/* Languages */}
-        <div className="text-sm text-foreground/90 font-semibold">
-          Subtitles: <span className="text-base">🇬🇧 🇪🇸 🇵🇹 🇫🇷 🇩🇪 🇮🇹</span>
-        </div>
-        <p className="text-[11px] text-muted-foreground mt-1 mb-4">
-          Don't have your language? Request it in our VIP community.
-        </p>
+        {/* Languages — only render flags that appear in the per-title paywall text */}
+        {(() => {
+          const flags = Array.from(paywallText.matchAll(/\p{Regional_Indicator}\p{Regional_Indicator}/gu)).map((m) => m[0]);
+          const unique = Array.from(new Set(flags));
+          if (unique.length === 0) return null;
+          return (
+            <>
+              <div className="text-sm text-foreground/90 font-semibold">
+                Subtitles: <span className="text-base">{unique.join(" ")}</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-1 mb-4">
+                Don't have your language? Request it in our VIP community.
+              </p>
+            </>
+          );
+        })()}
 
         {/* Synopsis */}
         {synopsis && (
