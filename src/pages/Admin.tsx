@@ -668,10 +668,10 @@ const Admin = () => {
               </CardContent>
             </Card>
           );
-
-
+        })()}
 
         {/* User Click Details - Aggregated */}
+
 
 
         <Card className="bg-card border-border">
