@@ -76,7 +76,7 @@ const TitlesTicker = () => {
               {titles.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => navigate(`/player/${item.id}`)}
+                  onClick={() => navigate(`/title/${slugify(item.title)}`)}
                   className="flex flex-col items-start px-3 py-2 rounded-xl bg-muted/50 text-left hover:bg-primary/10 transition-colors border border-border hover:border-primary/40 active:scale-95 max-w-[200px]"
                 >
                   <span className="text-sm font-medium text-foreground">{item.title}</span>
