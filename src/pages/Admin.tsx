@@ -652,7 +652,7 @@ const Admin = () => {
                       return (
                         <div key={ev.id} className="grid grid-cols-1 sm:grid-cols-[1.2fr_1fr_1fr_1.2fr_140px] gap-1 sm:gap-3 px-3 py-2 rounded-lg hover:bg-muted/30 border-b border-border/30 last:border-0">
                           <span className="text-xs sm:text-sm font-semibold text-primary">{({
-                            paywall_view: "Paywall opened",
+                            paywall_view: "Locked title viewed",
                             locked_content_view: "Locked title viewed",
                             become_supporter_click: "Supporter plan clicked",
                             supporter_player_click: "Supporter player clicked",
