@@ -83,7 +83,11 @@ const TitlePage = () => {
         .order("title");
       if (cancelled) return;
       const list = ((data ?? []) as TitleContent[]).filter((c) => !c.is_archived);
-      const match = list.find((c) => slugify(c.title) === slug);
+      const matches = list.filter((c) => slugify(c.title) === slug);
+      // Prefer the duplicate that has a preview video, then any non-"exclusivos" section.
+      const match =
+        matches.find((c) => (c.preview_video_url ?? "").trim().length > 0) ??
+        matches[0];
       if (!match) {
         setNotFound(true);
         setLoading(false);
