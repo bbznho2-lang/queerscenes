@@ -463,7 +463,7 @@ const Player = () => {
                     <Crown className="w-3.5 h-3.5" /> Supporters only
                   </div>
                   <h2 className="text-xl sm:text-2xl font-extrabold mb-1.5">
-                    {currentEp ? `“${normalizeEpisodeLabel(currentEp.title, currentEp.episode_number)}” is waiting for you` : `“${content?.title ?? "This title"}” is waiting for you`}
+                    {`“${content?.title ?? "This title"}” is waiting for you`}
                   </h2> 
                   {content?.preview_video_url && (() => {
                   const prev = content.preview_video_url!.trim();
