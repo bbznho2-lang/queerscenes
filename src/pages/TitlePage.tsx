@@ -139,10 +139,15 @@ const TitlePage = () => {
       ]);
       if (cancelled) return;
       const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
-      setCanWatch(isAdmin || Boolean(canPlay) || Boolean(profile?.is_premium && notExpired));
+      const allowed = isAdmin || Boolean(canPlay) || Boolean(profile?.is_premium && notExpired);
+      setCanWatch(allowed);
+      // Supporters/admins land straight on the episode list instead of the SEO paywall.
+      if (allowed && playableContentId) {
+        navigate(`/player/${playableContentId}`, { replace: true });
+      }
     })();
     return () => { cancelled = true; };
-  }, [user?.id, isAdmin, authLoading]);
+  }, [user?.id, isAdmin, authLoading, playableContentId, navigate]);
 
   useEffect(() => {
     if (!content) return;
@@ -349,9 +354,10 @@ const TitlePage = () => {
           ))}
         </div>
 
-        {/* CTA */}
+        {/* CTA — always route through the Player, which enforces supporter access
+             and shows the episode list to supporters or the paywall to everyone else. */}
         <Link
-          to={canWatch && playableContentId ? `/player/${playableContentId}` : "/?highlight=supporter#supporter-card"}
+          to={playableContentId ? `/player/${playableContentId}` : "/?highlight=supporter#supporter-card"}
           className="shine-cta w-full flex items-center justify-center gap-2 rounded-full py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-500 via-fuchsia-500 to-purple-600 hover:opacity-95 shadow-lg shadow-fuchsia-500/30"
         >
           {canWatch ? <Play className="w-4 h-4" /> : <Crown className="w-4 h-4" />}
