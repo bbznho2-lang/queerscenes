@@ -349,9 +349,10 @@ const TitlePage = () => {
           ))}
         </div>
 
-        {/* CTA */}
+        {/* CTA — always route through the Player, which enforces supporter access
+             and shows the episode list to supporters or the paywall to everyone else. */}
         <Link
-          to={canWatch && playableContentId ? `/player/${playableContentId}` : "/?highlight=supporter#supporter-card"}
+          to={playableContentId ? `/player/${playableContentId}` : "/?highlight=supporter#supporter-card"}
           className="shine-cta w-full flex items-center justify-center gap-2 rounded-full py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-500 via-fuchsia-500 to-purple-600 hover:opacity-95 shadow-lg shadow-fuchsia-500/30"
         >
           {canWatch ? <Play className="w-4 h-4" /> : <Crown className="w-4 h-4" />}
