@@ -1,19 +1,11 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
 Allow: /
+Allow: /title/
+Disallow: /player
 Disallow: /admin
+Disallow: /dashboard
+Disallow: /checkout
+Disallow: /auth
 Disallow: /reset-password
-Disallow: /player/
 
 Sitemap: https://queerscenes.lovable.app/sitemap.xml
