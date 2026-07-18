@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Play, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { slugify } from "@/lib/slug";
 
 interface FeaturedItem {
   id: string;
@@ -106,7 +107,7 @@ const RecentUpdatesSection = () => {
             return (
               <div
                 key={item.id}
-                onClick={() => navigate(`/player/${c.id}`)}
+                onClick={() => navigate(`/title/${slugify(c.title)}`)}
                 className="group flex-shrink-0 w-[70vw] sm:w-[280px] cursor-pointer rounded-xl overflow-hidden bg-card border border-border hover:border-primary/50 transition-all"
               >
                 <div className="relative aspect-video bg-muted">
