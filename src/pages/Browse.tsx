@@ -58,10 +58,9 @@ const ContentCard = ({
 }) => {
   const navigate = useNavigate();
   const handleClick = () => {
-    // Even when locked, route to the player so the in-player Supporter paywall is shown
-    // (without revealing episodes/synopsis).
+    // Public SEO page first — paywall lives there; player stays behind auth.
     onClickTrack();
-    navigate(`/player/${item.id}`);
+    navigate(`/title/${slugify(item.title)}`);
   };
   return (
     <motion.div
