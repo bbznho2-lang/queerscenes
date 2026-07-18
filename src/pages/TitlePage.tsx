@@ -139,10 +139,15 @@ const TitlePage = () => {
       ]);
       if (cancelled) return;
       const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
-      setCanWatch(isAdmin || Boolean(canPlay) || Boolean(profile?.is_premium && notExpired));
+      const allowed = isAdmin || Boolean(canPlay) || Boolean(profile?.is_premium && notExpired);
+      setCanWatch(allowed);
+      // Supporters/admins land straight on the episode list instead of the SEO paywall.
+      if (allowed && playableContentId) {
+        navigate(`/player/${playableContentId}`, { replace: true });
+      }
     })();
     return () => { cancelled = true; };
-  }, [user?.id, isAdmin, authLoading]);
+  }, [user?.id, isAdmin, authLoading, playableContentId, navigate]);
 
   useEffect(() => {
     if (!content) return;
