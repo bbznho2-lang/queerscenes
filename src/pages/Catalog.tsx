@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { getUniqueItemsByTitle } from "@/lib/top-content";
+import { slugify } from "@/lib/slug";
 
 interface CatalogItem {
   id: string;
