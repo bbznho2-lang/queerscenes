@@ -4,6 +4,7 @@ import DOMPurify from "dompurify";
 import { Play, Heart, Sparkles, ChevronLeft, Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { slugify } from "@/lib/slug";
+import { useAuth } from "@/hooks/useAuth";
 import { DEFAULT_PAYWALL_TEXT } from "@/components/PaywallCustomizationsAdmin";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
@@ -66,7 +67,10 @@ const getEmbedUrl = (url: string) => {
 const TitlePage = () => {
   const { slug = "" } = useParams();
   const navigate = useNavigate();
+  const { user, isAdmin, loading: authLoading } = useAuth();
   const [content, setContent] = useState<TitleContent | null>(null);
+  const [playableContentId, setPlayableContentId] = useState<string | null>(null);
+  const [canWatch, setCanWatch] = useState(false);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [customText, setCustomText] = useState<string | null>(null);
@@ -84,6 +88,14 @@ const TitlePage = () => {
       if (cancelled) return;
       const list = ((data ?? []) as TitleContent[]).filter((c) => !c.is_archived);
       const matches = list.filter((c) => slugify(c.title) === slug);
+      const matchIds = matches.map((c) => c.id);
+      const { data: episodeRows } = matchIds.length
+        ? await supabase.from("episodes").select("content_id").in("content_id", matchIds)
+        : { data: [] as any[] };
+      const episodeCounts = new Map<string, number>();
+      (episodeRows || []).forEach((row: any) => {
+        episodeCounts.set(row.content_id, (episodeCounts.get(row.content_id) || 0) + 1);
+      });
       // Prefer the duplicate that has a preview video, then any non-"exclusivos" section.
       const match =
         matches.find((c) => (c.preview_video_url ?? "").trim().length > 0) ??
@@ -94,6 +106,10 @@ const TitlePage = () => {
         return;
       }
       setContent(match);
+      const playable =
+        matches.find((c) => (episodeCounts.get(c.id) || 0) > 0) ??
+        match;
+      setPlayableContentId(playable.id);
       const { data: pw } = await (supabase as any)
         .from("paywall_customizations")
         .select("custom_text")
@@ -104,6 +120,29 @@ const TitlePage = () => {
     })();
     return () => { cancelled = true; };
   }, [slug]);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user) {
+      setCanWatch(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const [{ data: canPlay }, { data: profile }] = await Promise.all([
+        supabase.rpc("current_user_can_play_premium"),
+        supabase
+          .from("profiles")
+          .select("is_premium, premium_expires_at")
+          .eq("user_id", user.id)
+          .maybeSingle(),
+      ]);
+      if (cancelled) return;
+      const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
+      setCanWatch(isAdmin || Boolean(canPlay) || Boolean(profile?.is_premium && notExpired));
+    })();
+    return () => { cancelled = true; };
+  }, [user?.id, isAdmin, authLoading]);
 
   useEffect(() => {
     if (!content) return;
@@ -312,10 +351,11 @@ const TitlePage = () => {
 
         {/* CTA */}
         <Link
-          to="/?highlight=supporter#supporter-card"
+          to={canWatch && playableContentId ? `/player/${playableContentId}` : "/?highlight=supporter#supporter-card"}
           className="shine-cta w-full flex items-center justify-center gap-2 rounded-full py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-500 via-fuchsia-500 to-purple-600 hover:opacity-95 shadow-lg shadow-fuchsia-500/30"
         >
-          <Crown className="w-4 h-4" /> Yes, become a Supporter
+          {canWatch ? <Play className="w-4 h-4" /> : <Crown className="w-4 h-4" />}
+          {canWatch ? "Watch episodes now" : "Yes, become a Supporter"}
         </Link>
 
         <div className="text-center mt-3 mb-8">
