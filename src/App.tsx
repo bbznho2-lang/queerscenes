@@ -9,6 +9,7 @@ import Browse from "./pages/Browse";
 import Player from "./pages/Player";
 import Admin from "./pages/Admin";
 import Catalog from "./pages/Catalog";
+import TitlePage from "./pages/TitlePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
