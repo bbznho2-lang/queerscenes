@@ -175,7 +175,7 @@ const TitlePage = () => {
           <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
             <ChevronLeft className="w-4 h-4" /> Back
           </button>
-          <Link to="/" style={{ fontFamily: "'Sora', sans-serif", fontSize: "13px", fontWeight: 700, letterSpacing: ".14em", color: "#a855f7", textShadow: "0 0 16px rgba(168,85,247,.4)" }}>QUEER SCENES</Link>
+          <Link to="/" style={{ fontFamily: "'Sora', sans-serif", fontSize: "18px", fontWeight: 800, letterSpacing: ".22em", color: "#a855f7" }}>QUEER SCENES</Link>
           <Link to="/browse" className="text-xs px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:text-foreground">Browse</Link>
         </div>
       </div>
@@ -198,7 +198,15 @@ const TitlePage = () => {
             <span className="text-[11px] px-3 py-1 rounded-full bg-primary/15 border border-primary/30 text-primary font-semibold">{content.tag}</span>
           )}
           {content.type && (
-            <span className="text-[11px] px-3 py-1 rounded-full bg-muted border border-border text-muted-foreground font-semibold">{content.type}</span>
+            <span className="text-[11px] px-3 py-1 rounded-full bg-muted border border-border text-muted-foreground font-semibold">
+              {(() => {
+                const t = String(content.type).toLowerCase();
+                if (t.includes("filme") || t.includes("movie")) return "Movie";
+                if (t.includes("novela") || t.includes("soap")) return "Soap Opera";
+                if (t.includes("serie")) return "Series";
+                return content.type;
+              })()}
+            </span>
           )}
           {content.year && (
             <span className="text-[11px] px-3 py-1 rounded-full bg-muted border border-border text-muted-foreground font-semibold">{content.year}</span>
