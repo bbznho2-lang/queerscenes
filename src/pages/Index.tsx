@@ -792,7 +792,7 @@ const Index = () => {
                 <div className="relative z-10 mt-4 flex justify-center">
                   <div className="qs-supporter-backers">
                     <span className="qs-supporter-backers-dot" />
-                    <span>85 supporters back this project</span>
+                    <span>{supporterCount} supporters back this project</span>
                   </div>
                 </div>
 
