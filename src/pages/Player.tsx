@@ -53,6 +53,7 @@ const Player = () => {
   const [editOpen, setEditOpen] = useState(false);
   const [premiumBlocked, setPremiumBlocked] = useState(false);
   const [userIsPremium, setUserIsPremium] = useState(false);
+  const [accessResolved, setAccessResolved] = useState(false);
   const [userExpired, setUserExpired] = useState(false);
   const [userExpiredAt, setUserExpiredAt] = useState<string | null>(null);
   const [tier, setTier] = useState<PlayerTier>("free");
@@ -72,6 +73,7 @@ const Player = () => {
   const fetchContent = async () => {
     if (!id) return;
     if (authLoading) return; // wait for auth to settle to avoid double-fetch
+    setAccessResolved(false);
     let requestedContentId = id;
     const contentPromise = supabase
       .from("contents")
@@ -94,7 +96,10 @@ const Player = () => {
       profilePromise,
       premiumAccessPromise,
     ]);
-    if (!data) return;
+    if (!data) {
+      setAccessResolved(true);
+      return;
+    }
     let resolvedContent = data as ContentItem;
 
     const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
@@ -185,6 +190,7 @@ const Player = () => {
       setEpisodes([]);
       setCurrentEp(null);
     }
+    setAccessResolved(true);
   };
 
   // Clear stale state immediately when switching to a different title so the
@@ -195,6 +201,7 @@ const Player = () => {
     setCurrentEp(null);
     setPaywallCustom(null);
     setPremiumBlocked(false);
+    setAccessResolved(false);
     setEpisodeLinks([]);
     setSelectedLinkIdx(-1);
     setRawPlayerUrl("");
@@ -251,8 +258,9 @@ const Player = () => {
   }, [content?.id]);
 
 
-  const episodePremiumBlocked = currentEp?.is_premium && !userIsPremium && !isAdmin;
-  const isBlocked = premiumBlocked || episodePremiumBlocked;
+  const userCanWatchPremium = userIsPremium || isAdmin;
+  const episodePremiumBlocked = Boolean(currentEp?.is_premium && !userCanWatchPremium);
+  const isBlocked = accessResolved && (premiumBlocked || episodePremiumBlocked) && !userCanWatchPremium;
 
   type EpisodeLink = { title: string; type: "embed" | "redirect"; url: string };
   const [episodeLinks, setEpisodeLinks] = useState<EpisodeLink[]>([]);
