@@ -57,6 +57,32 @@ const Index = () => {
   const [checkoutEmail, setCheckoutEmail] = useState("");
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [selectedPlanId, setSelectedPlanId] = useState<string>("price_1TmNFHJ5xR4MDdjr5915HBR2");
+  const [supporterCount, setSupporterCount] = useState<number>(85);
+
+  useEffect(() => {
+    let active = true;
+    const fetchCount = async () => {
+      const { count } = await supabase
+        .from("profiles")
+        .select("id", { count: "exact", head: true })
+        .eq("is_premium", true);
+      if (!active || count == null) return;
+      setSupporterCount((prev) => Math.max(prev, count, 85));
+    };
+    fetchCount();
+    const channel = supabase
+      .channel("supporter-count")
+      .on("postgres_changes", { event: "*", schema: "public", table: "profiles" }, fetchCount)
+      .subscribe();
+    const interval = setInterval(fetchCount, 60000);
+    return () => {
+      active = false;
+      supabase.removeChannel(channel);
+      clearInterval(interval);
+    };
+  }, []);
+
+  
   
   const navigate = useNavigate();
   const { user, loading: authLoading, isAdmin, signIn, signUp } = useAuth();
@@ -766,7 +792,7 @@ const Index = () => {
                 <div className="relative z-10 mt-4 flex justify-center">
                   <div className="qs-supporter-backers">
                     <span className="qs-supporter-backers-dot" />
-                    <span>85 supporters back this project</span>
+                    <span>{supporterCount} supporters back this project</span>
                   </div>
                 </div>
 
