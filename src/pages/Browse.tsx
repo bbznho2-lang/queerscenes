@@ -13,6 +13,7 @@ import AddExistingContentDialog from "@/components/AddExistingContentDialog";
 import AutoScrollRow from "@/components/AutoScrollRow";
 import SiteNoteBanner from "@/components/SiteNoteBanner";
 import RecentUpdatesSection from "@/components/RecentUpdatesSection";
+import { slugify } from "@/lib/slug";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { buildUniqueTopContent, fetchTopContentRanking, getUniqueItemsByTitle } from "@/lib/top-content";
@@ -58,10 +59,9 @@ const ContentCard = ({
 }) => {
   const navigate = useNavigate();
   const handleClick = () => {
-    // Even when locked, route to the player so the in-player Supporter paywall is shown
-    // (without revealing episodes/synopsis).
+    // Public SEO page first — paywall lives there; player stays behind auth.
     onClickTrack();
-    navigate(`/player/${item.id}`);
+    navigate(`/title/${slugify(item.title)}`);
   };
   return (
     <motion.div

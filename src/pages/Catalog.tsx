@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { getUniqueItemsByTitle } from "@/lib/top-content";
+import { slugify } from "@/lib/slug";
 
 interface CatalogItem {
   id: string;
@@ -88,11 +89,13 @@ const Catalog = () => {
                 <h2 className="text-2xl font-semibold mb-4">Series & soap operas</h2>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {series.map((c) => (
-                    <li key={c.id} className="border border-border rounded-lg p-4 bg-card/40">
-                      <h3 className="font-medium text-foreground">{c.title}</h3>
-                      {c.synopsis && (
-                        <p className="text-sm text-muted-foreground mt-1 line-clamp-3">{c.synopsis}</p>
-                      )}
+                    <li key={c.id} className="border border-border rounded-lg p-4 bg-card/40 hover:border-primary/40 transition-colors">
+                      <Link to={`/title/${slugify(c.title)}`} className="block">
+                        <h3 className="font-medium text-foreground">{c.title}</h3>
+                        {c.synopsis && (
+                          <p className="text-sm text-muted-foreground mt-1 line-clamp-3">{c.synopsis}</p>
+                        )}
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -104,11 +107,13 @@ const Catalog = () => {
                 <h2 className="text-2xl font-semibold mb-4">Movies</h2>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {movies.map((c) => (
-                    <li key={c.id} className="border border-border rounded-lg p-4 bg-card/40">
-                      <h3 className="font-medium text-foreground">{c.title}</h3>
-                      {c.synopsis && (
-                        <p className="text-sm text-muted-foreground mt-1 line-clamp-3">{c.synopsis}</p>
-                      )}
+                    <li key={c.id} className="border border-border rounded-lg p-4 bg-card/40 hover:border-primary/40 transition-colors">
+                      <Link to={`/title/${slugify(c.title)}`} className="block">
+                        <h3 className="font-medium text-foreground">{c.title}</h3>
+                        {c.synopsis && (
+                          <p className="text-sm text-muted-foreground mt-1 line-clamp-3">{c.synopsis}</p>
+                        )}
+                      </Link>
                     </li>
                   ))}
                 </ul>
