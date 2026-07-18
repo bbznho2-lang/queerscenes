@@ -148,7 +148,7 @@ const Player = () => {
         const { data: duplicates } = await supabase
           .from("contents")
           .select("id, title, year, tag, type, banner_url, section, position, is_premium, supporter_player_enabled, synopsis, preview_video_url")
-          .ilike("title", data.title.trim())
+          .ilike("title", `${data.title.trim()}%`)
           .neq("id", id)
           .in("type", ["serie", "novela", "anime"]);
         const duplicateIds = ((duplicates || []) as ContentItem[]).map((item) => item.id);
