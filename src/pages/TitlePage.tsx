@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import DOMPurify from "dompurify";
 import { Play, Heart, Sparkles, ChevronLeft, Crown } from "lucide-react";
@@ -7,6 +7,7 @@ import { slugify } from "@/lib/slug";
 import { useAuth } from "@/hooks/useAuth";
 import { DEFAULT_PAYWALL_TEXT } from "@/components/PaywallCustomizationsAdmin";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { trackSupporterEvent } from "@/lib/supporter-tracking";
 
 interface TitleContent {
   id: string;
@@ -76,6 +77,8 @@ const TitlePage = () => {
   const [customText, setCustomText] = useState<string | null>(null);
   const [readMore, setReadMore] = useState(false);
   const [telegramOpen, setTelegramOpen] = useState(false);
+  const [accessChecked, setAccessChecked] = useState(false);
+  const trackedPaywallViewsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     let cancelled = false;
@@ -122,12 +125,17 @@ const TitlePage = () => {
   }, [slug]);
 
   useEffect(() => {
-    if (authLoading) return;
+    if (authLoading) {
+      setAccessChecked(false);
+      return;
+    }
     if (!user) {
       setCanWatch(false);
+      setAccessChecked(true);
       return;
     }
     let cancelled = false;
+    setAccessChecked(false);
     (async () => {
       const [{ data: canPlay }, { data: profile }] = await Promise.all([
         supabase.rpc("current_user_can_play_premium"),
@@ -141,6 +149,7 @@ const TitlePage = () => {
       const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
       const allowed = isAdmin || Boolean(canPlay) || Boolean(profile?.is_premium && notExpired);
       setCanWatch(allowed);
+      setAccessChecked(true);
       // Supporters/admins land straight on the episode list instead of the SEO paywall.
       if (allowed && playableContentId) {
         navigate(`/player/${playableContentId}`, { replace: true });
@@ -148,6 +157,29 @@ const TitlePage = () => {
     })();
     return () => { cancelled = true; };
   }, [user?.id, isAdmin, authLoading, playableContentId, navigate]);
+
+  useEffect(() => {
+    if (!content?.id || !accessChecked || canWatch) return;
+    const eventContentId = playableContentId || content.id;
+    const key = `${eventContentId}:${user?.id ?? "anon"}`;
+    if (trackedPaywallViewsRef.current.has(key)) return;
+    trackedPaywallViewsRef.current.add(key);
+    const metadata = { title_slug: slug, surface: "seo_title_page" };
+    void trackSupporterEvent(supabase, {
+      event_type: "paywall_view",
+      source: "title_page_paywall",
+      user_id: user?.id ?? null,
+      content_id: eventContentId,
+      metadata,
+    });
+    void trackSupporterEvent(supabase, {
+      event_type: "locked_content_view",
+      source: "title_page_paywall",
+      user_id: user?.id ?? null,
+      content_id: eventContentId,
+      metadata,
+    });
+  }, [content?.id, playableContentId, accessChecked, canWatch, user?.id, slug]);
 
   useEffect(() => {
     if (!content) return;
@@ -358,6 +390,16 @@ const TitlePage = () => {
              and shows the episode list to supporters or the paywall to everyone else. */}
         <Link
           to={playableContentId ? `/player/${playableContentId}` : "/?highlight=supporter#supporter-card"}
+          onClick={() => {
+            if (canWatch || !content?.id) return;
+            void trackSupporterEvent(supabase, {
+              event_type: "become_supporter_click",
+              source: "title_page_paywall_cta",
+              user_id: user?.id ?? null,
+              content_id: playableContentId || content.id,
+              metadata: { title_slug: slug, surface: "seo_title_page" },
+            });
+          }}
           className="shine-cta w-full flex items-center justify-center gap-2 rounded-full py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-500 via-fuchsia-500 to-purple-600 hover:opacity-95 shadow-lg shadow-fuchsia-500/30"
         >
           {canWatch ? <Play className="w-4 h-4" /> : <Crown className="w-4 h-4" />}

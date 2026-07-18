@@ -66,6 +66,7 @@ const Player = () => {
   const [paywallMode, setPaywallMode] = useState<"signup" | "login">("login");
   const [telegramPopupOpen, setTelegramPopupOpen] = useState(false);
   const [paywallCustom, setPaywallCustom] = useState<{ custom_text: string | null; testimonials: { name: string; quote: string }[] } | null>(null);
+  const trackedPaywallViewsRef = useRef<Set<string>>(new Set());
 
 
 
@@ -445,14 +446,15 @@ const Player = () => {
 
   // Track when user lands on locked content / paywall
   useEffect(() => {
-    if (!content) return;
-    if (premiumBlocked) {
-      void trackEvent("locked_content_view", "premium_content");
-    } else if (episodePremiumBlocked) {
-      void trackEvent("locked_content_view", "premium_episode");
-    }
+    if (!content || !isBlocked) return;
+    const source = episodePremiumBlocked ? "premium_episode" : "premium_content";
+    const key = `${content.id}:${currentEp?.id ?? "content"}:${source}`;
+    if (trackedPaywallViewsRef.current.has(key)) return;
+    trackedPaywallViewsRef.current.add(key);
+    void trackEvent("paywall_view", source);
+    void trackEvent("locked_content_view", source);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [content?.id, premiumBlocked, episodePremiumBlocked, currentEp?.id]);
+  }, [content?.id, isBlocked, episodePremiumBlocked, currentEp?.id]);
 
   const playerTierSelector = null;
 
