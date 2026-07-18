@@ -616,22 +616,27 @@ const Admin = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-3 mb-4">
-                  {[
-                    { key: "locked_content_view", label: "Locked title viewed", color: "#2dd4bf" },
-                    { key: "become_supporter_click", label: "Plan clicked", color: "#ec4899" },
-                    { key: "paywall_signup_submit", label: "New signups", color: "#d946ef" },
-                    { key: "paywall_view", label: "Paywall opened", color: "#f59e0b" },
-                  ].map((item) => (
-                    <div key={item.key} className="rounded-xl border border-border bg-card px-4 py-3">
-                      <p
-                        className="font-extrabold leading-none tracking-tight"
-                        style={{ color: item.color, fontSize: "clamp(24px, 5vw, 34px)", fontFamily: "'Sora', system-ui, sans-serif" }}
-                      >
-                        {totals[item.key] || 0}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1.5">{item.label}</p>
-                    </div>
-                  ))}
+                  {(() => {
+                    const lockedCount = totals["locked_content_view"] || 0;
+                    const paywallCount = totals["paywall_view"] || 0;
+                    const combinedPaywall = lockedCount + paywallCount;
+                    return [
+                      { key: "combined_paywall", value: combinedPaywall, sub: `Paywall opened: ${paywallCount}`, label: "Locked title viewed", color: "#2dd4bf" },
+                      { key: "become_supporter_click", label: "Plan clicked", color: "#ec4899" },
+                      { key: "paywall_signup_submit", label: "New signups", color: "#d946ef" },
+                    ].map((item) => (
+                      <div key={item.key} className="rounded-xl border border-border bg-card px-4 py-3">
+                        <p
+                          className="font-extrabold leading-none tracking-tight"
+                          style={{ color: item.color, fontSize: "clamp(24px, 5vw, 34px)", fontFamily: "'Sora', system-ui, sans-serif" }}
+                        >
+                          {item.value !== undefined ? item.value : (totals[item.key] || 0)}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1.5">{item.label}</p>
+                        {item.sub ? <p className="text-[10px] text-muted-foreground/70 mt-0.5">{item.sub}</p> : null}
+                      </div>
+                    ));
+                  })()}
                 </div>
                 {supporterEvents.length > 0 ? (
                   <div className="space-y-1">
