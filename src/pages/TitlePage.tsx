@@ -198,7 +198,15 @@ const TitlePage = () => {
             <span className="text-[11px] px-3 py-1 rounded-full bg-primary/15 border border-primary/30 text-primary font-semibold">{content.tag}</span>
           )}
           {content.type && (
-            <span className="text-[11px] px-3 py-1 rounded-full bg-muted border border-border text-muted-foreground font-semibold">{content.type}</span>
+            <span className="text-[11px] px-3 py-1 rounded-full bg-muted border border-border text-muted-foreground font-semibold">
+              {(() => {
+                const t = String(content.type).toLowerCase();
+                if (t.includes("filme") || t.includes("movie")) return "Movie";
+                if (t.includes("novela") || t.includes("soap")) return "Soap Opera";
+                if (t.includes("serie")) return "Series";
+                return content.type;
+              })()}
+            </span>
           )}
           {content.year && (
             <span className="text-[11px] px-3 py-1 rounded-full bg-muted border border-border text-muted-foreground font-semibold">{content.year}</span>
