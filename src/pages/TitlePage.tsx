@@ -175,7 +175,7 @@ const TitlePage = () => {
           <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
             <ChevronLeft className="w-4 h-4" /> Back
           </button>
-          <Link to="/" style={{ fontFamily: "'Sora', sans-serif", fontSize: "13px", fontWeight: 700, letterSpacing: ".14em", color: "#a855f7", textShadow: "0 0 16px rgba(168,85,247,.4)" }}>QUEER SCENES</Link>
+          <Link to="/" style={{ fontFamily: "'Sora', sans-serif", fontSize: "18px", fontWeight: 800, letterSpacing: ".22em", color: "#a855f7" }}>QUEER SCENES</Link>
           <Link to="/browse" className="text-xs px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:text-foreground">Browse</Link>
         </div>
       </div>
