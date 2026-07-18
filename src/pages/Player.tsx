@@ -84,26 +84,31 @@ const Player = () => {
           .eq("user_id", user.id)
           .maybeSingle()
       : Promise.resolve({ data: null, error: null } as any);
+    const premiumAccessPromise = user
+      ? supabase.rpc("current_user_can_play_premium")
+      : Promise.resolve({ data: false, error: null } as any);
 
-    const [{ data }, { data: profile, error: profileError }] = await Promise.all([
+    const [{ data }, { data: profile, error: profileError }, { data: canPlayPremium, error: premiumAccessError }] = await Promise.all([
       contentPromise,
       profilePromise,
+      premiumAccessPromise,
     ]);
     if (!data) return;
     setContent(data as ContentItem);
 
     const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
-    const hasPremium = !!(profile?.is_premium && notExpired);
-    const expired = !!(profile?.is_premium && profile?.premium_expires_at && new Date(profile.premium_expires_at) <= new Date());
+    const hasPremiumFromProfile = !!(profile?.is_premium && notExpired);
+    const hasPremium = isAdmin || Boolean(canPlayPremium) || hasPremiumFromProfile;
+    const expired = !hasPremium && !!(profile?.is_premium && profile?.premium_expires_at && new Date(profile.premium_expires_at) <= new Date());
 
     if (data.is_premium) {
-      if (isAdmin) {
+      if (hasPremium) {
         setPremiumBlocked(false);
         setUserIsPremium(true);
       } else if (!user) {
         setPremiumBlocked(true);
         setUserIsPremium(false);
-      } else if (profileError) {
+      } else if (profileError && premiumAccessError) {
         setPremiumBlocked(true);
         setUserIsPremium(false);
         setUserExpired(false);
