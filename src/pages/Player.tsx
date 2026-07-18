@@ -72,6 +72,7 @@ const Player = () => {
   const fetchContent = async () => {
     if (!id) return;
     if (authLoading) return; // wait for auth to settle to avoid double-fetch
+    let requestedContentId = id;
     const contentPromise = supabase
       .from("contents")
       .select("id, title, year, tag, type, banner_url, section, position, is_premium, supporter_player_enabled, synopsis, preview_video_url")
@@ -94,7 +95,7 @@ const Player = () => {
       premiumAccessPromise,
     ]);
     if (!data) return;
-    setContent(data as ContentItem);
+    let resolvedContent = data as ContentItem;
 
     const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
     const hasPremiumFromProfile = !!(profile?.is_premium && notExpired);
@@ -139,10 +140,39 @@ const Player = () => {
       const { data: eps } = await supabase
         .from("episodes")
         .select("id, content_id, title, episode_number, season, is_premium, created_at")
-        .eq("content_id", id)
+        .eq("content_id", requestedContentId)
         .order("season")
         .order("episode_number");
-      const normalizedEpisodes = ((eps || []) as Episode[]).map(e => ({ ...e, season: e.season || 1 }));
+      let normalizedEpisodes = ((eps || []) as Episode[]).map(e => ({ ...e, season: e.season || 1 }));
+      if (normalizedEpisodes.length === 0) {
+        const { data: duplicates } = await supabase
+          .from("contents")
+          .select("id, title, year, tag, type, banner_url, section, position, is_premium, supporter_player_enabled, synopsis, preview_video_url")
+          .ilike("title", data.title.trim())
+          .neq("id", id)
+          .in("type", ["serie", "novela", "anime"]);
+        const duplicateIds = ((duplicates || []) as ContentItem[]).map((item) => item.id);
+        if (duplicateIds.length > 0) {
+          const { data: duplicateEpisodes } = await supabase
+            .from("episodes")
+            .select("id, content_id, title, episode_number, season, is_premium, created_at")
+            .in("content_id", duplicateIds)
+            .order("season")
+            .order("episode_number");
+          const firstEpisode = duplicateEpisodes?.[0] as Episode | undefined;
+          const duplicateWithEpisodes = firstEpisode
+            ? ((duplicates || []) as ContentItem[]).find((item) => item.id === firstEpisode.content_id)
+            : null;
+          if (duplicateWithEpisodes) {
+            requestedContentId = duplicateWithEpisodes.id;
+            resolvedContent = duplicateWithEpisodes;
+            normalizedEpisodes = ((duplicateEpisodes || []) as Episode[])
+              .filter((episode) => episode.content_id === requestedContentId)
+              .map(e => ({ ...e, season: e.season || 1 }));
+          }
+        }
+      }
+      setContent(resolvedContent);
       setEpisodes(normalizedEpisodes);
       if (normalizedEpisodes.length > 0) {
         setSelectedSeason(normalizedEpisodes[0].season);
@@ -151,6 +181,7 @@ const Player = () => {
         setCurrentEp(null);
       }
     } else {
+      setContent(resolvedContent);
       setEpisodes([]);
       setCurrentEp(null);
     }
