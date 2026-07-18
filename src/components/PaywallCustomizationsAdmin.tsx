@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const DEFAULT_PAYWALL_TEXT =
-  "You just found something rare. This title was hand-subtitled by our team and it doesn't exist anywhere else on the internet. Supporters get exclusive access to rare queer titles, cinema premieres, and new releases every month — a catalog built by fans, for fans. The only way to watch it is here.";
+  "You just found something rare. This title was hand-subtitled by our team and it doesn't exist anywhere else on the internet. Supporters get exclusive access to rare queer titles, cinema premieres, and new releases every month — a catalog built by fans, for fans. The only way to watch it is here.\n\nSubtitles: 🇬🇧 🇪🇸 🇵🇹 🇫🇷 🇩🇪 🇮🇹";
 
 type ContentOpt = { id: string; title: string };
 
