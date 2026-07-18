@@ -150,9 +150,25 @@ const Admin = () => {
       )
       .subscribe();
 
+    const supporterEventsChannel = supabase
+      .channel("admin-supporter-events-realtime")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "supporter_events" },
+        (payload) => {
+          const newEvent = payload.new as { id: string; event_type: string; source: string | null; user_id: string | null; content_id: string | null; created_at: string; metadata: any };
+          setSupporterEvents((current) => {
+            if (current.some((event) => event.id === newEvent.id)) return current;
+            return [newEvent, ...current].slice(0, 500);
+          });
+        }
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(clicksChannel);
       supabase.removeChannel(profilesChannel);
+      supabase.removeChannel(supporterEventsChannel);
     };
   }, [isAdmin]);
 
