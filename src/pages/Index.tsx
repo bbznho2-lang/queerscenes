@@ -57,7 +57,7 @@ const Index = () => {
   const [checkoutEmail, setCheckoutEmail] = useState("");
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [selectedPlanId, setSelectedPlanId] = useState<string>("price_1TmNFHJ5xR4MDdjr5915HBR2");
-  const [supporterCount, setSupporterCount] = useState<number>(85);
+  const [supporterCount, setSupporterCount] = useState<number>(90);
 
   useEffect(() => {
     let active = true;
