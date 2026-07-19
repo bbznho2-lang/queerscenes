@@ -456,6 +456,14 @@ const Player = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content?.id, isBlocked, episodePremiumBlocked, currentEp?.id]);
 
+  // Old in-player paywall is disabled — redirect non-supporters straight to the plans page
+  useEffect(() => {
+    if (!accessResolved) return;
+    if (isBlocked && !userIsPremium && !isAdmin) {
+      navigate("/?highlight=supporter#supporter-card", { replace: true });
+    }
+  }, [accessResolved, isBlocked, userIsPremium, isAdmin, navigate]);
+
   const playerTierSelector = null;
 
   return (
