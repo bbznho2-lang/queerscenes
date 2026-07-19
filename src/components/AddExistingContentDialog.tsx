@@ -72,8 +72,7 @@ const AddExistingContentDialog = ({ open, onOpenChange, targetSection, onSaved }
     setSaving(true);
     try {
       // Get full data (incl. player_url) via admin RPC to duplicate items
-      const { data: items, error: fetchErr } = await supabase
-        .rpc("admin_get_contents", { _ids: Array.from(selected) });
+      const { data: items, error: fetchErr } = await (supabase.rpc as any)("admin_get_contents_v2", { _ids: Array.from(selected) });
       if (fetchErr) throw fetchErr;
 
       for (const item of (items as any[]) || []) {
