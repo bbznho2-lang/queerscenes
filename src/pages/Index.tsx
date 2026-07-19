@@ -67,7 +67,7 @@ const Index = () => {
         .select("id", { count: "exact", head: true })
         .eq("is_premium", true);
       if (!active || count == null) return;
-      setSupporterCount((prev) => Math.max(prev, count, 85));
+      setSupporterCount((prev) => Math.max(prev, count, 90));
     };
     fetchCount();
     const channel = supabase
