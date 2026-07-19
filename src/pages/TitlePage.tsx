@@ -389,7 +389,7 @@ const TitlePage = () => {
         {/* CTA — always route through the Player, which enforces supporter access
              and shows the episode list to supporters or the paywall to everyone else. */}
         <Link
-          to={playableContentId ? `/player/${playableContentId}` : "/?highlight=supporter#supporter-card"}
+          to={canWatch && playableContentId ? `/player/${playableContentId}` : "/?highlight=supporter#supporter-card"}
           onClick={() => {
             if (canWatch || !content?.id) return;
             void trackSupporterEvent(supabase, {
