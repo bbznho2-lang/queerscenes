@@ -824,6 +824,7 @@ export type Database = {
           banner_url: string
           id: string
           is_premium: boolean
+          links: Json
           player_url: string
           position: number
           section: string
