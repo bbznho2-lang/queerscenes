@@ -57,7 +57,7 @@ const Index = () => {
   const [checkoutEmail, setCheckoutEmail] = useState("");
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [selectedPlanId, setSelectedPlanId] = useState<string>("price_1TmNFHJ5xR4MDdjr5915HBR2");
-  const [supporterCount, setSupporterCount] = useState<number>(85);
+  const [supporterCount, setSupporterCount] = useState<number>(90);
 
   useEffect(() => {
     let active = true;
@@ -67,7 +67,7 @@ const Index = () => {
         .select("id", { count: "exact", head: true })
         .eq("is_premium", true);
       if (!active || count == null) return;
-      setSupporterCount((prev) => Math.max(prev, count, 85));
+      setSupporterCount((prev) => Math.max(prev, count, 90));
     };
     fetchCount();
     const channel = supabase
