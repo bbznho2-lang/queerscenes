@@ -895,7 +895,7 @@ const Index = () => {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 sm:py-24 px-4">
+      <section id="faq" className="py-16 sm:py-24 px-4">
         <div className="max-w-3xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="mb-8 sm:mb-10 text-center">
             <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--brand-pink)]">Support</p>
