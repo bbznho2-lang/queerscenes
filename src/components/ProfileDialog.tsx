@@ -182,6 +182,17 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
             <p className="text-[11px] text-muted-foreground mt-2 text-center">
               You can sign up again later with the same email.
             </p>
+            <p className="text-[11px] text-muted-foreground mt-2 text-center">
+              Deleting your profile does not cancel your subscription. To cancel it, go to the{" "}
+              <a
+                href="/#faq"
+                onClick={() => onOpenChange(false)}
+                className="text-[var(--brand-pink)] font-semibold hover:underline"
+              >
+                FAQ
+              </a>
+              .
+            </p>
           </div>
         </div>
       </DialogContent>
