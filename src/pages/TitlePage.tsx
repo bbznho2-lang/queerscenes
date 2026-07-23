@@ -79,6 +79,19 @@ const TitlePage = () => {
   const [telegramOpen, setTelegramOpen] = useState(false);
   const [accessChecked, setAccessChecked] = useState(false);
   const trackedPaywallViewsRef = useRef<Set<string>>(new Set());
+  const inlineCtaRef = useRef<HTMLAnchorElement | null>(null);
+  const [inlineCtaVisible, setInlineCtaVisible] = useState(false);
+
+  useEffect(() => {
+    const el = inlineCtaRef.current;
+    if (!el || canWatch) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setInlineCtaVisible(entry.isIntersecting),
+      { rootMargin: "0px 0px -80px 0px", threshold: 0.01 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [canWatch, accessChecked, content?.id]);
 
   useEffect(() => {
     let cancelled = false;
