@@ -416,6 +416,37 @@ const TitlePage = () => {
         </div>
       </main>
 
+      {/* Sticky bottom CTA — only for locked users, so they always see the action */}
+      {accessChecked && !canWatch && (
+        <>
+          <div className="h-24" aria-hidden />
+          <div className="fixed bottom-0 inset-x-0 z-40 px-3 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 bg-gradient-to-t from-background via-background/95 to-background/0 pointer-events-none">
+            <div className="max-w-3xl mx-auto pointer-events-auto">
+              <Link
+                to="/?highlight=supporter#supporter-card"
+                onClick={() => {
+                  if (!content?.id) return;
+                  void trackSupporterEvent(supabase, {
+                    event_type: "become_supporter_click",
+                    source: "title_page_sticky_cta",
+                    user_id: user?.id ?? null,
+                    content_id: playableContentId || content.id,
+                    metadata: { title_slug: slug, surface: "seo_title_page_sticky" },
+                  });
+                }}
+                className="shine-cta w-full flex items-center justify-center gap-2 rounded-full py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-500 via-fuchsia-500 to-purple-600 shadow-lg shadow-fuchsia-500/40 ring-1 ring-white/10"
+              >
+                <Crown className="w-4 h-4" />
+                Unlock this title — Become a Supporter
+              </Link>
+              <div className="text-center mt-1.5 text-[10px] text-muted-foreground font-semibold tracking-wide">
+                ↓ Scroll to see plans & benefits
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
       <Dialog open={telegramOpen} onOpenChange={setTelegramOpen}>
         <DialogContent className="max-w-sm bg-background border-primary/30">
           <DialogHeader>
