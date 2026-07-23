@@ -87,7 +87,7 @@ const TitlePage = () => {
     if (!el || canWatch) return;
     const io = new IntersectionObserver(
       ([entry]) => setInlineCtaVisible(entry.isIntersecting),
-      { rootMargin: "0px 0px -80px 0px", threshold: 0.01 }
+      { rootMargin: "0px 0px -140px 0px", threshold: 0 }
     );
     io.observe(el);
     return () => io.disconnect();
