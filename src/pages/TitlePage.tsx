@@ -90,7 +90,22 @@ const TitlePage = () => {
       { rootMargin: "0px 0px -140px 0px", threshold: 0 }
     );
     io.observe(el);
-    return () => io.disconnect();
+
+    // Safari fallback: hide the sticky bar when the user is within ~160px of
+    // the page bottom (IntersectionObserver can miss it under Safari's UI).
+    const onScroll = () => {
+      const nearBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 160;
+      if (nearBottom) setInlineCtaVisible(true);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+
+    return () => {
+      io.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
   }, [canWatch, accessChecked, content?.id]);
 
   useEffect(() => {
