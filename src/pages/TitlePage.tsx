@@ -83,28 +83,36 @@ const TitlePage = () => {
   const [inlineCtaVisible, setInlineCtaVisible] = useState(false);
 
   useEffect(() => {
-    const el = inlineCtaRef.current;
-    if (!el || canWatch) return;
-    const io = new IntersectionObserver(
-      ([entry]) => setInlineCtaVisible(entry.isIntersecting),
-      { rootMargin: "0px 0px -140px 0px", threshold: 0 }
-    );
-    io.observe(el);
+    if (canWatch) return;
+    let raf = 0;
 
-    // Safari fallback: hide the sticky bar when the user is within ~160px of
-    // the page bottom (IntersectionObserver can miss it under Safari's UI).
-    const onScroll = () => {
-      const nearBottom =
-        window.innerHeight + window.scrollY >=
-        document.documentElement.scrollHeight - 160;
-      if (nearBottom) setInlineCtaVisible(true);
+    const updateStickyVisibility = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const el = document.querySelector('[data-title-paywall-cta-area="true"]') as HTMLElement | null;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const viewportHeight = window.visualViewport?.height || window.innerHeight;
+        const inlineButtonVisible = rect.top < viewportHeight - 120;
+        const nearBottom =
+          viewportHeight + window.scrollY >=
+          document.documentElement.scrollHeight - 360;
+        setInlineCtaVisible(inlineButtonVisible || nearBottom);
+      });
     };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
+
+    window.addEventListener("scroll", updateStickyVisibility, { passive: true });
+    window.addEventListener("resize", updateStickyVisibility);
+    window.visualViewport?.addEventListener("resize", updateStickyVisibility);
+    window.visualViewport?.addEventListener("scroll", updateStickyVisibility);
+    updateStickyVisibility();
 
     return () => {
-      io.disconnect();
-      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", updateStickyVisibility);
+      window.removeEventListener("resize", updateStickyVisibility);
+      window.visualViewport?.removeEventListener("resize", updateStickyVisibility);
+      window.visualViewport?.removeEventListener("scroll", updateStickyVisibility);
     };
   }, [canWatch, accessChecked, content?.id]);
 
@@ -416,44 +424,44 @@ const TitlePage = () => {
 
         {/* CTA — always route through the Player, which enforces supporter access
              and shows the episode list to supporters or the paywall to everyone else. */}
-        <Link
-          ref={inlineCtaRef as any}
-          to={canWatch && playableContentId ? `/player/${playableContentId}` : "/?highlight=supporter#supporter-card"}
-          onClick={() => {
-            if (canWatch || !content?.id) return;
-            void trackSupporterEvent(supabase, {
-              event_type: "become_supporter_click",
-              source: "title_page_paywall_cta",
-              user_id: user?.id ?? null,
-              content_id: playableContentId || content.id,
-              metadata: { title_slug: slug, surface: "seo_title_page" },
-            });
-          }}
-          className="shine-cta w-full flex items-center justify-center gap-2 rounded-full py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-500 via-fuchsia-500 to-purple-600 hover:opacity-95 shadow-lg shadow-fuchsia-500/30"
-        >
-          {canWatch ? <Play className="w-4 h-4" /> : <Crown className="w-4 h-4" />}
-          {canWatch ? "Watch episodes now" : "Yes, become a Supporter"}
-        </Link>
-
-        <div className="text-center mt-3 mb-8">
-          <button
-            onClick={() => setTelegramOpen(true)}
-            className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4"
+        <div data-title-paywall-cta-area="true">
+          <Link
+            ref={inlineCtaRef as any}
+            to={canWatch && playableContentId ? `/player/${playableContentId}` : "/?highlight=supporter#supporter-card"}
+            onClick={() => {
+              if (canWatch || !content?.id) return;
+              void trackSupporterEvent(supabase, {
+                event_type: "become_supporter_click",
+                source: "title_page_paywall_cta",
+                user_id: user?.id ?? null,
+                content_id: playableContentId || content.id,
+                metadata: { title_slug: slug, surface: "seo_title_page" },
+              });
+            }}
+            className="shine-cta w-full flex items-center justify-center gap-2 rounded-full py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-500 via-fuchsia-500 to-purple-600 hover:opacity-95 shadow-lg shadow-fuchsia-500/30"
           >
-            Not now
-          </button>
+            {canWatch ? <Play className="w-4 h-4" /> : <Crown className="w-4 h-4" />}
+            {canWatch ? "Watch episodes now" : "Yes, become a Supporter"}
+          </Link>
+
+          <div className="text-center mt-3 mb-8">
+            <button
+              onClick={() => setTelegramOpen(true)}
+              className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4"
+            >
+              Not now
+            </button>
+          </div>
         </div>
       </main>
 
       {/* Sticky bottom CTA — only for locked users, so they always see the action */}
-      {accessChecked && !canWatch && (
+      {accessChecked && !canWatch && !inlineCtaVisible && (
         <>
           <div className="h-24" aria-hidden />
           <div
-            className={`fixed bottom-0 inset-x-0 z-40 px-3 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 bg-gradient-to-t from-background via-background/95 to-background/0 pointer-events-none transition-opacity duration-300 ${
-              inlineCtaVisible ? "opacity-0 pointer-events-none" : "opacity-100"
-            }`}
-            aria-hidden={inlineCtaVisible}
+            className="fixed bottom-0 inset-x-0 z-40 px-3 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 bg-gradient-to-t from-background via-background/95 to-background/0 pointer-events-none transition-opacity duration-300 opacity-100"
+            aria-hidden="false"
           >
             <div className="max-w-3xl mx-auto pointer-events-auto">
               <Link
