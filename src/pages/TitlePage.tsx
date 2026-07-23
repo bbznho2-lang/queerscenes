@@ -101,12 +101,6 @@ const TitlePage = () => {
       });
     };
 
-    const io = new IntersectionObserver(
-      () => updateStickyVisibility(),
-      { rootMargin: "0px", threshold: [0, 0.01, 0.5, 1] }
-    );
-    io.observe(el);
-
     window.addEventListener("scroll", updateStickyVisibility, { passive: true });
     window.addEventListener("resize", updateStickyVisibility);
     window.visualViewport?.addEventListener("resize", updateStickyVisibility);
@@ -115,7 +109,6 @@ const TitlePage = () => {
 
     return () => {
       cancelAnimationFrame(raf);
-      io.disconnect();
       window.removeEventListener("scroll", updateStickyVisibility);
       window.removeEventListener("resize", updateStickyVisibility);
       window.visualViewport?.removeEventListener("resize", updateStickyVisibility);
