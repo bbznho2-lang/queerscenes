@@ -80,20 +80,20 @@ const TitlePage = () => {
   const [accessChecked, setAccessChecked] = useState(false);
   const trackedPaywallViewsRef = useRef<Set<string>>(new Set());
   const inlineCtaRef = useRef<HTMLAnchorElement | null>(null);
-  const ctaAreaRef = useRef<HTMLDivElement | null>(null);
   const [inlineCtaVisible, setInlineCtaVisible] = useState(false);
 
   useEffect(() => {
-    const el = ctaAreaRef.current;
-    if (!el || canWatch) return;
+    if (canWatch) return;
     let raf = 0;
 
     const updateStickyVisibility = () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
+        const el = document.querySelector('[data-title-paywall-cta-area="true"]') as HTMLElement | null;
+        if (!el) return;
         const rect = el.getBoundingClientRect();
         const viewportHeight = window.visualViewport?.height || window.innerHeight;
-        const inlineButtonVisible = rect.top < viewportHeight - 140;
+        const inlineButtonVisible = rect.top < viewportHeight - 120;
         const nearBottom =
           viewportHeight + window.scrollY >=
           document.documentElement.scrollHeight - 360;
@@ -431,7 +431,7 @@ const TitlePage = () => {
 
         {/* CTA — always route through the Player, which enforces supporter access
              and shows the episode list to supporters or the paywall to everyone else. */}
-        <div ref={ctaAreaRef}>
+        <div data-title-paywall-cta-area="true">
           <Link
             ref={inlineCtaRef as any}
             to={canWatch && playableContentId ? `/player/${playableContentId}` : "/?highlight=supporter#supporter-card"}
