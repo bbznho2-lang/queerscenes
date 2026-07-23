@@ -85,26 +85,40 @@ const TitlePage = () => {
   useEffect(() => {
     const el = inlineCtaRef.current;
     if (!el || canWatch) return;
+    let raf = 0;
+
+    const updateStickyVisibility = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const rect = el.getBoundingClientRect();
+        const viewportHeight = window.visualViewport?.height || window.innerHeight;
+        const inlineButtonVisible = rect.top < viewportHeight - 24 && rect.bottom > 24;
+        const nearBottom =
+          viewportHeight + window.scrollY >=
+          document.documentElement.scrollHeight - 220;
+        setInlineCtaVisible(inlineButtonVisible || nearBottom);
+      });
+    };
+
     const io = new IntersectionObserver(
-      ([entry]) => setInlineCtaVisible(entry.isIntersecting),
-      { rootMargin: "0px 0px -140px 0px", threshold: 0 }
+      () => updateStickyVisibility(),
+      { rootMargin: "0px", threshold: [0, 0.01, 0.5, 1] }
     );
     io.observe(el);
 
-    // Safari fallback: hide the sticky bar when the user is within ~160px of
-    // the page bottom (IntersectionObserver can miss it under Safari's UI).
-    const onScroll = () => {
-      const nearBottom =
-        window.innerHeight + window.scrollY >=
-        document.documentElement.scrollHeight - 160;
-      if (nearBottom) setInlineCtaVisible(true);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
+    window.addEventListener("scroll", updateStickyVisibility, { passive: true });
+    window.addEventListener("resize", updateStickyVisibility);
+    window.visualViewport?.addEventListener("resize", updateStickyVisibility);
+    window.visualViewport?.addEventListener("scroll", updateStickyVisibility);
+    updateStickyVisibility();
 
     return () => {
+      cancelAnimationFrame(raf);
       io.disconnect();
-      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scroll", updateStickyVisibility);
+      window.removeEventListener("resize", updateStickyVisibility);
+      window.visualViewport?.removeEventListener("resize", updateStickyVisibility);
+      window.visualViewport?.removeEventListener("scroll", updateStickyVisibility);
     };
   }, [canWatch, accessChecked, content?.id]);
 
