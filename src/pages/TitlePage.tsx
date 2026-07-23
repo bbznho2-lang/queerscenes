@@ -80,10 +80,11 @@ const TitlePage = () => {
   const [accessChecked, setAccessChecked] = useState(false);
   const trackedPaywallViewsRef = useRef<Set<string>>(new Set());
   const inlineCtaRef = useRef<HTMLAnchorElement | null>(null);
+  const ctaAreaRef = useRef<HTMLDivElement | null>(null);
   const [inlineCtaVisible, setInlineCtaVisible] = useState(false);
 
   useEffect(() => {
-    const el = inlineCtaRef.current;
+    const el = ctaAreaRef.current;
     if (!el || canWatch) return;
     let raf = 0;
 
@@ -92,10 +93,10 @@ const TitlePage = () => {
       raf = requestAnimationFrame(() => {
         const rect = el.getBoundingClientRect();
         const viewportHeight = window.visualViewport?.height || window.innerHeight;
-        const inlineButtonVisible = rect.top < viewportHeight - 96 && rect.bottom > 24;
+        const inlineButtonVisible = rect.top < viewportHeight - 140;
         const nearBottom =
           viewportHeight + window.scrollY >=
-          document.documentElement.scrollHeight - 520;
+          document.documentElement.scrollHeight - 360;
         setInlineCtaVisible(inlineButtonVisible || nearBottom);
       });
     };
@@ -430,32 +431,34 @@ const TitlePage = () => {
 
         {/* CTA — always route through the Player, which enforces supporter access
              and shows the episode list to supporters or the paywall to everyone else. */}
-        <Link
-          ref={inlineCtaRef as any}
-          to={canWatch && playableContentId ? `/player/${playableContentId}` : "/?highlight=supporter#supporter-card"}
-          onClick={() => {
-            if (canWatch || !content?.id) return;
-            void trackSupporterEvent(supabase, {
-              event_type: "become_supporter_click",
-              source: "title_page_paywall_cta",
-              user_id: user?.id ?? null,
-              content_id: playableContentId || content.id,
-              metadata: { title_slug: slug, surface: "seo_title_page" },
-            });
-          }}
-          className="shine-cta w-full flex items-center justify-center gap-2 rounded-full py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-500 via-fuchsia-500 to-purple-600 hover:opacity-95 shadow-lg shadow-fuchsia-500/30"
-        >
-          {canWatch ? <Play className="w-4 h-4" /> : <Crown className="w-4 h-4" />}
-          {canWatch ? "Watch episodes now" : "Yes, become a Supporter"}
-        </Link>
-
-        <div className="text-center mt-3 mb-8">
-          <button
-            onClick={() => setTelegramOpen(true)}
-            className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4"
+        <div ref={ctaAreaRef}>
+          <Link
+            ref={inlineCtaRef as any}
+            to={canWatch && playableContentId ? `/player/${playableContentId}` : "/?highlight=supporter#supporter-card"}
+            onClick={() => {
+              if (canWatch || !content?.id) return;
+              void trackSupporterEvent(supabase, {
+                event_type: "become_supporter_click",
+                source: "title_page_paywall_cta",
+                user_id: user?.id ?? null,
+                content_id: playableContentId || content.id,
+                metadata: { title_slug: slug, surface: "seo_title_page" },
+              });
+            }}
+            className="shine-cta w-full flex items-center justify-center gap-2 rounded-full py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-500 via-fuchsia-500 to-purple-600 hover:opacity-95 shadow-lg shadow-fuchsia-500/30"
           >
-            Not now
-          </button>
+            {canWatch ? <Play className="w-4 h-4" /> : <Crown className="w-4 h-4" />}
+            {canWatch ? "Watch episodes now" : "Yes, become a Supporter"}
+          </Link>
+
+          <div className="text-center mt-3 mb-8">
+            <button
+              onClick={() => setTelegramOpen(true)}
+              className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4"
+            >
+              Not now
+            </button>
+          </div>
         </div>
       </main>
 
