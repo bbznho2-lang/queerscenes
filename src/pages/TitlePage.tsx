@@ -463,14 +463,12 @@ const TitlePage = () => {
       </main>
 
       {/* Sticky bottom CTA — only for locked users, so they always see the action */}
-      {accessChecked && !canWatch && (
+      {accessChecked && !canWatch && !inlineCtaVisible && (
         <>
           <div className="h-24" aria-hidden />
           <div
-            className={`fixed bottom-0 inset-x-0 z-40 px-3 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 bg-gradient-to-t from-background via-background/95 to-background/0 pointer-events-none transition-opacity duration-300 ${
-              inlineCtaVisible ? "opacity-0 pointer-events-none" : "opacity-100"
-            }`}
-            aria-hidden={inlineCtaVisible}
+            className="fixed bottom-0 inset-x-0 z-40 px-3 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 bg-gradient-to-t from-background via-background/95 to-background/0 pointer-events-none transition-opacity duration-300 opacity-100"
+            aria-hidden="false"
           >
             <div className="max-w-3xl mx-auto pointer-events-auto">
               <Link
