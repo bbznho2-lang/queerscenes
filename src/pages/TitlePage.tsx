@@ -434,7 +434,12 @@ const TitlePage = () => {
       {accessChecked && !canWatch && (
         <>
           <div className="h-24" aria-hidden />
-          <div className="fixed bottom-0 inset-x-0 z-40 px-3 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 bg-gradient-to-t from-background via-background/95 to-background/0 pointer-events-none">
+          <div
+            className={`fixed bottom-0 inset-x-0 z-40 px-3 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 bg-gradient-to-t from-background via-background/95 to-background/0 pointer-events-none transition-opacity duration-300 ${
+              inlineCtaVisible ? "opacity-0 pointer-events-none" : "opacity-100"
+            }`}
+            aria-hidden={inlineCtaVisible}
+          >
             <div className="max-w-3xl mx-auto pointer-events-auto">
               <Link
                 to="/?highlight=supporter#supporter-card"
@@ -454,7 +459,7 @@ const TitlePage = () => {
                 Unlock this title — Become a Supporter
               </Link>
               <div className="text-center mt-1.5 text-[10px] text-muted-foreground font-semibold tracking-wide">
-                ↓ Scroll to see plans & benefits
+                ↓ Scroll down to see the preview & benefits
               </div>
             </div>
           </div>
