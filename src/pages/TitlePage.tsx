@@ -92,12 +92,11 @@ const TitlePage = () => {
       raf = requestAnimationFrame(() => {
         const rect = el.getBoundingClientRect();
         const viewportHeight = window.visualViewport?.height || window.innerHeight;
-        const inlineButtonReached = rect.top < viewportHeight - 96;
-        const inlineButtonVisible = inlineButtonReached && rect.bottom > 24;
+        const inlineButtonVisible = rect.top < viewportHeight - 96 && rect.bottom > 24;
         const nearBottom =
           viewportHeight + window.scrollY >=
-          document.documentElement.scrollHeight - 220;
-        setInlineCtaVisible(inlineButtonReached || inlineButtonVisible || nearBottom);
+          document.documentElement.scrollHeight - 520;
+        setInlineCtaVisible(inlineButtonVisible || nearBottom);
       });
     };
 
