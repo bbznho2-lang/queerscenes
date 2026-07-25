@@ -166,6 +166,11 @@ const TitlePage = () => {
       setAccessChecked(false);
       return;
     }
+    // Free titles (no supporter badge) are open to everyone — skip the paywall entirely.
+    if (content && content.is_premium === false && playableContentId) {
+      navigate(`/player/${playableContentId}`, { replace: true });
+      return;
+    }
     if (!user) {
       setCanWatch(false);
       setAccessChecked(true);
@@ -193,7 +198,7 @@ const TitlePage = () => {
       }
     })();
     return () => { cancelled = true; };
-  }, [user?.id, isAdmin, authLoading, playableContentId, navigate]);
+  }, [user?.id, isAdmin, authLoading, playableContentId, navigate, content?.id, content?.is_premium]);
 
   useEffect(() => {
     if (!content?.id || !accessChecked || canWatch) return;
