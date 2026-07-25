@@ -19,6 +19,7 @@ interface TitleContent {
   synopsis: string | null;
   preview_video_url: string | null;
   is_archived?: boolean | null;
+  is_premium?: boolean | null;
 }
 
 const SITE = "https://queerscenes.lovable.app";
@@ -122,7 +123,7 @@ const TitlePage = () => {
       setLoading(true);
       const { data } = await supabase
         .from("contents")
-        .select("id, title, year, tag, type, banner_url, synopsis, preview_video_url, is_archived")
+        .select("id, title, year, tag, type, banner_url, synopsis, preview_video_url, is_archived, is_premium")
         .order("title");
       if (cancelled) return;
       const list = ((data ?? []) as TitleContent[]).filter((c) => !c.is_archived);
@@ -165,6 +166,11 @@ const TitlePage = () => {
       setAccessChecked(false);
       return;
     }
+    // Free titles (no supporter badge) are open to everyone — skip the paywall entirely.
+    if (content && content.is_premium === false && playableContentId) {
+      navigate(`/player/${playableContentId}`, { replace: true });
+      return;
+    }
     if (!user) {
       setCanWatch(false);
       setAccessChecked(true);
@@ -192,7 +198,7 @@ const TitlePage = () => {
       }
     })();
     return () => { cancelled = true; };
-  }, [user?.id, isAdmin, authLoading, playableContentId, navigate]);
+  }, [user?.id, isAdmin, authLoading, playableContentId, navigate, content?.id, content?.is_premium]);
 
   useEffect(() => {
     if (!content?.id || !accessChecked || canWatch) return;
