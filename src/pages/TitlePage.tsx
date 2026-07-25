@@ -19,6 +19,7 @@ interface TitleContent {
   synopsis: string | null;
   preview_video_url: string | null;
   is_archived?: boolean | null;
+  is_premium?: boolean | null;
 }
 
 const SITE = "https://queerscenes.lovable.app";
