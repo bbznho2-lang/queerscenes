@@ -550,10 +550,10 @@ const Index = () => {
             <div className="qs-modal p-6 sm:p-7">
               <div className="space-y-1 mb-5">
                 <h2 className="text-2xl font-bold text-[var(--t1)]">
-                  {isForgot ? "Reset password" : isSignUp ? "Create account" : "Bem vindo ao Queer Scenes 💜"}
+                  {isForgot ? "Reset password" : isSignUp ? "Create account" : "Welcome to Queer Scenes 💜"}
                 </h2>
                 <p className="text-sm text-[var(--t2)]">
-                  {isForgot ? "Enter your email to receive a reset link" : isSignUp ? "Join the community" : "Faça login para explorar nosso catálogo"}
+                  {isForgot ? "Enter your email to receive a reset link" : isSignUp ? "Join the community" : "Log in to explore our catalog"}
                 </p>
               </div>
               <form onSubmit={handleLogin} className="space-y-4">
