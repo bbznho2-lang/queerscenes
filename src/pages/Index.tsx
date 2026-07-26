@@ -39,6 +39,7 @@ const Index = () => {
     return localStorage.getItem("qs_remember_email") || "";
   });
   const [password, setPassword] = useState("");
+  const [supportOpen, setSupportOpen] = useState(false);
   const [rememberMe, setRememberMe] = useState(() => {
     if (typeof window === "undefined") return true;
     return localStorage.getItem("qs_remember_me") !== "false";
