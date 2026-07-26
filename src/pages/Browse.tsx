@@ -548,7 +548,7 @@ const Browse = () => {
             {/* Header with admin add button */}
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-xl sm:text-2xl font-black neon-text-dark-blue flex items-center gap-2">
-                Movies
+                🎬Movies
               </h2>
               {isAdmin && (
                 <button onClick={() => handleNew("filmes", "filme")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add movie">
@@ -560,7 +560,7 @@ const Browse = () => {
             {/* Open Catalog */}
             <div>
               <div className="mb-5">
-                <h3 className="text-lg sm:text-xl font-black neon-text-blue">Open Catalog 🎬</h3>
+                <h3 className="text-lg sm:text-xl font-black neon-text-blue">🍿Open Catalog</h3>
               </div>
               {filmes.filter((f) => !f.is_premium).length > 0 ? (
                 <AutoScrollRow>
