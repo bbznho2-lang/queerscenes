@@ -134,6 +134,11 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
 
   }, [content, open]);
 
+  useEffect(() => {
+    if (section === "filmes_open" && isPremium) setSection("filmes_rare");
+    else if (section === "filmes_rare" && !isPremium) setSection("filmes_open");
+  }, [isPremium, section]);
+
   const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
