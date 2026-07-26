@@ -8,9 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, Trash2 } from "lucide-react";
+import { Camera, Trash2, LifeBuoy } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import SupportDialog from "./SupportDialog";
 
 interface ProfileDialogProps {
   open: boolean;
@@ -28,6 +29,7 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
   const [premiumExpiresAt, setPremiumExpiresAt] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [supportOpen, setSupportOpen] = useState(false);
 
   const handleDeleteAccount = async () => {
     setDeleting(true);
@@ -182,24 +184,26 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
             <p className="text-[11px] text-muted-foreground mt-2 text-center">
               You can sign up again later with the same email.
             </p>
-            <p className="text-[11px] text-muted-foreground mt-2 text-center">
-              Deleting your profile does not cancel your subscription. To cancel it, go to{" "}
-              <span className="text-[var(--t1)] font-semibold">Menu → Support</span>{" "}
-              or{" "}
-              <a
-                href="https://t.me/L7kznr"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => onOpenChange(false)}
-                className="text-[var(--brand-pink)] font-semibold hover:underline"
+
+            <div className="mt-4 rounded-xl border border-white/10 bg-white/[.03] p-3">
+              <p className="text-[11px] text-muted-foreground text-center mb-2">
+                Deleting your profile does not cancel your subscription.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full gap-2 border-[rgba(139,43,226,.45)] text-[var(--brand-purple-light)] hover:bg-[rgba(139,43,226,.1)]"
+                onClick={() => setSupportOpen(true)}
               >
-                click here
-              </a>
-              .
-            </p>
+                <LifeBuoy className="w-4 h-4" />
+                Contact Support / Cancel subscription
+              </Button>
+            </div>
           </div>
         </div>
       </DialogContent>
+
+      <SupportDialog open={supportOpen} onOpenChange={setSupportOpen} />
 
       <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <AlertDialogContent>
