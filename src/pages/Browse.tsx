@@ -561,7 +561,6 @@ const Browse = () => {
             <div>
               <div className="mb-5">
                 <h3 className="text-lg sm:text-xl font-black neon-text-purple">Open Catalog</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1">Explore for free. No account needed.</p>
               </div>
               {filmes.filter((f) => !f.is_premium).length > 0 ? (
                 <AutoScrollRow>
@@ -584,7 +583,6 @@ const Browse = () => {
                 <h3 className="text-lg sm:text-xl font-black neon-text-purple flex items-center gap-2">
                   <span>👑</span> Rare Premieres
                 </h3>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1">Hand-subtitled by our team. Not available on any streaming platform.</p>
               </div>
               {filmes.filter((f) => f.is_premium).length > 0 ? (
                 <AutoScrollRow>
