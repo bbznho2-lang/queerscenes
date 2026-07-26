@@ -13,6 +13,7 @@ import { getResetPasswordRedirectUrl } from "@/lib/auth-urls";
 import { buildUniqueTopContent, fetchTopContentRanking, getUniqueItemsByTitle } from "@/lib/top-content";
 import { getFunnelVisitorId, trackSupporterClick } from "@/lib/supporter-tracking";
 import { toast } from "sonner";
+import SupportDialog from "@/components/SupportDialog";
 
 const fade = {
   hidden: { opacity: 0, y: 20 },
@@ -38,6 +39,7 @@ const Index = () => {
     return localStorage.getItem("qs_remember_email") || "";
   });
   const [password, setPassword] = useState("");
+  const [supportOpen, setSupportOpen] = useState(false);
   const [rememberMe, setRememberMe] = useState(() => {
     if (typeof window === "undefined") return true;
     return localStorage.getItem("qs_remember_me") !== "false";
@@ -915,7 +917,7 @@ const Index = () => {
                 { q: "Is Queer Scenes free?", a: "Yes. We have free content available. We also offer Supporter plans with exclusive access for the full experience." },
                 { q: "How do I become a Supporter?", a: "Pick a Supporter plan, complete the secure checkout, and your account will be upgraded instantly." },
                 { q: "Can I cancel anytime?", a: "Yes. Cancellation can be done at any time, with no penalty." },
-                { q: "How do I cancel my subscription?", a: (<>Just contact our support team. We'll process the cancellation and provide all the information you need about the process. Reach us on Telegram: <a href="https://t.me/L7kznr" target="_blank" rel="noopener noreferrer" className="text-[var(--brand-pink)] underline hover:opacity-80">@L7kznr</a>.</>) },
+                { q: "How do I cancel my subscription?", a: (<>Open the <button type="button" onClick={() => setSupportOpen(true)} className="text-[var(--brand-pink)] underline hover:opacity-80 font-semibold">Support</button> form and choose "Cancel subscription" — we'll process it and reply by email. You can also reach us on Telegram: <a href="https://t.me/L7kznr" target="_blank" rel="noopener noreferrer" className="text-[var(--brand-pink)] underline hover:opacity-80">@L7kznr</a>.</>) },
                 { q: "Is the content only LGBTQIA+?", a: "Yes. The platform's focus is exclusively on stories, scenes, and productions with LGBTQIA+ representation." },
                 { q: "Does it work on mobile?", a: "Yes. The platform is adapted for mobile, tablet, and desktop." },
                 { q: "Can I become a Supporter from outside Europe?", a: "Yes. Anyone in the world can become a Supporter, even though the plans are priced in Euros (EUR). Checkout is handled by Stripe, which automatically converts the charge to your local currency using your card's exchange rate — no European address or bank account required." },
@@ -961,6 +963,7 @@ const Index = () => {
         <p>© 2026 Queer Scenes. All rights reserved. 🌈</p>
       </footer>
 
+      <SupportDialog open={supportOpen} onOpenChange={setSupportOpen} />
     </div>
   );
 };

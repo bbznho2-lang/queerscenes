@@ -6,6 +6,7 @@ import { XIcon } from "@/components/icons/XIcon";
 import { Button } from "@/components/ui/button";
 
 import ProfileDialog from "@/components/ProfileDialog";
+import SupportDialog from "@/components/SupportDialog";
 import MessagesPopover from "@/components/MessagesPopover";
 import TitlesTicker from "@/components/TitlesTicker";
 import EditContentDialog from "@/components/EditContentDialog";
@@ -141,6 +142,7 @@ const Browse = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [profileOpen, setProfileOpen] = useState(false);
+  const [supportOpen, setSupportOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [editingContent, setEditingContent] = useState<ContentItem | null>(null);
   const [newDefaults, setNewDefaults] = useState<{ section: string; type: string }>({ section: "series", type: "filme" });
@@ -298,7 +300,7 @@ const Browse = () => {
     { label: "My List", icon: "🔖", action: () => { setMenuOpen(false); document.getElementById("minha-lista")?.scrollIntoView({ behavior: "smooth" }); } },
     ...(!isAdmin && !userIsPremium ? [{ label: "Become a Supporter", icon: "👑", action: () => { setMenuOpen(false); goToPlans("browse_sidebar"); }, premium: true }] : []),
     { label: "Telegram Community", icon: "📣", action: () => { setMenuOpen(false); window.open("https://t.me/QueerScenesTv", "_blank", "noopener,noreferrer"); } },
-    { label: "Support", icon: "💬", action: () => { setMenuOpen(false); window.open("https://t.me/L7kznr", "_blank", "noopener,noreferrer"); } },
+    { label: "Support", icon: "💬", action: () => { setMenuOpen(false); setSupportOpen(true); } },
     { label: "Profile", icon: "👤", action: () => { setMenuOpen(false); setProfileOpen(true); } },
     ...(isAdmin ? [{ label: "Admin Panel", icon: "⚙️", action: () => { setMenuOpen(false); navigate("/admin"); } }] : []),
   ];
@@ -698,6 +700,7 @@ const Browse = () => {
       </footer>
 
       <ProfileDialog open={profileOpen} onOpenChange={setProfileOpen} />
+      <SupportDialog open={supportOpen} onOpenChange={setSupportOpen} />
       
       <EditContentDialog open={editOpen} onOpenChange={setEditOpen} content={editingContent} onSaved={fetchContents} defaults={newDefaults} />
       <AddExistingContentDialog open={addExistingOpen} onOpenChange={setAddExistingOpen} targetSection="exclusivos" onSaved={fetchContents} />
