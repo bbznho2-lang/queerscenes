@@ -142,6 +142,7 @@ const Browse = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [profileOpen, setProfileOpen] = useState(false);
+  const [supportOpen, setSupportOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [editingContent, setEditingContent] = useState<ContentItem | null>(null);
   const [newDefaults, setNewDefaults] = useState<{ section: string; type: string }>({ section: "series", type: "filme" });
