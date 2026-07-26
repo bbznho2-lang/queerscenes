@@ -29,6 +29,7 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
   const [premiumExpiresAt, setPremiumExpiresAt] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [supportOpen, setSupportOpen] = useState(false);
 
   const handleDeleteAccount = async () => {
     setDeleting(true);
