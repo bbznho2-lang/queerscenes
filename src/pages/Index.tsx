@@ -121,7 +121,15 @@ const Index = () => {
 
   const scrollToLogin = useCallback((behavior: ScrollBehavior = "smooth") => {
     if (typeof window === "undefined") return;
+    let cancelled = false;
+    const cancel = () => { cancelled = true; };
+    // If the user starts scrolling/touching, abort any pending programmatic scrolls
+    window.addEventListener("wheel", cancel, { once: true, passive: true });
+    window.addEventListener("touchstart", cancel, { once: true, passive: true });
+    window.addEventListener("keydown", cancel, { once: true });
+
     const doScroll = (scrollBehavior: ScrollBehavior = behavior) => {
+      if (cancelled) return;
       const el = document.getElementById("login");
       if (!el) return;
       const rect = el.getBoundingClientRect();
@@ -130,11 +138,9 @@ const Index = () => {
       const targetTop = window.scrollY + rect.top - offset;
       window.scrollTo({ top: Math.max(0, targetTop), behavior: scrollBehavior });
     };
-    // Re-measure after the landing rows/images settle so the CTA doesn't stop on the banner rows.
     requestAnimationFrame(() => requestAnimationFrame(() => doScroll(behavior)));
-    window.setTimeout(() => doScroll("auto"), 350);
-    window.setTimeout(() => doScroll("auto"), 900);
   }, []);
+
 
   useEffect(() => {
     const loadCatalog = async () => {
@@ -544,10 +550,10 @@ const Index = () => {
             <div className="qs-modal p-6 sm:p-7">
               <div className="space-y-1 mb-5">
                 <h2 className="text-2xl font-bold text-[var(--t1)]">
-                  {isForgot ? "Reset password" : isSignUp ? "Create account" : "Welcome back 👋"}
+                  {isForgot ? "Reset password" : isSignUp ? "Create account" : "Bem vindo ao Queer Scenes 💜"}
                 </h2>
                 <p className="text-sm text-[var(--t2)]">
-                  {isForgot ? "Enter your email to receive a reset link" : isSignUp ? "Join the community" : "Sign in to continue watching"}
+                  {isForgot ? "Enter your email to receive a reset link" : isSignUp ? "Join the community" : "Faça login para explorar nosso catálogo"}
                 </p>
               </div>
               <form onSubmit={handleLogin} className="space-y-4">
