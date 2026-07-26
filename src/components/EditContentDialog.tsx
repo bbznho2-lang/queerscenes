@@ -120,7 +120,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setYear(2025);
       setTag("Drama");
       setType(defaults?.type || "filme");
-      setSection(defaults?.section || "series");
+      setSection(toUiSection(defaults?.section, false));
       setPlayerUrl("");
       setBannerPreview("");
       setBannerUrlInput("");
