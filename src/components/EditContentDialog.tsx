@@ -180,7 +180,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         year,
         tag,
         type,
-        section,
+        section: toDbSection(section),
         player_url: legacyMoviePlayer,
         links: cleanMovieLinks as any,
         banner_url: bannerUrl,
