@@ -544,32 +544,62 @@ const Browse = () => {
 
         {/* MOVIES */}
         <section id="filmes" className="py-10 sm:py-16 px-4">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-6 gap-3">
+          <div className="max-w-7xl mx-auto space-y-10">
+            {/* Header with admin add button */}
+            <div className="flex items-center justify-between gap-3">
               <h2 className="text-xl sm:text-2xl font-black neon-text-dark-blue flex items-center gap-2">
                 <span>🎬</span> Iconic Movies
               </h2>
-              <div className="flex items-center gap-2">
-                {isAdmin && (
-                  <button onClick={() => handleNew("filmes", "filme")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add movie">
-                    <Plus className="w-5 h-5 text-primary" />
-                  </button>
-                )}
-              </div>
+              {isAdmin && (
+                <button onClick={() => handleNew("filmes", "filme")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add movie">
+                  <Plus className="w-5 h-5 text-primary" />
+                </button>
+              )}
             </div>
-            {filmes.length > 0 ? (
-              <AutoScrollRow>
-                {filmes.map((f) => (
-                  <div key={f.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={f} isAdmin={isAdmin} onEdit={() => handleEdit(f)} onDelete={() => handleDelete(f.id)} onClickTrack={() => trackClick(f.id)} isInWatchlist={watchlistIds.has(f.id)} onToggleWatchlist={() => toggleWatchlist(f.id)} userIsPremium={userIsPremium} />
-                  </div>
-                ))}
-              </AutoScrollRow>
-            ) : (
-              <p className="text-muted-foreground text-center py-8">
-                {isAdmin ? "Click + to add movies" : "New content coming soon!"}
-              </p>
-            )}
+
+            {/* Open Catalog */}
+            <div>
+              <div className="mb-5">
+                <h3 className="text-lg sm:text-xl font-black neon-text-purple">Open Catalog</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">Explore for free. No account needed.</p>
+              </div>
+              {filmes.filter((f) => !f.is_premium).length > 0 ? (
+                <AutoScrollRow>
+                  {filmes.filter((f) => !f.is_premium).map((f) => (
+                    <div key={f.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
+                      <ContentCard item={f} isAdmin={isAdmin} onEdit={() => handleEdit(f)} onDelete={() => handleDelete(f.id)} onClickTrack={() => trackClick(f.id)} isInWatchlist={watchlistIds.has(f.id)} onToggleWatchlist={() => toggleWatchlist(f.id)} userIsPremium={userIsPremium} />
+                    </div>
+                  ))}
+                </AutoScrollRow>
+              ) : (
+                <p className="text-muted-foreground text-center py-8">
+                  {isAdmin ? "No free movies yet" : "New content coming soon!"}
+                </p>
+              )}
+            </div>
+
+            {/* Rare Premieres */}
+            <div>
+              <div className="mb-5">
+                <h3 className="text-lg sm:text-xl font-black neon-text-purple flex items-center gap-2">
+                  <span>👑</span> Rare Premieres
+                </h3>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">Hand-subtitled by our team. Not available on any streaming platform.</p>
+              </div>
+              {filmes.filter((f) => f.is_premium).length > 0 ? (
+                <AutoScrollRow>
+                  {filmes.filter((f) => f.is_premium).map((f) => (
+                    <div key={f.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
+                      <ContentCard item={f} isAdmin={isAdmin} onEdit={() => handleEdit(f)} onDelete={() => handleDelete(f.id)} onClickTrack={() => trackClick(f.id)} isInWatchlist={watchlistIds.has(f.id)} onToggleWatchlist={() => toggleWatchlist(f.id)} userIsPremium={userIsPremium} />
+                    </div>
+                  ))}
+                </AutoScrollRow>
+              ) : (
+                <p className="text-muted-foreground text-center py-8">
+                  {isAdmin ? "No supporter-only movies yet" : "New content coming soon!"}
+                </p>
+              )}
+            </div>
           </div>
         </section>
 
