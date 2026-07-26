@@ -339,7 +339,8 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                 <SelectTrigger className="bg-muted border-border"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="series">Series</SelectItem>
-                  <SelectItem value="filmes">Movies</SelectItem>
+                  <SelectItem value="filmes_open">Movies (Open Catalog)</SelectItem>
+                  <SelectItem value="filmes_rare">Movies (Rare Premiers)</SelectItem>
                   <SelectItem value="novelas">Soap Operas</SelectItem>
                   <SelectItem value="gl">GL Dramas</SelectItem>
                   <SelectItem value="exclusivos">Queer Scenes Exclusives</SelectItem>
