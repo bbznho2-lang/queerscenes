@@ -963,6 +963,7 @@ const Index = () => {
         <p>© 2026 Queer Scenes. All rights reserved. 🌈</p>
       </footer>
 
+      <SupportDialog open={supportOpen} onOpenChange={setSupportOpen} />
     </div>
   );
 };
