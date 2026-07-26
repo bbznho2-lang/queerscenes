@@ -45,12 +45,22 @@ interface Props {
   defaults?: { section: string; type: string };
 }
 
+const toUiSection = (dbSection?: string, premium?: boolean) => {
+  if (dbSection === "filmes") return premium ? "filmes_rare" : "filmes_open";
+  return dbSection || "series";
+};
+
+const toDbSection = (uiSection: string) => {
+  if (uiSection === "filmes_open" || uiSection === "filmes_rare") return "filmes";
+  return uiSection;
+};
+
 const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: Props) => {
   const [title, setTitle] = useState("");
   const [year, setYear] = useState(2025);
   const [tag, setTag] = useState("Drama");
   const [type, setType] = useState("filme");
-  const [section, setSection] = useState("filmes");
+  const [section, setSection] = useState("filmes_open");
   const [playerUrl, setPlayerUrl] = useState("");
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [bannerPreview, setBannerPreview] = useState("");
@@ -70,7 +80,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setYear(content.year);
       setTag(content.tag);
       setType(content.type);
-      setSection(content.section);
+      setSection(toUiSection(content.section, content.is_premium));
       const legacy = content.player_url || (content as any).player_url_free || "";
       setPlayerUrl(legacy);
       if (!legacy) {
@@ -110,7 +120,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setYear(2025);
       setTag("Drama");
       setType(defaults?.type || "filme");
-      setSection(defaults?.section || "series");
+      setSection(toUiSection(defaults?.section, false));
       setPlayerUrl("");
       setBannerPreview("");
       setBannerUrlInput("");
@@ -123,6 +133,11 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
     }
 
   }, [content, open]);
+
+  useEffect(() => {
+    if (section === "filmes_open" && isPremium) setSection("filmes_rare");
+    else if (section === "filmes_rare" && !isPremium) setSection("filmes_open");
+  }, [isPremium, section]);
 
   const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -165,7 +180,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         year,
         tag,
         type,
-        section,
+        section: toDbSection(section),
         player_url: legacyMoviePlayer,
         links: cleanMovieLinks as any,
         banner_url: bannerUrl,
@@ -324,7 +339,8 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                 <SelectTrigger className="bg-muted border-border"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="series">Series</SelectItem>
-                  <SelectItem value="filmes">Movies</SelectItem>
+                  <SelectItem value="filmes_open">Movies (Open Catalog)</SelectItem>
+                  <SelectItem value="filmes_rare">Movies (Rare Premiers)</SelectItem>
                   <SelectItem value="novelas">Soap Operas</SelectItem>
                   <SelectItem value="gl">GL Dramas</SelectItem>
                   <SelectItem value="exclusivos">Queer Scenes Exclusives</SelectItem>
