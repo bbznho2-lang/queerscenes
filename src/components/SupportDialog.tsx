@@ -1,222 +1,213 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, MessageCircle, ArrowLeft } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { MessageCircle, Mail, HelpCircle, XCircle, Crown } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 interface SupportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-interface ChatMessage {
-  id: string;
-  chat_id: string;
-  sender_role: string;
-  message: string;
-  created_at: string;
-}
+const SUPPORT_EMAIL = "scenes.queer@gmail.com";
 
-const CHAT_ID_KEY = "support_chat_id";
-const CHAT_TOKEN_KEY = "support_chat_token";
+type Purpose = "question" | "cancel";
 
 const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
-  const [name, setName] = useState("");
+  const { user } = useAuth();
   const [email, setEmail] = useState("");
-  const [chatId, setChatId] = useState<string | null>(null);
-  const [chatToken, setChatToken] = useState<string | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [newMessage, setNewMessage] = useState("");
-  const [sending, setSending] = useState(false);
-  const [starting, setStarting] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [name, setName] = useState("");
+  const [isSupporter, setIsSupporter] = useState<boolean | null>(null);
+  const [purpose, setPurpose] = useState<Purpose>("question");
+  const [message, setMessage] = useState("");
+  const [reason, setReason] = useState("");
 
   useEffect(() => {
-    if (open) {
-      const savedId = localStorage.getItem(CHAT_ID_KEY);
-      const savedToken = localStorage.getItem(CHAT_TOKEN_KEY);
-      if (savedId && savedToken) {
-        setChatId(savedId);
-        setChatToken(savedToken);
-      }
-    }
-  }, [open]);
-
-  useEffect(() => {
-    if (!chatId || !chatToken) return;
-    const load = () => loadMessages(chatId, chatToken);
-    load();
-    const interval = setInterval(load, 1200);
-    return () => clearInterval(interval);
-  }, [chatId, chatToken]);
-
-  useEffect(() => {
-    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [messages]);
-
-  const loadMessages = async (id: string, token: string) => {
-    const { data, error } = await supabase.rpc("list_support_chat_messages" as any, { _chat_id: id, _token: token });
-    if (!error && data) setMessages(data as ChatMessage[]);
-  };
-
-  const startChat = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim() || !email.trim()) {
-      toast.error("Please fill in your name and email.");
+    if (!open) return;
+    if (user?.email) setEmail(user.email);
+    if (!user) {
+      setIsSupporter(null);
       return;
     }
-    setStarting(true);
-    try {
-      const { data, error } = await supabase.rpc("start_support_chat" as any, {
-        _name: name.trim(),
-        _email: email.trim(),
-      });
-      if (error || !data) {
-        toast.error("Error starting chat.");
-        return;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("first_name, last_name, is_premium, premium_expires_at")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (data) {
+        const composed = [data.first_name, data.last_name].filter(Boolean).join(" ").trim();
+        if (composed) setName(composed);
+        const notExpired = !data.premium_expires_at || new Date(data.premium_expires_at) > new Date();
+        setIsSupporter(Boolean(data.is_premium && notExpired));
+      } else {
+        setIsSupporter(false);
       }
-      const result = data as { id: string; token: string };
-      setChatId(result.id);
-      setChatToken(result.token);
-      localStorage.setItem(CHAT_ID_KEY, result.id);
-      localStorage.setItem(CHAT_TOKEN_KEY, result.token);
-      setMessages([]);
-    } finally {
-      setStarting(false);
-    }
-  };
+    })();
+  }, [open, user]);
 
-  const sendMessage = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !chatId || !chatToken) return;
-    setSending(true);
-    try {
-      const { error } = await supabase.rpc("send_support_chat_message" as any, {
-        _chat_id: chatId,
-        _token: chatToken,
-        _message: newMessage.trim(),
-      });
-      if (error) {
-        toast.error("Error sending message.");
-        return;
-      }
-      setNewMessage("");
-      loadMessages(chatId, chatToken);
-    } finally {
-      setSending(false);
+    if (!email.trim()) { toast.error("Please enter your email."); return; }
+    if (purpose === "cancel" && !reason.trim()) {
+      toast.error("Please tell us the reason for cancellation.");
+      return;
     }
-  };
+    if (purpose === "question" && !message.trim()) {
+      toast.error("Please describe your question.");
+      return;
+    }
 
-  const endChat = () => {
-    setChatId(null);
-    setChatToken(null);
-    setMessages([]);
-    setName("");
-    setEmail("");
-    localStorage.removeItem(CHAT_ID_KEY);
-    localStorage.removeItem(CHAT_TOKEN_KEY);
+    const subject = purpose === "cancel"
+      ? "Cancel subscription request"
+      : "Support question";
+
+    const statusLine = isSupporter === true
+      ? "Account status: Supporter ⭐"
+      : isSupporter === false
+      ? "Account status: Free user"
+      : "Account status: Not logged in";
+
+    const bodyLines = [
+      `From: ${name || "(no name)"} <${email}>`,
+      statusLine,
+      "",
+      purpose === "cancel" ? "Request: Cancel subscription" : "Request: Question / help",
+      "",
+      purpose === "cancel" ? `Reason for cancellation:\n${reason}` : `Message:\n${message}`,
+    ];
+
+    const mailto = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join("\n"))}`;
+    window.location.href = mailto;
+    toast.success("Opening your email app...");
+    setTimeout(() => onOpenChange(false), 400);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="qs-modal max-w-md flex flex-col max-h-[85vh]">
+      <DialogContent className="qs-modal max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl flex items-center gap-2 text-grad-brand">
-            {chatId && (
-              <button onClick={endChat} className="hover:bg-white/10 rounded-full p-1 transition-colors text-[var(--t1)]">
-                <ArrowLeft className="w-4 h-4" />
-              </button>
-            )}
-            Live Support
-          </DialogTitle>
+          <DialogTitle className="text-xl text-grad-brand">Support</DialogTitle>
         </DialogHeader>
 
-        {!chatId ? (
-          <form onSubmit={startChat} className="space-y-4 pt-2">
-            <div className="space-y-2">
-              <Label className="text-[var(--t2)] text-xs">Name</Label>
-              <Input
-                placeholder="Your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="qs-input"
-                maxLength={100}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-[var(--t2)] text-xs">Email</Label>
-              <Input
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="qs-input"
-                maxLength={255}
-              />
-            </div>
-            <Button type="submit" disabled={starting} className="qs-btn-primary w-full gap-2">
-              <MessageCircle className="w-4 h-4" /> {starting ? "Starting..." : "Start Chat"}
-            </Button>
+        <div className="space-y-4 pt-1">
+          <p className="text-sm text-[var(--t2)]">
+            Ask a question or cancel your subscription. We'll reply as soon as possible — for faster answers, use Telegram.
+          </p>
 
-            <div className="border-t border-white/5 pt-4 mt-2">
-              <p className="text-xs text-[var(--t2)] text-center mb-3">For faster responses:</p>
-              <a
-                href="https://t.me/L7kznr"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full border border-[rgba(139,43,226,.45)] text-[var(--brand-purple-light)] hover:bg-[rgba(139,43,226,.1)] transition-colors text-sm font-medium"
-              >
-                <MessageCircle className="w-4 h-4" /> Join Telegram
-              </a>
+          {/* Account line */}
+          <div className="rounded-lg border border-white/10 bg-white/[.03] px-3 py-2 text-xs flex items-center justify-between gap-2">
+            <div className="min-w-0">
+              <div className="text-[10px] uppercase tracking-wider text-[var(--t2)]">Sending from</div>
+              <div className="text-[var(--t1)] truncate">{email || "not logged in"}</div>
             </div>
-          </form>
-        ) : (
-          <div className="flex flex-col flex-1 min-h-0">
-            <ScrollArea className="flex-1 pr-3 min-h-[250px] max-h-[400px]">
-              <div ref={scrollRef} className="space-y-3 py-2">
-                {messages.length === 0 && (
-                  <p className="text-xs text-[var(--t2)] text-center py-8">
-                    Send a message to start the conversation. We'll respond as soon as possible!
-                  </p>
-                )}
-                {messages.map((msg) => (
-                  <div key={msg.id} className={`flex ${msg.sender_role === "user" ? "justify-end" : "justify-start"}`}>
-                    <div
-                      className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm ${
-                        msg.sender_role === "user"
-                          ? "bg-grad-pb text-white rounded-br-md"
-                          : "bg-[var(--s2)] text-[var(--t1)] rounded-bl-md"
-                      }`}
-                    >
-                      <p className="whitespace-pre-wrap break-words">{msg.message}</p>
-                      <span className="text-[10px] opacity-60 mt-1 block">
-                        {new Date(msg.created_at).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-
-            <form onSubmit={sendMessage} className="flex gap-2 pt-3 border-t border-white/5 mt-2">
-              <Input
-                placeholder="Type a message..."
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                className="qs-input flex-1"
-                maxLength={1000}
-                autoFocus
-              />
-              <Button type="submit" size="icon" disabled={sending || !newMessage.trim()} className="qs-btn-primary rounded-full shrink-0">
-                <Send className="w-4 h-4" />
-              </Button>
-            </form>
+            {isSupporter === true && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-400/30 px-2 py-0.5 text-[10px] font-semibold">
+                <Crown className="w-3 h-3" /> Supporter
+              </span>
+            )}
+            {isSupporter === false && (
+              <span className="inline-flex items-center rounded-full bg-white/5 text-[var(--t2)] border border-white/10 px-2 py-0.5 text-[10px] font-semibold">
+                Free
+              </span>
+            )}
           </div>
-        )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Purpose */}
+            <div className="space-y-2">
+              <Label className="text-[var(--t2)] text-xs">What do you need?</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPurpose("question")}
+                  className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm transition-colors ${
+                    purpose === "question"
+                      ? "border-[rgba(139,43,226,.6)] bg-[rgba(139,43,226,.12)] text-[var(--t1)]"
+                      : "border-white/10 bg-white/[.02] text-[var(--t2)] hover:text-[var(--t1)]"
+                  }`}
+                >
+                  <HelpCircle className="w-4 h-4" /> Ask a question
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPurpose("cancel")}
+                  className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm transition-colors ${
+                    purpose === "cancel"
+                      ? "border-pink-500/60 bg-pink-500/10 text-[var(--t1)]"
+                      : "border-white/10 bg-white/[.02] text-[var(--t2)] hover:text-[var(--t1)]"
+                  }`}
+                >
+                  <XCircle className="w-4 h-4" /> Cancel subscription
+                </button>
+              </div>
+            </div>
+
+            {/* Email (editable in case not logged in) */}
+            {!user && (
+              <div className="space-y-1.5">
+                <Label className="text-[var(--t2)] text-xs">Your email</Label>
+                <Input
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="qs-input"
+                  maxLength={255}
+                />
+              </div>
+            )}
+
+            {purpose === "question" ? (
+              <div className="space-y-1.5">
+                <Label className="text-[var(--t2)] text-xs">Your question</Label>
+                <Textarea
+                  placeholder="Describe your question or issue…"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className="qs-input min-h-[110px]"
+                  maxLength={2000}
+                />
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                <Label className="text-[var(--t2)] text-xs">
+                  Reason for cancellation <span className="text-pink-400">*required</span>
+                </Label>
+                <Textarea
+                  placeholder="Tell us why you want to cancel — it helps us improve."
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  className="qs-input min-h-[110px]"
+                  maxLength={2000}
+                  required
+                />
+              </div>
+            )}
+
+            <Button type="submit" className="qs-btn-primary w-full gap-2">
+              <Mail className="w-4 h-4" />
+              Send email to {SUPPORT_EMAIL}
+            </Button>
+          </form>
+
+          <div className="border-t border-white/5 pt-4">
+            <p className="text-xs text-[var(--t2)] text-center mb-2">Prefer a faster reply?</p>
+            <a
+              href="https://t.me/L7kznr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full border border-[rgba(139,43,226,.45)] text-[var(--brand-purple-light)] hover:bg-[rgba(139,43,226,.1)] transition-colors text-sm font-medium"
+            >
+              <MessageCircle className="w-4 h-4" /> Chat on Telegram
+            </a>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );
