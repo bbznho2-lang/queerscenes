@@ -13,6 +13,7 @@ import { getResetPasswordRedirectUrl } from "@/lib/auth-urls";
 import { buildUniqueTopContent, fetchTopContentRanking, getUniqueItemsByTitle } from "@/lib/top-content";
 import { getFunnelVisitorId, trackSupporterClick } from "@/lib/supporter-tracking";
 import { toast } from "sonner";
+import SupportDialog from "@/components/SupportDialog";
 
 const fade = {
   hidden: { opacity: 0, y: 20 },
