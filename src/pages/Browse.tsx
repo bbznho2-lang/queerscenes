@@ -6,6 +6,7 @@ import { XIcon } from "@/components/icons/XIcon";
 import { Button } from "@/components/ui/button";
 
 import ProfileDialog from "@/components/ProfileDialog";
+import SupportDialog from "@/components/SupportDialog";
 import MessagesPopover from "@/components/MessagesPopover";
 import TitlesTicker from "@/components/TitlesTicker";
 import EditContentDialog from "@/components/EditContentDialog";
