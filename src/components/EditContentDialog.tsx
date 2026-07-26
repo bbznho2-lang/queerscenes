@@ -45,12 +45,22 @@ interface Props {
   defaults?: { section: string; type: string };
 }
 
+const toUiSection = (dbSection?: string, premium?: boolean) => {
+  if (dbSection === "filmes") return premium ? "filmes_rare" : "filmes_open";
+  return dbSection || "series";
+};
+
+const toDbSection = (uiSection: string) => {
+  if (uiSection === "filmes_open" || uiSection === "filmes_rare") return "filmes";
+  return uiSection;
+};
+
 const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: Props) => {
   const [title, setTitle] = useState("");
   const [year, setYear] = useState(2025);
   const [tag, setTag] = useState("Drama");
   const [type, setType] = useState("filme");
-  const [section, setSection] = useState("filmes");
+  const [section, setSection] = useState("filmes_open");
   const [playerUrl, setPlayerUrl] = useState("");
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [bannerPreview, setBannerPreview] = useState("");
