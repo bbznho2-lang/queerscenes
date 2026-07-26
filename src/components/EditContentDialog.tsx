@@ -80,7 +80,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setYear(content.year);
       setTag(content.tag);
       setType(content.type);
-      setSection(content.section);
+      setSection(toUiSection(content.section, content.is_premium));
       const legacy = content.player_url || (content as any).player_url_free || "";
       setPlayerUrl(legacy);
       if (!legacy) {
