@@ -117,119 +117,156 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
         </DialogHeader>
 
         <div className="space-y-4 pt-1">
-          <p className="text-sm text-[var(--t2)] break-words">
-            Ask a question or cancel your subscription. We'll reply as soon as possible — for faster answers, use Telegram.
-          </p>
-
-          {/* Account line */}
-          <div className="rounded-lg border border-white/10 bg-white/[.03] px-3 py-2 text-xs flex items-center justify-between gap-2">
-            <div className="min-w-0 flex-1">
-              <div className="text-[10px] uppercase tracking-wider text-[var(--t2)]">Sending from</div>
-              <div className="text-[var(--t1)] truncate" translate="no">{email || "not logged in"}</div>
+          {showRetention ? (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-[var(--t1)] break-words leading-tight">
+                Wait — here's what you'll lose access to 💜
+              </h3>
+              <ul className="space-y-2">
+                {retentionItems.map((item, i) => (
+                  <li
+                    key={i}
+                    className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/[.03] px-3 py-2.5"
+                  >
+                    <span className="text-xl flex-shrink-0 leading-none pt-0.5">{item.icon}</span>
+                    <span className="text-sm text-[var(--t1)] min-w-0 break-words leading-snug">
+                      {item.text}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <Button
+                type="button"
+                onClick={() => onOpenChange(false)}
+                className="qs-btn-primary w-full whitespace-normal h-auto min-h-[3rem] py-2 text-center leading-tight"
+              >
+                <span className="min-w-0 break-words">Keep my access 💜</span>
+              </Button>
+              <button
+                type="button"
+                onClick={() => setShowRetention(false)}
+                className="w-full text-xs text-[var(--t2)] hover:text-[var(--t1)] underline underline-offset-2 py-1"
+              >
+                Cancel anyway
+              </button>
             </div>
-            {isSupporter === true && (
-              <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-400/30 px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap">
-                <Crown className="w-3 h-3" /> Supporter
-              </span>
-            )}
-            {isSupporter === false && (
-              <span className="inline-flex flex-shrink-0 items-center rounded-full bg-white/5 text-[var(--t2)] border border-white/10 px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap">
-                Free
-              </span>
-            )}
-          </div>
+          ) : (
+            <>
+              <p className="text-sm text-[var(--t2)] break-words">
+                Ask a question or cancel your subscription. We'll reply as soon as possible — for faster answers, use Telegram.
+              </p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Purpose */}
-            <div className="space-y-2">
-              <Label className="text-[var(--t2)] text-xs">What do you need?</Label>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setPurpose("question")}
-                  className={`flex min-w-0 items-center justify-center gap-2 rounded-xl border px-2 py-2.5 text-sm text-center leading-tight transition-colors ${
-                    purpose === "question"
-                      ? "border-[rgba(139,43,226,.6)] bg-[rgba(139,43,226,.12)] text-[var(--t1)]"
-                      : "border-white/10 bg-white/[.02] text-[var(--t2)] hover:text-[var(--t1)]"
-                  }`}
+              {/* Account line */}
+              <div className="rounded-lg border border-white/10 bg-white/[.03] px-3 py-2 text-xs flex items-center justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <div className="text-[10px] uppercase tracking-wider text-[var(--t2)]">Sending from</div>
+                  <div className="text-[var(--t1)] truncate" translate="no">{email || "not logged in"}</div>
+                </div>
+                {isSupporter === true && (
+                  <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-400/30 px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap">
+                    <Crown className="w-3 h-3" /> Supporter
+                  </span>
+                )}
+                {isSupporter === false && (
+                  <span className="inline-flex flex-shrink-0 items-center rounded-full bg-white/5 text-[var(--t2)] border border-white/10 px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap">
+                    Free
+                  </span>
+                )}
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Purpose */}
+                <div className="space-y-2">
+                  <Label className="text-[var(--t2)] text-xs">What do you need?</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handlePurposeChange("question")}
+                      className={`flex min-w-0 items-center justify-center gap-2 rounded-xl border px-2 py-2.5 text-sm text-center leading-tight transition-colors ${
+                        purpose === "question"
+                          ? "border-[rgba(139,43,226,.6)] bg-[rgba(139,43,226,.12)] text-[var(--t1)]"
+                          : "border-white/10 bg-white/[.02] text-[var(--t2)] hover:text-[var(--t1)]"
+                      }`}
+                    >
+                      <HelpCircle className="w-4 h-4 flex-shrink-0" />
+                      <span className="min-w-0 break-words">Ask a question</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handlePurposeChange("cancel")}
+                      className={`flex min-w-0 items-center justify-center gap-2 rounded-xl border px-2 py-2.5 text-sm text-center leading-tight transition-colors ${
+                        purpose === "cancel"
+                          ? "border-pink-500/60 bg-pink-500/10 text-[var(--t1)]"
+                          : "border-white/10 bg-white/[.02] text-[var(--t2)] hover:text-[var(--t1)]"
+                      }`}
+                    >
+                      <XCircle className="w-4 h-4 flex-shrink-0" />
+                      <span className="min-w-0 break-words">Cancel subscription</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Email (editable in case not logged in) */}
+                {!user && (
+                  <div className="space-y-1.5">
+                    <Label className="text-[var(--t2)] text-xs">Your email</Label>
+                    <Input
+                      type="email"
+                      placeholder="your@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="qs-input"
+                      maxLength={255}
+                    />
+                  </div>
+                )}
+
+                {purpose === "question" ? (
+                  <div className="space-y-1.5">
+                    <Label className="text-[var(--t2)] text-xs">Your question</Label>
+                    <Textarea
+                      placeholder="Describe your question or issue…"
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      className="qs-input min-h-[110px]"
+                      maxLength={2000}
+                    />
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    <Label className="text-[var(--t2)] text-xs">
+                      Reason for cancellation <span className="text-pink-400">*required</span>
+                    </Label>
+                    <Textarea
+                      placeholder="Tell us why you want to cancel — it helps us improve."
+                      value={reason}
+                      onChange={(e) => setReason(e.target.value)}
+                      className="qs-input min-h-[110px]"
+                      maxLength={2000}
+                      required
+                    />
+                  </div>
+                )}
+
+                <Button type="submit" className="qs-btn-primary w-full gap-2 whitespace-normal h-auto min-h-[3rem] py-2 text-center leading-tight">
+                  <Mail className="w-4 h-4 flex-shrink-0" />
+                  <span className="min-w-0 break-words">Send email to <span translate="no">{SUPPORT_EMAIL}</span></span>
+                </Button>
+              </form>
+
+              <div className="border-t border-white/5 pt-4">
+                <p className="text-xs text-[var(--t2)] text-center mb-2">Prefer a faster reply?</p>
+                <a
+                  href="https://t.me/L7kznr"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full border border-[rgba(139,43,226,.45)] text-[var(--brand-purple-light)] hover:bg-[rgba(139,43,226,.1)] transition-colors text-sm font-medium whitespace-normal text-center leading-tight"
                 >
-                  <HelpCircle className="w-4 h-4 flex-shrink-0" />
-                  <span className="min-w-0 break-words">Ask a question</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPurpose("cancel")}
-                  className={`flex min-w-0 items-center justify-center gap-2 rounded-xl border px-2 py-2.5 text-sm text-center leading-tight transition-colors ${
-                    purpose === "cancel"
-                      ? "border-pink-500/60 bg-pink-500/10 text-[var(--t1)]"
-                      : "border-white/10 bg-white/[.02] text-[var(--t2)] hover:text-[var(--t1)]"
-                  }`}
-                >
-                  <XCircle className="w-4 h-4 flex-shrink-0" />
-                  <span className="min-w-0 break-words">Cancel subscription</span>
-                </button>
+                  <MessageCircle className="w-4 h-4 flex-shrink-0" /> <span className="min-w-0 break-words">Chat on Telegram</span>
+                </a>
               </div>
-            </div>
-
-            {/* Email (editable in case not logged in) */}
-            {!user && (
-              <div className="space-y-1.5">
-                <Label className="text-[var(--t2)] text-xs">Your email</Label>
-                <Input
-                  type="email"
-                  placeholder="your@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="qs-input"
-                  maxLength={255}
-                />
-              </div>
-            )}
-
-            {purpose === "question" ? (
-              <div className="space-y-1.5">
-                <Label className="text-[var(--t2)] text-xs">Your question</Label>
-                <Textarea
-                  placeholder="Describe your question or issue…"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  className="qs-input min-h-[110px]"
-                  maxLength={2000}
-                />
-              </div>
-            ) : (
-              <div className="space-y-1.5">
-                <Label className="text-[var(--t2)] text-xs">
-                  Reason for cancellation <span className="text-pink-400">*required</span>
-                </Label>
-                <Textarea
-                  placeholder="Tell us why you want to cancel — it helps us improve."
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                  className="qs-input min-h-[110px]"
-                  maxLength={2000}
-                  required
-                />
-              </div>
-            )}
-
-            <Button type="submit" className="qs-btn-primary w-full gap-2 whitespace-normal h-auto min-h-[3rem] py-2 text-center leading-tight">
-              <Mail className="w-4 h-4 flex-shrink-0" />
-              <span className="min-w-0 break-words">Send email to <span translate="no">{SUPPORT_EMAIL}</span></span>
-            </Button>
-          </form>
-
-          <div className="border-t border-white/5 pt-4">
-            <p className="text-xs text-[var(--t2)] text-center mb-2">Prefer a faster reply?</p>
-            <a
-              href="https://t.me/L7kznr"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full border border-[rgba(139,43,226,.45)] text-[var(--brand-purple-light)] hover:bg-[rgba(139,43,226,.1)] transition-colors text-sm font-medium whitespace-normal text-center leading-tight"
-            >
-              <MessageCircle className="w-4 h-4 flex-shrink-0" /> <span className="min-w-0 break-words">Chat on Telegram</span>
-            </a>
-          </div>
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>
