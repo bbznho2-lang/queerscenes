@@ -26,9 +26,13 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
   const [purpose, setPurpose] = useState<Purpose>("question");
   const [message, setMessage] = useState("");
   const [reason, setReason] = useState("");
+  const [showRetention, setShowRetention] = useState(false);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      setShowRetention(false);
+      return;
+    }
     if (user?.email) setEmail(user.email);
     if (!user) {
       setIsSupporter(null);
@@ -50,6 +54,23 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
       }
     })();
   }, [open, user]);
+
+  const handlePurposeChange = (next: Purpose) => {
+    if (next === "cancel") {
+      setShowRetention(true);
+      setPurpose("cancel");
+    } else {
+      setShowRetention(false);
+      setPurpose("question");
+    }
+  };
+
+  const retentionItems = [
+    { icon: "🎬", text: "New LGBTQIA+ films subtitled every month — hand-picked by our team" },
+    { icon: "📺", text: "New LGBTQIA+ series and soap operas with subtitles — not available anywhere else" },
+    { icon: "👑", text: "VIP Telegram group — early access to new titles and exclusive news" },
+    { icon: "🎭", text: "GL Dramas subtitled — rare titles you won't find on any streaming platform" },
+  ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
