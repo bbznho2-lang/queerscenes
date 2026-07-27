@@ -187,18 +187,17 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
             </p>
 
             <div className="mt-4 rounded-xl border border-white/10 bg-white/[.03] p-3">
-              <p className="text-[11px] text-muted-foreground text-center mb-2 break-words">
-                Deleting your profile does not cancel your subscription.
+              <p className="text-[11px] text-muted-foreground text-center break-words">
+                Deleting your profile does not cancel your subscription. If you want to know more, go to{" "}
+                <button
+                  type="button"
+                  onClick={() => setSupportOpen(true)}
+                  className="underline text-[var(--brand-purple-light)] hover:opacity-80 font-semibold"
+                >
+                  Support
+                </button>
+                .
               </p>
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full gap-2 border-[rgba(139,43,226,.45)] text-[var(--brand-purple-light)] hover:bg-[rgba(139,43,226,.1)] whitespace-normal h-auto min-h-10 py-2 leading-tight"
-                onClick={() => setSupportOpen(true)}
-              >
-                <LifeBuoy className="w-4 h-4 flex-shrink-0" />
-                <span className="min-w-0 break-words">Contact Support / Cancel subscription</span>
-              </Button>
             </div>
           </div>
         </div>
