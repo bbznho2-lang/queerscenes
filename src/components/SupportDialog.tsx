@@ -90,29 +90,29 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="qs-modal max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="qs-modal w-[calc(100vw-2rem)] sm:w-full max-w-md max-h-[90vh] overflow-y-auto overflow-x-hidden">
         <DialogHeader>
-          <DialogTitle className="text-xl text-grad-brand">Support</DialogTitle>
+          <DialogTitle className="text-xl text-grad-brand break-words">Support</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 pt-1">
-          <p className="text-sm text-[var(--t2)]">
+          <p className="text-sm text-[var(--t2)] break-words">
             Ask a question or cancel your subscription. We'll reply as soon as possible — for faster answers, use Telegram.
           </p>
 
           {/* Account line */}
           <div className="rounded-lg border border-white/10 bg-white/[.03] px-3 py-2 text-xs flex items-center justify-between gap-2">
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <div className="text-[10px] uppercase tracking-wider text-[var(--t2)]">Sending from</div>
-              <div className="text-[var(--t1)] truncate">{email || "not logged in"}</div>
+              <div className="text-[var(--t1)] truncate" translate="no">{email || "not logged in"}</div>
             </div>
             {isSupporter === true && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-400/30 px-2 py-0.5 text-[10px] font-semibold">
+              <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-400/30 px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap">
                 <Crown className="w-3 h-3" /> Supporter
               </span>
             )}
             {isSupporter === false && (
-              <span className="inline-flex items-center rounded-full bg-white/5 text-[var(--t2)] border border-white/10 px-2 py-0.5 text-[10px] font-semibold">
+              <span className="inline-flex flex-shrink-0 items-center rounded-full bg-white/5 text-[var(--t2)] border border-white/10 px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap">
                 Free
               </span>
             )}
@@ -126,24 +126,26 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
                 <button
                   type="button"
                   onClick={() => setPurpose("question")}
-                  className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm transition-colors ${
+                  className={`flex min-w-0 items-center justify-center gap-2 rounded-xl border px-2 py-2.5 text-sm text-center leading-tight transition-colors ${
                     purpose === "question"
                       ? "border-[rgba(139,43,226,.6)] bg-[rgba(139,43,226,.12)] text-[var(--t1)]"
                       : "border-white/10 bg-white/[.02] text-[var(--t2)] hover:text-[var(--t1)]"
                   }`}
                 >
-                  <HelpCircle className="w-4 h-4" /> Ask a question
+                  <HelpCircle className="w-4 h-4 flex-shrink-0" />
+                  <span className="min-w-0 break-words">Ask a question</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setPurpose("cancel")}
-                  className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm transition-colors ${
+                  className={`flex min-w-0 items-center justify-center gap-2 rounded-xl border px-2 py-2.5 text-sm text-center leading-tight transition-colors ${
                     purpose === "cancel"
                       ? "border-pink-500/60 bg-pink-500/10 text-[var(--t1)]"
                       : "border-white/10 bg-white/[.02] text-[var(--t2)] hover:text-[var(--t1)]"
                   }`}
                 >
-                  <XCircle className="w-4 h-4" /> Cancel subscription
+                  <XCircle className="w-4 h-4 flex-shrink-0" />
+                  <span className="min-w-0 break-words">Cancel subscription</span>
                 </button>
               </div>
             </div>
@@ -190,9 +192,9 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
               </div>
             )}
 
-            <Button type="submit" className="qs-btn-primary w-full gap-2">
-              <Mail className="w-4 h-4" />
-              Send email to {SUPPORT_EMAIL}
+            <Button type="submit" className="qs-btn-primary w-full gap-2 whitespace-normal h-auto min-h-[3rem] py-2 text-center leading-tight">
+              <Mail className="w-4 h-4 flex-shrink-0" />
+              <span className="min-w-0 break-words">Send email to <span translate="no">{SUPPORT_EMAIL}</span></span>
             </Button>
           </form>
 
@@ -202,9 +204,9 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
               href="https://t.me/L7kznr"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full border border-[rgba(139,43,226,.45)] text-[var(--brand-purple-light)] hover:bg-[rgba(139,43,226,.1)] transition-colors text-sm font-medium"
+              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full border border-[rgba(139,43,226,.45)] text-[var(--brand-purple-light)] hover:bg-[rgba(139,43,226,.1)] transition-colors text-sm font-medium whitespace-normal text-center leading-tight"
             >
-              <MessageCircle className="w-4 h-4" /> Chat on Telegram
+              <MessageCircle className="w-4 h-4 flex-shrink-0" /> <span className="min-w-0 break-words">Chat on Telegram</span>
             </a>
           </div>
         </div>
