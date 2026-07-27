@@ -94,7 +94,7 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="qs-modal max-w-md">
+      <DialogContent className="qs-modal w-[calc(100vw-2rem)] sm:w-full max-w-md max-h-[90vh] overflow-y-auto overflow-x-hidden">
         <DialogHeader>
           <DialogTitle className="text-xl text-grad-brand">
             My Profile
@@ -131,9 +131,10 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
 
           <div className="space-y-2">
             <Label className="text-[var(--t2)] text-xs">Email</Label>
-            <div className="px-3 py-2.5 rounded-xl bg-[var(--s2)] border border-white/5 text-sm text-[var(--t1)]">
+            <div className="px-3 py-2.5 rounded-xl bg-[var(--s2)] border border-white/5 text-sm text-[var(--t1)] truncate" translate="no">
               {email}
             </div>
+
           </div>
 
 
@@ -176,27 +177,27 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
             <Button
               variant="outline"
               onClick={() => setConfirmDelete(true)}
-              className="w-full border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
+              className="w-full border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive whitespace-normal h-auto min-h-10 py-2 leading-tight"
             >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete account permanently
+              <Trash2 className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="min-w-0 break-words">Delete account permanently</span>
             </Button>
-            <p className="text-[11px] text-muted-foreground mt-2 text-center">
+            <p className="text-[11px] text-muted-foreground mt-2 text-center break-words">
               You can sign up again later with the same email.
             </p>
 
             <div className="mt-4 rounded-xl border border-white/10 bg-white/[.03] p-3">
-              <p className="text-[11px] text-muted-foreground text-center mb-2">
+              <p className="text-[11px] text-muted-foreground text-center mb-2 break-words">
                 Deleting your profile does not cancel your subscription.
               </p>
               <Button
                 type="button"
                 variant="outline"
-                className="w-full gap-2 border-[rgba(139,43,226,.45)] text-[var(--brand-purple-light)] hover:bg-[rgba(139,43,226,.1)]"
+                className="w-full gap-2 border-[rgba(139,43,226,.45)] text-[var(--brand-purple-light)] hover:bg-[rgba(139,43,226,.1)] whitespace-normal h-auto min-h-10 py-2 leading-tight"
                 onClick={() => setSupportOpen(true)}
               >
-                <LifeBuoy className="w-4 h-4" />
-                Contact Support / Cancel subscription
+                <LifeBuoy className="w-4 h-4 flex-shrink-0" />
+                <span className="min-w-0 break-words">Contact Support / Cancel subscription</span>
               </Button>
             </div>
           </div>
