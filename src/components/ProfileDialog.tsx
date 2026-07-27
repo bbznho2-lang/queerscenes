@@ -94,7 +94,7 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="qs-modal max-w-md">
+      <DialogContent className="qs-modal w-[calc(100vw-2rem)] sm:w-full max-w-md max-h-[90vh] overflow-y-auto overflow-x-hidden">
         <DialogHeader>
           <DialogTitle className="text-xl text-grad-brand">
             My Profile
@@ -131,9 +131,10 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
 
           <div className="space-y-2">
             <Label className="text-[var(--t2)] text-xs">Email</Label>
-            <div className="px-3 py-2.5 rounded-xl bg-[var(--s2)] border border-white/5 text-sm text-[var(--t1)]">
+            <div className="px-3 py-2.5 rounded-xl bg-[var(--s2)] border border-white/5 text-sm text-[var(--t1)] truncate" translate="no">
               {email}
             </div>
+
           </div>
 
 
