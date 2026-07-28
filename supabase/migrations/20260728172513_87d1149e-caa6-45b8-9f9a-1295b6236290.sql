@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.get_top_content_ids(integer) TO anon, authenticated, service_role;
