@@ -59,7 +59,7 @@ const Index = () => {
   const [checkoutEmail, setCheckoutEmail] = useState("");
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [selectedPlanId, setSelectedPlanId] = useState<string>("price_1TmNFHJ5xR4MDdjr5915HBR2");
-  const [supporterCount, setSupporterCount] = useState<number>(90);
+  const [supporterCount, setSupporterCount] = useState<number>(0);
 
   useEffect(() => {
     let active = true;
@@ -69,7 +69,7 @@ const Index = () => {
         .select("id", { count: "exact", head: true })
         .eq("is_premium", true);
       if (!active || count == null) return;
-      setSupporterCount((prev) => Math.max(prev, count, 90));
+      setSupporterCount(count);
     };
     fetchCount();
     const channel = supabase
@@ -496,7 +496,7 @@ const Index = () => {
       {/* TOP 10 THIS MONTH */}
       {top10CatalogItems.length > 0 && (
         <section className="py-12 sm:py-20 px-4">
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-7xl mx-auto">
             <div className="text-center mb-6 sm:mb-8">
               <h3 className="inline-flex items-center justify-center gap-2 text-xl sm:text-2xl font-black text-[var(--t1)] tracking-tight">
                 <span>🔥</span>
@@ -510,13 +510,14 @@ const Index = () => {
               className="overflow-x-auto -mx-4 px-4 scroll-smooth snap-x snap-mandatory"
               style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
             >
-              <div className="flex items-start gap-4 sm:gap-6 pb-4" style={{ width: "max-content" }}>
+              <div className="flex flex-nowrap items-start gap-4 sm:gap-6 pb-4" style={{ width: "max-content" }}>
                 {top10CatalogItems.map((item, i) => {
                   const rank = i + 1;
                   return (
                     <article
                       key={`top10-${item.id}`}
-                       className="qs-top10-card qs-top10-card-landing flex-shrink-0 snap-start"
+                      className="qs-top10-card flex-shrink-0 snap-start"
+                      style={{ width: "clamp(120px, 34vw, 220px)" }}
                     >
                       <div className="qs-top10-poster">
                         {item.banner_url ? (
