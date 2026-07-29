@@ -461,7 +461,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
           <div>
   <label className="text-sm text-muted-foreground">Preview Video (shown on paywall)</label>
   <p className="text-[10px] text-muted-foreground/60 mb-1">
-    Short clip (15s–1min) shown to non-supporters before they unlock. Paste a video URL or an &lt;iframe&gt; embed.
+    Paste any video URL or an &lt;iframe&gt; embed. Full previews are supported — there is no 1-minute limit.
   </p>
   <Input
     value={previewVideoUrl}
