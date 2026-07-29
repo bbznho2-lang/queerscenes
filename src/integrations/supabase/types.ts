@@ -897,6 +897,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      get_active_supporter_count: { Args: never; Returns: number }
       get_content_links: { Args: { _content_id: string }; Returns: Json }
       get_content_player_url: { Args: { _content_id: string }; Returns: string }
       get_episode_links: { Args: { _episode_id: string }; Returns: Json }
