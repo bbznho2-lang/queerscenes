@@ -90,22 +90,15 @@ const Index = () => {
     if (typeof window === "undefined") return false;
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
 
-    const performScroll = (el: HTMLElement, offset: number, scrollBehavior: ScrollBehavior = behavior) => {
-      const run = () => {
-        const rect = el.getBoundingClientRect();
-        const targetTop = window.scrollY + rect.top - offset;
-        window.scrollTo({ top: Math.max(0, targetTop), behavior: scrollBehavior });
-      };
-      // Defer until the current paint settles, then scroll exactly once.
-      requestAnimationFrame(() => requestAnimationFrame(run));
-    };
-
     // For the Supporter CTA, always land directly on the Supporter card.
     // Mobile uses an instant jump to avoid smooth-scroll bounce/layout flicker.
     if (target === "supporter") {
       const sup = document.getElementById("supporter-card");
       if (sup) {
-        performScroll(sup, isMobile ? 14 : 40, isMobile ? "auto" : behavior);
+        smoothScrollToElement(sup, {
+          offset: isMobile ? 14 : 40,
+          behavior: isMobile ? "auto" : behavior,
+        });
         return true;
       }
     }
@@ -113,32 +106,19 @@ const Index = () => {
     const el = document.getElementById("planos-cards") || document.getElementById("planos");
     if (!el) return false;
 
-    performScroll(el, isMobile ? 80 : 16);
+    smoothScrollToElement(el, { offset: isMobile ? 80 : 16, behavior });
     return true;
   }, []);
 
 
   const scrollToLogin = useCallback((behavior: ScrollBehavior = "smooth") => {
     if (typeof window === "undefined") return;
-    let cancelled = false;
-    const cancel = () => { cancelled = true; };
-    // If the user starts scrolling/touching, abort any pending programmatic scrolls
-    window.addEventListener("wheel", cancel, { once: true, passive: true });
-    window.addEventListener("touchstart", cancel, { once: true, passive: true });
-    window.addEventListener("keydown", cancel, { once: true });
-
-    const doScroll = (scrollBehavior: ScrollBehavior = behavior) => {
-      if (cancelled) return;
-      const el = document.getElementById("login");
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const isMobile = window.matchMedia("(max-width: 767px)").matches;
-      const offset = isMobile ? 80 : 16;
-      const targetTop = window.scrollY + rect.top - offset;
-      window.scrollTo({ top: Math.max(0, targetTop), behavior: scrollBehavior });
-    };
-    requestAnimationFrame(() => requestAnimationFrame(() => doScroll(behavior)));
+    const el = document.getElementById("login");
+    if (!el) return;
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    smoothScrollToElement(el, { offset: isMobile ? 80 : 16, behavior });
   }, []);
+
 
 
   useEffect(() => {
