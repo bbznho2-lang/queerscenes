@@ -18,6 +18,7 @@ interface TitleContent {
   banner_url: string | null;
   synopsis: string | null;
   preview_video_url: string | null;
+  updated_at?: string | null;
   is_archived?: boolean | null;
   is_premium?: boolean | null;
 }
@@ -123,7 +124,7 @@ const TitlePage = () => {
       setLoading(true);
       const { data } = await supabase
         .from("contents")
-        .select("id, title, year, tag, type, banner_url, synopsis, preview_video_url, is_archived, is_premium")
+        .select("id, title, year, tag, type, banner_url, synopsis, preview_video_url, updated_at, is_archived, is_premium")
         .order("title");
       if (cancelled) return;
       const list = ((data ?? []) as TitleContent[]).filter((c) => !c.is_archived);
@@ -136,10 +137,15 @@ const TitlePage = () => {
       (episodeRows || []).forEach((row: any) => {
         episodeCounts.set(row.content_id, (episodeCounts.get(row.content_id) || 0) + 1);
       });
-      // Prefer the duplicate that has a preview video, then any non-"exclusivos" section.
+      const sortedMatches = [...matches].sort((a, b) => {
+        const aTime = a.updated_at ? new Date(a.updated_at).getTime() : 0;
+        const bTime = b.updated_at ? new Date(b.updated_at).getTime() : 0;
+        return bTime - aTime;
+      });
+      // Prefer the newest duplicate with a preview video so edited previews replace old clips immediately.
       const match =
-        matches.find((c) => (c.preview_video_url ?? "").trim().length > 0) ??
-        matches[0];
+        sortedMatches.find((c) => (c.preview_video_url ?? "").trim().length > 0) ??
+        sortedMatches[0];
       if (!match) {
         setNotFound(true);
         setLoading(false);
