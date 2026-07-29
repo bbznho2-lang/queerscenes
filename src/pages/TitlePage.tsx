@@ -369,7 +369,7 @@ const TitlePage = () => {
 
         {/* Preview video */}
         {preview ? (
-          <div className="relative w-full overflow-hidden rounded-xl bg-black mb-5" style={{ paddingBottom: "56.25%", height: 0 }}>
+          <div key={preview} className="relative w-full overflow-hidden rounded-xl bg-black mb-5" style={{ paddingBottom: "56.25%", height: 0 }}>
             {isIframeHtml ? (
               <div
                 className="absolute inset-0 [&>iframe]:absolute [&>iframe]:inset-0 [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0"
@@ -383,6 +383,7 @@ const TitlePage = () => {
               />
             ) : (
               <iframe
+                key={preview}
                 src={getEmbedUrl(preview)}
                 className="absolute inset-0 w-full h-full border-0"
                 allowFullScreen
@@ -390,6 +391,7 @@ const TitlePage = () => {
               />
             )}
           </div>
+
         ) : (
           <div className="relative w-full rounded-xl bg-muted/40 border border-border mb-5 flex items-center justify-center" style={{ paddingBottom: "56.25%", height: 0 }}>
             <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm">
