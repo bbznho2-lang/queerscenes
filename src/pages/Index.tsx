@@ -64,12 +64,9 @@ const Index = () => {
   useEffect(() => {
     let active = true;
     const fetchCount = async () => {
-      const { count } = await supabase
-        .from("profiles")
-        .select("id", { count: "exact", head: true })
-        .eq("is_premium", true);
-      if (!active || count == null) return;
-      setSupporterCount(count);
+      const { data } = await supabase.rpc("get_active_supporter_count" as any);
+      if (!active || data == null) return;
+      setSupporterCount(Number(data) || 0);
     };
     fetchCount();
     const channel = supabase
