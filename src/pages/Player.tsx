@@ -525,7 +525,7 @@ const Player = () => {
                   const prev = content.preview_video_url!.trim();
                   const isHtml = prev.toLowerCase().startsWith("<iframe");
                   return (
-                    <div className="relative w-full overflow-hidden rounded-xl bg-black mb-4"
+                    <div key={prev} className="relative w-full overflow-hidden rounded-xl bg-black mb-4"
                       style={{ paddingBottom: "56.25%", height: 0 }}>
                       {isHtml ? (
                         <div
@@ -540,6 +540,7 @@ const Player = () => {
                         />
                       ) : (
                         <iframe
+                          key={prev}
                           src={getEmbedUrl(prev)}
                           className="absolute inset-0 w-full h-full border-0"
                           allowFullScreen
@@ -548,6 +549,7 @@ const Player = () => {
                         />
                       )}
                     </div>
+
                   );
                 })()}
 
