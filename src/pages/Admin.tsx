@@ -927,7 +927,7 @@ const Admin = () => {
                             </div>
                             <div className="space-y-1.5">
                               <label className="text-xs text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> Expires at</label>
-                              <Input type="date" className="h-9 text-xs bg-background" value={p.premium_expires_at ? new Date(p.premium_expires_at).toISOString().split("T")[0] : ""} onChange={(e) => updateExpirationDate(p, e.target.value)} />
+                              <Input type="date" className="h-9 text-xs bg-background" value={isoToDateInput(p.premium_expires_at)} onChange={(e) => updateExpirationDate(p, e.target.value)} />
                             </div>
                             <div className="space-y-1.5">
                               <label className="text-xs text-muted-foreground">Status</label>
