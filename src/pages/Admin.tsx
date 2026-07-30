@@ -398,21 +398,25 @@ const Admin = () => {
   const grantPremiumByEmail = async () => {
     const emailTrimmed = premiumEmail.trim().toLowerCase();
     if (!emailTrimmed) { toast.error("Please enter an email address"); return; }
+    const expiresIso = premiumUntil ? dateInputToIso(premiumUntil) : null;
+    if (premiumUntil && !expiresIso) { toast.error("Invalid date"); return; }
     setAddingPremium(true);
     try {
       const { data, error } = await supabase.rpc("admin_grant_supporter_by_email" as never, {
         _email: emailTrimmed,
-        _plan: "lifetime",
-        _expires_at: null,
+        _plan: expiresIso ? "monthly" : "lifetime",
+        _expires_at: expiresIso,
       } as never);
       if (error) throw error;
       const status = (data as { status?: string } | null)?.status;
+      const until = expiresIso ? ` until ${new Date(expiresIso).toLocaleDateString("en-US")}` : " (lifetime)";
       if (status === "pending") {
-        toast.success(`No account yet — ${emailTrimmed} saved as pending supporter. Access activates on first login.`);
+        toast.success(`No account yet — ${emailTrimmed} saved as pending supporter${until}. Access activates on first login.`);
       } else {
-        toast.success(`Supporter access granted to ${emailTrimmed}!`);
+        toast.success(`Supporter access granted to ${emailTrimmed}${until}!`);
       }
       setPremiumEmail("");
+      setPremiumUntil("");
       fetchData(false);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Error granting premium");
