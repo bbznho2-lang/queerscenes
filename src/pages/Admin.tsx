@@ -810,10 +810,14 @@ const Admin = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex gap-3 items-end">
-              <div className="flex-1 space-y-1.5">
+            <div className="flex flex-wrap gap-3 items-end">
+              <div className="flex-1 min-w-[200px] space-y-1.5">
                 <label className="text-xs text-muted-foreground">User email</label>
                 <Input type="email" placeholder="user@email.com" value={premiumEmail} onChange={(e) => setPremiumEmail(e.target.value)} className="bg-muted border-border" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs text-muted-foreground">Active until (empty = lifetime)</label>
+                <Input type="date" value={premiumUntil} onChange={(e) => setPremiumUntil(e.target.value)} className="bg-muted border-border" />
               </div>
               <Button onClick={grantPremiumByEmail} disabled={addingPremium} className="bg-secondary text-secondary-foreground hover:bg-secondary/90">
                 <Crown className="w-4 h-4 mr-1" />
