@@ -366,11 +366,30 @@ const Admin = () => {
     }
   };
 
+  // Turns "YYYY-MM-DD" into that day's local end-of-day ISO string, so the plan
+  // stays active for the whole selected day in the admin's timezone.
+  const dateInputToIso = (dateStr: string) => {
+    const [y, m, d] = dateStr.split("-").map(Number);
+    if (!y || !m || !d) return null;
+    return new Date(y, m - 1, d, 23, 59, 59).toISOString();
+  };
+
+  // Renders an ISO timestamp back into the "YYYY-MM-DD" the date input expects,
+  // using local time so the day shown matches the day that was picked.
+  const isoToDateInput = (iso: string | null) => {
+    if (!iso) return "";
+    const dt = new Date(iso);
+    if (Number.isNaN(dt.getTime())) return "";
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}`;
+  };
+
   const updateExpirationDate = async (profile: Profile, dateStr: string) => {
-    if (!dateStr) return;
+    const iso = dateStr ? dateInputToIso(dateStr) : null;
+    if (dateStr && !iso) return;
     try {
-      await applyPremiumUpdate(profile, true, profile.premium_plan || "monthly", new Date(dateStr).toISOString());
-      toast.success("Expiration date updated");
+      await applyPremiumUpdate(profile, true, profile.premium_plan || "monthly", iso);
+      toast.success(iso ? "Expiration date updated" : "Set to lifetime access");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Error updating date");
     }
