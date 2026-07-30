@@ -381,11 +381,18 @@ const Admin = () => {
     if (!emailTrimmed) { toast.error("Please enter an email address"); return; }
     setAddingPremium(true);
     try {
-      const { data: profile, error } = await supabase.from("profiles").select("*").ilike("email", emailTrimmed).maybeSingle();
-      if (error) { toast.error("Error searching for user"); return; }
-      if (!profile) { toast.error("No user found with this email."); return; }
-      await applyPremiumUpdate(profile as Profile, true, "lifetime", null);
-      toast.success(`Supporter access granted to ${emailTrimmed}!`);
+      const { data, error } = await supabase.rpc("admin_grant_supporter_by_email" as never, {
+        _email: emailTrimmed,
+        _plan: "lifetime",
+        _expires_at: null,
+      } as never);
+      if (error) throw error;
+      const status = (data as { status?: string } | null)?.status;
+      if (status === "pending") {
+        toast.success(`No account yet — ${emailTrimmed} saved as pending supporter. Access activates on first login.`);
+      } else {
+        toast.success(`Supporter access granted to ${emailTrimmed}!`);
+      }
       setPremiumEmail("");
       fetchData(false);
     } catch (error) {
