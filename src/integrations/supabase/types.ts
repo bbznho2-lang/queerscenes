@@ -866,6 +866,10 @@ export type Database = {
           title: string
         }[]
       }
+      admin_grant_supporter_by_email: {
+        Args: { _email: string; _expires_at?: string; _plan?: string }
+        Returns: Json
+      }
       admin_set_profile_premium: {
         Args: {
           _is_premium: boolean
