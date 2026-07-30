@@ -87,6 +87,7 @@ const Admin = () => {
   const [loadingData, setLoadingData] = useState(true);
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
   const [premiumEmail, setPremiumEmail] = useState("");
+  const [premiumUntil, setPremiumUntil] = useState("");
   const [addingPremium, setAddingPremium] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [userSearch, setUserSearch] = useState("");
