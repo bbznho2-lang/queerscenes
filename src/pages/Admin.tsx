@@ -87,6 +87,7 @@ const Admin = () => {
   const [loadingData, setLoadingData] = useState(true);
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
   const [premiumEmail, setPremiumEmail] = useState("");
+  const [premiumUntil, setPremiumUntil] = useState("");
   const [addingPremium, setAddingPremium] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [userSearch, setUserSearch] = useState("");
@@ -366,11 +367,30 @@ const Admin = () => {
     }
   };
 
+  // Turns "YYYY-MM-DD" into that day's local end-of-day ISO string, so the plan
+  // stays active for the whole selected day in the admin's timezone.
+  const dateInputToIso = (dateStr: string) => {
+    const [y, m, d] = dateStr.split("-").map(Number);
+    if (!y || !m || !d) return null;
+    return new Date(y, m - 1, d, 23, 59, 59).toISOString();
+  };
+
+  // Renders an ISO timestamp back into the "YYYY-MM-DD" the date input expects,
+  // using local time so the day shown matches the day that was picked.
+  const isoToDateInput = (iso: string | null) => {
+    if (!iso) return "";
+    const dt = new Date(iso);
+    if (Number.isNaN(dt.getTime())) return "";
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}`;
+  };
+
   const updateExpirationDate = async (profile: Profile, dateStr: string) => {
-    if (!dateStr) return;
+    const iso = dateStr ? dateInputToIso(dateStr) : null;
+    if (dateStr && !iso) return;
     try {
-      await applyPremiumUpdate(profile, true, profile.premium_plan || "monthly", new Date(dateStr).toISOString());
-      toast.success("Expiration date updated");
+      await applyPremiumUpdate(profile, true, profile.premium_plan || "monthly", iso);
+      toast.success(iso ? "Expiration date updated" : "Set to lifetime access");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Error updating date");
     }
@@ -379,21 +399,25 @@ const Admin = () => {
   const grantPremiumByEmail = async () => {
     const emailTrimmed = premiumEmail.trim().toLowerCase();
     if (!emailTrimmed) { toast.error("Please enter an email address"); return; }
+    const expiresIso = premiumUntil ? dateInputToIso(premiumUntil) : null;
+    if (premiumUntil && !expiresIso) { toast.error("Invalid date"); return; }
     setAddingPremium(true);
     try {
       const { data, error } = await supabase.rpc("admin_grant_supporter_by_email" as never, {
         _email: emailTrimmed,
-        _plan: "lifetime",
-        _expires_at: null,
+        _plan: expiresIso ? "monthly" : "lifetime",
+        _expires_at: expiresIso,
       } as never);
       if (error) throw error;
       const status = (data as { status?: string } | null)?.status;
+      const until = expiresIso ? ` until ${new Date(expiresIso).toLocaleDateString("en-US")}` : " (lifetime)";
       if (status === "pending") {
-        toast.success(`No account yet — ${emailTrimmed} saved as pending supporter. Access activates on first login.`);
+        toast.success(`No account yet — ${emailTrimmed} saved as pending supporter${until}. Access activates on first login.`);
       } else {
-        toast.success(`Supporter access granted to ${emailTrimmed}!`);
+        toast.success(`Supporter access granted to ${emailTrimmed}${until}!`);
       }
       setPremiumEmail("");
+      setPremiumUntil("");
       fetchData(false);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Error granting premium");
@@ -786,10 +810,14 @@ const Admin = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex gap-3 items-end">
-              <div className="flex-1 space-y-1.5">
+            <div className="flex flex-wrap gap-3 items-end">
+              <div className="flex-1 min-w-[200px] space-y-1.5">
                 <label className="text-xs text-muted-foreground">User email</label>
                 <Input type="email" placeholder="user@email.com" value={premiumEmail} onChange={(e) => setPremiumEmail(e.target.value)} className="bg-muted border-border" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs text-muted-foreground">Active until (empty = lifetime)</label>
+                <Input type="date" value={premiumUntil} onChange={(e) => setPremiumUntil(e.target.value)} className="bg-muted border-border" />
               </div>
               <Button onClick={grantPremiumByEmail} disabled={addingPremium} className="bg-secondary text-secondary-foreground hover:bg-secondary/90">
                 <Crown className="w-4 h-4 mr-1" />
@@ -899,7 +927,7 @@ const Admin = () => {
                             </div>
                             <div className="space-y-1.5">
                               <label className="text-xs text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> Expires at</label>
-                              <Input type="date" className="h-9 text-xs bg-background" value={p.premium_expires_at ? new Date(p.premium_expires_at).toISOString().split("T")[0] : ""} onChange={(e) => updateExpirationDate(p, e.target.value)} />
+                              <Input type="date" className="h-9 text-xs bg-background" value={isoToDateInput(p.premium_expires_at)} onChange={(e) => updateExpirationDate(p, e.target.value)} />
                             </div>
                             <div className="space-y-1.5">
                               <label className="text-xs text-muted-foreground">Status</label>
