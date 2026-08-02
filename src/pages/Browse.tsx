@@ -92,7 +92,7 @@ const ContentCard = ({
           {item.tag}
         </span>
         <h3 className="text-sm sm:text-base font-semibold text-foreground leading-tight">{item.title}</h3>
-        <p className="text-xs text-muted-foreground">{item.year} · {item.type === "serie" ? "Series" : item.type === "novela" ? "Soap Opera" : "Movie"}</p>
+        <p className="text-xs text-muted-foreground">{item.year} · {item.type === "serie" ? "Series" : item.type === "novela" ? "Soap Opera" : item.type === "reality" ? "Reality Show" : "Movie"}</p>
         <p className="text-[10px] sm:text-xs text-muted-foreground/80 mt-1 line-clamp-2 leading-snug">
           {item.synopsis?.trim() || "No synopsis available."}
         </p>
@@ -493,7 +493,7 @@ const Browse = () => {
                           <span className="qs-top10-bignum" aria-hidden>{rank}</span>
                           <div className="qs-top10-meta">
                             <p className="qs-top10-fname">{item.title}</p>
-                            <p className="qs-top10-ftag">{item.year} · {item.type === "serie" ? "Series" : item.type === "novela" ? "Soap Opera" : "Movie"}</p>
+                            <p className="qs-top10-ftag">{item.year} · {item.type === "serie" ? "Series" : item.type === "novela" ? "Soap Opera" : item.type === "reality" ? "Reality Show" : "Movie"}</p>
                           </div>
                         </div>
                       </article>
