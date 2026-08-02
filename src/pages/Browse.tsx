@@ -666,6 +666,39 @@ const Browse = () => {
           </div>
         </section>
 
+        {/* REALITY SHOWS */}
+        <section id="realities" className="py-10 sm:py-16 px-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-6 gap-3">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-blue flex items-center gap-2">
+                <span>🎤</span> Reality Shows
+              </h2>
+              <div className="flex items-center gap-2">
+                {isAdmin && (
+                  <button onClick={() => handleNew("realities", "reality")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add reality show">
+                    <Plus className="w-5 h-5 text-primary" />
+                  </button>
+                )}
+              </div>
+            </div>
+            {realities.length > 0 ? (
+              <AutoScrollRow>
+                {realities.map((r) => (
+                  <div key={r.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
+                    <ContentCard item={r} isAdmin={isAdmin} onEdit={() => handleEdit(r)} onDelete={() => handleDelete(r.id)} onClickTrack={() => trackClick(r.id)} isInWatchlist={watchlistIds.has(r.id)} onToggleWatchlist={() => toggleWatchlist(r.id)} userIsPremium={userIsPremium} />
+                  </div>
+                ))}
+              </AutoScrollRow>
+            ) : (
+              <p className="text-muted-foreground text-center py-8">
+                {isAdmin ? "Click + to add reality shows" : "New content coming soon!"}
+              </p>
+            )}
+          </div>
+        </section>
+
+
+
 
 
 
