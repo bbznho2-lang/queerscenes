@@ -541,9 +541,8 @@ const Browse = () => {
 
         {/* MOVIES */}
         <section id="filmes" className="py-10 sm:py-16 px-4">
-          <div className="max-w-7xl mx-auto space-y-10">
-            {/* Header with admin add button */}
-            <div className="flex items-center justify-between gap-3">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-6 gap-3">
               <h2 className="text-xl sm:text-2xl font-black neon-text-dark-blue flex items-center gap-2">
                 <span>🎬</span> Movies
               </h2>
@@ -553,50 +552,22 @@ const Browse = () => {
                 </button>
               )}
             </div>
-
-            {/* Open Catalog */}
-            <div>
-              <div className="mb-5">
-                <h3 className="text-lg sm:text-xl font-black neon-text-blue flex items-center gap-2"><span>🍿</span> Open Catalog</h3>
-              </div>
-              {filmes.filter((f) => !f.is_premium).length > 0 ? (
-                <AutoScrollRow>
-                  {filmes.filter((f) => !f.is_premium).map((f) => (
-                    <div key={f.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                      <ContentCard item={f} isAdmin={isAdmin} onEdit={() => handleEdit(f)} onDelete={() => handleDelete(f.id)} onClickTrack={() => trackClick(f.id)} isInWatchlist={watchlistIds.has(f.id)} onToggleWatchlist={() => toggleWatchlist(f.id)} userIsPremium={userIsPremium} />
-                    </div>
-                  ))}
-                </AutoScrollRow>
-              ) : (
-                <p className="text-muted-foreground text-center py-8">
-                  {isAdmin ? "No free movies yet" : "New content coming soon!"}
-                </p>
-              )}
-            </div>
-
-            {/* Rare Premieres */}
-            <div>
-              <div className="mb-5">
-                <h3 className="text-lg sm:text-xl font-black neon-text-purple flex items-center gap-2">
-                  <span>👑</span> Rare Premieres
-                </h3>
-              </div>
-              {filmes.filter((f) => f.is_premium).length > 0 ? (
-                <AutoScrollRow>
-                  {filmes.filter((f) => f.is_premium).map((f) => (
-                    <div key={f.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                      <ContentCard item={f} isAdmin={isAdmin} onEdit={() => handleEdit(f)} onDelete={() => handleDelete(f.id)} onClickTrack={() => trackClick(f.id)} isInWatchlist={watchlistIds.has(f.id)} onToggleWatchlist={() => toggleWatchlist(f.id)} userIsPremium={userIsPremium} />
-                    </div>
-                  ))}
-                </AutoScrollRow>
-              ) : (
-                <p className="text-muted-foreground text-center py-8">
-                  {isAdmin ? "No supporter-only movies yet" : "New content coming soon!"}
-                </p>
-              )}
-            </div>
+            {filmes.length > 0 ? (
+              <AutoScrollRow>
+                {filmes.map((f) => (
+                  <div key={f.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
+                    <ContentCard item={f} isAdmin={isAdmin} onEdit={() => handleEdit(f)} onDelete={() => handleDelete(f.id)} onClickTrack={() => trackClick(f.id)} isInWatchlist={watchlistIds.has(f.id)} onToggleWatchlist={() => toggleWatchlist(f.id)} userIsPremium={userIsPremium} />
+                  </div>
+                ))}
+              </AutoScrollRow>
+            ) : (
+              <p className="text-muted-foreground text-center py-8">
+                {isAdmin ? "Click + to add movies" : "New content coming soon!"}
+              </p>
+            )}
           </div>
         </section>
+
 
         {/* SOAP OPERAS */}
         <section id="novelas" className="py-10 sm:py-16 px-4">
