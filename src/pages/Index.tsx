@@ -397,7 +397,7 @@ const Index = () => {
             style={{ fontSize: "14px", color: "rgba(238,234,255,.75)", lineHeight: 1.68, maxWidth: 320 }}
             initial="hidden" animate="visible" variants={fade} custom={2}
           >
-            Stream free LGBTQIA+ content now — series, movies & exclusive moments. 100% free to start.
+            The queer streaming experience you've been waiting for. Hand-subtitled titles, rare series, GL Dramas and exclusive premieres — all in one place.
           </motion.p>
 
           <motion.p
