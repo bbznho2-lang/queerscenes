@@ -45,8 +45,8 @@ interface Props {
   defaults?: { section: string; type: string };
 }
 
-const toUiSection = (dbSection?: string, premium?: boolean) => {
-  if (dbSection === "filmes") return premium ? "filmes_rare" : "filmes_open";
+const toUiSection = (dbSection?: string) => {
+  if (dbSection === "filmes_open" || dbSection === "filmes_rare") return "filmes";
   return dbSection || "series";
 };
 
@@ -55,17 +55,18 @@ const toDbSection = (uiSection: string) => {
   return uiSection;
 };
 
+
 const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: Props) => {
   const [title, setTitle] = useState("");
   const [year, setYear] = useState(2025);
   const [tag, setTag] = useState("Drama");
   const [type, setType] = useState("filme");
-  const [section, setSection] = useState("filmes_open");
+  const [section, setSection] = useState("filmes");
   const [playerUrl, setPlayerUrl] = useState("");
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [bannerPreview, setBannerPreview] = useState("");
   const [bannerUrlInput, setBannerUrlInput] = useState("");
-  const [isPremium, setIsPremium] = useState(false);
+  const [isPremium, setIsPremium] = useState(true);
   const [isArchived, setIsArchived] = useState(false);
   const [synopsis, setSynopsis] = useState("");
   const [previewVideoUrl, setPreviewVideoUrl] = useState("");
@@ -80,7 +81,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setYear(content.year);
       setTag(content.tag);
       setType(content.type);
-      setSection(toUiSection(content.section, content.is_premium));
+      setSection(toUiSection(content.section));
       const legacy = content.player_url || (content as any).player_url_free || "";
       setPlayerUrl(legacy);
       if (!legacy) {
@@ -99,7 +100,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       });
       setBannerPreview(content.banner_url || "");
       setBannerUrlInput(content.banner_url || "");
-      setIsPremium(content.is_premium || false);
+      setIsPremium(true);
       setIsArchived(content.is_archived || false);
       setSynopsis((content as any).synopsis || "");
       setPreviewVideoUrl((content as any).preview_video_url || "");
@@ -120,11 +121,11 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setYear(2025);
       setTag("Drama");
       setType(defaults?.type || "filme");
-      setSection(toUiSection(defaults?.section, false));
+      setSection(toUiSection(defaults?.section));
       setPlayerUrl("");
       setBannerPreview("");
       setBannerUrlInput("");
-      setIsPremium(false);
+      setIsPremium(true);
       setIsArchived(false);
       setSynopsis("");
       setPreviewVideoUrl("");
@@ -133,11 +134,6 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
     }
 
   }, [content, open]);
-
-  useEffect(() => {
-    if (section === "filmes_open" && isPremium) setSection("filmes_rare");
-    else if (section === "filmes_rare" && !isPremium) setSection("filmes_open");
-  }, [isPremium, section]);
 
   const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -204,7 +200,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       }
 
 
-      if (contentId && (type === "serie" || type === "novela" || type === "anime")) {
+      if (contentId && (type === "serie" || type === "novela" || type === "anime" || type === "reality")) {
         for (const ep of episodes) {
           const cleanLinks = (ep.links || [])
             .filter(l => l && l.url && l.url.trim())
@@ -330,6 +326,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                   <SelectItem value="serie">Series</SelectItem>
                   <SelectItem value="filme">Movie</SelectItem>
                   <SelectItem value="novela">Soap Opera</SelectItem>
+                  <SelectItem value="reality">Reality Show</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -339,10 +336,10 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                 <SelectTrigger className="bg-muted border-border"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="series">Series</SelectItem>
-                  <SelectItem value="filmes_open">Movies (Open Catalog)</SelectItem>
-                  <SelectItem value="filmes_rare">Movies (Rare Premiers)</SelectItem>
+                  <SelectItem value="filmes">Movies</SelectItem>
                   <SelectItem value="novelas">Soap Operas</SelectItem>
                   <SelectItem value="gl">GL Dramas</SelectItem>
+                  <SelectItem value="realities">Reality Shows</SelectItem>
                   <SelectItem value="exclusivos">Queer Scenes Exclusives</SelectItem>
                 </SelectContent>
               </Select>
@@ -350,13 +347,6 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
           </div>
 
 
-          <div className="flex items-center justify-between py-2">
-            <div>
-              <label className="text-sm text-muted-foreground">Supporters only</label>
-              <p className="text-[10px] text-muted-foreground/60">Locks the entire title — only Supporters can watch</p>
-            </div>
-            <Switch checked={isPremium} onCheckedChange={setIsPremium} />
-          </div>
 
           <div className="flex items-center justify-between py-2">
             <div>
@@ -471,7 +461,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
   />
 </div>
 
-          {(type === "serie" || type === "novela" || type === "anime") && (
+          {(type === "serie" || type === "novela" || type === "anime" || type === "reality") && (
             <div className="space-y-3 border-t border-border pt-4">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-semibold text-foreground">Episodes</label>

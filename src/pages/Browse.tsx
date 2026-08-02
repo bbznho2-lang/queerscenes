@@ -77,11 +77,6 @@ const ContentCard = ({
         className="w-full h-full object-cover bg-muted"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent opacity-80" />
-      {item.is_premium && (
-        <div className="absolute top-2 left-2 z-10 qs-badge-supporter">
-          <Crown className="w-3 h-3" /> SUPPORTERS
-        </div>
-      )}
 
       <button
         onClick={(e) => { e.stopPropagation(); onToggleWatchlist(); }}
@@ -97,7 +92,7 @@ const ContentCard = ({
           {item.tag}
         </span>
         <h3 className="text-sm sm:text-base font-semibold text-foreground leading-tight">{item.title}</h3>
-        <p className="text-xs text-muted-foreground">{item.year} · {item.type === "serie" ? "Series" : item.type === "novela" ? "Soap Opera" : "Movie"}</p>
+        <p className="text-xs text-muted-foreground">{item.year} · {item.type === "serie" ? "Series" : item.type === "novela" ? "Soap Opera" : item.type === "reality" ? "Reality Show" : "Movie"}</p>
         <p className="text-[10px] sm:text-xs text-muted-foreground/80 mt-1 line-clamp-2 leading-snug">
           {item.synopsis?.trim() || "No synopsis available."}
         </p>
@@ -225,7 +220,8 @@ const Browse = () => {
   const filmes = visibleContents.filter((c) => c.section === "filmes");
   const novelas = visibleContents.filter((c) => c.section === "novelas");
   const gl = visibleContents.filter((c) => c.section === "gl");
-  const exclusivos = visibleContents.filter((c) => c.section === "exclusivos");
+  const realities = visibleContents.filter((c) => c.section === "realities");
+
   const watchlistItems = visibleContents.filter((c) => watchlistIds.has(c.id));
   const top10Items = buildUniqueTopContent(visibleContents, top10Ids, 10);
 
@@ -296,6 +292,8 @@ const Browse = () => {
     { label: "Movies", icon: "🎬", action: () => { setMenuOpen(false); document.getElementById("filmes")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Soap Operas", icon: "💕", action: () => { setMenuOpen(false); document.getElementById("novelas")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "GL Dramas", icon: "🌸", action: () => { setMenuOpen(false); document.getElementById("gl")?.scrollIntoView({ behavior: "smooth" }); } },
+    { label: "Reality Shows", icon: "🎤", action: () => { setMenuOpen(false); document.getElementById("realities")?.scrollIntoView({ behavior: "smooth" }); } },
+
     
     { label: "My List", icon: "🔖", action: () => { setMenuOpen(false); document.getElementById("minha-lista")?.scrollIntoView({ behavior: "smooth" }); } },
     ...(!isAdmin && !userIsPremium ? [{ label: "Become a Supporter", icon: "👑", action: () => { setMenuOpen(false); goToPlans("browse_sidebar"); }, premium: true }] : []),
@@ -495,7 +493,7 @@ const Browse = () => {
                           <span className="qs-top10-bignum" aria-hidden>{rank}</span>
                           <div className="qs-top10-meta">
                             <p className="qs-top10-fname">{item.title}</p>
-                            <p className="qs-top10-ftag">{item.year} · {item.type === "serie" ? "Series" : item.type === "novela" ? "Soap Opera" : "Movie"}</p>
+                            <p className="qs-top10-ftag">{item.year} · {item.type === "serie" ? "Series" : item.type === "novela" ? "Soap Opera" : item.type === "reality" ? "Reality Show" : "Movie"}</p>
                           </div>
                         </div>
                       </article>
@@ -546,9 +544,8 @@ const Browse = () => {
 
         {/* MOVIES */}
         <section id="filmes" className="py-10 sm:py-16 px-4">
-          <div className="max-w-7xl mx-auto space-y-10">
-            {/* Header with admin add button */}
-            <div className="flex items-center justify-between gap-3">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-6 gap-3">
               <h2 className="text-xl sm:text-2xl font-black neon-text-dark-blue flex items-center gap-2">
                 <span>🎬</span> Movies
               </h2>
@@ -558,50 +555,22 @@ const Browse = () => {
                 </button>
               )}
             </div>
-
-            {/* Open Catalog */}
-            <div>
-              <div className="mb-5">
-                <h3 className="text-lg sm:text-xl font-black neon-text-blue flex items-center gap-2"><span>🍿</span> Open Catalog</h3>
-              </div>
-              {filmes.filter((f) => !f.is_premium).length > 0 ? (
-                <AutoScrollRow>
-                  {filmes.filter((f) => !f.is_premium).map((f) => (
-                    <div key={f.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                      <ContentCard item={f} isAdmin={isAdmin} onEdit={() => handleEdit(f)} onDelete={() => handleDelete(f.id)} onClickTrack={() => trackClick(f.id)} isInWatchlist={watchlistIds.has(f.id)} onToggleWatchlist={() => toggleWatchlist(f.id)} userIsPremium={userIsPremium} />
-                    </div>
-                  ))}
-                </AutoScrollRow>
-              ) : (
-                <p className="text-muted-foreground text-center py-8">
-                  {isAdmin ? "No free movies yet" : "New content coming soon!"}
-                </p>
-              )}
-            </div>
-
-            {/* Rare Premieres */}
-            <div>
-              <div className="mb-5">
-                <h3 className="text-lg sm:text-xl font-black neon-text-purple flex items-center gap-2">
-                  <span>👑</span> Rare Premieres
-                </h3>
-              </div>
-              {filmes.filter((f) => f.is_premium).length > 0 ? (
-                <AutoScrollRow>
-                  {filmes.filter((f) => f.is_premium).map((f) => (
-                    <div key={f.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                      <ContentCard item={f} isAdmin={isAdmin} onEdit={() => handleEdit(f)} onDelete={() => handleDelete(f.id)} onClickTrack={() => trackClick(f.id)} isInWatchlist={watchlistIds.has(f.id)} onToggleWatchlist={() => toggleWatchlist(f.id)} userIsPremium={userIsPremium} />
-                    </div>
-                  ))}
-                </AutoScrollRow>
-              ) : (
-                <p className="text-muted-foreground text-center py-8">
-                  {isAdmin ? "No supporter-only movies yet" : "New content coming soon!"}
-                </p>
-              )}
-            </div>
+            {filmes.length > 0 ? (
+              <AutoScrollRow>
+                {filmes.map((f) => (
+                  <div key={f.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
+                    <ContentCard item={f} isAdmin={isAdmin} onEdit={() => handleEdit(f)} onDelete={() => handleDelete(f.id)} onClickTrack={() => trackClick(f.id)} isInWatchlist={watchlistIds.has(f.id)} onToggleWatchlist={() => toggleWatchlist(f.id)} userIsPremium={userIsPremium} />
+                  </div>
+                ))}
+              </AutoScrollRow>
+            ) : (
+              <p className="text-muted-foreground text-center py-8">
+                {isAdmin ? "Click + to add movies" : "New content coming soon!"}
+              </p>
+            )}
           </div>
         </section>
+
 
         {/* SOAP OPERAS */}
         <section id="novelas" className="py-10 sm:py-16 px-4">
@@ -670,6 +639,39 @@ const Browse = () => {
             )}
           </div>
         </section>
+
+        {/* REALITY SHOWS */}
+        <section id="realities" className="py-10 sm:py-16 px-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-6 gap-3">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-blue flex items-center gap-2">
+                <span>🎤</span> Reality Shows
+              </h2>
+              <div className="flex items-center gap-2">
+                {isAdmin && (
+                  <button onClick={() => handleNew("realities", "reality")} className="w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors" title="Add reality show">
+                    <Plus className="w-5 h-5 text-primary" />
+                  </button>
+                )}
+              </div>
+            </div>
+            {realities.length > 0 ? (
+              <AutoScrollRow>
+                {realities.map((r) => (
+                  <div key={r.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
+                    <ContentCard item={r} isAdmin={isAdmin} onEdit={() => handleEdit(r)} onDelete={() => handleDelete(r.id)} onClickTrack={() => trackClick(r.id)} isInWatchlist={watchlistIds.has(r.id)} onToggleWatchlist={() => toggleWatchlist(r.id)} userIsPremium={userIsPremium} />
+                  </div>
+                ))}
+              </AutoScrollRow>
+            ) : (
+              <p className="text-muted-foreground text-center py-8">
+                {isAdmin ? "Click + to add reality shows" : "New content coming soon!"}
+              </p>
+            )}
+          </div>
+        </section>
+
+
 
 
 
