@@ -108,7 +108,10 @@ const Player = () => {
     const hasPremium = isAdmin || Boolean(canPlayPremium) || hasPremiumFromProfile;
     const expired = !hasPremium && !!(profile?.is_premium && profile?.premium_expires_at && new Date(profile.premium_expires_at) <= new Date());
 
-    if (true) {
+    // 100% paid platform: every title requires Supporter access.
+    const requiresSupporter = true;
+    if (requiresSupporter) {
+
       if (hasPremium) {
         setPremiumBlocked(false);
         setUserIsPremium(true);
