@@ -618,20 +618,18 @@ const Index = () => {
 
           <div className="space-y-4 text-[var(--t2)] text-base sm:text-lg leading-relaxed mb-8">
             <p>
-              Queer Scenes exists so people <span className="font-semibold" style={{ color: "#a855f7" }}>all over the world</span> can watch titles that represent them — series, films, soap operas and GL, without filters or limits.
-            </p>
-            <p>
-              Start free. For those who want the full experience, a world of <span className="font-semibold" style={{ color: "#a855f7" }}>exclusive content</span> awaits Supporters. 💜
+              Queer Scenes exists so people <span className="font-semibold" style={{ color: "#a855f7" }}>all over the world</span> can watch titles that represent them — series, films, soap operas, GL Dramas and reality shows. Hand-subtitled by our team, curated with love, brought to you by fans who get it.
             </p>
           </div>
 
           {/* Numbered inline steps */}
           <div className="grid grid-cols-3 gap-4 mb-14">
             {[
-              { n: "01", text: "Watch free" },
-              { n: "02", text: "Fall in love" },
-              { n: "03", text: "Support us" },
+              { n: "01", text: "Discover rare titles" },
+              { n: "02", text: "Watch hand-subtitled content" },
+              { n: "03", text: "Join a community that gets you" },
             ].map((s) => (
+
               <div key={s.n}>
                 <p className="text-[10px] font-bold tracking-widest mb-1" style={{ color: "#d946a8" }}>{s.n}</p>
                 <p className="text-sm font-semibold text-[var(--t1)]">{s.text}</p>
