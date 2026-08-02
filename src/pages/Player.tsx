@@ -108,7 +108,7 @@ const Player = () => {
     const hasPremium = isAdmin || Boolean(canPlayPremium) || hasPremiumFromProfile;
     const expired = !hasPremium && !!(profile?.is_premium && profile?.premium_expires_at && new Date(profile.premium_expires_at) <= new Date());
 
-    if (data.is_premium) {
+    if (true) {
       if (hasPremium) {
         setPremiumBlocked(false);
         setUserIsPremium(true);
