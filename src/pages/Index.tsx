@@ -696,19 +696,17 @@ const Index = () => {
               <div id="supporter-card" className="qs-supporter-panel p-6 sm:p-7 h-full flex flex-col relative overflow-visible scroll-mt-20">
                 <div className="qs-supporter-glow" aria-hidden />
 
-                <span className="qs-supporter-pill">✦ MOST POPULAR</span>
-
                 <div className="relative z-10 text-center pt-3">
                   <div className="text-4xl mb-1">💜</div>
                   <h3 className="text-2xl font-black tracking-tight" style={{ color: "#c084fc" }}>Supporter</h3>
                 </div>
 
                 {/* Plan selector */}
-                <div className="relative z-10 mt-5 grid grid-cols-3 gap-2.5">
+                <div className="relative z-10 mt-7 grid grid-cols-3 gap-2.5">
                   {[
-                    { label: "Monthly", price: "€11.90", note: "", priceId: "price_1TmNFHJ5xR4MDdjr5915HBR2" },
-                    { label: "Quarterly", price: "€29.90", note: "Save 16%", priceId: "price_1TmNGNJ5xR4MDdjrsxC9bhtx" },
-                    { label: "Yearly", price: "€106.90", note: "Save 25%", priceId: "price_1TmNHMJ5xR4MDdjrTnNTQAHV" },
+                    { label: "Monthly", price: "€11.90", note: "", popular: false, priceId: "price_1TmNFHJ5xR4MDdjr5915HBR2" },
+                    { label: "Quarterly", price: "€29.90", note: "Save 16%", popular: true, priceId: "price_1TmNGNJ5xR4MDdjrsxC9bhtx" },
+                    { label: "Yearly", price: "€106.90", note: "Save 25%", popular: false, priceId: "price_1TmNHMJ5xR4MDdjrTnNTQAHV" },
                   ].map((opt) => {
                     const selected = selectedPlanId === opt.priceId;
                     return (
@@ -720,6 +718,14 @@ const Index = () => {
                         onClick={() => setSelectedPlanId(opt.priceId)}
                         className={`qs-supporter-plan ${selected ? "qs-supporter-plan-selected" : ""} text-center relative`}
                       >
+                        {opt.popular && (
+                          <span
+                            className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-[0.12em] text-white shadow-lg"
+                            style={{ background: "linear-gradient(135deg,#a855f7,#ec4899)" }}
+                          >
+                            ✦ Most Popular
+                          </span>
+                        )}
                         {selected && (
                           <span
                             aria-hidden
@@ -738,8 +744,9 @@ const Index = () => {
                 </div>
 
                 <p className="relative z-10 mt-4 text-center text-sm text-[var(--t2)]">
-                  Support the project & unlock the full experience.
+                  Unlock our full catalog — rare queer titles, hand-subtitled series, GL Dramas, reality shows and premieres you won't find anywhere else. Made by fans, for fans.
                 </p>
+
 
                 <div className="relative z-10 mt-4 flex justify-center">
                   <div className="qs-supporter-backers">
