@@ -81,7 +81,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setYear(content.year);
       setTag(content.tag);
       setType(content.type);
-      setSection(toUiSection(content.section, content.is_premium));
+      setSection(toUiSection(content.section));
       const legacy = content.player_url || (content as any).player_url_free || "";
       setPlayerUrl(legacy);
       if (!legacy) {
@@ -100,7 +100,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       });
       setBannerPreview(content.banner_url || "");
       setBannerUrlInput(content.banner_url || "");
-      setIsPremium(content.is_premium || false);
+      setIsPremium(true);
       setIsArchived(content.is_archived || false);
       setSynopsis((content as any).synopsis || "");
       setPreviewVideoUrl((content as any).preview_video_url || "");
@@ -121,7 +121,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setYear(2025);
       setTag("Drama");
       setType(defaults?.type || "filme");
-      setSection(toUiSection(defaults?.section, false));
+      setSection(toUiSection(defaults?.section));
       setPlayerUrl("");
       setBannerPreview("");
       setBannerUrlInput("");
