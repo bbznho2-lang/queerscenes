@@ -432,7 +432,8 @@ const Index = () => {
               }}
             >
               <Play className="w-4 h-4" />
-              Start watching free
+              Start Watch Now
+
             </button>
             <button
               onClick={() => handleBecomeSupporterClick("landing_hero_button")}
