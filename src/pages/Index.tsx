@@ -677,7 +677,7 @@ const Index = () => {
               Unlock this title and our entire <span className="italic font-extrabold" style={{ color: "#a855f7" }}>rare collection.</span>
             </h2>
             <p className="text-[var(--t2)] mt-3 text-sm sm:text-base max-w-xl mx-auto">
-              Start free. Upgrade anytime.
+              One plan. Full access. Cancel anytime.
             </p>
 
             {!showSubscribeActions && !authLoading && !profileLoading && (
@@ -686,43 +686,9 @@ const Index = () => {
           </motion.div>
 
 
-          {/* Free vs Supporter cards — Free first */}
-          <div id="planos-cards" className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto scroll-mt-24">
+          {/* Supporter plan */}
+          <div id="planos-cards" className="grid grid-cols-1 gap-6 max-w-xl mx-auto scroll-mt-24">
 
-            {/* FREE */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
-
-              <div className="qs-card-lg p-6 sm:p-7 h-full flex flex-col">
-                <div className="text-center pb-2">
-                  <div className="text-4xl mb-1">🌈</div>
-                  <h3 className="text-xl font-bold text-[var(--t1)]">Free</h3>
-                  <div className="mt-2">
-                    <span className="text-4xl sm:text-5xl font-extrabold text-[var(--t1)]">€0</span>
-                  </div>
-                  <p className="text-[var(--t2)] text-sm mt-2">
-                    Join the community and explore general content for free.
-                  </p>
-                </div>
-                <div className="flex-1 flex flex-col mt-4">
-                  <ul className="space-y-2.5 text-sm flex-1">
-                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Get a taste of our LGBTQIA+ universe</span></li>
-                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Daily picks from the open catalog</span></li>
-                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Join the conversation in the comments</span></li>
-                    <li className="flex items-start gap-2"><span style={{ color: "#a855f7" }} className="mt-0.5">✓</span><span className="text-[var(--t1)]">Hang out with the community on Telegram</span></li>
-                    <li className="flex items-start gap-2 opacity-50"><span className="text-[var(--t3)] mt-0.5">✗</span><span className="text-[var(--t3)] line-through">International subtitled series & movies</span></li>
-                    <li className="flex items-start gap-2 opacity-50"><span className="text-[var(--t3)] mt-0.5">✗</span><span className="text-[var(--t3)] line-through">Soap operas subtitled weekly</span></li>
-                    <li className="flex items-start gap-2 opacity-50"><span className="text-[var(--t3)] mt-0.5">✗</span><span className="text-[var(--t3)] line-through">GL Dramas subtitled</span></li>
-                    <li className="flex items-start gap-2 opacity-50"><span className="text-[var(--t3)] mt-0.5">✗</span><span className="text-[var(--t3)] line-through">Early access content</span></li>
-                  </ul>
-                  <Button
-                    onClick={() => scrollToLogin()}
-                    className="qs-btn-primary w-full mt-5 h-11 gap-2"
-                  >
-                    <Play className="w-4 h-4" /> Join free
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
 
 
             {/* SUPPORTER */}
