@@ -61,12 +61,12 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
   const [year, setYear] = useState(2025);
   const [tag, setTag] = useState("Drama");
   const [type, setType] = useState("filme");
-  const [section, setSection] = useState("filmes_open");
+  const [section, setSection] = useState("filmes");
   const [playerUrl, setPlayerUrl] = useState("");
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [bannerPreview, setBannerPreview] = useState("");
   const [bannerUrlInput, setBannerUrlInput] = useState("");
-  const [isPremium, setIsPremium] = useState(false);
+  const [isPremium, setIsPremium] = useState(true);
   const [isArchived, setIsArchived] = useState(false);
   const [synopsis, setSynopsis] = useState("");
   const [previewVideoUrl, setPreviewVideoUrl] = useState("");
@@ -125,7 +125,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setPlayerUrl("");
       setBannerPreview("");
       setBannerUrlInput("");
-      setIsPremium(false);
+      setIsPremium(true);
       setIsArchived(false);
       setSynopsis("");
       setPreviewVideoUrl("");
@@ -134,11 +134,6 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
     }
 
   }, [content, open]);
-
-  useEffect(() => {
-    if (section === "filmes_open" && isPremium) setSection("filmes_rare");
-    else if (section === "filmes_rare" && !isPremium) setSection("filmes_open");
-  }, [isPremium, section]);
 
   const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
