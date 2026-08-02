@@ -330,6 +330,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                   <SelectItem value="serie">Series</SelectItem>
                   <SelectItem value="filme">Movie</SelectItem>
                   <SelectItem value="novela">Soap Opera</SelectItem>
+                  <SelectItem value="reality">Reality Show</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -339,10 +340,10 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
                 <SelectTrigger className="bg-muted border-border"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="series">Series</SelectItem>
-                  <SelectItem value="filmes_open">Movies (Open Catalog)</SelectItem>
-                  <SelectItem value="filmes_rare">Movies (Rare Premiers)</SelectItem>
+                  <SelectItem value="filmes">Movies</SelectItem>
                   <SelectItem value="novelas">Soap Operas</SelectItem>
                   <SelectItem value="gl">GL Dramas</SelectItem>
+                  <SelectItem value="realities">Reality Shows</SelectItem>
                   <SelectItem value="exclusivos">Queer Scenes Exclusives</SelectItem>
                 </SelectContent>
               </Select>
@@ -350,13 +351,6 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
           </div>
 
 
-          <div className="flex items-center justify-between py-2">
-            <div>
-              <label className="text-sm text-muted-foreground">Supporters only</label>
-              <p className="text-[10px] text-muted-foreground/60">Locks the entire title — only Supporters can watch</p>
-            </div>
-            <Switch checked={isPremium} onCheckedChange={setIsPremium} />
-          </div>
 
           <div className="flex items-center justify-between py-2">
             <div>
