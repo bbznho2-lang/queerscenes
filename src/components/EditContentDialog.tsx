@@ -45,8 +45,8 @@ interface Props {
   defaults?: { section: string; type: string };
 }
 
-const toUiSection = (dbSection?: string, premium?: boolean) => {
-  if (dbSection === "filmes") return premium ? "filmes_rare" : "filmes_open";
+const toUiSection = (dbSection?: string) => {
+  if (dbSection === "filmes_open" || dbSection === "filmes_rare") return "filmes";
   return dbSection || "series";
 };
 
@@ -54,6 +54,7 @@ const toDbSection = (uiSection: string) => {
   if (uiSection === "filmes_open" || uiSection === "filmes_rare") return "filmes";
   return uiSection;
 };
+
 
 const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: Props) => {
   const [title, setTitle] = useState("");
