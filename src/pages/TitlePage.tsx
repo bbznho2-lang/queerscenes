@@ -172,11 +172,8 @@ const TitlePage = () => {
       setAccessChecked(false);
       return;
     }
-    // Free titles (no supporter badge) are open to everyone — skip the paywall entirely.
-    if (content && content.is_premium === false && playableContentId) {
-      navigate(`/player/${playableContentId}`, { replace: true });
-      return;
-    }
+    // Every title is paid — non-supporters always see the paywall.
+
     if (!user) {
       setCanWatch(false);
       setAccessChecked(true);
