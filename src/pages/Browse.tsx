@@ -77,11 +77,6 @@ const ContentCard = ({
         className="w-full h-full object-cover bg-muted"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent opacity-80" />
-      {item.is_premium && (
-        <div className="absolute top-2 left-2 z-10 qs-badge-supporter">
-          <Crown className="w-3 h-3" /> SUPPORTERS
-        </div>
-      )}
 
       <button
         onClick={(e) => { e.stopPropagation(); onToggleWatchlist(); }}
