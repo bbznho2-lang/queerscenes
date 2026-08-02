@@ -757,7 +757,7 @@ const Index = () => {
 
                 <div className="relative z-10 mt-5 space-y-2.5">
                   {[
-                    "Everything in Free",
+                    "Full catalog access",
                     "Uninterrupted experience",
                     "Soap operas — weekly",
                     "LGBT series & movies",
@@ -865,7 +865,7 @@ const Index = () => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
             <Accordion type="single" collapsible className="space-y-3">
               {[
-                { q: "Is Queer Scenes free?", a: "Yes. We have free content available. We also offer Supporter plans with exclusive access for the full experience." },
+                { q: "Is Queer Scenes free?", a: "Queer Scenes is a paid platform. We offer exclusive content — rare queer titles, hand-subtitled series, GL Dramas, reality shows and premieres that you won't find on any major streaming platform. Supporters get full access to our entire catalog." },
                 { q: "How do I become a Supporter?", a: "Pick a Supporter plan, complete the secure checkout, and your account will be upgraded instantly." },
                 { q: "Can I cancel anytime?", a: "Yes. Cancellation can be done at any time, with no penalty." },
                 { q: "How do I cancel my subscription?", a: (<>Open the <button type="button" onClick={() => setSupportOpen(true)} className="text-[var(--brand-pink)] underline hover:opacity-80 font-semibold">Support</button> form and choose "Cancel subscription".</>) },
