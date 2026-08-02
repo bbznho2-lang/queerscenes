@@ -200,7 +200,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       }
 
 
-      if (contentId && (type === "serie" || type === "novela" || type === "anime")) {
+      if (contentId && (type === "serie" || type === "novela" || type === "anime" || type === "reality")) {
         for (const ep of episodes) {
           const cleanLinks = (ep.links || [])
             .filter(l => l && l.url && l.url.trim())
@@ -461,7 +461,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
   />
 </div>
 
-          {(type === "serie" || type === "novela" || type === "anime") && (
+          {(type === "serie" || type === "novela" || type === "anime" || type === "reality") && (
             <div className="space-y-3 border-t border-border pt-4">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-semibold text-foreground">Episodes</label>
