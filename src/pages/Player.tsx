@@ -145,7 +145,7 @@ const Player = () => {
       }
     }
 
-    if (data.type === "serie" || data.type === "novela" || data.type === "anime") {
+    if (data.type === "serie" || data.type === "novela" || data.type === "anime" || data.type === "reality") {
       const { data: eps } = await supabase
         .from("episodes")
         .select("id, content_id, title, episode_number, season, is_premium, created_at")
@@ -159,7 +159,7 @@ const Player = () => {
           .select("id, title, year, tag, type, banner_url, section, position, is_premium, supporter_player_enabled, synopsis, preview_video_url")
           .ilike("title", `${data.title.trim()}%`)
           .neq("id", id)
-          .in("type", ["serie", "novela", "anime"]);
+          .in("type", ["serie", "novela", "anime", "reality"]);
         const duplicateIds = ((duplicates || []) as ContentItem[]).map((item) => item.id);
         if (duplicateIds.length > 0) {
           const { data: duplicateEpisodes } = await supabase
@@ -858,7 +858,7 @@ const Player = () => {
           <div className="flex flex-wrap gap-2">
             <span className="px-2 py-0.5 text-xs rounded bg-primary/20 text-primary">{content?.tag}</span>
             <span className="px-2 py-0.5 text-xs rounded bg-secondary/20 text-secondary">{content?.year}</span>
-            <span className="px-2 py-0.5 text-xs rounded bg-muted text-muted-foreground">{content?.type === "serie" ? "Series" : content?.type === "novela" ? "Soap Opera" : "Movie"}</span>
+            <span className="px-2 py-0.5 text-xs rounded bg-muted text-muted-foreground">{content?.type === "serie" ? "Series" : content?.type === "novela" ? "Soap Opera" : content?.type === "reality" ? "Reality Show" : "Movie"}</span>
           </div>
         </div>
 
@@ -867,7 +867,7 @@ const Player = () => {
         )}
 
 
-        {!premiumBlocked && (content?.type === "serie" || content?.type === "novela" || content?.type === "anime") && episodes.length > 0 && (() => {
+        {!premiumBlocked && (content?.type === "serie" || content?.type === "novela" || content?.type === "anime" || content?.type === "reality") && episodes.length > 0 && (() => {
           const seasons = [...new Set(episodes.map(e => e.season))].sort((a, b) => a - b);
           const filteredEps = episodes.filter(e => e.season === selectedSeason);
           return (

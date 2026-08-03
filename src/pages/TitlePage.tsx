@@ -324,7 +324,9 @@ const TitlePage = () => {
                 const t = String(content.type).toLowerCase();
                 if (t.includes("filme") || t.includes("movie")) return "Movie";
                 if (t.includes("novela") || t.includes("soap")) return "Soap Opera";
+                if (t.includes("reality")) return "Reality Show";
                 if (t.includes("serie")) return "Series";
+
                 return content.type;
               })()}
             </span>
