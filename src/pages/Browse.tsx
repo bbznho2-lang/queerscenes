@@ -14,6 +14,7 @@ import AddExistingContentDialog from "@/components/AddExistingContentDialog";
 import AutoScrollRow from "@/components/AutoScrollRow";
 import SiteNoteBanner from "@/components/SiteNoteBanner";
 import RecentUpdatesSection from "@/components/RecentUpdatesSection";
+import ContinueWatchingSection from "@/components/ContinueWatchingSection";
 import { slugify } from "@/lib/slug";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
