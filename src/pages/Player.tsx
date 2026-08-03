@@ -266,6 +266,19 @@ const Player = () => {
   const episodePremiumBlocked = Boolean(currentEp?.is_premium && !userCanWatchPremium);
   const isBlocked = accessResolved && (premiumBlocked || episodePremiumBlocked) && !userCanWatchPremium;
 
+  // Remember what the user started watching so it shows up in "Continue Watching".
+  useEffect(() => {
+    if (!user?.id || !content?.id || !accessResolved || isBlocked) return;
+    void saveWatchProgress({
+      userId: user.id,
+      contentId: content.id,
+      episodeId: currentEp?.id ?? null,
+      season: currentEp?.season ?? null,
+      episodeNumber: currentEp?.episode_number ?? null,
+    });
+  }, [user?.id, content?.id, currentEp?.id, accessResolved, isBlocked]);
+
+
   type EpisodeLink = { title: string; type: "embed" | "redirect"; url: string };
   const [episodeLinks, setEpisodeLinks] = useState<EpisodeLink[]>([]);
   const [selectedLinkIdx, setSelectedLinkIdx] = useState(-1);
