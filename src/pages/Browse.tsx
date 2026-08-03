@@ -508,6 +508,8 @@ const Browse = () => {
 
         <RecentUpdatesSection />
 
+        <ContinueWatchingSection />
+
 
 
 
