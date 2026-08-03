@@ -10,6 +10,7 @@ import EditContentDialog from "@/components/EditContentDialog";
 import CommentsSection from "@/components/CommentsSection";
 import { getFunnelVisitorId, trackSupporterEvent, type SupporterEventType } from "@/lib/supporter-tracking";
 import { getEmailRedirectUrl } from "@/lib/auth-urls";
+import { saveWatchProgress } from "@/lib/watch-progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { DEFAULT_PAYWALL_TEXT } from "@/components/PaywallCustomizationsAdmin";
 
@@ -265,6 +266,19 @@ const Player = () => {
   const userCanWatchPremium = userIsPremium || isAdmin;
   const episodePremiumBlocked = Boolean(currentEp?.is_premium && !userCanWatchPremium);
   const isBlocked = accessResolved && (premiumBlocked || episodePremiumBlocked) && !userCanWatchPremium;
+
+  // Remember what the user started watching so it shows up in "Continue Watching".
+  useEffect(() => {
+    if (!user?.id || !content?.id || !accessResolved || isBlocked) return;
+    void saveWatchProgress({
+      userId: user.id,
+      contentId: content.id,
+      episodeId: currentEp?.id ?? null,
+      season: currentEp?.season ?? null,
+      episodeNumber: currentEp?.episode_number ?? null,
+    });
+  }, [user?.id, content?.id, currentEp?.id, accessResolved, isBlocked]);
+
 
   type EpisodeLink = { title: string; type: "embed" | "redirect"; url: string };
   const [episodeLinks, setEpisodeLinks] = useState<EpisodeLink[]>([]);

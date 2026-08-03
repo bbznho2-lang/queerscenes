@@ -784,6 +784,54 @@ export type Database = {
         }
         Relationships: []
       }
+      watch_progress: {
+        Row: {
+          content_id: string
+          created_at: string
+          episode_id: string | null
+          episode_number: number | null
+          id: string
+          season: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content_id: string
+          created_at?: string
+          episode_id?: string | null
+          episode_number?: number | null
+          id?: string
+          season?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content_id?: string
+          created_at?: string
+          episode_id?: string | null
+          episode_number?: number | null
+          id?: string
+          season?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "watch_progress_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "contents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "watch_progress_episode_id_fkey"
+            columns: ["episode_id"]
+            isOneToOne: false
+            referencedRelation: "episodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       watchlist: {
         Row: {
           content_id: string
