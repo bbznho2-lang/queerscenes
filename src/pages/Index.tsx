@@ -417,7 +417,7 @@ const Index = () => {
 
           <motion.div initial="hidden" animate="visible" variants={fade} custom={4} className="flex flex-col items-center gap-3 mx-auto" style={{ maxWidth: 290 }}>
             <button
-              onClick={() => handleBecomeSupporterClick("landing_hero_button")}
+              onClick={() => scrollToLogin()}
               className="w-full flex items-center justify-center gap-2"
               style={{
                 padding: "16px",
@@ -431,11 +431,11 @@ const Index = () => {
                 cursor: "pointer",
               }}
             >
-              <Crown className="w-4 h-4" />
-              BECOME A SUPPORTER
+              <Play className="w-4 h-4" />
+              Start Watch Now
             </button>
             <button
-              onClick={() => scrollToLogin()}
+              onClick={() => handleBecomeSupporterClick("landing_hero_button")}
               className="w-full flex items-center justify-center gap-2 backdrop-blur-md"
               style={{
                 padding: "15px",
@@ -448,9 +448,10 @@ const Index = () => {
                 cursor: "pointer",
               }}
             >
-              <Play className="w-4 h-4" />
-              Start Watch Now
+              <Crown className="w-4 h-4" />
+              BECOME A SUPPORTER
             </button>
+
 
           </motion.div>
 
