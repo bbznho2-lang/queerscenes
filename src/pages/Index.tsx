@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { getResetPasswordRedirectUrl } from "@/lib/auth-urls";
 import { buildUniqueTopContent, fetchTopContentRanking, getUniqueItemsByTitle } from "@/lib/top-content";
 import { getFunnelVisitorId, trackSupporterClick } from "@/lib/supporter-tracking";
+import { getReferralCode } from "@/lib/referral";
 import { smoothScrollToElement } from "@/lib/scroll-to";
 import { toast } from "sonner";
 import SupportDialog from "@/components/SupportDialog";
