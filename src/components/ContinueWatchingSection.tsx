@@ -76,6 +76,7 @@ const ContinueWatchingSection = () => {
         season: ep?.season ?? row.season ?? null,
         episodeNumber: ep?.episode_number ?? row.episode_number ?? null,
         episodeTitle: ep?.title ?? null,
+        episodeId: row.episode_id ?? null,
       });
       if (mapped.length >= 12) break;
     }
