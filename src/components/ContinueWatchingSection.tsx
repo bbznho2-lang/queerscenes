@@ -15,6 +15,7 @@ interface ContinueItem {
   season: number | null;
   episodeNumber: number | null;
   episodeTitle: string | null;
+  episodeId: string | null;
 }
 
 const ContinueWatchingSection = () => {
