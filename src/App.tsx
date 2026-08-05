@@ -11,29 +11,37 @@ import Admin from "./pages/Admin";
 import Catalog from "./pages/Catalog";
 import TitlePage from "./pages/TitlePage";
 import NotFound from "./pages/NotFound";
+import { useEffect } from "react";
+import { captureReferralFromUrl } from "@/lib/referral";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/browse" element={<Browse />} />
-          <Route path="/catalog" element={<Catalog />} />
-          <Route path="/title/:slug" element={<TitlePage />} />
-          <Route path="/player/:id" element={<Player />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+const App = () => {
+  useEffect(() => {
+    void captureReferralFromUrl();
+  }, []);
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/browse" element={<Browse />} />
+            <Route path="/catalog" element={<Catalog />} />
+            <Route path="/title/:slug" element={<TitlePage />} />
+            <Route path="/player/:id" element={<Player />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

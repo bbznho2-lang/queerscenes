@@ -628,6 +628,45 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_events: {
+        Row: {
+          amount_cents: number | null
+          created_at: string
+          currency: string | null
+          email: string | null
+          event_type: string
+          id: string
+          metadata: Json
+          ref_code: string
+          user_id: string | null
+          visitor_id: string | null
+        }
+        Insert: {
+          amount_cents?: number | null
+          created_at?: string
+          currency?: string | null
+          email?: string | null
+          event_type: string
+          id?: string
+          metadata?: Json
+          ref_code: string
+          user_id?: string | null
+          visitor_id?: string | null
+        }
+        Update: {
+          amount_cents?: number | null
+          created_at?: string
+          currency?: string | null
+          email?: string | null
+          event_type?: string
+          id?: string
+          metadata?: Json
+          ref_code?: string
+          user_id?: string | null
+          visitor_id?: string | null
+        }
+        Relationships: []
+      }
       site_notes: {
         Row: {
           body: string

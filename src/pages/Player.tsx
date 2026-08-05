@@ -185,8 +185,11 @@ const Player = () => {
       setContent(resolvedContent);
       setEpisodes(normalizedEpisodes);
       if (normalizedEpisodes.length > 0) {
-        setSelectedSeason(normalizedEpisodes[0].season);
-        setCurrentEp(normalizedEpisodes[0]);
+        const requestedEpId = new URLSearchParams(window.location.search).get("ep");
+        const resumeEp =
+          (requestedEpId && normalizedEpisodes.find((e) => e.id === requestedEpId)) || normalizedEpisodes[0];
+        setSelectedSeason(resumeEp.season);
+        setCurrentEp(resumeEp);
       } else {
         setCurrentEp(null);
       }

@@ -201,6 +201,58 @@ Deno.serve(async (req) => {
     }
   }
 
+  async function recordReferralPayment(opts: {
+    refCode: string | null;
+    visitorId: string | null;
+    email: string | null;
+    userId: string | null;
+    amountCents: number | null;
+    currency: string | null;
+    sessionId: string | null;
+  }) {
+    try {
+      let refCode = (opts.refCode || "").trim().toLowerCase();
+
+      // Fallback: attribute by the visitor id that logged the original click.
+      if (!refCode && opts.visitorId) {
+        const { data: click } = await supabase
+          .from("referral_events")
+          .select("ref_code")
+          .eq("event_type", "click")
+          .eq("visitor_id", opts.visitorId)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        refCode = click?.ref_code ?? "";
+      }
+      if (!refCode) return;
+
+      // Avoid duplicates for the same checkout session.
+      if (opts.sessionId) {
+        const { data: dup } = await supabase
+          .from("referral_events")
+          .select("id")
+          .eq("event_type", "payment")
+          .eq("metadata->>session_id", opts.sessionId)
+          .maybeSingle();
+        if (dup?.id) return;
+      }
+
+      await supabase.from("referral_events").insert({
+        ref_code: refCode,
+        event_type: "payment",
+        visitor_id: opts.visitorId,
+        user_id: opts.userId,
+        email: opts.email ? opts.email.trim().toLowerCase() : null,
+        amount_cents: opts.amountCents,
+        currency: opts.currency ?? "eur",
+        metadata: { session_id: opts.sessionId },
+      });
+    } catch (e) {
+      console.error("[stripe-webhook] referral payment insert failed", e);
+    }
+  }
+
   try {
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
@@ -232,6 +284,15 @@ Deno.serve(async (req) => {
             sessionId: session.id,
             subscriptionId: subId,
           });
+          await recordReferralPayment({
+            refCode: (session.metadata?.ref_code as string) || null,
+            visitorId,
+            email: email || null,
+            userId: metaUserId,
+            amountCents: session.amount_total ?? null,
+            currency: session.currency ?? "eur",
+            sessionId: session.id,
+          });
           return new Response(JSON.stringify({ received: true }), {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
           });
@@ -254,6 +315,15 @@ Deno.serve(async (req) => {
         visitorId,
         sessionId: session.id,
         subscriptionId: subId,
+      });
+      await recordReferralPayment({
+        refCode: (session.metadata?.ref_code as string) || null,
+        visitorId,
+        email: email || null,
+        userId: metaUserId,
+        amountCents: session.amount_total ?? null,
+        currency: session.currency ?? "eur",
+        sessionId: session.id,
       });
     } else if (event.type === "invoice.paid") {
       const invoice = event.data.object as Stripe.Invoice;

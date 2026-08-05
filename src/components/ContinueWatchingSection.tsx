@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { History, Play, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { slugify } from "@/lib/slug";
+
 import { removeWatchProgress } from "@/lib/watch-progress";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -15,6 +15,7 @@ interface ContinueItem {
   season: number | null;
   episodeNumber: number | null;
   episodeTitle: string | null;
+  episodeId: string | null;
 }
 
 const ContinueWatchingSection = () => {
@@ -75,6 +76,7 @@ const ContinueWatchingSection = () => {
         season: ep?.season ?? row.season ?? null,
         episodeNumber: ep?.episode_number ?? row.episode_number ?? null,
         episodeTitle: ep?.title ?? null,
+        episodeId: row.episode_id ?? null,
       });
       if (mapped.length >= 12) break;
     }
@@ -104,7 +106,13 @@ const ContinueWatchingSection = () => {
           {items.map((item) => (
             <div
               key={item.contentId}
-              onClick={() => navigate(`/title/${slugify(item.title)}`)}
+              onClick={() =>
+                navigate(
+                  item.episodeId
+                    ? `/player/${item.contentId}?ep=${item.episodeId}`
+                    : `/player/${item.contentId}`,
+                )
+              }
               className="group relative flex-shrink-0 w-[70vw] sm:w-[280px] cursor-pointer rounded-xl overflow-hidden bg-card border border-border hover:border-accent/50 transition-all"
             >
               <div className="relative aspect-video bg-muted">

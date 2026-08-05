@@ -22,6 +22,7 @@ import SiteNoteAdmin from "@/components/SiteNoteAdmin";
 import PaywallCustomizationsAdmin from "@/components/PaywallCustomizationsAdmin";
 import FeaturedEpisodesAdmin from "@/components/FeaturedEpisodesAdmin";
 import CanceledSubscriptionsSection from "@/components/CanceledSubscriptionsSection";
+import ReferralsSection from "@/components/ReferralsSection";
 
 
 interface Profile {
@@ -625,6 +626,10 @@ const Admin = () => {
             )}
           </CardContent>
         </Card>
+
+        <div className="mb-6">
+          <ReferralsSection />
+        </div>
 
         {/* Supporter Conversion Events */}
         {(() => {

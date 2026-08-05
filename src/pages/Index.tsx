@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { getResetPasswordRedirectUrl } from "@/lib/auth-urls";
 import { buildUniqueTopContent, fetchTopContentRanking, getUniqueItemsByTitle } from "@/lib/top-content";
 import { getFunnelVisitorId, trackSupporterClick } from "@/lib/supporter-tracking";
+import { getReferralCode } from "@/lib/referral";
 import { smoothScrollToElement } from "@/lib/scroll-to";
 import { toast } from "sonner";
 import SupportDialog from "@/components/SupportDialog";
@@ -275,8 +276,9 @@ const Index = () => {
     setCheckoutLoading(priceId);
     try {
       const visitorId = getFunnelVisitorId();
+      const refCode = getReferralCode();
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { priceId, visitorId },
+        body: { priceId, visitorId, refCode },
       });
       if (error) throw error;
       const url = (data as any)?.url;
