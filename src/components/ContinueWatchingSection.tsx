@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { History, Play, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { slugify } from "@/lib/slug";
+
 import { removeWatchProgress } from "@/lib/watch-progress";
 import { useAuth } from "@/hooks/useAuth";
 
