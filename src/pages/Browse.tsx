@@ -519,7 +519,7 @@ const Browse = () => {
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6 gap-3">
               <h2 className="text-xl sm:text-2xl font-black neon-text-purple flex items-center gap-2">
-                <span>🎭</span> Trending Queer Series
+                <span>🎭</span> Series
               </h2>
               <div className="flex items-center gap-2">
                 {isAdmin && (
