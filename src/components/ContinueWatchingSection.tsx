@@ -106,7 +106,13 @@ const ContinueWatchingSection = () => {
           {items.map((item) => (
             <div
               key={item.contentId}
-              onClick={() => navigate(`/title/${slugify(item.title)}`)}
+              onClick={() =>
+                navigate(
+                  item.episodeId
+                    ? `/player/${item.contentId}?ep=${item.episodeId}`
+                    : `/player/${item.contentId}`,
+                )
+              }
               className="group relative flex-shrink-0 w-[70vw] sm:w-[280px] cursor-pointer rounded-xl overflow-hidden bg-card border border-border hover:border-accent/50 transition-all"
             >
               <div className="relative aspect-video bg-muted">
