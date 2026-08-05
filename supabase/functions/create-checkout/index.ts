@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { priceId, visitorId } = await req.json();
+    const { priceId, visitorId, refCode } = await req.json();
     if (!priceId || !ALLOWED_PRICE_IDS.has(priceId)) {
       return new Response(JSON.stringify({ error: "Invalid priceId" }), {
         status: 400,
@@ -73,6 +73,10 @@ Deno.serve(async (req) => {
       email: authedEmail,
       price_id: priceId,
       visitor_id: typeof visitorId === "string" ? visitorId.slice(0, 100) : "",
+      ref_code:
+        typeof refCode === "string"
+          ? refCode.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 60)
+          : "",
     };
 
     const session = await stripe.checkout.sessions.create({
