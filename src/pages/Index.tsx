@@ -275,8 +275,9 @@ const Index = () => {
     setCheckoutLoading(priceId);
     try {
       const visitorId = getFunnelVisitorId();
+      const refCode = getReferralCode();
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { priceId, visitorId },
+        body: { priceId, visitorId, refCode },
       });
       if (error) throw error;
       const url = (data as any)?.url;
