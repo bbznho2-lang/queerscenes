@@ -227,10 +227,7 @@ Deno.serve(async (req) => {
     }
   }
 
-    } catch (e) {
-      console.error("[stripe-webhook] funnel insert failed", e);
-    }
-  }
+
 
   async function recordReferralPayment(opts: {
     refCode: string | null;
