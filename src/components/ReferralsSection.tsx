@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { buildReferralUrl, maskEmail, normalizeRefCode } from "@/lib/referral";
-import { Copy, Link2, RefreshCw, TrendingUp } from "lucide-react";
+import { Copy, Link2, Plus, RefreshCw, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 
 type RangeKey = "7" | "30" | "all";
@@ -134,9 +134,17 @@ const ReferralsSection = () => {
             className="flex-1 min-w-[180px] h-9 px-3 rounded-lg bg-muted text-sm text-foreground outline-none"
           />
           <button
+            onClick={addInfluencer}
+            title="Add influencer to tracking"
+            className="h-9 w-9 rounded-lg bg-accent text-accent-foreground text-lg font-black flex items-center justify-center"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+          <button
             onClick={() => {
               const code = normalizeRefCode(newInfluencer);
               if (!code) return toast.error("Type a valid influencer name");
+              if (!customCodes.includes(code)) persistCodes([...customCodes, code]);
               void copy(buildReferralUrl(code));
             }}
             className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-semibold"
@@ -144,6 +152,7 @@ const ReferralsSection = () => {
             Generate & copy
           </button>
         </div>
+
         {normalizeRefCode(newInfluencer) && (
           <p className="mt-2 text-xs text-muted-foreground break-all">
             {buildReferralUrl(normalizeRefCode(newInfluencer)!)}
