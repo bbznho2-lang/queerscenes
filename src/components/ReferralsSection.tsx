@@ -50,11 +50,39 @@ const ReferralsSection = () => {
     };
   }, [load]);
 
+  const [customCodes, setCustomCodes] = useState<string[]>(() => {
+    try {
+      const raw = window.localStorage.getItem("qs_ref_influencers");
+      return raw ? (JSON.parse(raw) as string[]) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const persistCodes = (codes: string[]) => {
+    setCustomCodes(codes);
+    try {
+      window.localStorage.setItem("qs_ref_influencers", JSON.stringify(codes));
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const addInfluencer = () => {
+    const code = normalizeRefCode(newInfluencer);
+    if (!code) return toast.error("Type a valid influencer name");
+    if (customCodes.includes(code)) return toast.info(`@${code} is already tracked`);
+    persistCodes([...customCodes, code]);
+    setNewInfluencer("");
+    toast.success(`@${code} added to tracking`);
+  };
+
   const influencers = useMemo(() => {
-    const codes = new Set<string>(["artie"]);
+    const codes = new Set<string>(["artie", ...customCodes]);
     events.forEach((e) => codes.add(e.ref_code));
     return Array.from(codes).sort();
-  }, [events]);
+  }, [events, customCodes]);
+
 
   const copy = async (text: string) => {
     try {
