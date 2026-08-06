@@ -354,6 +354,7 @@ Deno.serve(async (req) => {
             visitorId,
             sessionId: session.id,
             subscriptionId: subId,
+            refCode: (session.metadata?.ref_code as string) || null,
           });
           await recordReferralPayment({
             refCode: (session.metadata?.ref_code as string) || null,
@@ -386,6 +387,7 @@ Deno.serve(async (req) => {
         visitorId,
         sessionId: session.id,
         subscriptionId: subId,
+        refCode: (session.metadata?.ref_code as string) || null,
       });
       await recordReferralPayment({
         refCode: (session.metadata?.ref_code as string) || null,
