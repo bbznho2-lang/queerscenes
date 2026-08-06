@@ -171,6 +171,7 @@ Deno.serve(async (req) => {
     visitorId: string | null;
     sessionId: string | null;
     subscriptionId: string | null;
+    refCode?: string | null;
   }) {
     try {
       let userId = opts.userId;
@@ -183,6 +184,30 @@ Deno.serve(async (req) => {
           .maybeSingle();
         userId = prof?.user_id ?? null;
       }
+
+      // Resolve the influencer that brought this user (metadata → visitor → email).
+      let refCode = (opts.refCode || "").trim().toLowerCase();
+      if (!refCode && opts.visitorId) {
+        const { data: click } = await supabase
+          .from("referral_events")
+          .select("ref_code")
+          .eq("visitor_id", opts.visitorId)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        refCode = click?.ref_code ?? "";
+      }
+      if (!refCode && opts.email) {
+        const { data: byEmail } = await supabase
+          .from("referral_events")
+          .select("ref_code")
+          .ilike("email", opts.email.trim().toLowerCase())
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        refCode = byEmail?.ref_code ?? "";
+      }
+
       await supabase.from("supporter_events").insert({
         user_id: userId,
         event_type: "checkout_completed",
@@ -193,6 +218,7 @@ Deno.serve(async (req) => {
           visitor_id: opts.visitorId,
           session_id: opts.sessionId,
           subscription_id: opts.subscriptionId,
+          ref_code: refCode || null,
           linked_by: opts.userId ? "metadata" : userId ? "email" : "none",
         },
       });
@@ -200,6 +226,8 @@ Deno.serve(async (req) => {
       console.error("[stripe-webhook] funnel insert failed", e);
     }
   }
+
+
 
   async function recordReferralPayment(opts: {
     refCode: string | null;
@@ -213,7 +241,7 @@ Deno.serve(async (req) => {
     try {
       let refCode = (opts.refCode || "").trim().toLowerCase();
 
-      // Fallback: attribute by the visitor id that logged the original click.
+      // Fallback 1: attribute by the visitor id that logged the original click.
       if (!refCode && opts.visitorId) {
         const { data: click } = await supabase
           .from("referral_events")
@@ -225,7 +253,47 @@ Deno.serve(async (req) => {
           .maybeSingle();
         refCode = click?.ref_code ?? "";
       }
+
+      // Fallback 2: attribute by the logged-in user id seen on an earlier event.
+      if (!refCode && opts.userId) {
+        const { data: byUser } = await supabase
+          .from("referral_events")
+          .select("ref_code")
+          .eq("user_id", opts.userId)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        refCode = byUser?.ref_code ?? "";
+      }
+
+      // Fallback 3: attribute by email (user came back later on another device).
+      if (!refCode && opts.email) {
+        const { data: byEmail } = await supabase
+          .from("referral_events")
+          .select("ref_code")
+          .ilike("email", opts.email.trim().toLowerCase())
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        refCode = byEmail?.ref_code ?? "";
+      }
+
+      // Fallback 4: a paywall/funnel event from this visitor or user carried the ref code.
+      if (!refCode && (opts.visitorId || opts.userId)) {
+        const query = supabase
+          .from("supporter_events")
+          .select("metadata")
+          .not("metadata->>ref_code", "is", null)
+          .order("created_at", { ascending: false })
+          .limit(1);
+        const { data: ev } = opts.visitorId
+          ? await query.eq("metadata->>visitor_id", opts.visitorId).maybeSingle()
+          : await query.eq("user_id", opts.userId!).maybeSingle();
+        refCode = ((ev as any)?.metadata?.ref_code as string) || "";
+      }
+
       if (!refCode) return;
+
 
       // Avoid duplicates for the same checkout session.
       if (opts.sessionId) {
@@ -283,6 +351,7 @@ Deno.serve(async (req) => {
             visitorId,
             sessionId: session.id,
             subscriptionId: subId,
+            refCode: (session.metadata?.ref_code as string) || null,
           });
           await recordReferralPayment({
             refCode: (session.metadata?.ref_code as string) || null,
@@ -315,6 +384,7 @@ Deno.serve(async (req) => {
         visitorId,
         sessionId: session.id,
         subscriptionId: subId,
+        refCode: (session.metadata?.ref_code as string) || null,
       });
       await recordReferralPayment({
         refCode: (session.metadata?.ref_code as string) || null,
