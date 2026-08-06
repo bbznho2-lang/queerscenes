@@ -56,6 +56,10 @@ export async function trackSupporterEvent(
     const visitorId = getFunnelVisitorId();
     const metadata = { ...(params.metadata ?? {}) };
     if (visitorId) metadata.visitor_id = visitorId;
+    if (metadata.ref_code == null) {
+      const refCode = getStoredRefCode();
+      if (refCode) metadata.ref_code = refCode;
+    }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result = await ((supabase as any).rpc as any)("log_supporter_event", {
       _event_type: params.event_type,

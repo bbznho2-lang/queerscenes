@@ -103,7 +103,7 @@ Deno.serve(async (req) => {
         user_id: authedUserId,
         event_type: "checkout_session_created",
         source: "create-checkout",
-        metadata: { price_id: priceId, session_id: session.id, email: authedEmail, visitor_id: metadata.visitor_id },
+        metadata: { price_id: priceId, session_id: session.id, email: authedEmail, visitor_id: metadata.visitor_id, ref_code: metadata.ref_code || null },
       });
     } catch (e) {
       console.error("[create-checkout] funnel insert failed", e);
