@@ -98,7 +98,7 @@ const ContinueWatchingSection = () => {
   return (
     <section className="py-6 sm:py-10 px-4">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-6 flex items-center gap-2 text-foreground">
+        <h2 className="text-xl sm:text-2xl font-black mb-6 flex items-center gap-2 text-foreground">
           <History className="w-6 h-6 text-accent" />
           <span className="neon-text-blue">Continue Watching</span>
         </h2>

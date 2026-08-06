@@ -96,8 +96,9 @@ const RecentUpdatesSection = () => {
   return (
     <section className="py-10 sm:py-16 px-4">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-6 flex items-center gap-2 text-foreground">
-          <Sparkles className="w-6 h-6 text-primary" />
+        <h2 className="text-xl sm:text-2xl font-black mb-6 flex items-center gap-2 text-foreground">
+          <Sparkles className="w-5 h-5 text-primary" />
+
           <span className="neon-text-purple">Recent Updates</span>
         </h2>
         <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide" style={{ scrollbarWidth: "none" }}>
