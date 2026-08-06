@@ -171,6 +171,7 @@ Deno.serve(async (req) => {
     visitorId: string | null;
     sessionId: string | null;
     subscriptionId: string | null;
+    refCode?: string | null;
   }) {
     try {
       let userId = opts.userId;
@@ -183,6 +184,30 @@ Deno.serve(async (req) => {
           .maybeSingle();
         userId = prof?.user_id ?? null;
       }
+
+      // Resolve the influencer that brought this user (metadata → visitor → email).
+      let refCode = (opts.refCode || "").trim().toLowerCase();
+      if (!refCode && opts.visitorId) {
+        const { data: click } = await supabase
+          .from("referral_events")
+          .select("ref_code")
+          .eq("visitor_id", opts.visitorId)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        refCode = click?.ref_code ?? "";
+      }
+      if (!refCode && opts.email) {
+        const { data: byEmail } = await supabase
+          .from("referral_events")
+          .select("ref_code")
+          .ilike("email", opts.email.trim().toLowerCase())
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        refCode = byEmail?.ref_code ?? "";
+      }
+
       await supabase.from("supporter_events").insert({
         user_id: userId,
         event_type: "checkout_completed",
@@ -193,9 +218,15 @@ Deno.serve(async (req) => {
           visitor_id: opts.visitorId,
           session_id: opts.sessionId,
           subscription_id: opts.subscriptionId,
+          ref_code: refCode || null,
           linked_by: opts.userId ? "metadata" : userId ? "email" : "none",
         },
       });
+    } catch (e) {
+      console.error("[stripe-webhook] funnel insert failed", e);
+    }
+  }
+
     } catch (e) {
       console.error("[stripe-webhook] funnel insert failed", e);
     }
