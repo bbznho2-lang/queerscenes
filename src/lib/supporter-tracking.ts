@@ -34,6 +34,24 @@ export function getFunnelVisitorId(): string | null {
   return generated;
 }
 
+/** Referral code stored for this visitor (localStorage or 30-day cookie). */
+export function getStoredRefCode(): string | null {
+  if (typeof window === "undefined") return null;
+  let raw: string | null = null;
+  try {
+    raw = window.localStorage.getItem("qs_ref_code");
+  } catch {
+    raw = null;
+  }
+  if (!raw && typeof document !== "undefined") {
+    const match = document.cookie.match(/(?:^|; )qs_ref=([^;]*)/);
+    raw = match ? decodeURIComponent(match[1]) : null;
+  }
+  if (!raw) return null;
+  const clean = raw.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 60);
+  return clean.length ? clean : null;
+}
+
 export function trackSupporterClick(
   supabase: Pick<SupabaseClient, "from">,
   params: Omit<TrackSupporterEventParams, "event_type">,
