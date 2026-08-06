@@ -674,19 +674,58 @@ const Admin = () => {
                     ));
                   })()}
                 </div>
+                {(() => {
+                  const byInfluencer: Record<string, { views: number; clicks: number; checkouts: number; emails: Set<string> }> = {};
+                  supporterEvents.forEach((e) => {
+                    const code = (e.metadata?.ref_code || "").toString().trim().toLowerCase();
+                    if (!code) return;
+                    const bucket = (byInfluencer[code] ||= { views: 0, clicks: 0, checkouts: 0, emails: new Set<string>() });
+                    if (e.event_type === "paywall_view" || e.event_type === "locked_content_view") bucket.views += 1;
+                    if (e.event_type === "become_supporter_click") bucket.clicks += 1;
+                    if (e.event_type === "checkout_completed") bucket.checkouts += 1;
+                    const email = e.metadata?.email || (e.user_id ? profileById[e.user_id]?.email : null);
+                    if (email) bucket.emails.add(String(email).toLowerCase());
+                  });
+                  const rows = Object.entries(byInfluencer).sort((a, b) => b[1].views - a[1].views);
+                  if (rows.length === 0) return null;
+                  return (
+                    <div className="mb-5 rounded-xl border border-border bg-background/40 p-3 sm:p-4">
+                      <p className="text-xs font-semibold text-muted-foreground mb-3">Traffic by influencer</p>
+                      <div className="space-y-2">
+                        {rows.map(([code, s]) => (
+                          <div key={code} className="rounded-lg bg-muted/40 px-3 py-2">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <span className="text-sm font-black" style={{ color: "#2dd4bf", fontFamily: "'Sora', system-ui, sans-serif" }}>@{code}</span>
+                              <span className="text-[11px] text-muted-foreground">
+                                Paywall: <b className="text-foreground">{s.views}</b> · Plan clicks: <b className="text-foreground">{s.clicks}</b> · Checkouts: <b className="text-foreground">{s.checkouts}</b>
+                              </span>
+                            </div>
+                            {s.emails.size > 0 && (
+                              <p className="mt-1 text-[11px] text-muted-foreground break-all">
+                                {Array.from(s.emails).slice(0, 12).join(", ")}
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
                 {supporterEvents.length > 0 ? (
                   <div className="space-y-1">
-                    <div className="hidden sm:grid grid-cols-[1.2fr_1fr_1fr_1.2fr_140px] gap-3 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
+                    <div className="hidden sm:grid grid-cols-[1.2fr_1fr_1fr_1fr_1fr_140px] gap-3 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
                       <span>Event</span>
                       <span>Source</span>
+                      <span>Influencer</span>
                       <span>User</span>
                       <span>Content ID</span>
                       <span className="text-right">When</span>
                     </div>
                     {pageEvents.map((ev) => {
                       const prof = ev.user_id ? profileById[ev.user_id] : null;
+                      const refCode = (ev.metadata?.ref_code || "").toString().trim().toLowerCase();
                       return (
-                        <div key={ev.id} className="grid grid-cols-1 sm:grid-cols-[1.2fr_1fr_1fr_1.2fr_140px] gap-1 sm:gap-3 px-3 py-2 rounded-lg hover:bg-muted/30 border-b border-border/30 last:border-0">
+                        <div key={ev.id} className="grid grid-cols-1 sm:grid-cols-[1.2fr_1fr_1fr_1fr_1fr_140px] gap-1 sm:gap-3 px-3 py-2 rounded-lg hover:bg-muted/30 border-b border-border/30 last:border-0">
                           <span className="text-xs sm:text-sm font-semibold text-primary">{({
                             paywall_view: "Locked title viewed",
                             locked_content_view: "Locked title viewed",
@@ -694,15 +733,21 @@ const Admin = () => {
                             supporter_player_click: "Supporter player clicked",
                             paywall_signup_click: "Signup button clicked",
                             paywall_signup_submit: "Signup submitted",
+                            checkout_session_created: "Checkout started",
+                            checkout_completed: "Checkout completed",
                             watch_free_fallback_click: "Watch free fallback",
                           } as Record<string, string>)[ev.event_type] || ev.event_type}</span>
                           <span className="text-xs sm:text-sm text-foreground truncate">{ev.source || "—"}</span>
-                          <span className="text-xs sm:text-sm text-muted-foreground truncate">{prof?.email || (ev.user_id ? ev.user_id.slice(0, 8) : "anon")}</span>
+                          <span className="text-xs sm:text-sm truncate" style={{ color: refCode ? "#2dd4bf" : undefined }}>
+                            {refCode ? `@${refCode}` : "—"}
+                          </span>
+                          <span className="text-xs sm:text-sm text-muted-foreground truncate">{prof?.email || ev.metadata?.email || (ev.user_id ? ev.user_id.slice(0, 8) : "anon")}</span>
                           <span className="text-[11px] sm:text-xs text-muted-foreground truncate">{ev.content_id?.slice(0, 8) || "—"}</span>
                           <span className="text-xs text-muted-foreground text-right">{new Date(ev.created_at).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>
                         </div>
                       );
                     })}
+
                     {totalEventPages > 1 && (
                       <div className="flex items-center justify-between pt-4 border-t border-border mt-2">
                         <span className="text-xs text-muted-foreground">
