@@ -637,11 +637,15 @@ const Admin = () => {
                 New users — last 14 days
               </span>
               <span className="text-xs font-normal text-muted-foreground">
-                {newUsersTotal14d} new {newUsersTotal14d === 1 ? "signup" : "signups"}
+                {newUsersTotal14d} new {newUsersTotal14d === 1 ? "signup" : "signups"} · {visitsTotal14d} visits
               </span>
             </CardTitle>
           </CardHeader>
           <CardContent>
+            <div className="flex items-center gap-3 text-[10px] text-muted-foreground mb-2 pl-[68px]">
+              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: "#a855f7" }} /> signups</span>
+              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: "#2dd4bf" }} /> site accesses</span>
+            </div>
             <div className="space-y-1.5">
               {newUsersByDay.map((d) => (
                 <div key={d.key} className="flex items-center gap-3 text-xs">
@@ -659,9 +663,17 @@ const Admin = () => {
                   <span className="w-12 shrink-0 text-right font-semibold tabular-nums" style={{ color: d.count > 0 ? "#f59e0b" : "hsl(var(--muted-foreground))" }}>
                     {d.count}
                   </span>
+                  <span
+                    className="w-16 shrink-0 text-right font-semibold tabular-nums"
+                    style={{ color: d.visits > 0 ? "#2dd4bf" : "hsl(var(--muted-foreground))" }}
+                    title="Unique site accesses"
+                  >
+                    {d.visits} in
+                  </span>
                 </div>
               ))}
             </div>
+
           </CardContent>
         </Card>
 
