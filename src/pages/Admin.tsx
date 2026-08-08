@@ -217,18 +217,56 @@ const Admin = () => {
     }
     setProfiles(allProfiles);
 
+    // Supporter events (paywall analytics + anonymous visitor activity).
+    // Paginated so anonymous clicks and daily access counts aren't truncated.
+    const allEvents: any[] = [];
+    const EVT_PAGE = 1000;
+    for (let from = 0; from < 4000; from += EVT_PAGE) {
+      const { data, error } = await supabase
+        .from("supporter_events" as any)
+        .select("*")
+        .order("created_at", { ascending: false })
+        .range(from, from + EVT_PAGE - 1) as any;
+      if (error || !data || data.length === 0) break;
+      allEvents.push(...data);
+      if (data.length < EVT_PAGE) break;
+    }
+    setSupporterEvents(allEvents as any);
 
-    const { data: clicks } = await supabase
-      .from("content_clicks")
-      .select("content_id, user_id, clicked_at, episode_id")
-      .order("clicked_at", { ascending: false });
+    // Every click row — paginated to bypass the 1000-row PostgREST cap so
+    // "User Click Details" shows every user, not just the most recent page.
+    const clicks: any[] = [];
+    const CLICK_PAGE = 1000;
+    for (let from = 0; from < 20000; from += CLICK_PAGE) {
+      const { data, error } = await supabase
+        .from("content_clicks")
+        .select("content_id, user_id, clicked_at, episode_id")
+        .order("clicked_at", { ascending: false })
+        .range(from, from + CLICK_PAGE - 1);
+      if (error || !data || data.length === 0) break;
+      clicks.push(...data);
+      if (data.length < CLICK_PAGE) break;
+    }
 
-    if (clicks && clicks.length > 0) {
+    // Anonymous (signed-out) title views, taken from supporter_events.
+    const anonEvents = allEvents.filter(
+      (e) => !e.user_id && e.content_id && (e.event_type === "locked_content_view" || e.event_type === "paywall_view" || e.event_type === "become_supporter_click")
+    );
+
+    setAccessSignals([
+      ...clicks.map((c: any) => ({ ts: c.clicked_at, key: c.user_id as string })),
+      ...allEvents.map((e: any) => ({
+        ts: e.created_at as string,
+        key: (e.user_id || e.metadata?.visitor_id || `evt-${e.id}`) as string,
+      })),
+    ]);
+
+    if (clicks.length > 0 || anonEvents.length > 0) {
       const countMap: Record<string, number> = {};
       clicks.forEach((c: any) => {
         countMap[c.content_id] = (countMap[c.content_id] || 0) + 1;
       });
-      const contentIds = [...new Set(clicks.map((c: any) => c.content_id))];
+      const contentIds = [...new Set([...clicks.map((c: any) => c.content_id), ...anonEvents.map((e: any) => e.content_id)])];
       const episodeIds = [...new Set(clicks.map((c: any) => c.episode_id).filter(Boolean))];
       const { data: contents } = await supabase
         .from("contents")
@@ -264,8 +302,8 @@ const Admin = () => {
         const epLabel = ep ? `S${ep.season} · E${ep.episode_number} — ${ep.title}` : "—";
         if (!aggMap[key]) {
           aggMap[key] = {
-            user_name: profileMap[c.user_id]?.name || "Unknown",
-            user_email: profileMap[c.user_id]?.email || "Unknown",
+            user_name: profileMap[c.user_id]?.name || `Deleted user · ${String(c.user_id).slice(0, 8)}`,
+            user_email: profileMap[c.user_id]?.email || "—",
             content_title: contentMap[c.content_id] || "Deleted content",
             episode_label: epLabel,
             click_count: 0,
@@ -277,6 +315,28 @@ const Admin = () => {
           aggMap[key].last_clicked_at = c.clicked_at;
         }
       });
+
+      // Anonymous visitors: grouped by visitor id so you can see which titles
+      // signed-out people clicked on.
+      anonEvents.forEach((e: any) => {
+        const visitor = String(e.metadata?.visitor_id || "unknown");
+        const key = `anon-${visitor}__${e.content_id}`;
+        if (!aggMap[key]) {
+          aggMap[key] = {
+            user_name: `Anonymous · ${visitor.slice(0, 8)}`,
+            user_email: e.metadata?.ref_code ? `@${e.metadata.ref_code}` : "Not signed in",
+            content_title: contentMap[e.content_id] || "Deleted content",
+            episode_label: "—",
+            click_count: 0,
+            last_clicked_at: e.created_at,
+          };
+        }
+        aggMap[key].click_count += 1;
+        if (e.created_at > aggMap[key].last_clicked_at) {
+          aggMap[key].last_clicked_at = e.created_at;
+        }
+      });
+
       const aggregated = Object.values(aggMap).sort((a, b) => new Date(b.last_clicked_at).getTime() - new Date(a.last_clicked_at).getTime());
       setAggregatedClicks(aggregated);
 
@@ -292,13 +352,6 @@ const Admin = () => {
     }
 
 
-    // Fetch supporter events (paywall analytics)
-    const { data: events } = await supabase
-      .from("supporter_events" as any)
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(500) as any;
-    setSupporterEvents((events as any) || []);
 
     // Fetch account deletion log
     const { data: dels } = await supabase
