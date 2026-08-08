@@ -569,7 +569,7 @@ const Admin = () => {
     return `${y}-${m}-${day}`;
   };
   const newUsersByDay = (() => {
-    const days: { key: string; label: string; count: number }[] = [];
+    const days: { key: string; label: string; count: number; visits: number }[] = [];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     for (let i = 13; i >= 0; i--) {
@@ -579,6 +579,7 @@ const Admin = () => {
         key: localDayKey(d),
         label: d.toLocaleDateString("en-US", { month: "short", day: "2-digit" }),
         count: 0,
+        visits: 0,
       });
     }
     const idx: Record<string, number> = {};
@@ -587,10 +588,20 @@ const Admin = () => {
       const k = localDayKey(new Date(createdAt));
       if (k in idx) days[idx[k]].count += 1;
     });
+    // Unique visitors (signed in or anonymous) that touched the site each day.
+    const seen: Record<string, Set<string>> = {};
+    accessSignals.forEach((s) => {
+      const k = localDayKey(new Date(s.ts));
+      if (!(k in idx)) return;
+      (seen[k] ||= new Set<string>()).add(s.key);
+    });
+    Object.entries(seen).forEach(([k, set]) => { days[idx[k]].visits = set.size; });
     return days;
   })();
   const maxNewUsers = Math.max(1, ...newUsersByDay.map((d) => d.count));
   const newUsersTotal14d = newUsersByDay.reduce((a, b) => a + b.count, 0);
+  const visitsTotal14d = newUsersByDay.reduce((a, b) => a + b.visits, 0);
+
 
 
   const isExpired = (date: string | null) => {
