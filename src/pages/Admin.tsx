@@ -102,6 +102,9 @@ const Admin = () => {
   // Independent signup timestamps for the "last 14 days" chart. Kept separate from
   // the paginated `profiles` list so realtime re-fetch races cannot truncate it.
   const [recentSignupDates, setRecentSignupDates] = useState<string[]>([]);
+  // Every visit signal (click or paywall/funnel event) used to count daily site accesses.
+  const [accessSignals, setAccessSignals] = useState<Array<{ ts: string; key: string }>>([]);
+
   const EVENTS_PER_PAGE = 15;
 
   const USERS_PER_PAGE = 20;
