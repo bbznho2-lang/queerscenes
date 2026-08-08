@@ -178,6 +178,7 @@ const TitlePage = () => {
 
     if (!user) {
       setCanWatch(false);
+      setExpiredAt(null);
       setAccessChecked(true);
       return;
     }
@@ -196,7 +197,13 @@ const TitlePage = () => {
       const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
       const allowed = isAdmin || Boolean(canPlay) || Boolean(profile?.is_premium && notExpired);
       setCanWatch(allowed);
+      setExpiredAt(
+        !allowed && profile?.is_premium && profile?.premium_expires_at && new Date(profile.premium_expires_at) <= new Date()
+          ? profile.premium_expires_at
+          : null
+      );
       setAccessChecked(true);
+
       // Supporters/admins land straight on the episode list instead of the SEO paywall.
       if (allowed && playableContentId) {
         navigate(`/player/${playableContentId}`, { replace: true });
