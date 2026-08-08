@@ -164,9 +164,16 @@ const Admin = () => {
           const newEvent = payload.new as { id: string; event_type: string; source: string | null; user_id: string | null; content_id: string | null; created_at: string; metadata: any };
           setSupporterEvents((current) => {
             if (current.some((event) => event.id === newEvent.id)) return current;
-            return [newEvent, ...current].slice(0, 500);
+            return [newEvent, ...current].slice(0, 4000);
           });
+          setAccessSignals((current) => [
+            { ts: newEvent.created_at, key: String(newEvent.user_id || newEvent.metadata?.visitor_id || `evt-${newEvent.id}`) },
+            ...current,
+          ]);
+          // Anonymous title views only exist as events — refresh the click table.
+          if (!newEvent.user_id && newEvent.content_id) fetchData(false);
         }
+
       )
       .subscribe();
 
