@@ -80,6 +80,8 @@ const TitlePage = () => {
   const [readMore, setReadMore] = useState(false);
   const [telegramOpen, setTelegramOpen] = useState(false);
   const [accessChecked, setAccessChecked] = useState(false);
+  const [expiredAt, setExpiredAt] = useState<string | null>(null);
+
   const trackedPaywallViewsRef = useRef<Set<string>>(new Set());
   const inlineCtaRef = useRef<HTMLAnchorElement | null>(null);
   const [inlineCtaVisible, setInlineCtaVisible] = useState(false);
