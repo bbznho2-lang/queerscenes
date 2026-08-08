@@ -102,6 +102,9 @@ const Admin = () => {
   // Independent signup timestamps for the "last 14 days" chart. Kept separate from
   // the paginated `profiles` list so realtime re-fetch races cannot truncate it.
   const [recentSignupDates, setRecentSignupDates] = useState<string[]>([]);
+  // Every visit signal (click or paywall/funnel event) used to count daily site accesses.
+  const [accessSignals, setAccessSignals] = useState<Array<{ ts: string; key: string }>>([]);
+
   const EVENTS_PER_PAGE = 15;
 
   const USERS_PER_PAGE = 20;
@@ -161,9 +164,16 @@ const Admin = () => {
           const newEvent = payload.new as { id: string; event_type: string; source: string | null; user_id: string | null; content_id: string | null; created_at: string; metadata: any };
           setSupporterEvents((current) => {
             if (current.some((event) => event.id === newEvent.id)) return current;
-            return [newEvent, ...current].slice(0, 500);
+            return [newEvent, ...current].slice(0, 4000);
           });
+          setAccessSignals((current) => [
+            { ts: newEvent.created_at, key: String(newEvent.user_id || newEvent.metadata?.visitor_id || `evt-${newEvent.id}`) },
+            ...current,
+          ]);
+          // Anonymous title views only exist as events — refresh the click table.
+          if (!newEvent.user_id && newEvent.content_id) fetchData(false);
         }
+
       )
       .subscribe();
 
@@ -217,18 +227,56 @@ const Admin = () => {
     }
     setProfiles(allProfiles);
 
+    // Supporter events (paywall analytics + anonymous visitor activity).
+    // Paginated so anonymous clicks and daily access counts aren't truncated.
+    const allEvents: any[] = [];
+    const EVT_PAGE = 1000;
+    for (let from = 0; from < 4000; from += EVT_PAGE) {
+      const { data, error } = await supabase
+        .from("supporter_events" as any)
+        .select("*")
+        .order("created_at", { ascending: false })
+        .range(from, from + EVT_PAGE - 1) as any;
+      if (error || !data || data.length === 0) break;
+      allEvents.push(...data);
+      if (data.length < EVT_PAGE) break;
+    }
+    setSupporterEvents(allEvents as any);
 
-    const { data: clicks } = await supabase
-      .from("content_clicks")
-      .select("content_id, user_id, clicked_at, episode_id")
-      .order("clicked_at", { ascending: false });
+    // Every click row — paginated to bypass the 1000-row PostgREST cap so
+    // "User Click Details" shows every user, not just the most recent page.
+    const clicks: any[] = [];
+    const CLICK_PAGE = 1000;
+    for (let from = 0; from < 20000; from += CLICK_PAGE) {
+      const { data, error } = await supabase
+        .from("content_clicks")
+        .select("content_id, user_id, clicked_at, episode_id")
+        .order("clicked_at", { ascending: false })
+        .range(from, from + CLICK_PAGE - 1);
+      if (error || !data || data.length === 0) break;
+      clicks.push(...data);
+      if (data.length < CLICK_PAGE) break;
+    }
 
-    if (clicks && clicks.length > 0) {
+    // Anonymous (signed-out) title views, taken from supporter_events.
+    const anonEvents = allEvents.filter(
+      (e) => !e.user_id && e.content_id && (e.event_type === "locked_content_view" || e.event_type === "paywall_view" || e.event_type === "become_supporter_click")
+    );
+
+    setAccessSignals([
+      ...clicks.map((c: any) => ({ ts: c.clicked_at, key: c.user_id as string })),
+      ...allEvents.map((e: any) => ({
+        ts: e.created_at as string,
+        key: (e.user_id || e.metadata?.visitor_id || `evt-${e.id}`) as string,
+      })),
+    ]);
+
+    if (clicks.length > 0 || anonEvents.length > 0) {
       const countMap: Record<string, number> = {};
       clicks.forEach((c: any) => {
         countMap[c.content_id] = (countMap[c.content_id] || 0) + 1;
       });
-      const contentIds = [...new Set(clicks.map((c: any) => c.content_id))];
+      const contentIds = [...new Set([...clicks.map((c: any) => c.content_id), ...anonEvents.map((e: any) => e.content_id)])];
       const episodeIds = [...new Set(clicks.map((c: any) => c.episode_id).filter(Boolean))];
       const { data: contents } = await supabase
         .from("contents")
@@ -264,8 +312,8 @@ const Admin = () => {
         const epLabel = ep ? `S${ep.season} · E${ep.episode_number} — ${ep.title}` : "—";
         if (!aggMap[key]) {
           aggMap[key] = {
-            user_name: profileMap[c.user_id]?.name || "Unknown",
-            user_email: profileMap[c.user_id]?.email || "Unknown",
+            user_name: profileMap[c.user_id]?.name || `Deleted user · ${String(c.user_id).slice(0, 8)}`,
+            user_email: profileMap[c.user_id]?.email || "—",
             content_title: contentMap[c.content_id] || "Deleted content",
             episode_label: epLabel,
             click_count: 0,
@@ -277,6 +325,28 @@ const Admin = () => {
           aggMap[key].last_clicked_at = c.clicked_at;
         }
       });
+
+      // Anonymous visitors: grouped by visitor id so you can see which titles
+      // signed-out people clicked on.
+      anonEvents.forEach((e: any) => {
+        const visitor = String(e.metadata?.visitor_id || "unknown");
+        const key = `anon-${visitor}__${e.content_id}`;
+        if (!aggMap[key]) {
+          aggMap[key] = {
+            user_name: `Anonymous · ${visitor.slice(0, 8)}`,
+            user_email: e.metadata?.ref_code ? `@${e.metadata.ref_code}` : "Not signed in",
+            content_title: contentMap[e.content_id] || "Deleted content",
+            episode_label: "—",
+            click_count: 0,
+            last_clicked_at: e.created_at,
+          };
+        }
+        aggMap[key].click_count += 1;
+        if (e.created_at > aggMap[key].last_clicked_at) {
+          aggMap[key].last_clicked_at = e.created_at;
+        }
+      });
+
       const aggregated = Object.values(aggMap).sort((a, b) => new Date(b.last_clicked_at).getTime() - new Date(a.last_clicked_at).getTime());
       setAggregatedClicks(aggregated);
 
@@ -292,13 +362,6 @@ const Admin = () => {
     }
 
 
-    // Fetch supporter events (paywall analytics)
-    const { data: events } = await supabase
-      .from("supporter_events" as any)
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(500) as any;
-    setSupporterEvents((events as any) || []);
 
     // Fetch account deletion log
     const { data: dels } = await supabase
@@ -513,7 +576,7 @@ const Admin = () => {
     return `${y}-${m}-${day}`;
   };
   const newUsersByDay = (() => {
-    const days: { key: string; label: string; count: number }[] = [];
+    const days: { key: string; label: string; count: number; visits: number }[] = [];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     for (let i = 13; i >= 0; i--) {
@@ -523,6 +586,7 @@ const Admin = () => {
         key: localDayKey(d),
         label: d.toLocaleDateString("en-US", { month: "short", day: "2-digit" }),
         count: 0,
+        visits: 0,
       });
     }
     const idx: Record<string, number> = {};
@@ -531,10 +595,20 @@ const Admin = () => {
       const k = localDayKey(new Date(createdAt));
       if (k in idx) days[idx[k]].count += 1;
     });
+    // Unique visitors (signed in or anonymous) that touched the site each day.
+    const seen: Record<string, Set<string>> = {};
+    accessSignals.forEach((s) => {
+      const k = localDayKey(new Date(s.ts));
+      if (!(k in idx)) return;
+      (seen[k] ||= new Set<string>()).add(s.key);
+    });
+    Object.entries(seen).forEach(([k, set]) => { days[idx[k]].visits = set.size; });
     return days;
   })();
   const maxNewUsers = Math.max(1, ...newUsersByDay.map((d) => d.count));
   const newUsersTotal14d = newUsersByDay.reduce((a, b) => a + b.count, 0);
+  const visitsTotal14d = newUsersByDay.reduce((a, b) => a + b.visits, 0);
+
 
 
   const isExpired = (date: string | null) => {
@@ -570,11 +644,15 @@ const Admin = () => {
                 New users — last 14 days
               </span>
               <span className="text-xs font-normal text-muted-foreground">
-                {newUsersTotal14d} new {newUsersTotal14d === 1 ? "signup" : "signups"}
+                {newUsersTotal14d} new {newUsersTotal14d === 1 ? "signup" : "signups"} · {visitsTotal14d} visits
               </span>
             </CardTitle>
           </CardHeader>
           <CardContent>
+            <div className="flex items-center gap-3 text-[10px] text-muted-foreground mb-2 pl-[68px]">
+              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: "#a855f7" }} /> signups</span>
+              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: "#2dd4bf" }} /> site accesses</span>
+            </div>
             <div className="space-y-1.5">
               {newUsersByDay.map((d) => (
                 <div key={d.key} className="flex items-center gap-3 text-xs">
@@ -592,9 +670,17 @@ const Admin = () => {
                   <span className="w-12 shrink-0 text-right font-semibold tabular-nums" style={{ color: d.count > 0 ? "#f59e0b" : "hsl(var(--muted-foreground))" }}>
                     {d.count}
                   </span>
+                  <span
+                    className="w-16 shrink-0 text-right font-semibold tabular-nums"
+                    style={{ color: d.visits > 0 ? "#2dd4bf" : "hsl(var(--muted-foreground))" }}
+                    title="Unique site accesses"
+                  >
+                    {d.visits} in
+                  </span>
                 </div>
               ))}
             </div>
+
           </CardContent>
         </Card>
 
@@ -675,31 +761,44 @@ const Admin = () => {
                   })()}
                 </div>
                 {(() => {
-                  const byInfluencer: Record<string, { views: number; clicks: number; checkouts: number; emails: Set<string> }> = {};
+                  const byInfluencer: Record<string, { views: number; clicks: number; checkouts: number; visitors: Set<string>; emails: Set<string> }> = {};
                   supporterEvents.forEach((e) => {
-                    const code = (e.metadata?.ref_code || "").toString().trim().toLowerCase();
-                    if (!code) return;
-                    const bucket = (byInfluencer[code] ||= { views: 0, clicks: 0, checkouts: 0, emails: new Set<string>() });
+                    // Every entry on the site is counted — traffic without a
+                    // referral code lands in the "direct" bucket.
+                    const code = (e.metadata?.ref_code || "").toString().trim().toLowerCase() || "__direct__";
+                    const bucket = (byInfluencer[code] ||= { views: 0, clicks: 0, checkouts: 0, visitors: new Set<string>(), emails: new Set<string>() });
                     if (e.event_type === "paywall_view" || e.event_type === "locked_content_view") bucket.views += 1;
                     if (e.event_type === "become_supporter_click") bucket.clicks += 1;
                     if (e.event_type === "checkout_completed") bucket.checkouts += 1;
+                    const visitor = e.user_id || e.metadata?.visitor_id;
+                    if (visitor) bucket.visitors.add(String(visitor));
                     const email = e.metadata?.email || (e.user_id ? profileById[e.user_id]?.email : null);
                     if (email) bucket.emails.add(String(email).toLowerCase());
                   });
-                  const rows = Object.entries(byInfluencer).sort((a, b) => b[1].views - a[1].views);
+                  const rows = Object.entries(byInfluencer).sort((a, b) => {
+                    if (a[0] === "__direct__") return 1;
+                    if (b[0] === "__direct__") return -1;
+                    return b[1].views - a[1].views;
+                  });
                   if (rows.length === 0) return null;
                   return (
                     <div className="mb-5 rounded-xl border border-border bg-background/40 p-3 sm:p-4">
-                      <p className="text-xs font-semibold text-muted-foreground mb-3">Traffic by influencer</p>
+                      <p className="text-xs font-semibold text-muted-foreground mb-3">Site entries by source (all traffic)</p>
                       <div className="space-y-2">
                         {rows.map(([code, s]) => (
                           <div key={code} className="rounded-lg bg-muted/40 px-3 py-2">
                             <div className="flex flex-wrap items-center justify-between gap-2">
-                              <span className="text-sm font-black" style={{ color: "#2dd4bf", fontFamily: "'Sora', system-ui, sans-serif" }}>@{code}</span>
+                              <span
+                                className="text-sm font-black"
+                                style={{ color: code === "__direct__" ? "#f59e0b" : "#2dd4bf", fontFamily: "'Sora', system-ui, sans-serif" }}
+                              >
+                                {code === "__direct__" ? "Direct / organic" : `@${code}`}
+                              </span>
                               <span className="text-[11px] text-muted-foreground">
-                                Paywall: <b className="text-foreground">{s.views}</b> · Plan clicks: <b className="text-foreground">{s.clicks}</b> · Checkouts: <b className="text-foreground">{s.checkouts}</b>
+                                Entries: <b className="text-foreground">{s.visitors.size}</b> · Paywall: <b className="text-foreground">{s.views}</b> · Plan clicks: <b className="text-foreground">{s.clicks}</b> · Checkouts: <b className="text-foreground">{s.checkouts}</b>
                               </span>
                             </div>
+
                             {s.emails.size > 0 && (
                               <p className="mt-1 text-[11px] text-muted-foreground break-all">
                                 {Array.from(s.emails).slice(0, 12).join(", ")}

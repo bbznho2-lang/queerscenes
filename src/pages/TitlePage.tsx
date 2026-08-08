@@ -80,6 +80,8 @@ const TitlePage = () => {
   const [readMore, setReadMore] = useState(false);
   const [telegramOpen, setTelegramOpen] = useState(false);
   const [accessChecked, setAccessChecked] = useState(false);
+  const [expiredAt, setExpiredAt] = useState<string | null>(null);
+
   const trackedPaywallViewsRef = useRef<Set<string>>(new Set());
   const inlineCtaRef = useRef<HTMLAnchorElement | null>(null);
   const [inlineCtaVisible, setInlineCtaVisible] = useState(false);
@@ -176,6 +178,7 @@ const TitlePage = () => {
 
     if (!user) {
       setCanWatch(false);
+      setExpiredAt(null);
       setAccessChecked(true);
       return;
     }
@@ -194,7 +197,13 @@ const TitlePage = () => {
       const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
       const allowed = isAdmin || Boolean(canPlay) || Boolean(profile?.is_premium && notExpired);
       setCanWatch(allowed);
+      setExpiredAt(
+        !allowed && profile?.is_premium && profile?.premium_expires_at && new Date(profile.premium_expires_at) <= new Date()
+          ? profile.premium_expires_at
+          : null
+      );
       setAccessChecked(true);
+
       // Supporters/admins land straight on the episode list instead of the SEO paywall.
       if (allowed && playableContentId) {
         navigate(`/player/${playableContentId}`, { replace: true });
@@ -415,6 +424,31 @@ const TitlePage = () => {
             {social.a}, {social.b} and {social.others} others became Supporters this month
           </span>
         </div>
+
+        {/* Expired supporter notice */}
+        {expiredAt && (
+          <div className="mb-6 rounded-2xl border border-destructive/40 bg-destructive/10 p-4 text-center">
+            <div className="text-3xl mb-1" aria-hidden>😢</div>
+            <h2 className="text-base md:text-lg font-black text-foreground mb-2">
+              Your Supporter plan expired
+            </h2>
+            <p className="text-sm text-foreground/90 font-semibold leading-relaxed">
+              Your subscription was supposed to renew automatically on{" "}
+              <strong>{new Date(expiredAt).toLocaleDateString("en-US", { day: "2-digit", month: "long", year: "numeric" })}</strong>,
+              but the payment didn't go through. Right now you don't have access to this title, the full catalog or the new releases.
+            </p>
+            <p className="text-sm text-foreground/90 font-semibold leading-relaxed mt-2">
+              Please update your card or make sure you have enough balance so future renewals work.
+            </p>
+            <p className="text-xs text-muted-foreground font-semibold mt-3">
+              Need help? Talk to us on{" "}
+              <a href="https://t.me/L7kznr" target="_blank" rel="noopener noreferrer" className="underline text-[#2dd4bf]">Telegram @L7kznr</a>{" "}
+              or email{" "}
+              <a href="mailto:support@queerscenes.com" className="underline text-[#2dd4bf]">support@queerscenes.com</a>.
+            </p>
+          </div>
+        )}
+
 
         {/* Paywall copy */}
         <p className="text-foreground text-sm md:text-base leading-relaxed font-bold whitespace-pre-wrap text-center mb-6">

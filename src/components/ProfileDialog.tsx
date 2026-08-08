@@ -159,13 +159,35 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
                       </span>
                     </div>
                   ) : expired ? (
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-semibold">😢 Expired</span>
-                      <span className="text-xs">
-                        Expired on {new Date(premiumExpiresAt!).toLocaleDateString("en-US")}
-                      </span>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-semibold">😢 Expired</span>
+                        <span className="text-xs">
+                          Expired on {new Date(premiumExpiresAt!).toLocaleDateString("en-US")}
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground break-words leading-relaxed">
+                        Your plan was supposed to renew on{" "}
+                        <strong className="text-foreground">
+                          {new Date(premiumExpiresAt!).toLocaleDateString("en-US", { day: "2-digit", month: "long", year: "numeric" })}
+                        </strong>
+                        , but the payment didn't go through — so you no longer have access to the titles and new releases on the site.
+                        If you'd like to renew and keep your access, please{" "}
+                        <button
+                          type="button"
+                          onClick={() => setSupportOpen(true)}
+                          className="underline text-[var(--brand-purple-light)] hover:opacity-80 font-semibold"
+                        >
+                          contact Support
+                        </button>{" "}
+                        and we'll sort it out. You can also reach us on{" "}
+                        <a href="https://t.me/L7kznr" target="_blank" rel="noopener noreferrer" className="underline text-[var(--brand-purple-light)] font-semibold">Telegram</a>{" "}
+                        or by email at{" "}
+                        <a href="mailto:support@queerscenes.com" className="underline text-[var(--brand-purple-light)] font-semibold">support@queerscenes.com</a>.
+                      </p>
                     </div>
                   ) : (
+
                     <span>No active plan — Free user</span>
                   )}
                 </div>
