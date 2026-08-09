@@ -726,8 +726,8 @@ const Admin = () => {
           const totalEventPages = Math.max(1, Math.ceil(supporterEvents.length / EVENTS_PER_PAGE));
           const start = (eventsPage - 1) * EVENTS_PER_PAGE;
           const pageEvents = supporterEvents.slice(start, start + EVENTS_PER_PAGE);
-          const profileById: Record<string, Profile> = {};
-          profiles.forEach((p) => { profileById[p.user_id] = p; });
+         const profileById: Record<string, Profile> = {};
+         profiles.forEach((p) => { profileById[p.user_id] = p; profileById[p.id] = p; });
           return (
             <Card className="bg-card border-border">
               <CardHeader>
