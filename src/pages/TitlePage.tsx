@@ -512,7 +512,7 @@ const TitlePage = () => {
       </main>
 
       {/* Sticky bottom CTA — only for locked users, so they always see the action */}
-      {accessChecked && !canWatch && !inlineCtaVisible && (
+      {accessChecked && !canWatch && !expiredAt && !inlineCtaVisible && (
         <>
           <div className="h-24" aria-hidden />
           <div
