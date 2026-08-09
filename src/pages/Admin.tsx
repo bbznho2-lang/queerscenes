@@ -763,9 +763,8 @@ const Admin = () => {
                 {(() => {
                   const byInfluencer: Record<string, { views: number; clicks: number; checkouts: number; visitors: Set<string>; emails: Set<string> }> = {};
                   supporterEvents.forEach((e) => {
-                    // Every entry on the site is counted — traffic without a
-                    // referral code lands in the "direct" bucket.
-                    const code = (e.metadata?.ref_code || "").toString().trim().toLowerCase() || "__direct__";
+                    const code = (e.metadata?.ref_code || "").toString().trim().toLowerCase();
+                    if (!code) return; // only real influencer traffic
                     const bucket = (byInfluencer[code] ||= { views: 0, clicks: 0, checkouts: 0, visitors: new Set<string>(), emails: new Set<string>() });
                     if (e.event_type === "paywall_view" || e.event_type === "locked_content_view") bucket.views += 1;
                     if (e.event_type === "become_supporter_click") bucket.clicks += 1;
@@ -775,24 +774,20 @@ const Admin = () => {
                     const email = e.metadata?.email || (e.user_id ? profileById[e.user_id]?.email : null);
                     if (email) bucket.emails.add(String(email).toLowerCase());
                   });
-                  const rows = Object.entries(byInfluencer).sort((a, b) => {
-                    if (a[0] === "__direct__") return 1;
-                    if (b[0] === "__direct__") return -1;
-                    return b[1].views - a[1].views;
-                  });
+                  const rows = Object.entries(byInfluencer).sort((a, b) => b[1].views - a[1].views);
                   if (rows.length === 0) return null;
                   return (
                     <div className="mb-5 rounded-xl border border-border bg-background/40 p-3 sm:p-4">
-                      <p className="text-xs font-semibold text-muted-foreground mb-3">Site entries by source (all traffic)</p>
+                      <p className="text-xs font-semibold text-muted-foreground mb-3">Traffic by influencer</p>
                       <div className="space-y-2">
                         {rows.map(([code, s]) => (
                           <div key={code} className="rounded-lg bg-muted/40 px-3 py-2">
                             <div className="flex flex-wrap items-center justify-between gap-2">
                               <span
                                 className="text-sm font-black"
-                                style={{ color: code === "__direct__" ? "#f59e0b" : "#2dd4bf", fontFamily: "'Sora', system-ui, sans-serif" }}
+                                style={{ color: "#2dd4bf", fontFamily: "'Sora', system-ui, sans-serif" }}
                               >
-                                {code === "__direct__" ? "Direct / organic" : `@${code}`}
+                                {`@${code}`}
                               </span>
                               <span className="text-[11px] text-muted-foreground">
                                 Entries: <b className="text-foreground">{s.visitors.size}</b> · Paywall: <b className="text-foreground">{s.views}</b> · Plan clicks: <b className="text-foreground">{s.clicks}</b> · Checkouts: <b className="text-foreground">{s.checkouts}</b>
