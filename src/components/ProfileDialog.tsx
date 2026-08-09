@@ -150,45 +150,33 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
             return (
               <div className="space-y-2">
                 <Label className="text-muted-foreground text-xs">Supporter Plan</Label>
-                <div className={`px-3 py-2.5 rounded-md border text-sm ${active ? 'bg-primary/10 border-primary/30 text-foreground' : expired ? 'bg-destructive/10 border-destructive/30 text-foreground' : 'bg-muted/50 border-border text-muted-foreground'}`}>
-                  {active ? (
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-semibold">👑 {planLabel}</span>
-                      <span className="text-xs text-muted-foreground">
+                <div className={`px-3 py-2.5 rounded-md border text-sm ${active ? 'bg-muted/50 border-border text-foreground' : expired ? 'bg-destructive/10 border-destructive/40 text-foreground' : 'bg-muted/50 border-border text-muted-foreground'}`}>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-2 font-semibold min-w-0">
+                      <Crown className={`w-4 h-4 flex-shrink-0 ${expired ? 'text-red-400' : 'text-amber-400'}`} />
+                      <span className="truncate">{active ? planLabel : expired ? "Expired" : "Free user"}</span>
+                    </span>
+                    {active ? (
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">
                         {premiumExpiresAt ? `Active until ${new Date(premiumExpiresAt).toLocaleDateString("en-US")}` : "Lifetime"}
                       </span>
-                    </div>
-                  ) : expired ? (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="font-semibold">😢 Expired</span>
-                        <span className="text-xs">
-                          Expired on {new Date(premiumExpiresAt!).toLocaleDateString("en-US")}
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted-foreground break-words leading-relaxed">
-                        Your plan was supposed to renew on{" "}
-                        <strong className="text-foreground">
-                          {new Date(premiumExpiresAt!).toLocaleDateString("en-US", { day: "2-digit", month: "long", year: "numeric" })}
-                        </strong>
-                        , but the payment didn't go through — so you no longer have access to the titles and new releases on the site.
-                        If you'd like to renew and keep your access, please{" "}
-                        <button
-                          type="button"
-                          onClick={() => setSupportOpen(true)}
-                          className="underline text-[var(--brand-purple-light)] hover:opacity-80 font-semibold"
-                        >
-                          contact Support
-                        </button>{" "}
-                        and we'll sort it out. You can also reach us on{" "}
-                        <a href="https://t.me/L7kznr" target="_blank" rel="noopener noreferrer" className="underline text-[var(--brand-purple-light)] font-semibold">Telegram</a>{" "}
-                        or by email at{" "}
-                        <a href="mailto:support@queerscenes.com" className="underline text-[var(--brand-purple-light)] font-semibold">support@queerscenes.com</a>.
-                      </p>
-                    </div>
-                  ) : (
-
-                    <span>No active plan — Free user</span>
+                    ) : expired ? (
+                      <a
+                        href="https://t.me/l7kznr"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs font-semibold text-red-400 underline whitespace-nowrap hover:opacity-80"
+                      >
+                        Contact Support
+                      </a>
+                    ) : (
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">No active plan</span>
+                    )}
+                  </div>
+                  {expired && (
+                    <p className="mt-1.5 text-[11px] text-red-400/75 leading-snug">
+                      Payment failed — check your balance or update your card.
+                    </p>
                   )}
                 </div>
               </div>
