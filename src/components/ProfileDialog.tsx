@@ -175,7 +175,7 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
                   </div>
                   {expired && (
                     <p className="mt-1.5 text-[11px] text-red-400/75 leading-snug">
-                      Payment failed — check your balance or update your card.
+                      Should have renewed on {new Date(premiumExpiresAt!).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" })} — check your balance or update your card.
                     </p>
                   )}
                 </div>

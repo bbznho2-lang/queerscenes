@@ -424,6 +424,9 @@ const TitlePage = () => {
                 Plan expired
               </span>
               <h2 className="mt-3 text-xl font-semibold text-foreground">Your Supporter plan expired</h2>
+              <p className="mt-2 text-xs font-semibold text-red-400">
+                Renewal date: {new Date(expiredAt).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" })}
+              </p>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                 Your renewal didn't go through — usually an insufficient balance or an expired card.
                 Update your payment method to restore access.
