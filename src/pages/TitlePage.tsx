@@ -414,6 +414,38 @@ const TitlePage = () => {
           </div>
         )}
 
+        {expiredAt ? (
+          <div className="flex justify-center mb-8">
+            <div className="w-full max-w-[420px] rounded-[20px] border border-white/10 bg-card p-8 text-center shadow-2xl">
+              <div className="mx-auto mb-4 w-14 h-14 rounded-full flex items-center justify-center bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg shadow-fuchsia-500/30">
+                <Lock className="w-6 h-6 text-white" />
+              </div>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-destructive/40 bg-destructive/10 px-3 py-1 text-xs font-medium text-red-400">
+                Plan expired
+              </span>
+              <h2 className="mt-3 text-xl font-semibold text-foreground">Your Supporter plan expired</h2>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                Your renewal didn't go through — usually an insufficient balance or an expired card.
+                Update your payment method to restore access.
+              </p>
+              <a
+                href="https://t.me/l7kznr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 block w-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500 py-3 text-sm font-medium text-white hover:opacity-95"
+              >
+                Contact Support to Renew
+              </a>
+              <p className="mt-3 text-xs text-muted-foreground">
+                or email{" "}
+                <a href="mailto:scenes.queer@gmail.com" className="underline hover:text-foreground" translate="no">
+                  scenes.queer@gmail.com
+                </a>
+              </p>
+            </div>
+          </div>
+        ) : (
+          <>
         {/* Social proof */}
         <div className="flex justify-center mb-4">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-green-500/15 border border-green-500/40 text-green-400 px-3 py-1 text-[11px] font-bold">
@@ -424,31 +456,6 @@ const TitlePage = () => {
             {social.a}, {social.b} and {social.others} others became Supporters this month
           </span>
         </div>
-
-        {/* Expired supporter notice */}
-        {expiredAt && (
-          <div className="mb-6 rounded-2xl border border-destructive/40 bg-destructive/10 p-4 text-center">
-            <div className="text-3xl mb-1" aria-hidden>😢</div>
-            <h2 className="text-base md:text-lg font-black text-foreground mb-2">
-              Your Supporter plan expired
-            </h2>
-            <p className="text-sm text-foreground/90 font-semibold leading-relaxed">
-              Your subscription was supposed to renew automatically on{" "}
-              <strong>{new Date(expiredAt).toLocaleDateString("en-US", { day: "2-digit", month: "long", year: "numeric" })}</strong>,
-              but the payment didn't go through. Right now you don't have access to this title, the full catalog or the new releases.
-            </p>
-            <p className="text-sm text-foreground/90 font-semibold leading-relaxed mt-2">
-              Please update your card or make sure you have enough balance so future renewals work.
-            </p>
-            <p className="text-xs text-muted-foreground font-semibold mt-3">
-              Need help? Talk to us on{" "}
-              <a href="https://t.me/L7kznr" target="_blank" rel="noopener noreferrer" className="underline text-[#2dd4bf]">Telegram @L7kznr</a>{" "}
-              or email{" "}
-              <a href="mailto:support@queerscenes.com" className="underline text-[#2dd4bf]">support@queerscenes.com</a>.
-            </p>
-          </div>
-        )}
-
 
         {/* Paywall copy */}
         <p className="text-foreground text-sm md:text-base leading-relaxed font-bold whitespace-pre-wrap text-center mb-6">
@@ -500,6 +507,8 @@ const TitlePage = () => {
             </button>
           </div>
         </div>
+          </>
+        )}
       </main>
 
       {/* Sticky bottom CTA — only for locked users, so they always see the action */}
