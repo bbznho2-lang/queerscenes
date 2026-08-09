@@ -297,10 +297,20 @@ const Admin = () => {
 
       const profileMap: Record<string, { email: string; name: string }> = {};
       allProfiles.forEach((p) => {
-        profileMap[p.user_id] = {
+        const entry = {
           email: p.email || "No email",
           name: [p.first_name, p.last_name].filter(Boolean).join(" ") || "No name",
         };
+        profileMap[p.user_id] = entry;
+        profileMap[p.id] = entry;
+      });
+      // Fallback emails captured in funnel events for users without a profile row.
+      allEvents.forEach((e: any) => {
+        const uid = e.user_id;
+        const mail = e.metadata?.email;
+        if (uid && mail && !profileMap[uid]) {
+          profileMap[uid] = { email: String(mail), name: String(mail).split("@")[0] };
+        }
       });
 
       // Aggregate clicks: group by user + content + episode, count occurrences
