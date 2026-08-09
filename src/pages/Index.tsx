@@ -723,10 +723,11 @@ const Index = () => {
                       >
                         {opt.popular && (
                           <span
-                            className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-[0.12em] text-white shadow-lg"
+                            className="absolute -top-2.5 sm:-top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-1.5 sm:px-2 py-0 sm:py-0.5 rounded-full text-[7px] sm:text-[9px] font-black uppercase tracking-normal sm:tracking-[0.12em] text-white shadow-lg"
                             style={{ background: "linear-gradient(135deg,#a855f7,#ec4899)" }}
                           >
-                            ✦ Most Popular
+                            <span className="sm:hidden">★ Popular</span>
+                            <span className="hidden sm:inline">✦ Most Popular</span>
                           </span>
                         )}
                         {selected && (
