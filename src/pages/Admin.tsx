@@ -297,10 +297,20 @@ const Admin = () => {
 
       const profileMap: Record<string, { email: string; name: string }> = {};
       allProfiles.forEach((p) => {
-        profileMap[p.user_id] = {
+        const entry = {
           email: p.email || "No email",
           name: [p.first_name, p.last_name].filter(Boolean).join(" ") || "No name",
         };
+        profileMap[p.user_id] = entry;
+        profileMap[p.id] = entry;
+      });
+      // Fallback emails captured in funnel events for users without a profile row.
+      allEvents.forEach((e: any) => {
+        const uid = e.user_id;
+        const mail = e.metadata?.email;
+        if (uid && mail && !profileMap[uid]) {
+          profileMap[uid] = { email: String(mail), name: String(mail).split("@")[0] };
+        }
       });
 
       // Aggregate clicks: group by user + content + episode, count occurrences
@@ -606,6 +616,7 @@ const Admin = () => {
     return days;
   })();
   const maxNewUsers = Math.max(1, ...newUsersByDay.map((d) => d.count));
+  const maxVisits = Math.max(1, ...newUsersByDay.map((d) => d.visits));
   const newUsersTotal14d = newUsersByDay.reduce((a, b) => a + b.count, 0);
   const visitsTotal14d = newUsersByDay.reduce((a, b) => a + b.visits, 0);
 
@@ -641,18 +652,14 @@ const Admin = () => {
             <CardTitle className="flex items-center justify-between gap-2 text-foreground">
               <span className="flex items-center gap-2">
                 <Calendar className="w-5 h-5" style={{ color: "#2dd4bf" }} />
-                New users — last 14 days
+                Site accesses — last 14 days
               </span>
               <span className="text-xs font-normal text-muted-foreground">
-                {newUsersTotal14d} new {newUsersTotal14d === 1 ? "signup" : "signups"} · {visitsTotal14d} visits
+                {visitsTotal14d} accesses · {newUsersTotal14d} new signups
               </span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-3 text-[10px] text-muted-foreground mb-2 pl-[68px]">
-              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: "#a855f7" }} /> signups</span>
-              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: "#2dd4bf" }} /> site accesses</span>
-            </div>
             <div className="space-y-1.5">
               {newUsersByDay.map((d) => (
                 <div key={d.key} className="flex items-center gap-3 text-xs">
@@ -661,21 +668,21 @@ const Admin = () => {
                     <div
                       className="h-full rounded-md transition-all"
                       style={{
-                        width: `${(d.count / maxNewUsers) * 100}%`,
+                        width: `${(d.visits / maxVisits) * 100}%`,
                         background: "linear-gradient(90deg, #ec4899, #a855f7, #2dd4bf)",
-                        minWidth: d.count > 0 ? "6px" : "0",
+                        minWidth: d.visits > 0 ? "6px" : "0",
                       }}
                     />
                   </div>
-                  <span className="w-12 shrink-0 text-right font-semibold tabular-nums" style={{ color: d.count > 0 ? "#f59e0b" : "hsl(var(--muted-foreground))" }}>
-                    {d.count}
-                  </span>
                   <span
-                    className="w-16 shrink-0 text-right font-semibold tabular-nums"
+                    className="w-10 shrink-0 text-right font-semibold tabular-nums"
                     style={{ color: d.visits > 0 ? "#2dd4bf" : "hsl(var(--muted-foreground))" }}
-                    title="Unique site accesses"
+                    title="Total accesses (signed in + anonymous)"
                   >
-                    {d.visits} in
+                    {d.visits}
+                  </span>
+                  <span className="w-16 shrink-0 text-right tabular-nums text-muted-foreground" title="New signups">
+                    +{d.count} new
                   </span>
                 </div>
               ))}
@@ -683,6 +690,7 @@ const Admin = () => {
 
           </CardContent>
         </Card>
+
 
         <SiteNoteAdmin />
         <PaywallCustomizationsAdmin />
@@ -726,8 +734,8 @@ const Admin = () => {
           const totalEventPages = Math.max(1, Math.ceil(supporterEvents.length / EVENTS_PER_PAGE));
           const start = (eventsPage - 1) * EVENTS_PER_PAGE;
           const pageEvents = supporterEvents.slice(start, start + EVENTS_PER_PAGE);
-          const profileById: Record<string, Profile> = {};
-          profiles.forEach((p) => { profileById[p.user_id] = p; });
+         const profileById: Record<string, Profile> = {};
+         profiles.forEach((p) => { profileById[p.user_id] = p; profileById[p.id] = p; });
           return (
             <Card className="bg-card border-border">
               <CardHeader>
@@ -763,9 +771,8 @@ const Admin = () => {
                 {(() => {
                   const byInfluencer: Record<string, { views: number; clicks: number; checkouts: number; visitors: Set<string>; emails: Set<string> }> = {};
                   supporterEvents.forEach((e) => {
-                    // Every entry on the site is counted — traffic without a
-                    // referral code lands in the "direct" bucket.
-                    const code = (e.metadata?.ref_code || "").toString().trim().toLowerCase() || "__direct__";
+                    const code = (e.metadata?.ref_code || "").toString().trim().toLowerCase();
+                    if (!code) return; // only real influencer traffic
                     const bucket = (byInfluencer[code] ||= { views: 0, clicks: 0, checkouts: 0, visitors: new Set<string>(), emails: new Set<string>() });
                     if (e.event_type === "paywall_view" || e.event_type === "locked_content_view") bucket.views += 1;
                     if (e.event_type === "become_supporter_click") bucket.clicks += 1;
@@ -775,24 +782,20 @@ const Admin = () => {
                     const email = e.metadata?.email || (e.user_id ? profileById[e.user_id]?.email : null);
                     if (email) bucket.emails.add(String(email).toLowerCase());
                   });
-                  const rows = Object.entries(byInfluencer).sort((a, b) => {
-                    if (a[0] === "__direct__") return 1;
-                    if (b[0] === "__direct__") return -1;
-                    return b[1].views - a[1].views;
-                  });
+                  const rows = Object.entries(byInfluencer).sort((a, b) => b[1].views - a[1].views);
                   if (rows.length === 0) return null;
                   return (
                     <div className="mb-5 rounded-xl border border-border bg-background/40 p-3 sm:p-4">
-                      <p className="text-xs font-semibold text-muted-foreground mb-3">Site entries by source (all traffic)</p>
+                      <p className="text-xs font-semibold text-muted-foreground mb-3">Traffic by influencer</p>
                       <div className="space-y-2">
                         {rows.map(([code, s]) => (
                           <div key={code} className="rounded-lg bg-muted/40 px-3 py-2">
                             <div className="flex flex-wrap items-center justify-between gap-2">
                               <span
                                 className="text-sm font-black"
-                                style={{ color: code === "__direct__" ? "#f59e0b" : "#2dd4bf", fontFamily: "'Sora', system-ui, sans-serif" }}
+                                style={{ color: "#2dd4bf", fontFamily: "'Sora', system-ui, sans-serif" }}
                               >
-                                {code === "__direct__" ? "Direct / organic" : `@${code}`}
+                                {`@${code}`}
                               </span>
                               <span className="text-[11px] text-muted-foreground">
                                 Entries: <b className="text-foreground">{s.visitors.size}</b> · Paywall: <b className="text-foreground">{s.views}</b> · Plan clicks: <b className="text-foreground">{s.clicks}</b> · Checkouts: <b className="text-foreground">{s.checkouts}</b>
