@@ -641,18 +641,14 @@ const Admin = () => {
             <CardTitle className="flex items-center justify-between gap-2 text-foreground">
               <span className="flex items-center gap-2">
                 <Calendar className="w-5 h-5" style={{ color: "#2dd4bf" }} />
-                New users — last 14 days
+                Site accesses — last 14 days
               </span>
               <span className="text-xs font-normal text-muted-foreground">
-                {newUsersTotal14d} new {newUsersTotal14d === 1 ? "signup" : "signups"} · {visitsTotal14d} visits
+                {visitsTotal14d} accesses · {newUsersTotal14d} new signups
               </span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-3 text-[10px] text-muted-foreground mb-2 pl-[68px]">
-              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: "#a855f7" }} /> signups</span>
-              <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: "#2dd4bf" }} /> site accesses</span>
-            </div>
             <div className="space-y-1.5">
               {newUsersByDay.map((d) => (
                 <div key={d.key} className="flex items-center gap-3 text-xs">
@@ -661,21 +657,21 @@ const Admin = () => {
                     <div
                       className="h-full rounded-md transition-all"
                       style={{
-                        width: `${(d.count / maxNewUsers) * 100}%`,
+                        width: `${(d.visits / maxVisits) * 100}%`,
                         background: "linear-gradient(90deg, #ec4899, #a855f7, #2dd4bf)",
-                        minWidth: d.count > 0 ? "6px" : "0",
+                        minWidth: d.visits > 0 ? "6px" : "0",
                       }}
                     />
                   </div>
-                  <span className="w-12 shrink-0 text-right font-semibold tabular-nums" style={{ color: d.count > 0 ? "#f59e0b" : "hsl(var(--muted-foreground))" }}>
-                    {d.count}
-                  </span>
                   <span
-                    className="w-16 shrink-0 text-right font-semibold tabular-nums"
+                    className="w-10 shrink-0 text-right font-semibold tabular-nums"
                     style={{ color: d.visits > 0 ? "#2dd4bf" : "hsl(var(--muted-foreground))" }}
-                    title="Unique site accesses"
+                    title="Total accesses (signed in + anonymous)"
                   >
-                    {d.visits} in
+                    {d.visits}
+                  </span>
+                  <span className="w-16 shrink-0 text-right tabular-nums text-muted-foreground" title="New signups">
+                    +{d.count} new
                   </span>
                 </div>
               ))}
@@ -683,6 +679,7 @@ const Admin = () => {
 
           </CardContent>
         </Card>
+
 
         <SiteNoteAdmin />
         <PaywallCustomizationsAdmin />
