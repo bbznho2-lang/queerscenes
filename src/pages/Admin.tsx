@@ -606,6 +606,7 @@ const Admin = () => {
     return days;
   })();
   const maxNewUsers = Math.max(1, ...newUsersByDay.map((d) => d.count));
+  const maxVisits = Math.max(1, ...newUsersByDay.map((d) => d.visits));
   const newUsersTotal14d = newUsersByDay.reduce((a, b) => a + b.count, 0);
   const visitsTotal14d = newUsersByDay.reduce((a, b) => a + b.visits, 0);
 
