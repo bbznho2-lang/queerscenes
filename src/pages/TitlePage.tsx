@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import DOMPurify from "dompurify";
-import { Play, Heart, Sparkles, ChevronLeft, Crown } from "lucide-react";
+import { Play, Heart, Sparkles, ChevronLeft, Crown, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { slugify } from "@/lib/slug";
 import { useAuth } from "@/hooks/useAuth";
