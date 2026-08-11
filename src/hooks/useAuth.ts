@@ -43,6 +43,12 @@ export const useAuth = () => {
       setUser(currentUser);
       await loadAdminStatus(currentUser?.id ?? null);
 
+      // Restore supporter status (manual grants or prior Stripe payments) for
+      // sessions that are already active when the app loads.
+      if (currentUser) {
+        void supabase.rpc('claim_supporter_for_current_user' as any);
+      }
+
       if (isMounted) setLoading(false);
     };
 
