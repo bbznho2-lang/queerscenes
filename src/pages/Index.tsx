@@ -723,7 +723,7 @@ const Index = () => {
                       >
                         {opt.popular && (
                           <span
-                            className="absolute -top-2.5 sm:-top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-1.5 sm:px-2 py-0 sm:py-0.5 rounded-full text-[7px] sm:text-[9px] font-black uppercase tracking-normal sm:tracking-[0.12em] text-white shadow-lg"
+                            className="absolute -top-2 sm:-top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-1.5 sm:px-2.5 py-0.5 rounded-full text-[8px] sm:text-[10px] font-black uppercase tracking-wide text-white shadow-lg"
                             style={{ background: "linear-gradient(135deg,#a855f7,#ec4899)" }}
                           >
                             <span className="sm:hidden">★ Popular</span>
@@ -869,10 +869,12 @@ const Index = () => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
             <Accordion type="single" collapsible className="space-y-3">
               {[
+                { q: "Why subscribe to Queer Scenes?", a: (<>Queer Scenes brings together LGBTQIA+ movies, series, soap operas, GL Dramas and reality shows that are hard to find elsewhere — including rare titles fans search for across social media. Every release is hand-subtitled by our team and curated with care. Subscribers also join our Telegram community at <a href="https://t.me/QueerScenesTv" target="_blank" rel="noopener noreferrer" className="text-[var(--brand-pink)] underline hover:opacity-80 font-semibold">t.me/QueerScenesTv</a>, where we post new title announcements, recommendations and the latest premieres.</>) },
                 { q: "Is Queer Scenes free?", a: "Queer Scenes is a paid platform. We offer exclusive content — rare queer titles, hand-subtitled series, GL Dramas, reality shows and premieres that you won't find on any major streaming platform. Supporters get full access to our entire catalog." },
                 { q: "How do I become a Supporter?", a: "Pick a Supporter plan, complete the secure checkout, and your account will be upgraded instantly." },
                 { q: "Can I cancel anytime?", a: "Yes. Cancellation can be done at any time, with no penalty." },
                 { q: "How do I cancel my subscription?", a: (<>Open the <button type="button" onClick={() => setSupportOpen(true)} className="text-[var(--brand-pink)] underline hover:opacity-80 font-semibold">Support</button> form and choose "Cancel subscription".</>) },
+                { q: "What happens if my plan expires?", a: (<>Renewal is automatic on the due date. If it doesn't renew automatically, it may be due to insufficient card balance or an expired/changed payment method. To keep watching without losing access to titles and new releases, contact support and we'll help you update your payment details or renew manually.</>) },
                 { q: "Is the content only LGBTQIA+?", a: "Yes. The platform's focus is exclusively on stories, scenes, and productions with LGBTQIA+ representation." },
                 { q: "Does it work on mobile?", a: "Yes. The platform is adapted for mobile, tablet, and desktop." },
                 { q: "Can I become a Supporter from outside Europe?", a: "Yes. Anyone in the world can become a Supporter, even though the plans are priced in Euros (EUR). Checkout is handled by Stripe, which automatically converts the charge to your local currency using your card's exchange rate — no European address or bank account required." },
