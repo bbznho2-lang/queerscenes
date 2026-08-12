@@ -42,6 +42,23 @@ Deno.serve(async (req) => {
       .eq("role", "admin")
       .maybeSingle();
 
+    // A supporter can have their entitlement stored by email (manual grants,
+    // Stripe payments) even if the profile row lost the premium flag, so the
+    // deletion log falls back to that record.
+    const snapEmail = (profileSnap?.email ?? null);
+    let entitlement: any = null;
+    if (snapEmail) {
+      const { data: ent } = await adminClient
+        .from("pending_supporters")
+        .select("plan, premium_expires_at, status")
+        .eq("email", String(snapEmail).toLowerCase())
+        .in("status", ["pending", "paid", "claimed"])
+        .order("premium_expires_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      entitlement = ent;
+    }
+
     if (!roleCheck) {
       return new Response(JSON.stringify({ error: "Admin only" }), {
         status: 403,
@@ -95,9 +112,9 @@ Deno.serve(async (req) => {
       email: profileSnap?.email ?? null,
       first_name: profileSnap?.first_name ?? null,
       last_name: profileSnap?.last_name ?? null,
-      was_premium: Boolean(profileSnap?.is_premium),
-      premium_plan: profileSnap?.premium_plan ?? null,
-      premium_expires_at: profileSnap?.premium_expires_at ?? null,
+      was_premium: Boolean(profileSnap?.is_premium) || Boolean(entitlement),
+      premium_plan: profileSnap?.premium_plan ?? entitlement?.plan ?? null,
+      premium_expires_at: profileSnap?.premium_expires_at ?? entitlement?.premium_expires_at ?? null,
       deleted_by: "admin",
       deleted_by_user_id: caller.id,
     });

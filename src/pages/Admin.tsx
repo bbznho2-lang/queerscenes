@@ -398,7 +398,7 @@ const Admin = () => {
       _premium_expires_at: premiumExpiresAt,
     });
 
-    if (error) throw error;
+    if (error) throw new Error(error.message || "Error updating");
     const updated = Array.isArray(data) ? data[0] : data;
     if (!updated) throw new Error("Profile not found");
 
