@@ -54,19 +54,25 @@ const CommentsSection = ({ contentId }: Props) => {
 
   const loadLikes = async (commentIds: string[]) => {
     if (!commentIds.length) { setLikeCounts({}); setLikedByMe(new Set()); return; }
-    const { data } = await supabase
-      .from("comment_likes" as any)
-      .select("comment_id, user_id")
-      .in("comment_id", commentIds);
+    const { data } = await supabase.rpc("get_comment_like_counts" as any, { _comment_ids: commentIds } as any);
     const counts: Record<string, number> = {};
-    const mine = new Set<string>();
-    ((data as unknown as Array<{ comment_id: string; user_id: string }> | null) || []).forEach((row) => {
-      counts[row.comment_id] = (counts[row.comment_id] || 0) + 1;
-      if (user && row.user_id === user.id) mine.add(row.comment_id);
+    ((data as unknown as Array<{ comment_id: string; likes: number }> | null) || []).forEach((row) => {
+      counts[row.comment_id] = Number(row.likes) || 0;
     });
     setLikeCounts(counts);
+
+    const mine = new Set<string>();
+    if (user) {
+      const { data: own } = await supabase
+        .from("comment_likes" as any)
+        .select("comment_id")
+        .eq("user_id", user.id)
+        .in("comment_id", commentIds);
+      ((own as unknown as Array<{ comment_id: string }> | null) || []).forEach((row) => mine.add(row.comment_id));
+    }
     setLikedByMe(mine);
   };
+
 
   const load = async () => {
     const { data } = await supabase
