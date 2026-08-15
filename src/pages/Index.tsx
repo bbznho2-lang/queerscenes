@@ -824,7 +824,7 @@ const Index = () => {
                     "LGBT series & movies",
                     "GL Dramas subtitled",
                     "Early access content",
-                    "VIP Telegram channel",
+                    "Telegram community",
                   ].map((item) => (
                     <div key={item} className="flex items-center gap-2.5">
                       <span className="qs-supporter-check-min">✓</span>
