@@ -73,7 +73,7 @@ const Index = () => {
     fetchCount();
     const channel = supabase
       .channel("supporter-count")
-      .on("postgres_changes", { event: "*", schema: "public", table: "profiles" }, fetchCount)
+      .on("postgres_changes", { event: "*", schema: "public", table: "pending_supporters" }, fetchCount)
       .subscribe();
     const interval = setInterval(fetchCount, 60000);
     return () => {
