@@ -73,7 +73,7 @@ const Index = () => {
     fetchCount();
     const channel = supabase
       .channel("supporter-count")
-      .on("postgres_changes", { event: "*", schema: "public", table: "profiles" }, fetchCount)
+      .on("postgres_changes", { event: "*", schema: "public", table: "pending_supporters" }, fetchCount)
       .subscribe();
     const interval = setInterval(fetchCount, 60000);
     return () => {
@@ -664,6 +664,63 @@ const Index = () => {
                   <p className="text-xs sm:text-sm text-[var(--t2)] leading-relaxed">{c.text}</p>
                 </div>
               ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* CONTINUOUS SUPPORT */}
+      <section className="relative py-16 sm:py-24 px-4 overflow-hidden">
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse at 50% 0%, rgba(139,43,226,.14), transparent 60%), radial-gradient(ellipse at 20% 100%, rgba(217,70,168,.10), transparent 55%)",
+          }}
+        />
+        <div className="relative max-w-3xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.4 }} transition={{ duration: 0.6 }} className="mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="h-px flex-1 max-w-[36px]" style={{ background: "rgba(168,85,247,.5)" }} />
+              <span className="qs-section-label" style={{ color: "#a855f7" }}>Keep the scene alive</span>
+            </div>
+            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--t1)] leading-tight">
+              Your support <br />powers <span className="italic" style={{ color: "#a855f7" }}>everything.</span>
+            </h2>
+          </motion.div>
+
+          <div className="space-y-4 text-[var(--t2)] text-base sm:text-lg leading-relaxed mb-8">
+            <p>
+              Queer Scenes is built by a small team that works every day to bring you rare, hand-subtitled titles. Staying subscribed means we can keep updating the site, adding new releases, and growing the catalog for the whole community.
+            </p>
+          </div>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.6 }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+              {[
+                { title: "More releases, always", text: "Your subscription helps us upload and subtitle new titles every single week." },
+                { title: "A stronger community", text: "Continuous support lets us improve the platform and keep the Telegram groups active." },
+                { title: "No interrupted access", text: "Staying active means you never lose the titles you love or miss a new premiere." },
+                { title: "Help us grow", text: "Every supporter directly funds more content, better players and faster support." },
+              ].map((c) => (
+                <div key={c.title}>
+                  <div className="h-[2px] w-10 mb-3" style={{ background: "linear-gradient(90deg, #a855f7, transparent)" }} />
+                  <h4 className="font-bold text-[var(--t1)] text-sm sm:text-base mb-1.5">{c.title}</h4>
+                  <p className="text-xs sm:text-sm text-[var(--t2)] leading-relaxed">{c.text}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-10 p-5 sm:p-6 rounded-2xl border border-white/10 bg-white/[0.03]">
+              <p className="text-sm sm:text-base text-[var(--t1)] leading-relaxed">
+                <span className="font-semibold" style={{ color: "#a855f7"}}>Thinking about canceling?</span> Before you do, remember that your support is what keeps Queer Scenes online. If you're having any issue — payment, access, or content — reach out to support first. We'll do our best to solve it so you can keep watching without losing anything.
+              </p>
+              <div className="mt-4 flex items-center gap-2 text-sm">
+                <a href="https://t.me/L7kznr" target="_blank" rel="noopener noreferrer" className="font-semibold underline" style={{ color: "#c084fc" }}>
+                  Talk to support on Telegram
+                </a>
+                <span className="text-[var(--t3)]">— we're here to help.</span>
+              </div>
             </div>
           </motion.div>
         </div>
