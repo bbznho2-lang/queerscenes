@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Plus, Menu, X, Search, Bookmark, LogOut, Pencil, Trash2, Crown, Settings, Sparkles, Instagram, Youtube, Facebook, Music2, StarOff } from "lucide-react";
 import { XIcon } from "@/components/icons/XIcon";
+import { getSocialIcon } from "@/lib/social-icons";
 import { Button } from "@/components/ui/button";
 
 import ProfileDialog from "@/components/ProfileDialog";
@@ -135,6 +136,18 @@ const ContentCard = ({
 
 const Browse = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [socialLinks, setSocialLinks] = useState<{ id: string; label: string; href: string; icon: string }[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await (supabase as any)
+        .from("social_links")
+        .select("id, label, href, icon, is_active, position")
+        .eq("is_active", true)
+        .order("position", { ascending: true });
+      setSocialLinks((data || []) as any);
+    })();
+  }, []);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [profileOpen, setProfileOpen] = useState(false);
@@ -374,25 +387,23 @@ const Browse = () => {
                   QueerScenes Social Media
                 </p>
 
-                <div className="flex items-center gap-2 px-3 pb-1">
-                  {[
-                    { label: "Instagram", Icon: Instagram, href: "https://www.instagram.com/queer.scenes" },
-                    { label: "TikTok", Icon: Music2, href: "https://www.tiktok.com/@queer.scenes" },
-                    { label: "X", Icon: XIcon, href: "https://x.com/queerscenes" },
-                    { label: "YouTube", Icon: Youtube, href: "https://youtube.com/@queerscenestv?si=8mlUwn2WVYa-g-e5" },
-                  ].map(({ label, Icon, href }) => (
-                    <a
-                      key={label}
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title={label}
-                      aria-label={label}
-                      className="w-9 h-9 flex items-center justify-center rounded-full bg-muted/50 hover:bg-primary/20 hover:text-primary text-muted-foreground transition-colors"
-                    >
-                      <Icon className="w-4 h-4" />
-                    </a>
-                  ))}
+                <div className="flex items-center gap-2 px-3 pb-1 flex-wrap">
+                  {socialLinks.map(({ id, label, href, icon }) => {
+                    const Icon = getSocialIcon(icon);
+                    return (
+                      <a
+                        key={id}
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={label}
+                        aria-label={label}
+                        className="w-9 h-9 flex items-center justify-center rounded-full bg-muted/50 hover:bg-primary/20 hover:text-primary text-muted-foreground transition-colors"
+                      >
+                        <Icon className="w-4 h-4" />
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
 
