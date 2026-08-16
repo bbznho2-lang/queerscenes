@@ -20,6 +20,7 @@ import {
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import SiteNoteAdmin from "@/components/SiteNoteAdmin";
 import PaywallCustomizationsAdmin from "@/components/PaywallCustomizationsAdmin";
+import SocialLinksAdmin from "@/components/SocialLinksAdmin";
 import FeaturedEpisodesAdmin from "@/components/FeaturedEpisodesAdmin";
 import CanceledSubscriptionsSection from "@/components/CanceledSubscriptionsSection";
 import ReferralsSection from "@/components/ReferralsSection";
@@ -694,6 +695,7 @@ const Admin = () => {
 
         <SiteNoteAdmin />
         <PaywallCustomizationsAdmin />
+        <SocialLinksAdmin />
         <FeaturedEpisodesAdmin />
 
 
