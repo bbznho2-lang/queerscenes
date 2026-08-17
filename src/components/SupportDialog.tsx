@@ -23,10 +23,13 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [isSupporter, setIsSupporter] = useState<boolean | null>(null);
+  const [isExpired, setIsExpired] = useState(false);
+  const [expiredAt, setExpiredAt] = useState<string | null>(null);
   const [purpose, setPurpose] = useState<Purpose>("question");
   const [message, setMessage] = useState("");
   const [reason, setReason] = useState("");
   const [showRetention, setShowRetention] = useState(false);
+
 
   useEffect(() => {
     if (!open) {
