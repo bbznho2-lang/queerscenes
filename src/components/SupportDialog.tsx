@@ -51,8 +51,13 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
         const composed = [data.first_name, data.last_name].filter(Boolean).join(" ").trim();
         if (composed) setName(composed);
         const notExpired = !data.premium_expires_at || new Date(data.premium_expires_at) > new Date();
+        const expired = Boolean(data.premium_expires_at && new Date(data.premium_expires_at) <= new Date());
+        setIsExpired(expired);
+        setExpiredAt(expired ? data.premium_expires_at : null);
         setIsSupporter(Boolean(data.is_premium && notExpired));
       } else {
+        setIsExpired(false);
+        setExpiredAt(null);
         setIsSupporter(false);
       }
     })();
