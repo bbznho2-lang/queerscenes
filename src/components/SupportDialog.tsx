@@ -23,10 +23,13 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [isSupporter, setIsSupporter] = useState<boolean | null>(null);
+  const [isExpired, setIsExpired] = useState(false);
+  const [expiredAt, setExpiredAt] = useState<string | null>(null);
   const [purpose, setPurpose] = useState<Purpose>("question");
   const [message, setMessage] = useState("");
   const [reason, setReason] = useState("");
   const [showRetention, setShowRetention] = useState(false);
+
 
   useEffect(() => {
     if (!open) {
@@ -48,8 +51,13 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
         const composed = [data.first_name, data.last_name].filter(Boolean).join(" ").trim();
         if (composed) setName(composed);
         const notExpired = !data.premium_expires_at || new Date(data.premium_expires_at) > new Date();
+        const expired = Boolean(data.premium_expires_at && new Date(data.premium_expires_at) <= new Date());
+        setIsExpired(expired);
+        setExpiredAt(expired ? data.premium_expires_at : null);
         setIsSupporter(Boolean(data.is_premium && notExpired));
       } else {
+        setIsExpired(false);
+        setExpiredAt(null);
         setIsSupporter(false);
       }
     })();
@@ -88,10 +96,15 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
       ? "Cancel subscription request"
       : "Support question";
 
+    const expiredDate = expiredAt
+      ? new Date(expiredAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })
+      : null;
     const statusLine = isSupporter === true
       ? "Account status: Supporter ⭐"
+      : isExpired
+      ? `Account status: Supporter — plan expired${expiredDate ? ` on ${expiredDate}` : ""}`
       : isSupporter === false
-      ? "Account status: Free user"
+      ? "Account status: Registered user (no active plan)"
       : "Account status: Not logged in";
 
     const bodyLines = [
@@ -171,9 +184,14 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
                     <Crown className="w-3 h-3" /> Supporter
                   </span>
                 )}
-                {isSupporter === false && (
+                {isSupporter === false && isExpired && (
+                  <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-red-500/15 text-red-300 border border-red-400/30 px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap">
+                    <Crown className="w-3 h-3" /> Expired
+                  </span>
+                )}
+                {isSupporter === false && !isExpired && (
                   <span className="inline-flex flex-shrink-0 items-center rounded-full bg-white/5 text-[var(--t2)] border border-white/10 px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap">
-                    Free
+                    No plan
                   </span>
                 )}
               </div>
