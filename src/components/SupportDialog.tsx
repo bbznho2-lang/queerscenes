@@ -237,24 +237,33 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
                     />
                   </div>
                 ) : (
-                  <div className="space-y-1.5">
-                    <Label className="text-[var(--t2)] text-xs">
-                      Reason for cancellation <span className="text-pink-400">*required</span>
-                    </Label>
-                    <Textarea
-                      placeholder="Tell us why you want to cancel — it helps us improve."
-                      value={reason}
-                      onChange={(e) => setReason(e.target.value)}
-                      className="qs-input min-h-[110px]"
-                      maxLength={2000}
-                      required
-                    />
+                  <div className="space-y-2">
+                    <div className="rounded-lg border border-pink-500/20 bg-pink-500/[.06] px-3 py-2.5 text-sm text-[var(--t1)] leading-snug">
+                      Before you cancel, let us help. Most payment, access and content issues are fixed quickly on Telegram.
+                      Your support keeps Queer Scenes online for the whole community.
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-[var(--t2)] text-xs">
+                        What's happening? <span className="text-pink-400">*required</span>
+                      </Label>
+                      <Textarea
+                        placeholder="Tell us what's wrong — we'll do our best to fix it so you don't have to cancel."
+                        value={reason}
+                        onChange={(e) => setReason(e.target.value)}
+                        className="qs-input min-h-[110px]"
+                        maxLength={2000}
+                        required
+                      />
+                    </div>
                   </div>
                 )}
 
                 <Button type="submit" className="qs-btn-primary w-full gap-2 whitespace-normal h-auto min-h-[3rem] py-2 text-center leading-tight">
                   <Mail className="w-4 h-4 flex-shrink-0" />
-                  <span className="min-w-0 break-words">Send email to <span translate="no">{SUPPORT_EMAIL}</span></span>
+                  <span className="min-w-0 break-words">
+                    {purpose === "cancel" ? "Send cancellation request" : "Send email to"}{" "}
+                    {purpose !== "cancel" && <span translate="no">{SUPPORT_EMAIL}</span>}
+                  </span>
                 </Button>
               </form>
 
