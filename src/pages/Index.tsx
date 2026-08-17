@@ -713,13 +713,13 @@ const Index = () => {
 
             <div className="mt-10 p-5 sm:p-6 rounded-2xl border border-white/10 bg-white/[0.03]">
               <p className="text-sm sm:text-base text-[var(--t1)] leading-relaxed">
-                <span className="font-semibold" style={{ color: "#a855f7"}}>Thinking about canceling?</span> Before you do, remember that your support is what keeps Queer Scenes online. If you're having any issue — payment, access, or content — reach out to support first. We'll do our best to solve it so you can keep watching without losing anything.
+                <span className="font-semibold" style={{ color: "#a855f7"}}>Don't cancel — your support keeps Queer Scenes alive.</span> Every subscription funds new titles, subtitles and the community we built together. If something is bothering you — payment, access or content — reach out to support first. Most issues are solved in minutes, so you can keep watching and supporting without losing anything.
               </p>
               <div className="mt-4 flex items-center gap-2 text-sm">
                 <a href="https://t.me/L7kznr" target="_blank" rel="noopener noreferrer" className="font-semibold underline" style={{ color: "#c084fc" }}>
                   Talk to support on Telegram
                 </a>
-                <span className="text-[var(--t3)]">— we're here to help.</span>
+                <span className="text-[var(--t3)]">— we'll find a solution together.</span>
               </div>
             </div>
           </motion.div>
@@ -929,8 +929,8 @@ const Index = () => {
                 { q: "Why subscribe to Queer Scenes?", a: (<>Queer Scenes brings together LGBTQIA+ movies, series, soap operas, GL Dramas and reality shows that are hard to find elsewhere — including rare titles fans search for across social media. Every release is hand-subtitled by our team and curated with care. Subscribers also join our Telegram community at <a href="https://t.me/QueerScenesTv" target="_blank" rel="noopener noreferrer" className="text-[var(--brand-pink)] underline hover:opacity-80 font-semibold">t.me/QueerScenesTv</a>, where we post new title announcements, recommendations and the latest premieres.</>) },
                 { q: "Is Queer Scenes free?", a: "Queer Scenes is a paid platform. We offer exclusive content — rare queer titles, hand-subtitled series, GL Dramas, reality shows and premieres that you won't find on any major streaming platform. Supporters get full access to our entire catalog." },
                 { q: "How do I become a Supporter?", a: "Pick a Supporter plan, complete the secure checkout, and your account will be upgraded instantly." },
-                { q: "Can I cancel anytime?", a: "Yes. Cancellation can be done at any time, with no penalty." },
-                { q: "How do I cancel my subscription?", a: (<>Open the <button type="button" onClick={() => setSupportOpen(true)} className="text-[var(--brand-pink)] underline hover:opacity-80 font-semibold">Support</button> form and choose "Cancel subscription".</>) },
+                { q: "What if I'm thinking about canceling?", a: "Please contact support first. Most issues — payment, access or content — can be fixed quickly so you don't lose your catalog or new releases. Your support is what keeps Queer Scenes growing." },
+                { q: "How do I manage my subscription?", a: (<>Open the <button type="button" onClick={() => setSupportOpen(true)} className="text-[var(--brand-pink)] underline hover:opacity-80 font-semibold">Support</button> form. We recommend messaging us on Telegram first — we can usually solve whatever is making you consider leaving.</>) },
                 { q: "What happens if my plan expires?", a: (<>Renewal is automatic on the due date. If it doesn't renew automatically, it may be due to insufficient card balance or an expired/changed payment method. To keep watching without losing access to titles and new releases, contact support and we'll help you update your payment details or renew manually.</>) },
                 { q: "Is the content only LGBTQIA+?", a: "Yes. The platform's focus is exclusively on stories, scenes, and productions with LGBTQIA+ representation." },
                 { q: "Does it work on mobile?", a: "Yes. The platform is adapted for mobile, tablet, and desktop." },

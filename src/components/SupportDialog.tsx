@@ -66,10 +66,10 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
   };
 
   const retentionItems = [
-    { icon: "🎬", text: "New LGBTQIA+ films subtitled every month — hand-picked by our team" },
-    { icon: "📺", text: "New LGBTQIA+ series and soap operas with subtitles — not available anywhere else" },
-    { icon: "👑", text: "Telegram community — new titles, updates and recommendations" },
-    { icon: "🎭", text: "GL Dramas subtitled — rare titles you won't find on any streaming platform" },
+    { icon: "🎬", text: "Fresh LGBTQIA+ films, series and reality shows subtitled every month" },
+    { icon: "📺", text: "Rare premieres you won't find on any other streaming platform" },
+    { icon: "👑", text: "Telegram community with new releases, updates and recommendations" },
+    { icon: "💜", text: "Your support keeps the project alive, curated and growing for everyone" },
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -120,8 +120,12 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
           {showRetention ? (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-[var(--t1)] break-words leading-tight">
-                Wait — here's what you'll lose access to 💜
+                Your support is what keeps Queer Scenes alive 💜
               </h3>
+              <p className="text-sm text-[var(--t2)] break-words leading-snug">
+                Every subscription helps us add new titles, keep the site running and support the community.
+                If something is wrong — payment, access or content — talk to us first. Most problems are solved in minutes.
+              </p>
               <ul className="space-y-2">
                 {retentionItems.map((item, i) => (
                   <li
@@ -140,20 +144,20 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
                 onClick={() => onOpenChange(false)}
                 className="qs-btn-primary w-full whitespace-normal h-auto min-h-[3rem] py-2 text-center leading-tight"
               >
-                <span className="min-w-0 break-words">Keep my access 💜</span>
+                <span className="min-w-0 break-words">I want to keep supporting 💜</span>
               </Button>
               <button
                 type="button"
                 onClick={() => setShowRetention(false)}
                 className="w-full text-xs text-[var(--t2)] hover:text-[var(--t1)] underline underline-offset-2 py-1"
               >
-                Cancel anyway
+                I still want to cancel (not recommended)
               </button>
             </div>
           ) : (
             <>
               <p className="text-sm text-[var(--t2)] break-words">
-                Ask a question or cancel your subscription. We'll reply as soon as possible — for faster answers, use Telegram.
+                Ask a question or get help with your subscription. We reply as soon as possible — for faster answers, use Telegram.
               </p>
 
               {/* Account line */}
@@ -233,24 +237,33 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
                     />
                   </div>
                 ) : (
-                  <div className="space-y-1.5">
-                    <Label className="text-[var(--t2)] text-xs">
-                      Reason for cancellation <span className="text-pink-400">*required</span>
-                    </Label>
-                    <Textarea
-                      placeholder="Tell us why you want to cancel — it helps us improve."
-                      value={reason}
-                      onChange={(e) => setReason(e.target.value)}
-                      className="qs-input min-h-[110px]"
-                      maxLength={2000}
-                      required
-                    />
+                  <div className="space-y-2">
+                    <div className="rounded-lg border border-pink-500/20 bg-pink-500/[.06] px-3 py-2.5 text-sm text-[var(--t1)] leading-snug">
+                      Before you cancel, let us help. Most payment, access and content issues are fixed quickly on Telegram.
+                      Your support keeps Queer Scenes online for the whole community.
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-[var(--t2)] text-xs">
+                        What's happening? <span className="text-pink-400">*required</span>
+                      </Label>
+                      <Textarea
+                        placeholder="Tell us what's wrong — we'll do our best to fix it so you don't have to cancel."
+                        value={reason}
+                        onChange={(e) => setReason(e.target.value)}
+                        className="qs-input min-h-[110px]"
+                        maxLength={2000}
+                        required
+                      />
+                    </div>
                   </div>
                 )}
 
                 <Button type="submit" className="qs-btn-primary w-full gap-2 whitespace-normal h-auto min-h-[3rem] py-2 text-center leading-tight">
                   <Mail className="w-4 h-4 flex-shrink-0" />
-                  <span className="min-w-0 break-words">Send email to <span translate="no">{SUPPORT_EMAIL}</span></span>
+                  <span className="min-w-0 break-words">
+                    {purpose === "cancel" ? "Send cancellation request" : "Send email to"}{" "}
+                    {purpose !== "cancel" && <span translate="no">{SUPPORT_EMAIL}</span>}
+                  </span>
                 </Button>
               </form>
 

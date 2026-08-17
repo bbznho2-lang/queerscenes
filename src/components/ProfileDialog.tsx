@@ -198,7 +198,7 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
 
             <div className="mt-4 rounded-xl border border-white/10 bg-white/[.03] p-3">
               <p className="text-[11px] text-muted-foreground text-center break-words">
-                Deleting your profile does not cancel your subscription. If you want to know more, go to{" "}
+                Deleting your profile does not cancel your subscription. Need help or thinking about leaving? Talk to{" "}
                 <button
                   type="button"
                   onClick={() => setSupportOpen(true)}
@@ -206,7 +206,7 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
                 >
                   Support
                 </button>
-                .
+                {" "}first — we'll do our best to solve it.
               </p>
             </div>
           </div>
