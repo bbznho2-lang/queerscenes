@@ -120,8 +120,12 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
           {showRetention ? (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-[var(--t1)] break-words leading-tight">
-                Wait — here's what you'll lose access to 💜
+                Your support is what keeps Queer Scenes alive 💜
               </h3>
+              <p className="text-sm text-[var(--t2)] break-words leading-snug">
+                Every subscription helps us add new titles, keep the site running and support the community.
+                If something is wrong — payment, access or content — talk to us first. Most problems are solved in minutes.
+              </p>
               <ul className="space-y-2">
                 {retentionItems.map((item, i) => (
                   <li
@@ -140,14 +144,14 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
                 onClick={() => onOpenChange(false)}
                 className="qs-btn-primary w-full whitespace-normal h-auto min-h-[3rem] py-2 text-center leading-tight"
               >
-                <span className="min-w-0 break-words">Keep my access 💜</span>
+                <span className="min-w-0 break-words">I want to keep supporting 💜</span>
               </Button>
               <button
                 type="button"
                 onClick={() => setShowRetention(false)}
                 className="w-full text-xs text-[var(--t2)] hover:text-[var(--t1)] underline underline-offset-2 py-1"
               >
-                Cancel anyway
+                I still want to cancel (not recommended)
               </button>
             </div>
           ) : (
