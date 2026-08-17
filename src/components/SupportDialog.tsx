@@ -96,10 +96,15 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
       ? "Cancel subscription request"
       : "Support question";
 
+    const expiredDate = expiredAt
+      ? new Date(expiredAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })
+      : null;
     const statusLine = isSupporter === true
       ? "Account status: Supporter ⭐"
+      : isExpired
+      ? `Account status: Supporter — plan expired${expiredDate ? ` on ${expiredDate}` : ""}`
       : isSupporter === false
-      ? "Account status: Free user"
+      ? "Account status: Registered user (no active plan)"
       : "Account status: Not logged in";
 
     const bodyLines = [
