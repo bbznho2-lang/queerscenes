@@ -157,7 +157,7 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
           ) : (
             <>
               <p className="text-sm text-[var(--t2)] break-words">
-                Ask a question or cancel your subscription. We'll reply as soon as possible — for faster answers, use Telegram.
+                Ask a question or get help with your subscription. We reply as soon as possible — for faster answers, use Telegram.
               </p>
 
               {/* Account line */}
