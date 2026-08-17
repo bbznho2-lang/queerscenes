@@ -713,13 +713,13 @@ const Index = () => {
 
             <div className="mt-10 p-5 sm:p-6 rounded-2xl border border-white/10 bg-white/[0.03]">
               <p className="text-sm sm:text-base text-[var(--t1)] leading-relaxed">
-                <span className="font-semibold" style={{ color: "#a855f7"}}>Thinking about canceling?</span> Before you do, remember that your support is what keeps Queer Scenes online. If you're having any issue — payment, access, or content — reach out to support first. We'll do our best to solve it so you can keep watching without losing anything.
+                <span className="font-semibold" style={{ color: "#a855f7"}}>Don't cancel — your support keeps Queer Scenes alive.</span> Every subscription funds new titles, subtitles and the community we built together. If something is bothering you — payment, access or content — reach out to support first. Most issues are solved in minutes, so you can keep watching and supporting without losing anything.
               </p>
               <div className="mt-4 flex items-center gap-2 text-sm">
                 <a href="https://t.me/L7kznr" target="_blank" rel="noopener noreferrer" className="font-semibold underline" style={{ color: "#c084fc" }}>
                   Talk to support on Telegram
                 </a>
-                <span className="text-[var(--t3)]">— we're here to help.</span>
+                <span className="text-[var(--t3)]">— we'll find a solution together.</span>
               </div>
             </div>
           </motion.div>
