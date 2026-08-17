@@ -184,9 +184,14 @@ const SupportDialog = ({ open, onOpenChange }: SupportDialogProps) => {
                     <Crown className="w-3 h-3" /> Supporter
                   </span>
                 )}
-                {isSupporter === false && (
+                {isSupporter === false && isExpired && (
+                  <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-red-500/15 text-red-300 border border-red-400/30 px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap">
+                    <Crown className="w-3 h-3" /> Expired
+                  </span>
+                )}
+                {isSupporter === false && !isExpired && (
                   <span className="inline-flex flex-shrink-0 items-center rounded-full bg-white/5 text-[var(--t2)] border border-white/10 px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap">
-                    Free
+                    No plan
                   </span>
                 )}
               </div>
