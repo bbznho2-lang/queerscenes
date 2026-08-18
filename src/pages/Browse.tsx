@@ -307,6 +307,7 @@ const Browse = () => {
     { label: "Movies", icon: "🎬", action: () => { setMenuOpen(false); document.getElementById("filmes")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Soap Operas", icon: "💕", action: () => { setMenuOpen(false); document.getElementById("novelas")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "GL Dramas", icon: "🌸", action: () => { setMenuOpen(false); document.getElementById("gl")?.scrollIntoView({ behavior: "smooth" }); } },
+    { label: "BL Dramas", icon: "💙", action: () => { setMenuOpen(false); document.getElementById("bl")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Reality Shows", icon: "🎤", action: () => { setMenuOpen(false); document.getElementById("realities")?.scrollIntoView({ behavior: "smooth" }); } },
 
     
