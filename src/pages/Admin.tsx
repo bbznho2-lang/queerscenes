@@ -575,7 +575,11 @@ const Admin = () => {
   }
 
   const totalUsers = profiles.length;
-  const premiumUsers = profiles.filter((p) => p.is_premium).length;
+  const premiumUsers = profiles.filter(
+    (p) =>
+      p.is_premium &&
+      (!p.premium_expires_at || new Date(p.premium_expires_at).getTime() > Date.now())
+  ).length;
   const totalClicks = clickStats.reduce((a, b) => a + b.clicks, 0);
 
   // New users per day — last 14 days (use LOCAL calendar days so "today"
