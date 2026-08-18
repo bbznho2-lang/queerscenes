@@ -399,7 +399,7 @@ const Index = () => {
             style={{ fontSize: "14px", color: "rgba(238,234,255,.75)", lineHeight: 1.68, maxWidth: 320 }}
             initial="hidden" animate="visible" variants={fade} custom={2}
           >
-            The queer streaming experience you've been waiting for. Hand-subtitled titles, rare series, GL Dramas and exclusive premieres — all in one place.
+            The queer streaming experience you've been waiting for. Hand-subtitled titles, rare series, GL & BL Dramas and exclusive premieres — all in one place.
           </motion.p>
 
           <motion.p
@@ -414,7 +414,7 @@ const Index = () => {
             >
               Become a Supporter
             </button>{" "}
-            — unlock exclusive titles, weekly subtitled soap operas, GL Dramas & early access. 💜
+            — unlock exclusive titles, weekly subtitled soap operas, GL & BL Dramas & early access. 💜
           </motion.p>
 
           <motion.div initial="hidden" animate="visible" variants={fade} custom={4} className="flex flex-col items-center gap-3 mx-auto" style={{ maxWidth: 290 }}>
@@ -621,7 +621,7 @@ const Index = () => {
 
           <div className="space-y-4 text-[var(--t2)] text-base sm:text-lg leading-relaxed mb-8">
             <p>
-              Queer Scenes exists so people <span className="font-semibold" style={{ color: "#a855f7" }}>all over the world</span> can watch titles that represent them — series, films, soap operas, GL Dramas and reality shows. Hand-subtitled by our team, curated with love, brought to you by fans who get it.
+              Queer Scenes exists so people <span className="font-semibold" style={{ color: "#a855f7" }}>all over the world</span> can watch titles that represent them — series, films, soap operas, GL & BL Dramas and reality shows. Hand-subtitled by our team, curated with love, brought to you by fans who get it.
             </p>
           </div>
 
@@ -805,7 +805,7 @@ const Index = () => {
                 </div>
 
                 <p className="relative z-10 mt-4 text-center text-sm text-[var(--t2)]">
-                  Unlock our full catalog — rare queer titles, hand-subtitled series, GL Dramas, reality shows and premieres you won't find anywhere else. Made by fans, for fans.
+                  Unlock our full catalog — rare queer titles, hand-subtitled series, GL & BL Dramas, reality shows and premieres you won't find anywhere else. Made by fans, for fans.
                 </p>
 
 
@@ -822,7 +822,7 @@ const Index = () => {
                     "Uninterrupted experience",
                     "Soap operas — weekly",
                     "LGBT series & movies",
-                    "GL Dramas subtitled",
+                    "GL & BL Dramas subtitled",
                     "Early access content",
                     "Telegram community",
                   ].map((item) => (
@@ -926,8 +926,8 @@ const Index = () => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}>
             <Accordion type="single" collapsible className="space-y-3">
               {[
-                { q: "Why subscribe to Queer Scenes?", a: (<>Queer Scenes brings together LGBTQIA+ movies, series, soap operas, GL Dramas and reality shows that are hard to find elsewhere — including rare titles fans search for across social media. Every release is hand-subtitled by our team and curated with care. Subscribers also join our Telegram community at <a href="https://t.me/QueerScenesTv" target="_blank" rel="noopener noreferrer" className="text-[var(--brand-pink)] underline hover:opacity-80 font-semibold">t.me/QueerScenesTv</a>, where we post new title announcements, recommendations and the latest premieres.</>) },
-                { q: "Is Queer Scenes free?", a: "Queer Scenes is a paid platform. We offer exclusive content — rare queer titles, hand-subtitled series, GL Dramas, reality shows and premieres that you won't find on any major streaming platform. Supporters get full access to our entire catalog." },
+                { q: "Why subscribe to Queer Scenes?", a: (<>Queer Scenes brings together LGBTQIA+ movies, series, soap operas, GL & BL Dramas and reality shows that are hard to find elsewhere — including rare titles fans search for across social media. Every release is hand-subtitled by our team and curated with care. Subscribers also join our Telegram community at <a href="https://t.me/QueerScenesTv" target="_blank" rel="noopener noreferrer" className="text-[var(--brand-pink)] underline hover:opacity-80 font-semibold">t.me/QueerScenesTv</a>, where we post new title announcements, recommendations and the latest premieres.</>) },
+                { q: "Is Queer Scenes free?", a: "Queer Scenes is a paid platform. We offer exclusive content — rare queer titles, hand-subtitled series, GL & BL Dramas, reality shows and premieres that you won't find on any major streaming platform. Supporters get full access to our entire catalog." },
                 { q: "How do I become a Supporter?", a: "Pick a Supporter plan, complete the secure checkout, and your account will be upgraded instantly." },
                 { q: "What if I'm thinking about canceling?", a: "Please contact support first. Most issues — payment, access or content — can be fixed quickly so you don't lose your catalog or new releases. Your support is what keeps Queer Scenes growing." },
                 { q: "How do I manage my subscription?", a: (<>Open the <button type="button" onClick={() => setSupportOpen(true)} className="text-[var(--brand-pink)] underline hover:opacity-80 font-semibold">Support</button> form. We recommend messaging us on Telegram first — we can usually solve whatever is making you consider leaving.</>) },
