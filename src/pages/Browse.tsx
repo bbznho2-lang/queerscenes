@@ -234,6 +234,7 @@ const Browse = () => {
   const filmes = visibleContents.filter((c) => c.section === "filmes");
   const novelas = visibleContents.filter((c) => c.section === "novelas");
   const gl = visibleContents.filter((c) => c.section === "gl");
+  const bl = visibleContents.filter((c) => c.section === "bl");
   const realities = visibleContents.filter((c) => c.section === "realities");
 
   const watchlistItems = visibleContents.filter((c) => watchlistIds.has(c.id));
