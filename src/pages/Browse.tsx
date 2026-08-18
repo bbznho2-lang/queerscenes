@@ -656,6 +656,43 @@ const Browse = () => {
           </div>
         </section>
 
+        {/* BL DRAMAS */}
+        <section id="bl" className="py-10 sm:py-16 px-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-6 gap-3">
+              <h2 className="text-xl sm:text-2xl font-black neon-text-blue flex items-center gap-2">
+                <span>💙</span> BL Dramas
+              </h2>
+              <div className="flex items-center gap-2">
+                {isAdmin && (
+                  <>
+                    <button onClick={() => handleNew("bl", "serie")} className="h-9 px-3 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center gap-1.5 transition-colors text-xs font-medium text-primary" title="Add BL Series">
+                      <Plus className="w-3.5 h-3.5" /> Series
+                    </button>
+                    <button onClick={() => handleNew("bl", "filme")} className="h-9 px-3 rounded-full bg-secondary/10 hover:bg-secondary/20 flex items-center gap-1.5 transition-colors text-xs font-medium text-secondary" title="Add BL Movie">
+                      <Plus className="w-3.5 h-3.5" /> Movie
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+            {bl.length > 0 ? (
+              <AutoScrollRow>
+                {bl.map((b) => (
+                  <div key={b.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
+                    <ContentCard item={b} isAdmin={isAdmin} onEdit={() => handleEdit(b)} onDelete={() => handleDelete(b.id)} onClickTrack={() => trackClick(b.id)} isInWatchlist={watchlistIds.has(b.id)} onToggleWatchlist={() => toggleWatchlist(b.id)} userIsPremium={userIsPremium} />
+                  </div>
+                ))}
+              </AutoScrollRow>
+            ) : (
+              <p className="text-muted-foreground text-center py-8">
+                {isAdmin ? "Click + to add BL Dramas" : "New content coming soon!"}
+              </p>
+            )}
+          </div>
+        </section>
+
+
         {/* REALITY SHOWS */}
         <section id="realities" className="py-10 sm:py-16 px-4">
           <div className="max-w-7xl mx-auto">
