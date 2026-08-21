@@ -306,7 +306,7 @@ const Browse = () => {
     { label: "Series", icon: "📺", action: () => { setMenuOpen(false); document.getElementById("séries")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Movies", icon: "🎬", action: () => { setMenuOpen(false); document.getElementById("filmes")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Soap Operas", icon: "💕", action: () => { setMenuOpen(false); document.getElementById("novelas")?.scrollIntoView({ behavior: "smooth" }); } },
-    { label: "GL Dramas", icon: "💗", action: () => { setMenuOpen(false); document.getElementById("gl")?.scrollIntoView({ behavior: "smooth" }); } },
+    { label: "GL Dramas", icon: "🩷", action: () => { setMenuOpen(false); document.getElementById("gl")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "BL Dramas", icon: "💙", action: () => { setMenuOpen(false); document.getElementById("bl")?.scrollIntoView({ behavior: "smooth" }); } },
     { label: "Reality Shows", icon: "🎤", action: () => { setMenuOpen(false); document.getElementById("realities")?.scrollIntoView({ behavior: "smooth" }); } },
 
@@ -625,7 +625,7 @@ const Browse = () => {
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6 gap-3">
               <h2 className="text-xl sm:text-2xl font-black neon-text-pink flex items-center gap-2">
-                <span>💗</span> GL Dramas
+                <span>🩷</span> GL Dramas
               </h2>
               <div className="flex items-center gap-2">
                 {isAdmin && (
