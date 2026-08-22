@@ -24,6 +24,7 @@ import SocialLinksAdmin from "@/components/SocialLinksAdmin";
 import FeaturedEpisodesAdmin from "@/components/FeaturedEpisodesAdmin";
 import CanceledSubscriptionsSection from "@/components/CanceledSubscriptionsSection";
 import ReferralsSection from "@/components/ReferralsSection";
+import { fetchTopContentRanking } from "@/lib/top-content";
 
 
 interface Profile {
@@ -365,25 +366,24 @@ const Admin = () => {
       const aggregated = Object.values(aggMap).sort((a, b) => new Date(b.last_clicked_at).getTime() - new Date(a.last_clicked_at).getTime());
       setAggregatedClicks(aggregated);
 
-      // Merge duplicated titles so the chart matches the public Top 10 ranking.
-      const byTitle: Record<string, { title: string; clicks: number }> = {};
-      (contents || []).forEach((c: any) => {
-        const key = String(c.title || "").trim().toLowerCase();
-        if (!key) return;
-        if (!byTitle[key]) byTitle[key] = { title: c.title, clicks: 0 };
-        byTitle[key].clicks += countMap[c.id] || 0;
-      });
+      // Read the exact same server-side ranking used by Landing and Browse.
+      // This prevents pagination limits, duplicate title variants, and slightly
+      // different date calculations from making the admin chart disagree.
+      const ranking = await fetchTopContentRanking(10);
+      const rankedIds = ranking.map((row) => row.content_id);
+      const { data: rankedContents } = rankedIds.length > 0
+        ? await supabase.from("contents").select("id, title").in("id", rankedIds)
+        : { data: [] };
+      const rankedTitleById = new Map((rankedContents || []).map((item) => [item.id, item.title]));
 
-      const stats: ClickStat[] = Object.values(byTitle)
-        .filter((t) => t.clicks > 0)
-        .map((t) => ({
-          title: t.title.length > 15 ? t.title.slice(0, 15) + "…" : t.title,
-          clicks: t.clicks,
-        }))
-        .sort((a: ClickStat, b: ClickStat) => b.clicks - a.clicks)
-        .slice(0, 10);
-
-      setClickStats(stats);
+      setClickStats(ranking.flatMap((row) => {
+        const title = rankedTitleById.get(row.content_id);
+        if (!title) return [];
+        return [{
+          title: title.length > 15 ? `${title.slice(0, 15)}…` : title,
+          clicks: row.clicks,
+        }];
+      }));
     }
 
 
