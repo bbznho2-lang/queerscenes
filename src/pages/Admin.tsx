@@ -273,8 +273,12 @@ const Admin = () => {
     ]);
 
     if (clicks.length > 0 || anonEvents.length > 0) {
+      // Most Clicked Content uses the same window as the public Top 10:
+      // clicks from the last 30 days, grouped by title (duplicates merged).
+      const since30 = Date.now() - 30 * 24 * 60 * 60 * 1000;
       const countMap: Record<string, number> = {};
       clicks.forEach((c: any) => {
+        if (new Date(c.clicked_at).getTime() < since30) return;
         countMap[c.content_id] = (countMap[c.content_id] || 0) + 1;
       });
       const contentIds = [...new Set([...clicks.map((c: any) => c.content_id), ...anonEvents.map((e: any) => e.content_id)])];
