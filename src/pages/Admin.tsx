@@ -365,10 +365,20 @@ const Admin = () => {
       const aggregated = Object.values(aggMap).sort((a, b) => new Date(b.last_clicked_at).getTime() - new Date(a.last_clicked_at).getTime());
       setAggregatedClicks(aggregated);
 
-      const stats: ClickStat[] = (contents || [])
-        .map((c: any) => ({
-          title: c.title.length > 15 ? c.title.slice(0, 15) + "…" : c.title,
-          clicks: countMap[c.id] || 0,
+      // Merge duplicated titles so the chart matches the public Top 10 ranking.
+      const byTitle: Record<string, { title: string; clicks: number }> = {};
+      (contents || []).forEach((c: any) => {
+        const key = String(c.title || "").trim().toLowerCase();
+        if (!key) return;
+        if (!byTitle[key]) byTitle[key] = { title: c.title, clicks: 0 };
+        byTitle[key].clicks += countMap[c.id] || 0;
+      });
+
+      const stats: ClickStat[] = Object.values(byTitle)
+        .filter((t) => t.clicks > 0)
+        .map((t) => ({
+          title: t.title.length > 15 ? t.title.slice(0, 15) + "…" : t.title,
+          clicks: t.clicks,
         }))
         .sort((a: ClickStat, b: ClickStat) => b.clicks - a.clicks)
         .slice(0, 10);
