@@ -229,6 +229,32 @@ const Admin = () => {
     }
     setProfiles(allProfiles);
 
+    // The chart must always be sourced from the canonical Top 10 RPC. Clear
+    // any previous client-calculated values first, then rebuild it exclusively
+    // from the ranked response used by Landing and Browse.
+    setClickStats([]);
+    try {
+      const ranking = await fetchTopContentRanking(10);
+      const rankedIds = ranking.map((row) => row.content_id);
+      const { data: rankedContents, error: rankedContentsError } = rankedIds.length > 0
+        ? await supabase.from("contents").select("id, title").in("id", rankedIds)
+        : { data: [], error: null };
+
+      if (rankedContentsError) throw rankedContentsError;
+
+      const rankedTitleById = new Map((rankedContents || []).map((item) => [item.id, item.title]));
+      setClickStats(ranking.flatMap((row) => {
+        const title = rankedTitleById.get(row.content_id);
+        if (!title) return [];
+        return [{
+          title: title.length > 15 ? `${title.slice(0, 15)}…` : title,
+          clicks: Number(row.clicks),
+        }];
+      }));
+    } catch (error) {
+      console.error("official Top 10 fetch error", error);
+    }
+
     // Supporter events (paywall analytics + anonymous visitor activity).
     // Paginated so anonymous clicks and daily access counts aren't truncated.
     const allEvents: any[] = [];
@@ -366,24 +392,6 @@ const Admin = () => {
       const aggregated = Object.values(aggMap).sort((a, b) => new Date(b.last_clicked_at).getTime() - new Date(a.last_clicked_at).getTime());
       setAggregatedClicks(aggregated);
 
-      // Read the exact same server-side ranking used by Landing and Browse.
-      // This prevents pagination limits, duplicate title variants, and slightly
-      // different date calculations from making the admin chart disagree.
-      const ranking = await fetchTopContentRanking(10);
-      const rankedIds = ranking.map((row) => row.content_id);
-      const { data: rankedContents } = rankedIds.length > 0
-        ? await supabase.from("contents").select("id, title").in("id", rankedIds)
-        : { data: [] };
-      const rankedTitleById = new Map((rankedContents || []).map((item) => [item.id, item.title]));
-
-      setClickStats(ranking.flatMap((row) => {
-        const title = rankedTitleById.get(row.content_id);
-        if (!title) return [];
-        return [{
-          title: title.length > 15 ? `${title.slice(0, 15)}…` : title,
-          clicks: row.clicks,
-        }];
-      }));
     }
 
 
@@ -727,7 +735,7 @@ const Admin = () => {
           <CardContent>
             {clickStats.length > 0 ? (
               <ChartContainer config={chartConfig} className="h-[300px] w-full">
-                <BarChart data={clickStats}>
+                <BarChart key={clickStats.map((item) => `${item.title}:${item.clicks}`).join("|")} data={clickStats}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                   <XAxis dataKey="title" className="text-xs" tick={{ fill: "hsl(var(--muted-foreground))" }} />
                   <YAxis tick={{ fill: "hsl(var(--muted-foreground))" }} />
