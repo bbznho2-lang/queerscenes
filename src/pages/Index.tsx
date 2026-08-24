@@ -198,13 +198,32 @@ const Index = () => {
     const wantsPlans = hash === "#planos" || hash === "#planos-cards";
     if (!wantsSupporter && !wantsPlans) return;
 
-    const timeout = window.setTimeout(() => {
-      scrollToPlanCards(wantsSupporter ? "supporter" : "plans", "auto");
-    }, 350);
-    return () => {
-      clearTimeout(timeout);
+    const target = wantsSupporter ? "supporter" : "plans";
+    let cancelled = false;
+    const timeouts: number[] = [];
+
+    // Retry until the plans section is actually mounted (catalog/images load late),
+    // then correct the position once layout settles.
+    const attempt = (tries: number) => {
+      if (cancelled) return;
+      const ok = scrollToPlanCards(target, "auto");
+      if (!ok && tries < 40) {
+        timeouts.push(window.setTimeout(() => attempt(tries + 1), 120));
+        return;
+      }
+      if (ok) {
+        timeouts.push(window.setTimeout(() => !cancelled && scrollToPlanCards(target, "auto"), 400));
+        timeouts.push(window.setTimeout(() => !cancelled && scrollToPlanCards(target, "auto"), 1000));
+      }
     };
-  }, [scrollToPlanCards]);
+
+    timeouts.push(window.setTimeout(() => attempt(0), 120));
+    return () => {
+      cancelled = true;
+      timeouts.forEach((t) => clearTimeout(t));
+    };
+  }, [scrollToPlanCards, location.key]);
+
 
 
   // Pre-fill checkout email
