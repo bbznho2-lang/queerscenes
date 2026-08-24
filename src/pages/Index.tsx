@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Play, Lock, Heart, Film, Crown, ArrowRight, HelpCircle, Tv, Smartphone, Tablet, Eye, EyeOff, TrendingUp, Subtitles, Sparkles, ShieldCheck, MessageCircle, Zap, Wrench } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -87,6 +87,7 @@ const Index = () => {
   
   const navigate = useNavigate();
   const { user, loading: authLoading, isAdmin, signIn, signUp } = useAuth();
+  const routerLocation = useLocation();
 
   const scrollToPlanCards = useCallback((target?: "supporter" | "plans", behavior: ScrollBehavior = "smooth") => {
     if (typeof window === "undefined") return false;
@@ -222,7 +223,7 @@ const Index = () => {
       cancelled = true;
       timeouts.forEach((t) => clearTimeout(t));
     };
-  }, [scrollToPlanCards, location.key]);
+  }, [scrollToPlanCards, routerLocation.key]);
 
 
 
