@@ -104,7 +104,9 @@ const Index = () => {
         });
         return true;
       }
+      return false;
     }
+
 
     const el = document.getElementById("planos-cards") || document.getElementById("planos");
     if (!el) return false;
