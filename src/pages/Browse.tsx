@@ -489,7 +489,7 @@ const Browse = () => {
                 className="overflow-x-auto -mx-4 px-4 scroll-smooth snap-x snap-mandatory"
                 style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
               >
-                <div className="flex items-start gap-4 sm:gap-6 pb-4" style={{ width: "max-content" }}>
+                <div className="flex items-center gap-4 sm:gap-6 pb-4" style={{ width: "max-content" }}>
                   {top10Items.map((item, i) => {
                     const rank = i + 1;
                     return (
