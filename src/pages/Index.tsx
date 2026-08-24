@@ -809,12 +809,15 @@ const Index = () => {
                 </p>
 
 
-                <div className="relative z-10 mt-4 flex justify-center">
-                  <div className="qs-supporter-backers">
-                    <span className="qs-supporter-backers-dot" />
-                    <span>{supporterCount} supporters back this project</span>
+                {supporterCount > 0 && (
+                  <div className="relative z-10 mt-4 flex justify-center">
+                    <div className="qs-supporter-backers">
+                      <span className="qs-supporter-backers-dot" />
+                      <span>{supporterCount} supporters back this project</span>
+                    </div>
                   </div>
-                </div>
+                )}
+
 
                 <div className="relative z-10 mt-5 space-y-2.5">
                   {[
