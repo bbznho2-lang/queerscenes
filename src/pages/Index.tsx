@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Play, Lock, Heart, Film, Crown, ArrowRight, HelpCircle, Tv, Smartphone, Tablet, Eye, EyeOff, TrendingUp, Subtitles, Sparkles, ShieldCheck, MessageCircle, Zap, Wrench } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -87,6 +87,7 @@ const Index = () => {
   
   const navigate = useNavigate();
   const { user, loading: authLoading, isAdmin, signIn, signUp } = useAuth();
+  const routerLocation = useLocation();
 
   const scrollToPlanCards = useCallback((target?: "supporter" | "plans", behavior: ScrollBehavior = "smooth") => {
     if (typeof window === "undefined") return false;
@@ -198,13 +199,32 @@ const Index = () => {
     const wantsPlans = hash === "#planos" || hash === "#planos-cards";
     if (!wantsSupporter && !wantsPlans) return;
 
-    const timeout = window.setTimeout(() => {
-      scrollToPlanCards(wantsSupporter ? "supporter" : "plans", "auto");
-    }, 350);
-    return () => {
-      clearTimeout(timeout);
+    const target = wantsSupporter ? "supporter" : "plans";
+    let cancelled = false;
+    const timeouts: number[] = [];
+
+    // Retry until the plans section is actually mounted (catalog/images load late),
+    // then correct the position once layout settles.
+    const attempt = (tries: number) => {
+      if (cancelled) return;
+      const ok = scrollToPlanCards(target, "auto");
+      if (!ok && tries < 40) {
+        timeouts.push(window.setTimeout(() => attempt(tries + 1), 120));
+        return;
+      }
+      if (ok) {
+        timeouts.push(window.setTimeout(() => !cancelled && scrollToPlanCards(target, "auto"), 400));
+        timeouts.push(window.setTimeout(() => !cancelled && scrollToPlanCards(target, "auto"), 1000));
+      }
     };
-  }, [scrollToPlanCards]);
+
+    timeouts.push(window.setTimeout(() => attempt(0), 120));
+    return () => {
+      cancelled = true;
+      timeouts.forEach((t) => clearTimeout(t));
+    };
+  }, [scrollToPlanCards, routerLocation.key]);
+
 
 
   // Pre-fill checkout email
@@ -809,12 +829,15 @@ const Index = () => {
                 </p>
 
 
-                <div className="relative z-10 mt-4 flex justify-center">
-                  <div className="qs-supporter-backers">
-                    <span className="qs-supporter-backers-dot" />
-                    <span>{supporterCount} supporters back this project</span>
+                {supporterCount > 0 && (
+                  <div className="relative z-10 mt-4 flex justify-center">
+                    <div className="qs-supporter-backers">
+                      <span className="qs-supporter-backers-dot" />
+                      <span>{supporterCount} supporters back this project</span>
+                    </div>
                   </div>
-                </div>
+                )}
+
 
                 <div className="relative z-10 mt-5 space-y-2.5">
                   {[
