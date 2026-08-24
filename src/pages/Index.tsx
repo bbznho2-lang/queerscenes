@@ -104,7 +104,9 @@ const Index = () => {
         });
         return true;
       }
+      return false;
     }
+
 
     const el = document.getElementById("planos-cards") || document.getElementById("planos");
     if (!el) return false;
@@ -201,29 +203,37 @@ const Index = () => {
 
     const target = wantsSupporter ? "supporter" : "plans";
     let cancelled = false;
-    const timeouts: number[] = [];
+    let raf = 0;
+    const start = Date.now();
 
-    // Retry until the plans section is actually mounted (catalog/images load late),
-    // then correct the position once layout settles.
-    const attempt = (tries: number) => {
-      if (cancelled) return;
-      const ok = scrollToPlanCards(target, "auto");
-      if (!ok && tries < 40) {
-        timeouts.push(window.setTimeout(() => attempt(tries + 1), 120));
-        return;
-      }
-      if (ok) {
-        timeouts.push(window.setTimeout(() => !cancelled && scrollToPlanCards(target, "auto"), 400));
-        timeouts.push(window.setTimeout(() => !cancelled && scrollToPlanCards(target, "auto"), 1000));
-      }
-    };
-
-    timeouts.push(window.setTimeout(() => attempt(0), 120));
-    return () => {
+    // Keep re-anchoring while the page settles (images / whileInView animations
+    // shift the layout after the first scroll). Stops as soon as the user scrolls.
+    const stop = () => {
       cancelled = true;
-      timeouts.forEach((t) => clearTimeout(t));
+      cancelAnimationFrame(raf);
+      window.removeEventListener("wheel", stop);
+      window.removeEventListener("touchstart", stop);
+      window.removeEventListener("keydown", stop);
     };
+
+    const loop = () => {
+      if (cancelled) return;
+      scrollToPlanCards(target, "auto");
+      if (Date.now() - start < 2500) {
+        raf = requestAnimationFrame(loop);
+      } else {
+        stop();
+      }
+    };
+
+    window.addEventListener("wheel", stop, { passive: true });
+    window.addEventListener("touchstart", stop, { passive: true });
+    window.addEventListener("keydown", stop);
+    raf = requestAnimationFrame(loop);
+
+    return stop;
   }, [scrollToPlanCards, routerLocation.key]);
+
 
 
 
