@@ -444,8 +444,8 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-self: flex-start;
+  justify-content: center;
+  align-self: center;
 }
 
 .qs-top10-card-landing {
