@@ -682,7 +682,7 @@ const Admin = () => {
                 Site accesses — last 14 days
               </span>
               <span className="text-xs font-normal text-muted-foreground">
-                {visitsTotal14d} accesses · {newUsersTotal14d} new signups
+                {visitsTotal14d} total accesses
               </span>
             </CardTitle>
           </CardHeader>
@@ -707,9 +707,6 @@ const Admin = () => {
                     title="Total accesses (signed in + anonymous)"
                   >
                     {d.visits}
-                  </span>
-                  <span className="w-16 shrink-0 text-right tabular-nums text-muted-foreground" title="New signups">
-                    +{d.count} new
                   </span>
                 </div>
               ))}
