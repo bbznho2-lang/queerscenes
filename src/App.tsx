@@ -10,6 +10,7 @@ import Player from "./pages/Player";
 import Admin from "./pages/Admin";
 import Catalog from "./pages/Catalog";
 import TitlePage from "./pages/TitlePage";
+import Wishlist from "./pages/Wishlist";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
 import { captureReferralFromUrl } from "@/lib/referral";
@@ -32,6 +33,7 @@ const App = () => {
             <Route path="/browse" element={<Browse />} />
             <Route path="/catalog" element={<Catalog />} />
             <Route path="/title/:slug" element={<TitlePage />} />
+            <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/player/:id" element={<Player />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/reset-password" element={<ResetPassword />} />
