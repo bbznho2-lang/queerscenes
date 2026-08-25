@@ -916,75 +916,188 @@ const Player = () => {
       )}
 
 
-      {!isBlocked && (
-      <div className="w-full max-w-5xl mx-auto px-4 sm:px-0 pb-8">
-        <div className="mt-4 sm:mt-6">
-          <div className="flex flex-wrap gap-2">
-            <span className="px-2 py-0.5 text-xs rounded bg-primary/20 text-primary">{content?.tag}</span>
-            <span className="px-2 py-0.5 text-xs rounded bg-secondary/20 text-secondary">{content?.year}</span>
-            <span className="px-2 py-0.5 text-xs rounded bg-muted text-muted-foreground">{content?.type === "serie" ? "Series" : content?.type === "novela" ? "Soap Opera" : content?.type === "reality" ? "Reality Show" : "Movie"}</span>
-          </div>
-        </div>
+      {!isBlocked && content && (() => {
+        const isEpisodic = content.type === "serie" || content.type === "novela" || content.type === "anime" || content.type === "reality";
+        const hasEpisodes = !premiumBlocked && isEpisodic && episodes.length > 0;
+        const trailer = (content as any)?.preview_video_url?.trim() || "";
+        const tabs: { key: typeof detailTab; label: string }[] = [
+          ...(hasEpisodes ? [{ key: "episodes" as const, label: "Episodes" }] : []),
+          ...(trailer ? [{ key: "trailer" as const, label: "Trailer" }] : []),
+          ...(similar.length ? [{ key: "similar" as const, label: "Similar" }] : []),
+          { key: "details" as const, label: "Details" },
+        ];
+        const active = tabs.some((t) => t.key === detailTab) ? detailTab : tabs[0].key;
+        const seasons = [...new Set(episodes.map((e) => e.season))].sort((a, b) => a - b);
+        const filteredEps = episodes.filter((e) => e.season === selectedSeason);
+        const typeLabel = content.type === "serie" ? "Series" : content.type === "novela" ? "Soap Opera" : content.type === "reality" ? "Reality Show" : "Movie";
+        const isTrailerIframe = trailer.toLowerCase().startsWith("<iframe");
 
-        {(content as any)?.synopsis && (
-          <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{(content as any).synopsis}</p>
-        )}
-
-
-        {!premiumBlocked && (content?.type === "serie" || content?.type === "novela" || content?.type === "anime" || content?.type === "reality") && episodes.length > 0 && (() => {
-          const seasons = [...new Set(episodes.map(e => e.season))].sort((a, b) => a - b);
-          const filteredEps = episodes.filter(e => e.season === selectedSeason);
-          return (
-            <div className="mt-6 sm:mt-8 space-y-3">
-              <h3 className="text-lg font-semibold">Episodes</h3>
-              {seasons.length > 1 && (
-                <div className="flex gap-2 flex-wrap">
-                  {seasons.map(s => (
-                    <button
-                      key={s}
-                      onClick={() => setSelectedSeason(s)}
-                      className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
-                        selectedSeason === s
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted text-muted-foreground hover:bg-muted/80"
-                      }`}
-                    >
-                      Season {s}
-                    </button>
-                  ))}
-                </div>
-              )}
-              <p className="text-sm font-semibold text-primary">Season {selectedSeason}</p>
-              <div className="space-y-2">
-                {filteredEps.map((ep) => (
+        return (
+          <div className="w-full max-w-5xl mx-auto px-4 sm:px-0 pb-8">
+            {/* Tabs */}
+            <div className="mt-5 sm:mt-7 border-b border-border">
+              <div className="flex gap-5 sm:gap-7 overflow-x-auto scrollbar-hide">
+                {tabs.map((t) => (
                   <button
-                    key={ep.id}
-                    onClick={async () => {
-                      setCurrentEp(ep);
-                      if (user && content) {
-                        await supabase.from("content_clicks").insert({ content_id: content.id, user_id: user.id, episode_id: ep.id } as any);
-                      }
-                    }}
-                    className={`w-full text-left rounded-xl flex items-center transition-colors ${isMobile ? "px-3 py-2.5 gap-2.5" : "px-4 py-3 gap-3"} ${
-                      currentEp?.id === ep.id ? "bg-primary/10 border border-primary/30" : "bg-card border border-border hover:border-primary/20"
+                    key={t.key}
+                    onClick={() => setDetailTab(t.key)}
+                    className={`relative whitespace-nowrap pb-3 text-sm sm:text-base font-semibold transition-colors ${
+                      active === t.key ? "text-foreground" : "text-muted-foreground hover:text-foreground/80"
                     }`}
                   >
-                    <span className={isMobile ? "w-7 h-7 rounded-full bg-muted flex items-center justify-center text-[11px] font-bold text-foreground" : "w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-foreground"}>{ep.episode_number}</span>
-                    <span className={isMobile ? "text-xs text-foreground" : "text-sm text-foreground"}>{normalizeEpisodeLabel(ep.title, ep.episode_number)}</span>
-                    {ep.is_premium && (
-                      <Crown className="w-3 h-3 text-secondary flex-shrink-0" />
+                    {t.label}
+                    {active === t.key && (
+                      <span className="absolute left-0 right-0 -bottom-px h-[2px] rounded-full bg-primary" />
                     )}
-                    {currentEp?.id === ep.id && <Play className={isMobile ? "w-3 h-3 text-primary ml-auto" : "w-3 h-3 text-primary ml-auto"} />}
                   </button>
                 ))}
               </div>
             </div>
-          );
-        })()}
 
-        {content && !premiumBlocked && <CommentsSection contentId={content.id} />}
-      </div>
-      )}
+            {/* Episodes */}
+            {active === "episodes" && hasEpisodes && (
+              <div className="mt-5 space-y-3">
+                {seasons.length > 1 && (
+                  <div className="flex gap-2 flex-wrap">
+                    {seasons.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setSelectedSeason(s)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                          selectedSeason === s
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted text-muted-foreground hover:bg-muted/80"
+                        }`}
+                      >
+                        Season {s}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <p className="text-sm font-semibold text-primary">
+                  Season {selectedSeason} · {filteredEps.length} episodes
+                </p>
+                <div className="space-y-2">
+                  {filteredEps.map((ep) => (
+                    <button
+                      key={ep.id}
+                      onClick={async () => {
+                        setCurrentEp(ep);
+                        if (user && content) {
+                          await supabase.from("content_clicks").insert({ content_id: content.id, user_id: user.id, episode_id: ep.id } as any);
+                        }
+                      }}
+                      className={`w-full text-left rounded-xl flex items-center transition-colors ${isMobile ? "px-3 py-2.5 gap-2.5" : "px-4 py-3 gap-3"} ${
+                        currentEp?.id === ep.id ? "bg-primary/10 border border-primary/30" : "bg-card border border-border hover:border-primary/20"
+                      }`}
+                    >
+                      <span className={isMobile ? "w-7 h-7 rounded-full bg-muted flex items-center justify-center text-[11px] font-bold text-foreground" : "w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-foreground"}>{ep.episode_number}</span>
+                      <span className={isMobile ? "text-xs text-foreground" : "text-sm text-foreground"}>{normalizeEpisodeLabel(ep.title, ep.episode_number)}</span>
+                      {ep.is_premium && <Crown className="w-3 h-3 text-secondary flex-shrink-0" />}
+                      {currentEp?.id === ep.id && <Play className="w-3 h-3 text-primary ml-auto" />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Trailer */}
+            {active === "trailer" && trailer && (
+              <div className="mt-5">
+                <div key={trailer} className="relative w-full overflow-hidden rounded-xl bg-black" style={{ paddingBottom: "56.25%", height: 0 }}>
+                  {isTrailerIframe ? (
+                    <div
+                      className="absolute inset-0 [&>iframe]:absolute [&>iframe]:inset-0 [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0"
+                      dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(trailer, {
+                          ALLOWED_TAGS: ["iframe"],
+                          ALLOWED_ATTR: ["src", "allow", "allowfullscreen", "width", "height", "frameborder", "referrerpolicy", "title", "loading"],
+                          ADD_ATTR: ["allowfullscreen"],
+                        }),
+                      }}
+                    />
+                  ) : (
+                    <iframe
+                      key={trailer}
+                      src={getEmbedUrl(trailer)}
+                      className="absolute inset-0 w-full h-full border-0"
+                      allowFullScreen
+                      allow="autoplay; fullscreen; accelerometer; encrypted-media; gyroscope; picture-in-picture"
+                    />
+                  )}
+                </div>
+                {isAdmin && (
+                  <button
+                    onClick={() => setEditOpen(true)}
+                    className="mt-3 text-xs text-primary font-semibold inline-flex items-center gap-1.5"
+                  >
+                    <Pencil className="w-3.5 h-3.5" /> Change trailer video
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Similar */}
+            {active === "similar" && (
+              <div className="mt-5">
+                {similar.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No similar titles yet.</p>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    {similar.map((s) => (
+                      <button
+                        key={s.id}
+                        onClick={() => navigate(`/player/${s.id}`)}
+                        className="text-left group rounded-xl overflow-hidden bg-card border border-border hover:border-primary/40 transition-colors"
+                      >
+                        <div className="aspect-video bg-muted overflow-hidden">
+                          <img
+                            src={s.banner_url || "/placeholder.svg"}
+                            alt={s.title}
+                            loading="lazy"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          />
+                        </div>
+                        <div className="p-2.5">
+                          <p className="text-xs font-semibold text-foreground line-clamp-1">{s.title}</p>
+                          <p className="text-[10px] text-muted-foreground line-clamp-1">{s.tag}{s.year ? ` · ${s.year}` : ""}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Details */}
+            {active === "details" && (
+              <div className="mt-5 space-y-3">
+                <div className="flex flex-wrap gap-2">
+                  <span className="px-2 py-0.5 text-xs rounded bg-primary/20 text-primary">{content.tag}</span>
+                  <span className="px-2 py-0.5 text-xs rounded bg-secondary/20 text-secondary">{content.year}</span>
+                  <span className="px-2 py-0.5 text-xs rounded bg-muted text-muted-foreground">{typeLabel}</span>
+                </div>
+                {(content as any)?.synopsis ? (
+                  <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{(content as any).synopsis}</p>
+                ) : (
+                  <p className="text-sm text-muted-foreground">No description yet.</p>
+                )}
+                {isAdmin && (
+                  <button
+                    onClick={() => setEditOpen(true)}
+                    className="text-xs text-primary font-semibold inline-flex items-center gap-1.5"
+                  >
+                    <Pencil className="w-3.5 h-3.5" /> Edit details
+                  </button>
+                )}
+              </div>
+            )}
+
+            {!premiumBlocked && <CommentsSection contentId={content.id} />}
+          </div>
+        );
+      })()}
+
 
 
       {content && <EditContentDialog open={editOpen} onOpenChange={setEditOpen} content={content} onSaved={fetchContent} />}
