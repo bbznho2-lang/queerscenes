@@ -162,10 +162,18 @@ const TitlePage = () => {
       setPlayableContentId(playable.id);
       const { data: pw } = await (supabase as any)
         .from("paywall_customizations")
-        .select("custom_text")
+        .select("custom_text, testimonials")
         .eq("content_id", match.id)
         .maybeSingle();
-      if (!cancelled) setCustomText(pw?.custom_text ?? null);
+      if (!cancelled) {
+        setCustomText(pw?.custom_text ?? null);
+        const raw = Array.isArray(pw?.testimonials) ? pw.testimonials : [];
+        setTestimonials(
+          raw
+            .filter((t: any) => t && typeof t.quote === "string" && t.quote.trim())
+            .map((t: any) => ({ name: String(t.name || "Supporter"), quote: String(t.quote) }))
+        );
+      }
       setLoading(false);
     })();
     return () => { cancelled = true; };
