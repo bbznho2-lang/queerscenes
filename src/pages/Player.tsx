@@ -923,8 +923,8 @@ const Player = () => {
         const tabs: { key: typeof detailTab; label: string }[] = [
           ...(hasEpisodes ? [{ key: "episodes" as const, label: "Episodes" }] : []),
           ...(trailer ? [{ key: "trailer" as const, label: "Trailer" }] : []),
-          ...(similar.length ? [{ key: "similar" as const, label: "Similar" }] : []),
           { key: "details" as const, label: "Details" },
+          ...(similar.length ? [{ key: "similar" as const, label: "Similar" }] : []),
         ];
         const active = tabs.some((t) => t.key === detailTab) ? detailTab : tabs[0].key;
         const seasons = [...new Set(episodes.map((e) => e.season))].sort((a, b) => a - b);
