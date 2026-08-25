@@ -720,6 +720,7 @@ const Admin = () => {
         <SiteNoteAdmin />
         <PaywallCustomizationsAdmin />
         <SocialLinksAdmin />
+        <TitleRequestsAdmin />
         <FeaturedEpisodesAdmin />
 
 
