@@ -312,6 +312,7 @@ const Browse = () => {
 
     
     { label: "My List", icon: "🔖", action: () => { setMenuOpen(false); document.getElementById("minha-lista")?.scrollIntoView({ behavior: "smooth" }); } },
+    { label: "Wishlist", icon: "🌟", action: () => { setMenuOpen(false); navigate("/wishlist"); } },
     ...(!isAdmin && !userIsPremium ? [{ label: "Become a Supporter", icon: "👑", action: () => { setMenuOpen(false); goToPlans("browse_sidebar"); }, premium: true }] : []),
     { label: "Telegram Community", icon: "📣", action: () => { setMenuOpen(false); window.open("https://t.me/QueerScenesTv", "_blank", "noopener,noreferrer"); } },
     { label: "Support", icon: "💬", action: () => { setMenuOpen(false); setSupportOpen(true); } },

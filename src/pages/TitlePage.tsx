@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { slugify } from "@/lib/slug";
 import { useAuth } from "@/hooks/useAuth";
 import { DEFAULT_PAYWALL_TEXT } from "@/components/PaywallCustomizationsAdmin";
+import PaywallComments from "@/components/PaywallComments";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { trackSupporterEvent } from "@/lib/supporter-tracking";
 
@@ -77,6 +78,7 @@ const TitlePage = () => {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [customText, setCustomText] = useState<string | null>(null);
+  const [testimonials, setTestimonials] = useState<{ name: string; quote: string }[]>([]);
   const [readMore, setReadMore] = useState(false);
   const [telegramOpen, setTelegramOpen] = useState(false);
   const [accessChecked, setAccessChecked] = useState(false);
@@ -160,10 +162,18 @@ const TitlePage = () => {
       setPlayableContentId(playable.id);
       const { data: pw } = await (supabase as any)
         .from("paywall_customizations")
-        .select("custom_text")
+        .select("custom_text, testimonials")
         .eq("content_id", match.id)
         .maybeSingle();
-      if (!cancelled) setCustomText(pw?.custom_text ?? null);
+      if (!cancelled) {
+        setCustomText(pw?.custom_text ?? null);
+        const raw = Array.isArray(pw?.testimonials) ? pw.testimonials : [];
+        setTestimonials(
+          raw
+            .filter((t: any) => t && typeof t.quote === "string" && t.quote.trim())
+            .map((t: any) => ({ name: String(t.name || "Supporter"), quote: String(t.quote) }))
+        );
+      }
       setLoading(false);
     })();
     return () => { cancelled = true; };
@@ -460,10 +470,16 @@ const TitlePage = () => {
           </span>
         </div>
 
-        {/* Paywall copy */}
-        <p className="text-foreground text-sm md:text-base leading-relaxed font-bold whitespace-pre-wrap text-center mb-6">
-          {paywallText}
-        </p>
+        {/* Paywall copy (optional, per title) */}
+        {customText?.trim() && customText.trim() !== DEFAULT_PAYWALL_TEXT && (
+          <p className="text-foreground text-sm md:text-base leading-relaxed font-bold whitespace-pre-wrap text-center mb-6">
+            {customText.trim()}
+          </p>
+        )}
+
+        {/* Supporter comments — unique per title */}
+        <PaywallComments contentId={content.id} custom={testimonials} />
+
 
         {/* Benefits */}
         <div className="grid grid-cols-3 gap-2 md:gap-3 mb-6">

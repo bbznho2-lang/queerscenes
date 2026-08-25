@@ -838,6 +838,48 @@ export type Database = {
         }
         Relationships: []
       }
+      title_requests: {
+        Row: {
+          country: string | null
+          created_at: string
+          email: string
+          genre: string | null
+          id: string
+          note: string | null
+          requester_name: string | null
+          status: string
+          title_name: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          email: string
+          genre?: string | null
+          id?: string
+          note?: string | null
+          requester_name?: string | null
+          status?: string
+          title_name: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          email?: string
+          genre?: string | null
+          id?: string
+          note?: string | null
+          requester_name?: string | null
+          status?: string
+          title_name?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -1053,6 +1095,19 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      list_public_title_requests: {
+        Args: { _limit?: number }
+        Returns: {
+          country: string
+          created_at: string
+          display_name: string
+          genre: string
+          id: string
+          note: string
+          status: string
+          title_name: string
+        }[]
       }
       list_support_chat_messages: {
         Args: { _chat_id: string; _token: string }
