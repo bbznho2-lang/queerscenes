@@ -218,6 +218,7 @@ export type Database = {
       contents: {
         Row: {
           banner_url: string | null
+          cast_members: Json
           created_at: string
           id: string
           is_archived: boolean
@@ -237,6 +238,7 @@ export type Database = {
         }
         Insert: {
           banner_url?: string | null
+          cast_members?: Json
           created_at?: string
           id?: string
           is_archived?: boolean
@@ -256,6 +258,7 @@ export type Database = {
         }
         Update: {
           banner_url?: string | null
+          cast_members?: Json
           created_at?: string
           id?: string
           is_archived?: boolean

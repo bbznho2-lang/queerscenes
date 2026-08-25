@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
 import EditContentDialog from "@/components/EditContentDialog";
+import EditDetailsDialog, { parseCast } from "@/components/EditDetailsDialog";
 import CommentsSection from "@/components/CommentsSection";
 import { getFunnelVisitorId, trackSupporterEvent, type SupporterEventType } from "@/lib/supporter-tracking";
 import { getEmailRedirectUrl } from "@/lib/auth-urls";
@@ -53,6 +54,7 @@ const Player = () => {
   const [currentEp, setCurrentEp] = useState<Episode | null>(null);
   const [selectedSeason, setSelectedSeason] = useState(1);
   const [editOpen, setEditOpen] = useState(false);
+  const [editDetailsOpen, setEditDetailsOpen] = useState(false);
   const [premiumBlocked, setPremiumBlocked] = useState(false);
   const [userIsPremium, setUserIsPremium] = useState(false);
   const [accessResolved, setAccessResolved] = useState(false);
@@ -120,7 +122,7 @@ const Player = () => {
     let requestedContentId = id;
     const contentPromise = supabase
       .from("contents")
-      .select("id, title, year, tag, type, banner_url, section, position, is_premium, supporter_player_enabled, synopsis, preview_video_url")
+      .select("id, title, year, tag, type, banner_url, section, position, is_premium, supporter_player_enabled, synopsis, preview_video_url, cast_members")
       .eq("id", id)
       .single();
     const profilePromise = user
@@ -923,8 +925,8 @@ const Player = () => {
         const tabs: { key: typeof detailTab; label: string }[] = [
           ...(hasEpisodes ? [{ key: "episodes" as const, label: "Episodes" }] : []),
           ...(trailer ? [{ key: "trailer" as const, label: "Trailer" }] : []),
-          ...(similar.length ? [{ key: "similar" as const, label: "Similar" }] : []),
           { key: "details" as const, label: "Details" },
+          ...(similar.length ? [{ key: "similar" as const, label: "Similar" }] : []),
         ];
         const active = tabs.some((t) => t.key === detailTab) ? detailTab : tabs[0].key;
         const seasons = [...new Set(episodes.map((e) => e.season))].sort((a, b) => a - b);
@@ -1070,28 +1072,60 @@ const Player = () => {
             )}
 
             {/* Details */}
-            {active === "details" && (
-              <div className="mt-5 space-y-3">
-                <div className="flex flex-wrap gap-2">
-                  <span className="px-2 py-0.5 text-xs rounded bg-primary/20 text-primary">{content.tag}</span>
-                  <span className="px-2 py-0.5 text-xs rounded bg-secondary/20 text-secondary">{content.year}</span>
-                  <span className="px-2 py-0.5 text-xs rounded bg-muted text-muted-foreground">{typeLabel}</span>
+            {active === "details" && (() => {
+              const castList = parseCast((content as any)?.cast_members);
+              return (
+                <div className="mt-5 space-y-4">
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-2 py-0.5 text-xs rounded bg-primary/20 text-primary">{content.tag}</span>
+                    <span className="px-2 py-0.5 text-xs rounded bg-secondary/20 text-secondary">{content.year}</span>
+                    <span className="px-2 py-0.5 text-xs rounded bg-muted text-muted-foreground">{typeLabel}</span>
+                  </div>
+                  {(content as any)?.synopsis ? (
+                    <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{(content as any).synopsis}</p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No description yet.</p>
+                  )}
+
+                  {castList.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-bold text-foreground">Cast</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                        {castList.map((m, i) => (
+                          <div key={`${m.name}-${i}`} className="flex items-center gap-2.5 rounded-xl bg-card border border-border p-2.5">
+                            {m.photo_url ? (
+                              <img
+                                src={m.photo_url}
+                                alt={m.name}
+                                loading="lazy"
+                                className="w-10 h-10 rounded-full object-cover border border-border flex-shrink-0"
+                              />
+                            ) : (
+                              <span className="w-10 h-10 rounded-full bg-muted flex items-center justify-center flex-shrink-0 text-xs font-bold text-muted-foreground">
+                                {m.name.charAt(0).toUpperCase()}
+                              </span>
+                            )}
+                            <div className="min-w-0">
+                              <p className="text-xs font-semibold text-foreground line-clamp-1">{m.name}</p>
+                              {m.role && <p className="text-[10px] text-muted-foreground line-clamp-1">{m.role}</p>}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {isAdmin && (
+                    <button
+                      onClick={() => setEditDetailsOpen(true)}
+                      className="text-xs text-primary font-semibold inline-flex items-center gap-1.5"
+                    >
+                      <Pencil className="w-3.5 h-3.5" /> Edit details
+                    </button>
+                  )}
                 </div>
-                {(content as any)?.synopsis ? (
-                  <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{(content as any).synopsis}</p>
-                ) : (
-                  <p className="text-sm text-muted-foreground">No description yet.</p>
-                )}
-                {isAdmin && (
-                  <button
-                    onClick={() => setEditOpen(true)}
-                    className="text-xs text-primary font-semibold inline-flex items-center gap-1.5"
-                  >
-                    <Pencil className="w-3.5 h-3.5" /> Edit details
-                  </button>
-                )}
-              </div>
-            )}
+              );
+            })()}
 
             {!premiumBlocked && <CommentsSection contentId={content.id} />}
           </div>
@@ -1101,6 +1135,7 @@ const Player = () => {
 
 
       {content && <EditContentDialog open={editOpen} onOpenChange={setEditOpen} content={content} onSaved={fetchContent} />}
+      {content && <EditDetailsDialog open={editDetailsOpen} onOpenChange={setEditDetailsOpen} content={content as any} onSaved={fetchContent} />}
 
       <Dialog
         open={telegramPopupOpen}

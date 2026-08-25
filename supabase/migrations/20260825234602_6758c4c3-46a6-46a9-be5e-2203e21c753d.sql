@@ -1,0 +1,1 @@
+ALTER TABLE public.contents ADD COLUMN IF NOT EXISTS cast_members jsonb NOT NULL DEFAULT '[]'::jsonb;
