@@ -328,6 +328,7 @@ const Player = () => {
 
   type EpisodeLink = { title: string; type: "embed" | "redirect"; url: string };
   const [episodeLinks, setEpisodeLinks] = useState<EpisodeLink[]>([]);
+  const [linksLoading, setLinksLoading] = useState(false);
   const [selectedLinkIdx, setSelectedLinkIdx] = useState(-1);
   const [rawPlayerUrl, setRawPlayerUrl] = useState("");
   const normalizeEpisodeLabel = (value?: string | null, fallbackEpisodeNumber?: number) => {
@@ -338,36 +339,32 @@ const Player = () => {
   useEffect(() => {
     let cancelled = false;
     const resolve = async () => {
-      if (isBlocked) { setEpisodeLinks([]); setRawPlayerUrl(""); setSelectedLinkIdx(-1); return; }
+      if (isBlocked) { setEpisodeLinks([]); setRawPlayerUrl(""); setSelectedLinkIdx(-1); setLinksLoading(false); return; }
+      setLinksLoading(true);
       if (currentEp?.id) {
         const { data } = await (supabase.rpc as any)("get_episode_links", { _episode_id: currentEp.id });
-        const links = Array.isArray(data) ? (data as EpisodeLink[]) : [];
+        let resolvedLinks = Array.isArray(data) ? (data as EpisodeLink[]) : [];
         if (cancelled) return;
-        if (links.length > 0) {
-          setEpisodeLinks(links);
-        } else {
+        if (resolvedLinks.length === 0) {
           const { data: legacy } = await supabase.rpc("get_episode_player_url", { _episode_id: currentEp.id });
           const url = (legacy as string | null) || "";
           if (cancelled) return;
-          setEpisodeLinks(url ? [{ title: "Watch on site", type: "embed", url }] : []);
+          resolvedLinks = url ? [{ title: "Watch on site", type: "embed", url }] : [];
         }
-  if (!links || links.length === 0) {   
-  setSelectedLinkIdx(-1);
-  setRawPlayerUrl("");
-  return;
-}
+        setEpisodeLinks(resolvedLinks);
+        setSelectedLinkIdx(-1);
+        setRawPlayerUrl("");
       } else if (content?.id) {
         const { data } = await (supabase.rpc as any)("get_content_links", { _content_id: content.id });
-        const links = Array.isArray(data) ? (data as EpisodeLink[]) : [];
+        let resolvedLinks = Array.isArray(data) ? (data as EpisodeLink[]) : [];
         if (cancelled) return;
-        if (links.length > 0) {
-          setEpisodeLinks(links);
-        } else {
+        if (resolvedLinks.length === 0) {
           const { data: legacy } = await supabase.rpc("get_content_player_url", { _content_id: content.id });
           const url = (legacy as string | null) || "";
           if (cancelled) return;
-          setEpisodeLinks(url ? [{ title: "Watch on site", type: "embed", url }] : []);
+          resolvedLinks = url ? [{ title: "Watch on site", type: "embed", url }] : [];
         }
+        setEpisodeLinks(resolvedLinks);
         setSelectedLinkIdx(-1);
         setRawPlayerUrl("");
       } else {
@@ -375,7 +372,7 @@ const Player = () => {
         setSelectedLinkIdx(-1);
         setRawPlayerUrl("");
       }
-
+      if (!cancelled) setLinksLoading(false);
     };
     void resolve();
     return () => { cancelled = true; };
@@ -903,7 +900,7 @@ const Player = () => {
                       })}
                     </ul>
                   </div>
-                ) : (currentEp || !(content?.type === "serie" || content?.type === "novela" || content?.type === "anime" || content?.type === "reality")) ? (
+                ) : !linksLoading && (currentEp || !(content?.type === "serie" || content?.type === "novela" || content?.type === "anime" || content?.type === "reality")) ? (
                   <div className={isMobile ? "mt-4 px-3" : "mt-5"}>
                     <p className="text-sm text-muted-foreground">No links available for this {currentEp ? "episode" : "title"} yet.</p>
                   </div>
