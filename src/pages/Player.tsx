@@ -122,7 +122,7 @@ const Player = () => {
     let requestedContentId = id;
     const contentPromise = supabase
       .from("contents")
-      .select("id, title, year, tag, type, banner_url, section, position, is_premium, supporter_player_enabled, synopsis, preview_video_url")
+      .select("id, title, year, tag, type, banner_url, section, position, is_premium, supporter_player_enabled, synopsis, preview_video_url, cast_members")
       .eq("id", id)
       .single();
     const profilePromise = user
