@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { slugify } from "@/lib/slug";
 import { useAuth } from "@/hooks/useAuth";
 import { DEFAULT_PAYWALL_TEXT } from "@/components/PaywallCustomizationsAdmin";
+import PaywallComments from "@/components/PaywallComments";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { trackSupporterEvent } from "@/lib/supporter-tracking";
 
@@ -77,6 +78,7 @@ const TitlePage = () => {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [customText, setCustomText] = useState<string | null>(null);
+  const [testimonials, setTestimonials] = useState<{ name: string; quote: string }[]>([]);
   const [readMore, setReadMore] = useState(false);
   const [telegramOpen, setTelegramOpen] = useState(false);
   const [accessChecked, setAccessChecked] = useState(false);
