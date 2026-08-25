@@ -13,6 +13,7 @@ import { getEmailRedirectUrl } from "@/lib/auth-urls";
 import { saveWatchProgress } from "@/lib/watch-progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { DEFAULT_PAYWALL_TEXT } from "@/components/PaywallCustomizationsAdmin";
+import PaywallComments from "@/components/PaywallComments";
 
 
 interface ContentItem {
@@ -613,9 +614,15 @@ const Player = () => {
                     );
                   })()}
 
-                  <p className="text-foreground text-xs sm:text-sm mb-5 max-w-md font-bold whitespace-pre-wrap">
-                    {paywallCustom?.custom_text?.trim() || DEFAULT_PAYWALL_TEXT}
-                  </p>
+                  {paywallCustom?.custom_text?.trim() && paywallCustom.custom_text.trim() !== DEFAULT_PAYWALL_TEXT && (
+                    <p className="text-foreground text-xs sm:text-sm mb-5 max-w-md font-bold whitespace-pre-wrap">
+                      {paywallCustom.custom_text.trim()}
+                    </p>
+                  )}
+
+                  {content?.id && (
+                    <PaywallComments contentId={content.id} custom={paywallCustom?.testimonials} compact />
+                  )}
                 </>
               )}
 
