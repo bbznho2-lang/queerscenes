@@ -903,11 +903,11 @@ const Player = () => {
                       })}
                     </ul>
                   </div>
-                ) : (
+                ) : currentEp ? (
                   <div className={isMobile ? "mt-4 px-3" : "mt-5"}>
-                    <p className="text-sm text-muted-foreground">No links available for this {currentEp ? "episode" : "title"} yet.</p>
+                    <p className="text-sm text-muted-foreground">No links available for this episode yet.</p>
                   </div>
-                )}
+                ) : null}
 
                 {playerTierSelector}
               </>
