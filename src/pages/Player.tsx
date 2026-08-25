@@ -69,6 +69,46 @@ const Player = () => {
   const [telegramPopupOpen, setTelegramPopupOpen] = useState(false);
   const [paywallCustom, setPaywallCustom] = useState<{ custom_text: string | null; testimonials: { name: string; quote: string }[] } | null>(null);
   const trackedPaywallViewsRef = useRef<Set<string>>(new Set());
+  const [detailTab, setDetailTab] = useState<"episodes" | "trailer" | "similar" | "details">("episodes");
+  const [similar, setSimilar] = useState<{ id: string; title: string; banner_url: string | null; tag: string | null; year: number | null }[]>([]);
+
+  // Similar titles — matched by shared genre keywords from the title's tag.
+  useEffect(() => {
+    if (!content?.id) { setSimilar([]); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("contents")
+        .select("id, title, banner_url, tag, year, is_archived")
+        .limit(400);
+      if (cancelled) return;
+      const genres = String(content.tag || "")
+        .split(/[,/|]/)
+        .map((g) => g.trim().toLowerCase())
+        .filter(Boolean);
+      const seenTitles = new Set([content.title.trim().toLowerCase()]);
+      const scored = ((data || []) as any[])
+        .filter((c) => !c.is_archived && c.id !== content.id)
+        .map((c) => {
+          const key = String(c.title).trim().toLowerCase();
+          const cGenres = String(c.tag || "").split(/[,/|]/).map((g: string) => g.trim().toLowerCase()).filter(Boolean);
+          const overlap = cGenres.filter((g: string) => genres.includes(g)).length;
+          return { c, key, overlap };
+        })
+        .filter((x) => x.overlap > 0)
+        .sort((a, b) => b.overlap - a.overlap);
+      const out: any[] = [];
+      for (const x of scored) {
+        if (seenTitles.has(x.key)) continue;
+        seenTitles.add(x.key);
+        out.push({ id: x.c.id, title: x.c.title, banner_url: x.c.banner_url, tag: x.c.tag, year: x.c.year });
+        if (out.length >= 12) break;
+      }
+      setSimilar(out);
+    })();
+    return () => { cancelled = true; };
+  }, [content?.id, content?.tag, content?.title]);
+
 
 
 
