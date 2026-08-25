@@ -254,6 +254,7 @@ const Player = () => {
     setPremiumBlocked(false);
     setAccessResolved(false);
     setEpisodeLinks([]);
+    setLinksLoading(true);
     setSelectedLinkIdx(-1);
     setRawPlayerUrl("");
   }, [id]);
@@ -328,7 +329,7 @@ const Player = () => {
 
   type EpisodeLink = { title: string; type: "embed" | "redirect"; url: string };
   const [episodeLinks, setEpisodeLinks] = useState<EpisodeLink[]>([]);
-  const [linksLoading, setLinksLoading] = useState(false);
+  const [linksLoading, setLinksLoading] = useState(true);
   const [selectedLinkIdx, setSelectedLinkIdx] = useState(-1);
   const [rawPlayerUrl, setRawPlayerUrl] = useState("");
   const normalizeEpisodeLabel = (value?: string | null, fallbackEpisodeNumber?: number) => {
@@ -900,7 +901,7 @@ const Player = () => {
                       })}
                     </ul>
                   </div>
-                ) : !linksLoading && (currentEp || !(content?.type === "serie" || content?.type === "novela" || content?.type === "anime" || content?.type === "reality")) ? (
+                ) : !linksLoading && content && (currentEp || !(content.type === "serie" || content.type === "novela" || content.type === "anime" || content.type === "reality")) ? (
                   <div className={isMobile ? "mt-4 px-3" : "mt-5"}>
                     <p className="text-sm text-muted-foreground">No links available for this {currentEp ? "episode" : "title"} yet.</p>
                   </div>
