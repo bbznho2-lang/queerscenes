@@ -1,43 +1,67 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Save, RotateCcw } from "lucide-react";
+import { Sparkles, Save, RotateCcw, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { getPaywallComments } from "@/lib/paywall-comments";
 
 export const DEFAULT_PAYWALL_TEXT = "Subtitles: 🇬🇧";
 
 type ContentOpt = { id: string; title: string };
+type Testimonial = { name: string; quote: string };
 
 const PaywallCustomizationsAdmin = () => {
   const [contents, setContents] = useState<ContentOpt[]>([]);
   const [customMap, setCustomMap] = useState<Record<string, string>>({});
+  const [testimonialMap, setTestimonialMap] = useState<Record<string, Testimonial[]>>({});
   const [contentId, setContentId] = useState<string>("");
   const [text, setText] = useState(DEFAULT_PAYWALL_TEXT);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [saving, setSaving] = useState(false);
 
   const load = async () => {
     const [{ data: c }, { data: r }] = await Promise.all([
       supabase.from("contents").select("id, title").order("title"),
-      (supabase as any).from("paywall_customizations").select("content_id, custom_text"),
+      (supabase as any).from("paywall_customizations").select("content_id, custom_text, testimonials"),
     ]);
     setContents((c || []) as ContentOpt[]);
     const map: Record<string, string> = {};
-    (r || []).forEach((x: any) => { if (x.custom_text) map[x.content_id] = x.custom_text; });
+    const tMap: Record<string, Testimonial[]> = {};
+    (r || []).forEach((x: any) => {
+      if (x.custom_text) map[x.content_id] = x.custom_text;
+      if (Array.isArray(x.testimonials) && x.testimonials.length) {
+        tMap[x.content_id] = x.testimonials
+          .filter((t: any) => t && typeof t.quote === "string")
+          .map((t: any) => ({ name: String(t.name || ""), quote: String(t.quote || "") }));
+      }
+    });
     setCustomMap(map);
+    setTestimonialMap(tMap);
   };
 
   useEffect(() => { void load(); }, []);
 
   useEffect(() => {
-    if (!contentId) { setText(DEFAULT_PAYWALL_TEXT); return; }
+    if (!contentId) {
+      setText(DEFAULT_PAYWALL_TEXT);
+      setTestimonials([]);
+      return;
+    }
     setText(customMap[contentId] || DEFAULT_PAYWALL_TEXT);
-  }, [contentId, customMap]);
+    setTestimonials(testimonialMap[contentId] || []);
+  }, [contentId, customMap, testimonialMap]);
 
   const isCustom = useMemo(
     () => contentId && customMap[contentId] && customMap[contentId] !== DEFAULT_PAYWALL_TEXT,
     [contentId, customMap]
+  );
+
+  const autoComments = useMemo(
+    () => (contentId ? getPaywallComments(contentId, 3) : []),
+    [contentId]
   );
 
   const handleSave = async () => {
@@ -45,10 +69,14 @@ const PaywallCustomizationsAdmin = () => {
     setSaving(true);
     try {
       const trimmed = text.trim();
+      const cleanTestimonials = testimonials
+        .map((t) => ({ name: t.name.trim(), quote: t.quote.trim() }))
+        .filter((t) => t.quote.length > 0)
+        .slice(0, 6);
       const payload = {
         content_id: contentId,
         custom_text: trimmed && trimmed !== DEFAULT_PAYWALL_TEXT ? trimmed : null,
-        testimonials: [],
+        testimonials: cleanTestimonials,
       };
       const { error } = await (supabase as any)
         .from("paywall_customizations")
@@ -66,6 +94,7 @@ const PaywallCustomizationsAdmin = () => {
   const handleReset = async () => {
     if (!contentId) return;
     setText(DEFAULT_PAYWALL_TEXT);
+    setTestimonials([]);
     const { error } = await (supabase as any)
       .from("paywall_customizations")
       .delete()
@@ -80,7 +109,7 @@ const PaywallCustomizationsAdmin = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-foreground">
           <Sparkles className="w-5 h-5 text-primary" />
-          Paywall Text (per title)
+          Paywall text & comments (per title)
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -94,7 +123,7 @@ const PaywallCustomizationsAdmin = () => {
             <option value="">— Select a title —</option>
             {contents.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.title}{customMap[c.id] ? "  ✎" : ""}
+                {c.title}{customMap[c.id] || testimonialMap[c.id] ? "  ✎" : ""}
               </option>
             ))}
           </select>
@@ -118,14 +147,78 @@ const PaywallCustomizationsAdmin = () => {
           <Textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            rows={7}
+            rows={4}
             disabled={!contentId}
             className="bg-muted border-border"
           />
         </div>
 
+        <div className="space-y-2 pt-2 border-t border-border">
+          <div className="flex items-center justify-between">
+            <label className="text-xs text-muted-foreground">
+              Supporter comments {testimonials.length ? "(custom)" : "(auto — unique per title)"}
+            </label>
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              disabled={!contentId || testimonials.length >= 6}
+              onClick={() => setTestimonials((v) => [...v, { name: "", quote: "" }])}
+            >
+              <Plus className="w-3.5 h-3.5 mr-1" /> Add comment
+            </Button>
+          </div>
+
+          {testimonials.length === 0 && contentId && (
+            <div className="rounded-lg bg-muted/40 border border-border p-3 space-y-1.5">
+              <p className="text-[11px] text-muted-foreground">
+                These are shown automatically on this title's paywall:
+              </p>
+              {autoComments.map((c) => (
+                <p key={c.name} className="text-[11px] text-foreground/80">
+                  <span className="font-semibold">{c.name}:</span> {c.quote}
+                </p>
+              ))}
+            </div>
+          )}
+
+          {testimonials.map((t, i) => (
+            <div key={i} className="rounded-lg border border-border p-2 space-y-2">
+              <div className="flex items-center gap-2">
+                <Input
+                  value={t.name}
+                  placeholder="Name (e.g. Layla)"
+                  onChange={(e) =>
+                    setTestimonials((v) => v.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))
+                  }
+                  className="bg-muted border-border h-8 text-sm"
+                  maxLength={40}
+                />
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => setTestimonials((v) => v.filter((_, j) => j !== i))}
+                >
+                  <Trash2 className="w-4 h-4 text-destructive" />
+                </Button>
+              </div>
+              <Textarea
+                value={t.quote}
+                placeholder="Comment shown on the paywall"
+                rows={2}
+                onChange={(e) =>
+                  setTestimonials((v) => v.map((x, j) => (j === i ? { ...x, quote: e.target.value } : x)))
+                }
+                className="bg-muted border-border text-sm"
+                maxLength={280}
+              />
+            </div>
+          ))}
+        </div>
+
         <div className="flex items-center justify-end gap-2 pt-2 border-t border-border">
-          {isCustom && (
+          {(isCustom || testimonials.length > 0) && (
             <Button variant="ghost" onClick={handleReset} disabled={!contentId}>
               <RotateCcw className="w-4 h-4 mr-2" /> Reset to default
             </Button>
