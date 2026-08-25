@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
 import EditContentDialog from "@/components/EditContentDialog";
+import EditDetailsDialog, { parseCast } from "@/components/EditDetailsDialog";
 import CommentsSection from "@/components/CommentsSection";
 import { getFunnelVisitorId, trackSupporterEvent, type SupporterEventType } from "@/lib/supporter-tracking";
 import { getEmailRedirectUrl } from "@/lib/auth-urls";
