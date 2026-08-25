@@ -460,10 +460,16 @@ const TitlePage = () => {
           </span>
         </div>
 
-        {/* Paywall copy */}
-        <p className="text-foreground text-sm md:text-base leading-relaxed font-bold whitespace-pre-wrap text-center mb-6">
-          {paywallText}
-        </p>
+        {/* Paywall copy (optional, per title) */}
+        {customText?.trim() && customText.trim() !== DEFAULT_PAYWALL_TEXT && (
+          <p className="text-foreground text-sm md:text-base leading-relaxed font-bold whitespace-pre-wrap text-center mb-6">
+            {customText.trim()}
+          </p>
+        )}
+
+        {/* Supporter comments — unique per title */}
+        <PaywallComments contentId={content.id} custom={testimonials} />
+
 
         {/* Benefits */}
         <div className="grid grid-cols-3 gap-2 md:gap-3 mb-6">
