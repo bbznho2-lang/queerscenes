@@ -1135,6 +1135,7 @@ const Player = () => {
 
 
       {content && <EditContentDialog open={editOpen} onOpenChange={setEditOpen} content={content} onSaved={fetchContent} />}
+      {content && <EditDetailsDialog open={editDetailsOpen} onOpenChange={setEditDetailsOpen} content={content as any} onSaved={fetchContent} />}
 
       <Dialog
         open={telegramPopupOpen}
