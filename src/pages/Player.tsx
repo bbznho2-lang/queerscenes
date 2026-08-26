@@ -681,7 +681,14 @@ const Player = () => {
                   )}
 
                   {content?.id && (
-                    <PaywallComments contentId={content.id} title={content.title} type={content.type} custom={paywallCustom?.testimonials} compact />
+                    <PaywallComments
+                      contentId={content.id}
+                      title={content.title}
+                      type={content.type}
+                      hasMultipleSeasons={new Set(episodes.map((e) => e.season)).size > 1}
+                      custom={paywallCustom?.testimonials}
+                      compact
+                    />
                   )}
                 </>
               )}
