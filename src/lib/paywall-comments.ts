@@ -97,10 +97,9 @@ export const getPaywallComments = (
   for (let i = 0; i < titledCount && i < total; i += 1) {
     out.push({
       name: NAMES[(seed + i * 7) % NAMES.length],
-      quote: titled[(seed + i * 5) % titled.length],
+      quote: titled[(seed + i * 5) % titled.length](title),
       meta: METAS[(seed + i * 3) % METAS.length],
-    } as unknown as PaywallComment);
-    out[out.length - 1].quote = titled[(seed + i * 5) % titled.length](title);
+    });
   }
 
   const usedGeneric = new Set<number>();
