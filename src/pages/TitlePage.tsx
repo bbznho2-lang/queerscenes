@@ -7,7 +7,6 @@ import { slugify } from "@/lib/slug";
 import { useAuth } from "@/hooks/useAuth";
 import { DEFAULT_PAYWALL_TEXT } from "@/components/PaywallCustomizationsAdmin";
 import PaywallComments from "@/components/PaywallComments";
-import TitleCommentsPreview from "@/components/TitleCommentsPreview";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { trackSupporterEvent } from "@/lib/supporter-tracking";
 
