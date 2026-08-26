@@ -7,20 +7,21 @@ interface Props {
   title?: string | null;
   type?: string | null;
   hasMultipleSeasons?: boolean;
+  characters?: string[];
   custom?: { name: string; quote: string }[] | null;
   compact?: boolean;
 }
 
 const initials = (name: string) => name.trim().charAt(0).toUpperCase() || "S";
 
-const PaywallComments = ({ contentId, title, type, hasMultipleSeasons, custom, compact }: Props) => {
+const PaywallComments = ({ contentId, title, type, hasMultipleSeasons, characters, custom, compact }: Props) => {
   const comments: PaywallComment[] = useMemo(() => {
     const cleaned = (custom || []).filter((t) => t?.quote?.trim());
     if (cleaned.length) {
       return cleaned.map((t) => ({ name: t.name?.trim() || "Supporter", quote: t.quote.trim() }));
     }
-    return getPaywallComments(contentId, 3, { title, type, hasMultipleSeasons });
-  }, [contentId, custom, title, type, hasMultipleSeasons]);
+    return getPaywallComments(contentId, 3, { title, type, hasMultipleSeasons, characters });
+  }, [contentId, custom, title, type, hasMultipleSeasons, characters]);
 
 
   if (!comments.length) return null;

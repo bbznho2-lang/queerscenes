@@ -11,6 +11,8 @@ export interface PaywallCommentContext {
   type?: string | null;
   /** Whether the series has more than one season. Avoids "next season" comments when seasons already exist. */
   hasMultipleSeasons?: boolean;
+  /** Character names configured in Edit details. */
+  characters?: string[];
 }
 
 const NAMES = [
@@ -132,6 +134,26 @@ const PLATFORM_REACTIONS = [
   "i love that this platform always has another release ready when i finish the last one",
 ];
 
+const CHARACTER_REACTIONS = [
+  (t: string, c: string) => `${c} in ${t} had me completely invested`,
+  (t: string, c: string) => `i could watch ${c} in ${t} for hours honestly`,
+  (t: string, c: string) => `${c}'s scenes in ${t} were everything`,
+  (t: string, c: string) => `the way ${c}'s story unfolds in ${t} really got me`,
+  (t: string, c: string) => `${c} made ${t} impossible to stop watching`,
+  (t: string, c: string) => `i'm still thinking about ${c} after watching ${t}`,
+];
+
+const PLATFORM_ENDS = [
+  "i love watching releases like this on the platform",
+  "this is exactly why i love keeping up with every new title here",
+  "i always love finding another great watch on this platform",
+  "the platform makes following each new release so worth it",
+  "i love being able to watch titles like this here",
+  "another reason i love checking every release on the platform",
+  "watching the latest titles here has become my favorite routine",
+  "i love how the platform keeps bringing me stories like this",
+];
+
 const hashSeed = (value: string) => {
   let hash = 0;
   for (let i = 0; i < value.length; i += 1) {
@@ -149,6 +171,7 @@ export const getPaywallComments = (
   const title = (context?.title || "").trim();
   const kind = kindOf(context?.type);
   const hasMultipleSeasons = Boolean(context?.hasMultipleSeasons);
+  const characters = (context?.characters || []).map((name) => name.trim()).filter(Boolean);
 
   // Build the title-specific pool. For series with multiple seasons, drop comments that ask for more seasons.
   const titledBase = TITLED[kind];
@@ -166,9 +189,12 @@ export const getPaywallComments = (
   const titledCount = title ? (seed % 3 === 0 ? 2 : 1) : 0;
 
   for (let i = 0; i < titledCount && i < total; i += 1) {
+    const base = characters.length && i === 0
+      ? CHARACTER_REACTIONS[(seed + i * 5) % CHARACTER_REACTIONS.length](title, characters[seed % characters.length])
+      : titledPool[(seed + i * 5) % titledPool.length](title);
     out.push({
       name: NAMES[(seed + i * 7) % NAMES.length],
-      quote: titledPool[(seed + i * 5) % titledPool.length](title),
+      quote: `${base}, ${PLATFORM_ENDS[(seed + i * 3) % PLATFORM_ENDS.length]}`,
       meta: METAS[(seed + i * 3) % METAS.length],
     });
   }
@@ -180,9 +206,10 @@ export const getPaywallComments = (
     const startIdx = (seed + step * 11 + slot * 3) % REACTION_STARTS.length;
     const endIdx = (Math.floor(seed / 7) + step * 13 + slot * 5) % REACTION_ENDS.length;
     const platformIdx = (Math.floor(seed / 17) + slot * 7) % PLATFORM_REACTIONS.length;
+    const subject = title || "this release";
     let quote = slot === total - 1
-      ? PLATFORM_REACTIONS[platformIdx]
-      : `${REACTION_STARTS[startIdx]}, ${REACTION_ENDS[endIdx]}`;
+      ? `${subject} was such a good watch, ${PLATFORM_REACTIONS[platformIdx]}`
+      : `${REACTION_STARTS[startIdx]} with ${subject}, ${REACTION_ENDS[endIdx]}, ${PLATFORM_ENDS[(platformIdx + slot) % PLATFORM_ENDS.length]}`;
     while (usedReactions.has(quote)) {
       step += 1;
       const nextEnd = (endIdx + step) % REACTION_ENDS.length;

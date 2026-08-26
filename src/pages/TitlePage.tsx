@@ -22,6 +22,7 @@ interface TitleContent {
   updated_at?: string | null;
   is_archived?: boolean | null;
   is_premium?: boolean | null;
+  cast_members?: { name?: string; role?: string }[] | null;
 }
 
 const SITE = "https://queerscenes.lovable.app";
@@ -130,7 +131,7 @@ const TitlePage = () => {
       setLoading(true);
       const { data } = await supabase
         .from("contents")
-        .select("id, title, year, tag, type, banner_url, synopsis, preview_video_url, updated_at, is_archived, is_premium")
+        .select("id, title, year, tag, type, banner_url, synopsis, preview_video_url, updated_at, is_archived, is_premium, cast_members")
         .order("title");
       if (cancelled) return;
       const list = ((data ?? []) as TitleContent[]).filter((c) => !c.is_archived);
@@ -484,7 +485,14 @@ const TitlePage = () => {
         )}
 
         {/* Supporter comments — unique per title */}
-        <PaywallComments contentId={content.id} title={content.title} type={content.type} hasMultipleSeasons={hasMultipleSeasons} custom={testimonials} />
+        <PaywallComments
+          contentId={content.id}
+          title={content.title}
+          type={content.type}
+          hasMultipleSeasons={hasMultipleSeasons}
+          characters={(content.cast_members || []).map((member) => member.role || "").filter(Boolean)}
+          custom={testimonials}
+        />
 
 
 
