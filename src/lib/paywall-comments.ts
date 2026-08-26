@@ -183,7 +183,7 @@ export const getPaywallComments = (
     const slot = out.length;
     const startIdx = (seed + step * 11 + slot * 3) % REACTION_STARTS.length;
     const endIdx = (Math.floor(seed / 7) + step * 13 + slot * 5) % REACTION_ENDS.length;
-    const platformIdx = (Math.floor(seed / 17) + slot * 7) % PLATFORM_ENDS.length;
+    const platformIdx = (Math.floor(seed / 17) + slot * 7 + 5) % PLATFORM_ENDS.length;
     const subject = title || "this one";
     let quote = slot === total - 1
       ? `${subject} was such a good watch, ${PLATFORM_ENDS[platformIdx]}`
