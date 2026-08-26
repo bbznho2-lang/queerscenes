@@ -686,6 +686,7 @@ const Player = () => {
                       title={content.title}
                       type={content.type}
                       hasMultipleSeasons={new Set(episodes.map((e) => e.season)).size > 1}
+                      characters={parseCast((content as any).cast_members).map((member) => member.role || "").filter(Boolean)}
                       custom={paywallCustom?.testimonials}
                       compact
                     />
