@@ -63,6 +63,13 @@ const TITLED: Record<Kind, ((t: string) => string)[]> = {
   ],
 };
 
+/** Extra series comments that only make sense when there's only one season. */
+const SINGLE_SEASON_SERIES: ((t: string) => string)[] = [
+  (t) => `i need a season 2 of ${t} asap`,
+  (t) => `${t} ended and now i have a hole in my heart lol`,
+  (t) => `they really left ${t} like that?? i need more episodes`,
+];
+
 /** Short, natural comments that sound like real users — no direct advertising. */
 const GENERIC: string[] = [
   "no ads no virus no weird links lol finally",
@@ -103,7 +110,14 @@ export const getPaywallComments = (
 ): PaywallComment[] => {
   const title = (context?.title || "").trim();
   const kind = kindOf(context?.type);
-  const titled = TITLED[kind];
+  const hasMultipleSeasons = Boolean(context?.hasMultipleSeasons);
+
+  // Build the title-specific pool. For series with multiple seasons, drop comments that ask for more seasons.
+  const titledBase = TITLED[kind];
+  const titledPool = kind === "series" && !hasMultipleSeasons
+    ? [...titledBase, ...SINGLE_SEASON_SERIES]
+    : titledBase;
+
   const seed = hashSeed(key || "queerscenes");
   const total = Math.max(1, Math.min(count, 4));
   const out: PaywallComment[] = [];
@@ -114,7 +128,7 @@ export const getPaywallComments = (
   for (let i = 0; i < titledCount && i < total; i += 1) {
     out.push({
       name: NAMES[(seed + i * 7) % NAMES.length],
-      quote: titled[(seed + i * 5) % titled.length](title),
+      quote: titledPool[(seed + i * 5) % titledPool.length](title),
       meta: METAS[(seed + i * 3) % METAS.length],
     });
   }
