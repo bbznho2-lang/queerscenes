@@ -62,10 +62,10 @@ const PaywallCustomizationsAdmin = () => {
   const autoComments = useMemo(
     () => {
       if (!contentId) return [];
-      const opt = options.find((o) => o.id === contentId);
+      const opt = contents.find((o) => o.id === contentId);
       return getPaywallComments(contentId, 3, { title: opt?.title, type: opt?.type });
     },
-    [contentId, options]
+    [contentId, contents]
   );
 
   const handleSave = async () => {
