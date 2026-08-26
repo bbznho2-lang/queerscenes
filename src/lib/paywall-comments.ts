@@ -74,27 +74,47 @@ const SINGLE_SEASON_SERIES: ((t: string) => string)[] = [
   (t) => `they really left ${t} like that?? i need more episodes`,
 ];
 
-/** Short, natural comments that sound like real users — no direct advertising. */
-const GENERIC: string[] = [
-  "no ads no virus no weird links lol finally",
-  "the subs here are actually decent which is rare",
-  "my friend sent me here and i haven't left since",
-  "watched on my phone and it worked perfectly",
-  "the quality is better than i expected ngl",
-  "finally a place that actually has these titles",
-  "i've been here for months and the updates keep getting better",
-  "my partner and i watch something here every weekend",
-  "worth it just to not deal with sketchy sites",
-  "found so many titles i never heard of before",
-  "simple and works, that's all i need",
-  "the new drops every month keep me hooked",
-  "took me a while to decide and i regret waiting",
-  "honestly didn't expect the catalog to be this good",
-  "this is the only place i found this with real subtitles",
-  "been searching for ages, so glad i found this",
-  "works on my tv through browser, no issues",
-  "the rare titles here are everything",
-  "i come back every week to see what's new",
+/** Combinable reactions avoid repeating the same fixed review across different titles. */
+const REACTION_STARTS = [
+  "i clicked out of curiosity and ended up watching the whole thing",
+  "was not ready for how invested i got",
+  "the latest drops have been hitting so hard lately",
+  "me and my partner could not stop reacting to every scene",
+  "i genuinely lost track of time watching this",
+  "this week's watch absolutely delivered",
+  "i thought i'd watch ten minutes and suddenly it was over",
+  "the group chat was going off while we watched",
+  "another release that had me staring at the credits",
+  "i'm still processing what i just watched",
+  "the way i cancelled all my plans to finish this lol",
+  "every new drop gives me something else to obsess over",
+  "started watching on my phone and moved to the tv immediately",
+  "i was hooked way faster than i expected",
+  "this one had me pausing just to breathe",
+  "the reactions in my house were so loud lol",
+  "i keep finding releases here that completely surprise me",
+  "this was exactly the kind of story i wanted tonight",
+];
+
+const REACTION_ENDS = [
+  "the performances were sooo good",
+  "and the subtitles made every little detail land",
+  "definitely one i'm going to think about for a while",
+  "now i'm impatient for the next release lol",
+  "the chemistry had me yelling at my screen",
+  "honestly such a good find",
+  "the ending had everyone in silence",
+  "i already know i'm rewatching it",
+  "this is why i check every new release",
+  "the emotional damage was real 😭",
+  "the quality was way better than i expected ngl",
+  "and somehow it got better with every scene",
+  "i need everyone i know to watch this",
+  "still thinking about those final scenes",
+  "what a ride from beginning to end",
+  "the cast really gave everything",
+  "i haven't reacted this much to a release in ages",
+  "worth staying up way too late for",
 ];
 
 const hashSeed = (value: string) => {
@@ -136,15 +156,21 @@ export const getPaywallComments = (
     });
   }
 
-  const usedGeneric = new Set<number>();
+  const usedReactions = new Set<string>();
   let step = 0;
   while (out.length < total) {
-    let idx = (seed + step * 11) % GENERIC.length;
-    while (usedGeneric.has(idx)) idx = (idx + 1) % GENERIC.length;
-    usedGeneric.add(idx);
+    const startIdx = (seed + step * 11 + out.length * 3) % REACTION_STARTS.length;
+    const endIdx = (Math.floor(seed / 7) + step * 13 + out.length * 5) % REACTION_ENDS.length;
+    let quote = `${REACTION_STARTS[startIdx]}, ${REACTION_ENDS[endIdx]}`;
+    while (usedReactions.has(quote)) {
+      step += 1;
+      const nextEnd = (endIdx + step) % REACTION_ENDS.length;
+      quote = `${REACTION_STARTS[startIdx]}, ${REACTION_ENDS[nextEnd]}`;
+    }
+    usedReactions.add(quote);
     out.push({
       name: NAMES[(seed + (out.length + 2) * 7) % NAMES.length],
-      quote: GENERIC[idx],
+      quote,
       meta: METAS[(seed + out.length * 3) % METAS.length],
     });
     step += 1;
