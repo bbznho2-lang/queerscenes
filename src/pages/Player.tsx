@@ -352,9 +352,10 @@ const Player = () => {
           if (cancelled) return;
           resolvedLinks = url ? [{ title: "Watch on site", type: "embed", url }] : [];
         }
+        const firstEmbedIdx = resolvedLinks.findIndex((link) => link.type === "embed" && Boolean(link.url));
         setEpisodeLinks(resolvedLinks);
-        setSelectedLinkIdx(-1);
-        setRawPlayerUrl("");
+        setSelectedLinkIdx(firstEmbedIdx);
+        setRawPlayerUrl(firstEmbedIdx >= 0 ? resolvedLinks[firstEmbedIdx].url : "");
       } else if (content?.id) {
         const { data } = await (supabase.rpc as any)("get_content_links", { _content_id: content.id });
         let resolvedLinks = Array.isArray(data) ? (data as EpisodeLink[]) : [];
@@ -365,9 +366,10 @@ const Player = () => {
           if (cancelled) return;
           resolvedLinks = url ? [{ title: "Watch on site", type: "embed", url }] : [];
         }
+        const firstEmbedIdx = resolvedLinks.findIndex((link) => link.type === "embed" && Boolean(link.url));
         setEpisodeLinks(resolvedLinks);
-        setSelectedLinkIdx(-1);
-        setRawPlayerUrl("");
+        setSelectedLinkIdx(firstEmbedIdx);
+        setRawPlayerUrl(firstEmbedIdx >= 0 ? resolvedLinks[firstEmbedIdx].url : "");
       } else {
         setEpisodeLinks([]);
         setSelectedLinkIdx(-1);
