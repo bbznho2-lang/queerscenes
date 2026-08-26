@@ -10,7 +10,7 @@ import { getPaywallComments } from "@/lib/paywall-comments";
 
 export const DEFAULT_PAYWALL_TEXT = "Subtitles: 🇬🇧";
 
-type ContentOpt = { id: string; title: string };
+type ContentOpt = { id: string; title: string; type?: string | null };
 type Testimonial = { name: string; quote: string };
 
 const PaywallCustomizationsAdmin = () => {
@@ -24,7 +24,7 @@ const PaywallCustomizationsAdmin = () => {
 
   const load = async () => {
     const [{ data: c }, { data: r }] = await Promise.all([
-      supabase.from("contents").select("id, title").order("title"),
+      supabase.from("contents").select("id, title, type").order("title"),
       (supabase as any).from("paywall_customizations").select("content_id, custom_text, testimonials"),
     ]);
     setContents((c || []) as ContentOpt[]);
@@ -60,8 +60,12 @@ const PaywallCustomizationsAdmin = () => {
   );
 
   const autoComments = useMemo(
-    () => (contentId ? getPaywallComments(contentId, 3) : []),
-    [contentId]
+    () => {
+      if (!contentId) return [];
+      const opt = options.find((o) => o.id === contentId);
+      return getPaywallComments(contentId, 3, { title: opt?.title, type: opt?.type });
+    },
+    [contentId, options]
   );
 
   const handleSave = async () => {
