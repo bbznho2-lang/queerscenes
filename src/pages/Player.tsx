@@ -681,7 +681,7 @@ const Player = () => {
                   )}
 
                   {content?.id && (
-                    <PaywallComments contentId={content.id} custom={paywallCustom?.testimonials} compact />
+                    <PaywallComments contentId={content.id} title={content.title} type={content.type} custom={paywallCustom?.testimonials} compact />
                   )}
                 </>
               )}
