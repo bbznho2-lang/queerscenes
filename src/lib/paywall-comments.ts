@@ -183,16 +183,17 @@ export const getPaywallComments = (
     const slot = out.length;
     const startIdx = (seed + step * 11 + slot * 3) % REACTION_STARTS.length;
     const endIdx = (Math.floor(seed / 7) + step * 13 + slot * 5) % REACTION_ENDS.length;
-    const platformIdx = (Math.floor(seed / 17) + slot * 7) % PLATFORM_REACTIONS.length;
-    const subject = title || "this release";
+    const platformIdx = (Math.floor(seed / 17) + slot * 7) % PLATFORM_ENDS.length;
+    const subject = title || "this one";
     let quote = slot === total - 1
-      ? `${subject} was such a good watch, ${PLATFORM_REACTIONS[platformIdx]}`
-      : `${REACTION_STARTS[startIdx]} with ${subject}, ${REACTION_ENDS[endIdx]}, ${PLATFORM_ENDS[(platformIdx + slot) % PLATFORM_ENDS.length]}`;
+      ? `${subject} was such a good watch, ${PLATFORM_ENDS[platformIdx]}`
+      : `${REACTION_STARTS[startIdx]}, ${REACTION_ENDS[endIdx]}`;
     while (usedReactions.has(quote)) {
       step += 1;
       const nextEnd = (endIdx + step) % REACTION_ENDS.length;
       quote = `${REACTION_STARTS[startIdx]}, ${REACTION_ENDS[nextEnd]}`;
     }
+
     usedReactions.add(quote);
     out.push({
       name: NAMES[(seed + (out.length + 2) * 7) % NAMES.length],
