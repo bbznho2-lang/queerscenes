@@ -4,20 +4,23 @@ import { getPaywallComments, type PaywallComment } from "@/lib/paywall-comments"
 
 interface Props {
   contentId: string;
+  title?: string | null;
+  type?: string | null;
   custom?: { name: string; quote: string }[] | null;
   compact?: boolean;
 }
 
 const initials = (name: string) => name.trim().charAt(0).toUpperCase() || "S";
 
-const PaywallComments = ({ contentId, custom, compact }: Props) => {
+const PaywallComments = ({ contentId, title, type, custom, compact }: Props) => {
   const comments: PaywallComment[] = useMemo(() => {
     const cleaned = (custom || []).filter((t) => t?.quote?.trim());
     if (cleaned.length) {
       return cleaned.map((t) => ({ name: t.name?.trim() || "Supporter", quote: t.quote.trim() }));
     }
-    return getPaywallComments(contentId, 3);
-  }, [contentId, custom]);
+    return getPaywallComments(contentId, 3, { title, type });
+  }, [contentId, custom, title, type]);
+
 
   if (!comments.length) return null;
 
