@@ -588,7 +588,7 @@ const TitlePage = () => {
             className="w-full inline-flex items-center justify-center rounded-full py-2.5 text-sm font-bold text-white bg-gradient-to-r from-pink-500 via-fuchsia-500 to-purple-600"
             onClick={() => setTelegramOpen(false)}
           >
-            Join the community
+            Join Telegram
           </a>
           <button
             onClick={() => setTelegramOpen(false)}
