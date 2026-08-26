@@ -7,6 +7,7 @@ import { slugify } from "@/lib/slug";
 import { useAuth } from "@/hooks/useAuth";
 import { DEFAULT_PAYWALL_TEXT } from "@/components/PaywallCustomizationsAdmin";
 import PaywallComments from "@/components/PaywallComments";
+import TitleCommentsPreview from "@/components/TitleCommentsPreview";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { trackSupporterEvent } from "@/lib/supporter-tracking";
 
@@ -485,6 +486,11 @@ const TitlePage = () => {
 
         {/* Supporter comments — unique per title */}
         <PaywallComments contentId={content.id} title={content.title} type={content.type} hasMultipleSeasons={hasMultipleSeasons} custom={testimonials} />
+
+        {/* Real comment section preview — shows the community is active */}
+        <TitleCommentsPreview contentId={content.id} extraContentIds={relatedContentIds} />
+
+
 
 
         {/* Benefits */}
