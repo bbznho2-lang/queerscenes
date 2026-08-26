@@ -39,17 +39,19 @@ const kindOf = (type?: string | null): Kind => {
     : "movie";
 };
 
-/** Title-specific comments written like real people talk — casual, lowercase, emojis, no direct ads. */
+/** Title-specific comments written like real people talk — casual, lowercase, emojis. */
 const TITLED: Record<Kind, ((t: string) => string)[]> = {
   series: [
     (t) => `omg ${t} ate me upppp i binged the whole thing in one weekend lol`,
     (t) => `the chemistry in ${t} is actually insane`,
-    (t) => `${t} is so good it made me download telegram just to talk about it`,
     (t) => `i started ${t} at 11pm and didn't sleep. worth it`,
     (t) => `the acting in ${t}??? hello??? give them all awards`,
     (t) => `${t} had no business being this addictive`,
     (t) => `finally watching ${t} with decent subs, bless`,
     (t) => `${t} made me feel so seen i can't even explain`,
+    (t) => `the reactions to ${t} every week are everything`,
+    (t) => `i wait for every new drop of ${t} like it's an event`,
+    (t) => `people are sleeping on ${t} and i'm tired`,
   ],
   movie: [
     (t) => `${t} wrecked me. still thinking about the ending`,
@@ -60,6 +62,8 @@ const TITLED: Record<Kind, ((t: string) => string)[]> = {
     (t) => `i've been looking for ${t} forever finally found it here`,
     (t) => `${t} is quiet and slow and completely worth it`,
     (t) => `${t} is one of those films that just stays with you`,
+    (t) => `everyone's reaction to ${t} was so real`,
+    (t) => `i put off ${t} for too long, so glad i finally watched`,
   ],
 };
 
@@ -80,7 +84,6 @@ const GENERIC: string[] = [
   "finally a place that actually has these titles",
   "i've been here for months and the updates keep getting better",
   "my partner and i watch something here every weekend",
-  "the community on telegram is actually fun",
   "worth it just to not deal with sketchy sites",
   "found so many titles i never heard of before",
   "simple and works, that's all i need",

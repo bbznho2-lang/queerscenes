@@ -372,7 +372,7 @@ const TitlePage = () => {
                 Subtitles: <span className="text-base">{unique.join(" ")}</span>
               </div>
               <p className="text-[11px] text-muted-foreground mt-1 mb-4">
-                Don't have your language? Request it in our community.
+                Don't have your language? Request it in support.
               </p>
             </>
           );
@@ -588,7 +588,7 @@ const TitlePage = () => {
             className="w-full inline-flex items-center justify-center rounded-full py-2.5 text-sm font-bold text-white bg-gradient-to-r from-pink-500 via-fuchsia-500 to-purple-600"
             onClick={() => setTelegramOpen(false)}
           >
-            Join the community
+            Join Telegram
           </a>
           <button
             onClick={() => setTelegramOpen(false)}
