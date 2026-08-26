@@ -76,38 +76,30 @@ const SINGLE_SEASON_SERIES: ((t: string) => string)[] = [
   (t) => `they really left ${t} like that?? i need more episodes`,
 ];
 
-/** Combinable reactions avoid repeating the same fixed review across different titles. */
+/** Reactions about the title itself — no chat groups, no promises of future seasons. */
 const REACTION_STARTS = [
   "i clicked out of curiosity and ended up watching the whole thing",
   "was not ready for how invested i got",
-  "the latest drops have been hitting so hard lately",
+  "i genuinely lost track of time watching this one",
   "me and my partner could not stop reacting to every scene",
-  "i genuinely lost track of time watching this",
-  "this week's watch absolutely delivered",
   "i thought i'd watch ten minutes and suddenly it was over",
-  "the group chat was going off while we watched",
-  "another release that had me staring at the credits",
   "i'm still processing what i just watched",
   "the way i cancelled all my plans to finish this lol",
-  "every new drop gives me something else to obsess over",
   "started watching on my phone and moved to the tv immediately",
   "i was hooked way faster than i expected",
   "this one had me pausing just to breathe",
-  "the reactions in my house were so loud lol",
-  "i keep finding releases here that completely surprise me",
-  "this was exactly the kind of story i wanted tonight",
+  "i watched it twice in the same week, no regrets",
+  "this was exactly the kind of story i wanted that night",
 ];
 
 const REACTION_ENDS = [
   "the performances were sooo good",
   "and the subtitles made every little detail land",
   "definitely one i'm going to think about for a while",
-  "now i'm impatient for the next release lol",
   "the chemistry had me yelling at my screen",
   "honestly such a good find",
-  "the ending had everyone in silence",
+  "the ending had me completely silent",
   "i already know i'm rewatching it",
-  "this is why i check every new release",
   "the emotional damage was real 😭",
   "the quality was way better than i expected ngl",
   "and somehow it got better with every scene",
@@ -115,23 +107,19 @@ const REACTION_ENDS = [
   "still thinking about those final scenes",
   "what a ride from beginning to end",
   "the cast really gave everything",
-  "i haven't reacted this much to a release in ages",
   "worth staying up way too late for",
 ];
 
-const PLATFORM_REACTIONS = [
-  "i love watching the new releases here, there is always something i would never find on my own",
-  "watching here has become my favorite little ritual whenever a new title drops",
-  "i genuinely love following the releases on this platform, the picks are always so good",
-  "this platform keeps giving me titles to look forward to and i love that",
-  "i love how every new release here turns into my next late night watch lol",
-  "the releases on this platform never stay in my watchlist for long, i always end up watching immediately",
-  "i've loved keeping up with the latest titles here, every week there is a new surprise",
-  "watching new releases on this platform is honestly one of my favorite things now",
-  "i love opening the platform and finding another title that completely pulls me in",
-  "the selection here makes watching every new release way too easy lol i love it",
-  "i keep coming back for the new releases because watching them here is always such a good experience",
-  "i love that this platform always has another release ready when i finish the last one",
+/** Closing lines about loving the platform experience. */
+const PLATFORM_ENDS = [
+  "i love watching stuff like this on the platform",
+  "watching here is always such a smooth experience, i love it",
+  "i love that i can watch titles like this properly subtitled here",
+  "honestly the reason i keep watching everything here",
+  "i love how easy the platform makes it to just sit and watch",
+  "watching on this platform has become my favorite way to unwind",
+  "i love the catalog here, it never disappoints me",
+  "the platform makes finding stories like this so worth it",
 ];
 
 const CHARACTER_REACTIONS = [
@@ -143,16 +131,6 @@ const CHARACTER_REACTIONS = [
   (t: string, c: string) => `i'm still thinking about ${c} after watching ${t}`,
 ];
 
-const PLATFORM_ENDS = [
-  "i love watching releases like this on the platform",
-  "this is exactly why i love keeping up with every new title here",
-  "i always love finding another great watch on this platform",
-  "the platform makes following each new release so worth it",
-  "i love being able to watch titles like this here",
-  "another reason i love checking every release on the platform",
-  "watching the latest titles here has become my favorite routine",
-  "i love how the platform keeps bringing me stories like this",
-];
 
 const hashSeed = (value: string) => {
   let hash = 0;
