@@ -74,6 +74,7 @@ const TitlePage = () => {
   const { user, isAdmin, loading: authLoading } = useAuth();
   const [content, setContent] = useState<TitleContent | null>(null);
   const [playableContentId, setPlayableContentId] = useState<string | null>(null);
+  const [hasMultipleSeasons, setHasMultipleSeasons] = useState(false);
   const [canWatch, setCanWatch] = useState(false);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -135,12 +136,15 @@ const TitlePage = () => {
       const matches = list.filter((c) => slugify(c.title) === slug);
       const matchIds = matches.map((c) => c.id);
       const { data: episodeRows } = matchIds.length
-        ? await supabase.from("episodes").select("content_id").in("content_id", matchIds)
+        ? await supabase.from("episodes").select("content_id, season").in("content_id", matchIds)
         : { data: [] as any[] };
       const episodeCounts = new Map<string, number>();
+      const seasonSet = new Set<number>();
       (episodeRows || []).forEach((row: any) => {
         episodeCounts.set(row.content_id, (episodeCounts.get(row.content_id) || 0) + 1);
+        if (row.season) seasonSet.add(Number(row.season));
       });
+      setHasMultipleSeasons(seasonSet.size > 1);
       const sortedMatches = [...matches].sort((a, b) => {
         const aTime = a.updated_at ? new Date(a.updated_at).getTime() : 0;
         const bTime = b.updated_at ? new Date(b.updated_at).getTime() : 0;
@@ -478,7 +482,7 @@ const TitlePage = () => {
         )}
 
         {/* Supporter comments — unique per title */}
-        <PaywallComments contentId={content.id} title={content.title} type={content.type} custom={testimonials} />
+        <PaywallComments contentId={content.id} title={content.title} type={content.type} hasMultipleSeasons={hasMultipleSeasons} custom={testimonials} />
 
 
         {/* Benefits */}
