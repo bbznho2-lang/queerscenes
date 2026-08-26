@@ -21,6 +21,7 @@ const PaywallCustomizationsAdmin = () => {
   const [text, setText] = useState(DEFAULT_PAYWALL_TEXT);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [saving, setSaving] = useState(false);
+  const [seasonMap, setSeasonMap] = useState<Record<string, number[]>>({});
 
   const load = async () => {
     const [{ data: c }, { data: r }] = await Promise.all([
@@ -52,6 +53,11 @@ const PaywallCustomizationsAdmin = () => {
     }
     setText(customMap[contentId] || DEFAULT_PAYWALL_TEXT);
     setTestimonials(testimonialMap[contentId] || []);
+    void (async () => {
+      const { data } = await supabase.from("episodes").select("season").eq("content_id", contentId);
+      const seasons = [...new Set((data || []).map((e: any) => Number(e.season || 1)))];
+      setSeasonMap((prev) => ({ ...prev, [contentId]: seasons }));
+    })();
   }, [contentId, customMap, testimonialMap]);
 
   const isCustom = useMemo(
@@ -63,9 +69,14 @@ const PaywallCustomizationsAdmin = () => {
     () => {
       if (!contentId) return [];
       const opt = contents.find((o) => o.id === contentId);
-      return getPaywallComments(contentId, 3, { title: opt?.title, type: opt?.type });
+      const seasons = seasonMap[contentId] || [];
+      return getPaywallComments(contentId, 3, {
+        title: opt?.title,
+        type: opt?.type,
+        hasMultipleSeasons: seasons.length > 1,
+      });
     },
-    [contentId, contents]
+    [contentId, contents, seasonMap]
   );
 
   const handleSave = async () => {
