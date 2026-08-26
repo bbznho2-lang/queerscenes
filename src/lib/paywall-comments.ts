@@ -35,28 +35,41 @@ const kindOf = (type?: string | null): Kind => {
     : "movie";
 };
 
-/**
- * Templates praising the specific title, then the site, then inviting the
- * reader to join the community and follow the next releases.
- */
-const TEMPLATES: Record<Kind, ((t: string) => string)[]> = {
+/** Comments that mention the title by name — only one is used per paywall. */
+const TITLED: Record<Kind, ((t: string) => string)[]> = {
   series: [
-    (t) => `${t} is genuinely one of the best queer series I've watched — the acting got me from the first episode. Queer Scenes subtitles it properly, which nobody else does. Join us and you'll catch every new release first.`,
-    (t) => `I binged ${t} in two nights and I'm still thinking about it. The site is clean, no pop-ups, no broken links — being part of this community means new episodes keep landing every month.`,
-    (t) => `${t} has the kind of story we rarely get to see, and Queer Scenes is the only place keeping it alive with real subtitles. Becoming a supporter is how you get the next premieres too.`,
-    (t) => `Every episode of ${t} hit harder than the last. Honestly the platform itself is a joy to use — join the community and you'll never miss what drops next.`,
-    (t) => `${t} deserves way more attention. The team here subtitled it with so much care, and supporting means more series like it arrive every single month.`,
-    (t) => `Started ${t} out of curiosity and stayed for the whole season. Queer Scenes keeps adding rare titles — joining is the easiest way to follow every new release.`,
+    (t) => `${t} caught me off guard. I only meant to watch one episode.`,
+    (t) => `Been looking for ${t} with decent subtitles for ages. Finally.`,
+    (t) => `${t} is the kind of story I wish I'd had when I was younger.`,
+    (t) => `The chemistry in ${t} is unreal. Second season when?`,
+    (t) => `Finished ${t} last night and I'm still not over that ending.`,
+    (t) => `${t} deserves way more attention than it ever got.`,
   ],
   movie: [
-    (t) => `${t} is a beautiful film — I cried and then rewatched it the same week. Queer Scenes subtitles rare queer cinema like this properly, and supporters get every new premiere.`,
-    (t) => `I looked everywhere for ${t} and only found it here, with subtitles that actually make sense. The site is smooth, and joining means you follow all the upcoming releases.`,
-    (t) => `${t} stayed with me for days. What I love is that this community keeps rescuing films like it — become a supporter and the next premieres come to you.`,
-    (t) => `Watched ${t} on my phone during a break and it completely got me. No ads, no sketchy links, just a great platform — and new titles land every month for supporters.`,
-    (t) => `${t} is exactly the kind of queer film that never gets a proper release. Queer Scenes gave it one. Joining keeps that going and gets you every new drop.`,
-    (t) => `Gorgeous movie, gorgeous subtitles. ${t} alone was worth joining, and then the community kept surprising me with new releases.`,
+    (t) => `${t} wrecked me in the best way. Watched it twice.`,
+    (t) => `Couldn't find ${t} anywhere else, honestly.`,
+    (t) => `${t} is quiet and slow and completely worth it.`,
+    (t) => `Still thinking about the last ten minutes of ${t}.`,
+    (t) => `Put ${t} on expecting nothing. Ended up crying.`,
+    (t) => `${t} is one of those films that just stays with you.`,
   ],
 };
+
+/** Short, natural comments that don't name the title and don't advertise. */
+const GENERIC: string[] = [
+  "Subtitles are actually well done here, which is rare.",
+  "Watched on my phone on the train, worked perfectly.",
+  "No ads, no weird redirects. That alone is worth it.",
+  "Took me a while to decide and I regret waiting.",
+  "The catalogue keeps surprising me honestly.",
+  "Finally somewhere I can watch this stuff in peace.",
+  "Been here a few months now, no complaints.",
+  "Quality is better than I expected, not gonna lie.",
+  "My girlfriend and I watch something here every weekend.",
+  "Nice to have all of this in one place for once.",
+  "Simple, works, nothing else to say really.",
+  "Found so many titles I'd never even heard of.",
+];
 
 const hashSeed = (value: string) => {
   let hash = 0;
@@ -72,18 +85,50 @@ export const getPaywallComments = (
   count = 3,
   context?: PaywallCommentContext,
 ): PaywallComment[] => {
-  const title = (context?.title || "").trim() || "this title";
-  const templates = TEMPLATES[kindOf(context?.type)];
+  const title = (context?.title || "").trim();
+  const titled = TITLED[kindOf(context?.type)];
   const seed = hashSeed(key || "queerscenes");
-  const total = Math.min(count, templates.length);
+  const total = Math.max(1, Math.min(count, 4));
   const out: PaywallComment[] = [];
-  for (let i = 0; i < total; i += 1) {
-    const tIdx = (seed + i * 5) % templates.length;
-    const nIdx = (seed + i * 7) % NAMES.length;
-    const mIdx = (seed + i * 3) % METAS.length;
-    out.push({ name: NAMES[nIdx], quote: templates[tIdx](title), meta: METAS[mIdx] });
+
+  // 1 (sometimes 2) comment mentioning the title, the rest generic.
+  const titledCount = title ? (seed % 3 === 0 ? 2 : 1) : 0;
+
+  for (let i = 0; i < titledCount && i < total; i += 1) {
+    out.push({
+      name: NAMES[(seed + i * 7) % NAMES.length],
+      quote: titled[(seed + i * 5) % titled.length],
+      meta: METAS[(seed + i * 3) % METAS.length],
+    } as unknown as PaywallComment);
+    out[out.length - 1].quote = titled[(seed + i * 5) % titled.length](title);
   }
-  return out;
+
+  const usedGeneric = new Set<number>();
+  let step = 0;
+  while (out.length < total) {
+    let idx = (seed + step * 11) % GENERIC.length;
+    while (usedGeneric.has(idx)) idx = (idx + 1) % GENERIC.length;
+    usedGeneric.add(idx);
+    out.push({
+      name: NAMES[(seed + (out.length + 2) * 7) % NAMES.length],
+      quote: GENERIC[idx],
+      meta: METAS[(seed + out.length * 3) % METAS.length],
+    });
+    step += 1;
+  }
+
+  // Avoid duplicate display names.
+  const seen = new Set<string>();
+  return out.map((c) => {
+    let name = c.name;
+    let bump = 1;
+    while (seen.has(name)) {
+      name = NAMES[(NAMES.indexOf(c.name) + bump) % NAMES.length];
+      bump += 1;
+    }
+    seen.add(name);
+    return { ...c, name };
+  });
 };
 
 /** Kept for compatibility with older imports. */
