@@ -75,6 +75,7 @@ const TitlePage = () => {
   const [content, setContent] = useState<TitleContent | null>(null);
   const [playableContentId, setPlayableContentId] = useState<string | null>(null);
   const [hasMultipleSeasons, setHasMultipleSeasons] = useState(false);
+  const [relatedContentIds, setRelatedContentIds] = useState<string[]>([]);
   const [canWatch, setCanWatch] = useState(false);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -135,6 +136,7 @@ const TitlePage = () => {
       const list = ((data ?? []) as TitleContent[]).filter((c) => !c.is_archived);
       const matches = list.filter((c) => slugify(c.title) === slug);
       const matchIds = matches.map((c) => c.id);
+      setRelatedContentIds(matchIds);
       const { data: episodeRows } = matchIds.length
         ? await supabase.from("episodes").select("content_id, season").in("content_id", matchIds)
         : { data: [] as any[] };
