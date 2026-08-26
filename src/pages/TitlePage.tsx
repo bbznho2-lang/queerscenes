@@ -372,7 +372,7 @@ const TitlePage = () => {
                 Subtitles: <span className="text-base">{unique.join(" ")}</span>
               </div>
               <p className="text-[11px] text-muted-foreground mt-1 mb-4">
-                Don't have your language? Request it in our community.
+                Don't have your language? Request it in support.
               </p>
             </>
           );
