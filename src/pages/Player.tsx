@@ -15,6 +15,7 @@ import { saveWatchProgress } from "@/lib/watch-progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { DEFAULT_PAYWALL_TEXT } from "@/components/PaywallCustomizationsAdmin";
 import PaywallComments from "@/components/PaywallComments";
+import { Skeleton } from "@/components/ui/skeleton";
 
 
 interface ContentItem {
@@ -342,6 +343,9 @@ const Player = () => {
     const resolve = async () => {
       if (isBlocked) { setEpisodeLinks([]); setRawPlayerUrl(""); setSelectedLinkIdx(-1); setLinksLoading(false); return; }
       setLinksLoading(true);
+      setEpisodeLinks([]);
+      setSelectedLinkIdx(-1);
+      setRawPlayerUrl("");
       if (currentEp?.id) {
         const { data } = await (supabase.rpc as any)("get_episode_links", { _episode_id: currentEp.id });
         let resolvedLinks = Array.isArray(data) ? (data as EpisodeLink[]) : [];
@@ -352,10 +356,7 @@ const Player = () => {
           if (cancelled) return;
           resolvedLinks = url ? [{ title: "Watch on site", type: "embed", url }] : [];
         }
-        const firstEmbedIdx = resolvedLinks.findIndex((link) => link.type === "embed" && Boolean(link.url));
         setEpisodeLinks(resolvedLinks);
-        setSelectedLinkIdx(firstEmbedIdx);
-        setRawPlayerUrl(firstEmbedIdx >= 0 ? resolvedLinks[firstEmbedIdx].url : "");
       } else if (content?.id) {
         const { data } = await (supabase.rpc as any)("get_content_links", { _content_id: content.id });
         let resolvedLinks = Array.isArray(data) ? (data as EpisodeLink[]) : [];
@@ -366,10 +367,7 @@ const Player = () => {
           if (cancelled) return;
           resolvedLinks = url ? [{ title: "Watch on site", type: "embed", url }] : [];
         }
-        const firstEmbedIdx = resolvedLinks.findIndex((link) => link.type === "embed" && Boolean(link.url));
         setEpisodeLinks(resolvedLinks);
-        setSelectedLinkIdx(firstEmbedIdx);
-        setRawPlayerUrl(firstEmbedIdx >= 0 ? resolvedLinks[firstEmbedIdx].url : "");
       } else {
         setEpisodeLinks([]);
         setSelectedLinkIdx(-1);
@@ -545,7 +543,27 @@ const Player = () => {
         )}
       </div>
 
-      {isBlocked && !userIsPremium && !isAdmin ? (
+      {!accessResolved || authLoading ? (
+        <div className="w-full flex-1 px-3 pt-16 pb-8 sm:px-4 sm:pt-20" aria-label="Loading title">
+          <div className="mx-auto w-full max-w-5xl space-y-5">
+            <div className="space-y-2">
+              <Skeleton className="h-8 w-3/4 max-w-md" />
+              <Skeleton className="h-4 w-36" />
+            </div>
+            <Skeleton className="w-full aspect-video rounded-xl" />
+            <div className="space-y-3">
+              <Skeleton className="h-5 w-20" />
+              <Skeleton className="h-12 w-full rounded-lg" />
+              <Skeleton className="h-12 w-full rounded-lg" />
+            </div>
+            <div className="flex gap-5 border-b border-border pb-3">
+              <Skeleton className="h-5 w-20" />
+              <Skeleton className="h-5 w-16" />
+              <Skeleton className="h-5 w-16" />
+            </div>
+          </div>
+        </div>
+      ) : isBlocked && !userIsPremium && !isAdmin ? (
         null
       ) : false ? (
         <div className="w-full">
@@ -903,6 +921,12 @@ const Player = () => {
                       })}
                     </ul>
                   </div>
+                ) : linksLoading && content ? (
+                  <div className={isMobile ? "mt-4 space-y-3 px-3" : "mt-5 space-y-3"} aria-label="Loading watch links">
+                    <Skeleton className="h-5 w-20" />
+                    <Skeleton className="h-12 w-full rounded-lg" />
+                    <Skeleton className="h-12 w-full rounded-lg" />
+                  </div>
                 ) : !linksLoading && content && (currentEp || !(content.type === "serie" || content.type === "novela" || content.type === "anime" || content.type === "reality")) ? (
                   <div className={isMobile ? "mt-4 px-3" : "mt-5"}>
                     <p className="text-sm text-muted-foreground">No links available for this {currentEp ? "episode" : "title"} yet.</p>
@@ -924,8 +948,8 @@ const Player = () => {
         const trailer = (content as any)?.preview_video_url?.trim() || "";
         const tabs: { key: typeof detailTab; label: string }[] = [
           ...(hasEpisodes ? [{ key: "episodes" as const, label: "Episodes" }] : []),
-          ...(trailer ? [{ key: "trailer" as const, label: "Trailer" }] : []),
           { key: "details" as const, label: "Details" },
+          ...(trailer ? [{ key: "trailer" as const, label: "Trailer" }] : []),
           ...(similar.length ? [{ key: "similar" as const, label: "Similar" }] : []),
         ];
         const active = tabs.some((t) => t.key === detailTab) ? detailTab : tabs[0].key;
