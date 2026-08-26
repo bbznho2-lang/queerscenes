@@ -117,6 +117,21 @@ const REACTION_ENDS = [
   "worth staying up way too late for",
 ];
 
+const PLATFORM_REACTIONS = [
+  "i love watching the new releases here, there is always something i would never find on my own",
+  "watching here has become my favorite little ritual whenever a new title drops",
+  "i genuinely love following the releases on this platform, the picks are always so good",
+  "this platform keeps giving me titles to look forward to and i love that",
+  "i love how every new release here turns into my next late night watch lol",
+  "the releases on this platform never stay in my watchlist for long, i always end up watching immediately",
+  "i've loved keeping up with the latest titles here, every week there is a new surprise",
+  "watching new releases on this platform is honestly one of my favorite things now",
+  "i love opening the platform and finding another title that completely pulls me in",
+  "the selection here makes watching every new release way too easy lol i love it",
+  "i keep coming back for the new releases because watching them here is always such a good experience",
+  "i love that this platform always has another release ready when i finish the last one",
+];
+
 const hashSeed = (value: string) => {
   let hash = 0;
   for (let i = 0; i < value.length; i += 1) {
@@ -141,7 +156,9 @@ export const getPaywallComments = (
     ? [...titledBase, ...SINGLE_SEASON_SERIES]
     : titledBase;
 
-  const seed = hashSeed(key || "queerscenes");
+  // Use the complete title context so two different titles cannot accidentally
+  // receive the same selection merely because their id hashes share a remainder.
+  const seed = hashSeed(`${key || "queerscenes"}|${title.toLowerCase()}|${kind}`);
   const total = Math.max(1, Math.min(count, 4));
   const out: PaywallComment[] = [];
 
@@ -159,9 +176,13 @@ export const getPaywallComments = (
   const usedReactions = new Set<string>();
   let step = 0;
   while (out.length < total) {
-    const startIdx = (seed + step * 11 + out.length * 3) % REACTION_STARTS.length;
-    const endIdx = (Math.floor(seed / 7) + step * 13 + out.length * 5) % REACTION_ENDS.length;
-    let quote = `${REACTION_STARTS[startIdx]}, ${REACTION_ENDS[endIdx]}`;
+    const slot = out.length;
+    const startIdx = (seed + step * 11 + slot * 3) % REACTION_STARTS.length;
+    const endIdx = (Math.floor(seed / 7) + step * 13 + slot * 5) % REACTION_ENDS.length;
+    const platformIdx = (Math.floor(seed / 17) + slot * 7) % PLATFORM_REACTIONS.length;
+    let quote = slot === total - 1
+      ? PLATFORM_REACTIONS[platformIdx]
+      : `${REACTION_STARTS[startIdx]}, ${REACTION_ENDS[endIdx]}`;
     while (usedReactions.has(quote)) {
       step += 1;
       const nextEnd = (endIdx + step) % REACTION_ENDS.length;
