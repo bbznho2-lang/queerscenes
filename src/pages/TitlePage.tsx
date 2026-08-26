@@ -487,8 +487,6 @@ const TitlePage = () => {
         {/* Supporter comments — unique per title */}
         <PaywallComments contentId={content.id} title={content.title} type={content.type} hasMultipleSeasons={hasMultipleSeasons} custom={testimonials} />
 
-        {/* Real comment section preview — shows the community is active */}
-        <TitleCommentsPreview contentId={content.id} extraContentIds={relatedContentIds} />
 
 
 
