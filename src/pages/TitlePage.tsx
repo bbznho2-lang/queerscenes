@@ -7,6 +7,7 @@ import { slugify } from "@/lib/slug";
 import { useAuth } from "@/hooks/useAuth";
 import { DEFAULT_PAYWALL_TEXT } from "@/components/PaywallCustomizationsAdmin";
 import PaywallComments from "@/components/PaywallComments";
+import TitleCommentsPreview from "@/components/TitleCommentsPreview";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { trackSupporterEvent } from "@/lib/supporter-tracking";
 
@@ -75,6 +76,7 @@ const TitlePage = () => {
   const [content, setContent] = useState<TitleContent | null>(null);
   const [playableContentId, setPlayableContentId] = useState<string | null>(null);
   const [hasMultipleSeasons, setHasMultipleSeasons] = useState(false);
+  const [relatedContentIds, setRelatedContentIds] = useState<string[]>([]);
   const [canWatch, setCanWatch] = useState(false);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -135,6 +137,7 @@ const TitlePage = () => {
       const list = ((data ?? []) as TitleContent[]).filter((c) => !c.is_archived);
       const matches = list.filter((c) => slugify(c.title) === slug);
       const matchIds = matches.map((c) => c.id);
+      setRelatedContentIds(matchIds);
       const { data: episodeRows } = matchIds.length
         ? await supabase.from("episodes").select("content_id, season").in("content_id", matchIds)
         : { data: [] as any[] };
@@ -483,6 +486,11 @@ const TitlePage = () => {
 
         {/* Supporter comments — unique per title */}
         <PaywallComments contentId={content.id} title={content.title} type={content.type} hasMultipleSeasons={hasMultipleSeasons} custom={testimonials} />
+
+        {/* Real comment section preview — shows the community is active */}
+        <TitleCommentsPreview contentId={content.id} extraContentIds={relatedContentIds} />
+
+
 
 
         {/* Benefits */}
