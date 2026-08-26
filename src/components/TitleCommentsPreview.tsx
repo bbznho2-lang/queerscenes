@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MessageCircle, Lock } from "lucide-react";
+import { MessageCircle, Lock, Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Props {
@@ -68,8 +68,11 @@ const TitleCommentsPreview = ({ contentId, extraContentIds = [] }: Props) => {
               {initialOf(c.author_name)}
             </div>
             <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-foreground">{c.author_name || "User"}</span>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-xs font-bold text-foreground">{c.author_name || "Supporter"}</span>
+                <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full bg-primary/20 text-primary font-bold">
+                  <Crown className="w-2.5 h-2.5 fill-primary" /> SUPPORTER
+                </span>
                 <span className="text-[10px] text-muted-foreground">{timeAgo(c.created_at)}</span>
               </div>
               <p className="text-xs text-foreground/90 leading-relaxed break-words">{c.body}</p>
