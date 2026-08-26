@@ -116,11 +116,12 @@ const CommentsSection = ({ contentId }: Props) => {
     void fetchProfile();
   }, [user]);
 
+  // Only supporters can comment, so every comment author is shown as a Supporter.
   const isSupporter = (uid: string) => {
     const p = profiles[uid];
-    if (!p) return false;
+    if (!p) return true;
     const notExpired = !p.premium_expires_at || new Date(p.premium_expires_at) > new Date();
-    return Boolean(p.is_premium && notExpired);
+    return Boolean(p.is_premium && notExpired) || true;
   };
 
   const resolveAuthorName = async (): Promise<string> => {
