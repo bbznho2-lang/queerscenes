@@ -80,7 +80,6 @@ const GENERIC: string[] = [
   "finally a place that actually has these titles",
   "i've been here for months and the updates keep getting better",
   "my partner and i watch something here every weekend",
-  "the community on telegram is actually fun",
   "worth it just to not deal with sketchy sites",
   "found so many titles i never heard of before",
   "simple and works, that's all i need",
