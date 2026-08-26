@@ -478,7 +478,7 @@ const TitlePage = () => {
         )}
 
         {/* Supporter comments — unique per title */}
-        <PaywallComments contentId={content.id} custom={testimonials} />
+        <PaywallComments contentId={content.id} title={content.title} type={content.type} custom={testimonials} />
 
 
         {/* Benefits */}
