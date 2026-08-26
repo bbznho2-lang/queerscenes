@@ -1156,6 +1156,7 @@ export type Database = {
         Args: { _email: string; _name: string }
         Returns: Json
       }
+      system_notification_sender: { Args: never; Returns: string }
     }
     Enums: {
       app_role: "admin" | "user"
