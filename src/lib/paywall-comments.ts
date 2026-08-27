@@ -168,13 +168,18 @@ export const getPaywallComments = (
   const title = (context?.title || "").trim();
   const kind = kindOf(context?.type);
   const hasMultipleSeasons = Boolean(context?.hasMultipleSeasons);
+  const section = String(context?.section || "").toLowerCase();
+  const isBlGl = section === "bl" || section === "gl" || section.includes("bl drama");
   const characters = (context?.characters || []).map((name) => name.trim()).filter(Boolean);
 
-  // Build the title-specific pool. For series with multiple seasons, drop comments that ask for more seasons.
+  // Build the title-specific pool. BL/GL stories are usually closed (no season 2 asks);
+  // series with multiple seasons also drop comments that ask for more seasons.
   const titledBase = TITLED[kind];
-  const titledPool = kind === "series" && !hasMultipleSeasons
-    ? [...titledBase, ...SINGLE_SEASON_SERIES]
-    : titledBase;
+  const titledPool = isBlGl
+    ? BLGL_TITLED
+    : kind === "series" && !hasMultipleSeasons
+      ? [...titledBase, ...SINGLE_SEASON_SERIES]
+      : titledBase;
 
   // Use the complete title context so two different titles cannot accidentally
   // receive the same selection merely because their id hashes share a remainder.
