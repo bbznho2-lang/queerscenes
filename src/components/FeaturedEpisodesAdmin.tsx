@@ -69,23 +69,51 @@ const FeaturedEpisodesAdmin = () => {
   const results = useMemo(() => {
     const raw = search.trim();
     if (!raw) return { episodes: [] as EpisodeRow[], contents: [] as ContentRow[] };
-    const q = raw.toLowerCase();
-    const seasonEpRe = /s(\d{1,3})(?:\s*[ex]\s*(\d{1,3}))?/i;
-    const m = raw.match(seasonEpRe);
-    const wantedSeason = m ? parseInt(m[1], 10) : null;
-    const wantedEpisode = m && m[2] ? parseInt(m[2], 10) : null;
-    const textQ = (m ? raw.replace(m[0], "") : raw).trim().toLowerCase();
+
+    const norm = (s: string) =>
+      (s || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
+    let rest = norm(raw);
+
+    // Season: "s2", "season 2", "t2"
+    let wantedSeason: number | null = null;
+    const seasonMatch = rest.match(/\b(?:season|temporada|s|t)\s*(\d{1,3})\b/);
+    if (seasonMatch) {
+      wantedSeason = parseInt(seasonMatch[1], 10);
+      rest = rest.replace(seasonMatch[0], " ");
+    }
+
+    // Episode: "ep 33", "e33", "episode 33", "x33"
+    let wantedEpisode: number | null = null;
+    const epMatch = rest.match(/\b(?:episode|episodio|epis|ep|e|x)\s*(\d{1,4})\b/);
+    if (epMatch) {
+      wantedEpisode = parseInt(epMatch[1], 10);
+      rest = rest.replace(epMatch[0], " ");
+    } else {
+      const bare = rest.match(/\b(\d{1,4})\b/);
+      if (bare && rest.replace(bare[0], " ").trim().length > 0) {
+        wantedEpisode = parseInt(bare[1], 10);
+        rest = rest.replace(bare[0], " ");
+      }
+    }
+
+    const terms = rest.split(/\s+/).map((t) => t.trim()).filter(Boolean);
+    const matchesTerms = (...fields: string[]) => {
+      if (terms.length === 0) return true;
+      const hay = fields.map(norm).join(" ");
+      return terms.every((t) => hay.includes(t));
+    };
 
     const episodes = allEpisodes
       .filter((e) => !featuredEpIds.has(e.id))
       .filter((e) => {
-        const showTitle = (e.content_title || "").toLowerCase();
-        const epTitle = e.title.toLowerCase();
-        const textOk = !textQ || showTitle.includes(textQ) || epTitle.includes(textQ);
+        const textOk = matchesTerms(e.content_title || "", e.title);
         const seasonOk = wantedSeason === null || e.season === wantedSeason;
         const episodeOk = wantedEpisode === null || e.episode_number === wantedEpisode;
-        const fallback = !textQ && wantedSeason === null ? showTitle.includes(q) || epTitle.includes(q) : true;
-        return textOk && seasonOk && episodeOk && fallback;
+        return textOk && seasonOk && episodeOk;
       })
       .sort((a, b) => {
         const at = (a.content_title || "").localeCompare(b.content_title || "");
@@ -97,12 +125,13 @@ const FeaturedEpisodesAdmin = () => {
 
     const contents = allContents
       .filter((c) => !featuredContentIds.has(c.id))
-      .filter((c) => c.title.toLowerCase().includes(q))
+      .filter((c) => wantedEpisode === null && wantedSeason === null && matchesTerms(c.title))
       .sort((a, b) => a.title.localeCompare(b.title))
       .slice(0, 30);
 
     return { episodes, contents };
   }, [search, allEpisodes, allContents, featuredEpIds, featuredContentIds]);
+
 
   const addEpisode = async (ep: EpisodeRow) => {
     const nextPos = featured.length;
