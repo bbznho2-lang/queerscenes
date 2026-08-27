@@ -9,6 +9,8 @@ export interface PaywallCommentContext {
   title?: string | null;
   /** Raw content type from the database (movie, serie, novela, reality...). */
   type?: string | null;
+  /** Catalog section (series, filmes, novelas, bl, gl, realities, exclusivos...). */
+  section?: string | null;
   /** Whether the series has more than one season. Avoids "next season" comments when seasons already exist. */
   hasMultipleSeasons?: boolean;
   /** Character names configured in Edit details. */
@@ -76,6 +78,20 @@ const SINGLE_SEASON_SERIES: ((t: string) => string)[] = [
   (t) => `they really left ${t} like that?? i need more episodes`,
 ];
 
+/** BL/GL titles are usually closed stories — comments follow the site, not future seasons. */
+const BLGL_TITLED: ((t: string) => string)[] = [
+  (t) => `${t} is exactly the kind of story i only find here, i follow every new release on the site`,
+  (t) => `been keeping up with everything dropping on the site and ${t} is easily my favorite so far`,
+  (t) => `i check the site almost daily and ${t} was so worth the wait`,
+  (t) => `${t} broke my heart in the best way, glad i caught it here`,
+  (t) => `every time i open the site there's something new, but ${t} is the one i keep rewatching`,
+  (t) => `the leads in ${t} have the most beautiful chemistry, watched it twice already`,
+  (t) => `${t} had me smiling at my phone like an idiot, the site never misses`,
+  (t) => `i follow all the bl/gl drops here and ${t} is top tier, trust me`,
+  (t) => `${t} is so soft and so painful at the same time, i'm obsessed`,
+  (t) => `watching ${t} here with proper subs made every scene hit harder`,
+];
+
 /** Reactions about the title itself — no chat groups, no promises of future seasons. */
 const REACTION_STARTS = [
   "i clicked out of curiosity and ended up watching the whole thing",
@@ -120,6 +136,9 @@ const PLATFORM_ENDS = [
   "watching on this platform has become my favorite way to unwind",
   "i love the catalog here, it never disappoints me",
   "the platform makes finding stories like this so worth it",
+  "i've been following every release here and it never lets me down",
+  "the site keeps dropping gems like this and i'm here for all of it",
+  "i literally refresh the site to see what's new, that's how good it's been",
 ];
 
 const CHARACTER_REACTIONS = [
@@ -149,13 +168,18 @@ export const getPaywallComments = (
   const title = (context?.title || "").trim();
   const kind = kindOf(context?.type);
   const hasMultipleSeasons = Boolean(context?.hasMultipleSeasons);
+  const section = String(context?.section || "").toLowerCase();
+  const isBlGl = section === "bl" || section === "gl" || section.includes("bl drama");
   const characters = (context?.characters || []).map((name) => name.trim()).filter(Boolean);
 
-  // Build the title-specific pool. For series with multiple seasons, drop comments that ask for more seasons.
+  // Build the title-specific pool. BL/GL stories are usually closed (no season 2 asks);
+  // series with multiple seasons also drop comments that ask for more seasons.
   const titledBase = TITLED[kind];
-  const titledPool = kind === "series" && !hasMultipleSeasons
-    ? [...titledBase, ...SINGLE_SEASON_SERIES]
-    : titledBase;
+  const titledPool = isBlGl
+    ? BLGL_TITLED
+    : kind === "series" && !hasMultipleSeasons
+      ? [...titledBase, ...SINGLE_SEASON_SERIES]
+      : titledBase;
 
   // Use the complete title context so two different titles cannot accidentally
   // receive the same selection merely because their id hashes share a remainder.
