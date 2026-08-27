@@ -376,21 +376,27 @@ const Browse = () => {
         {/* Mobile menu */}
         <AnimatePresence>
           {menuOpen && (
-            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="bg-card border-b border-border px-4 py-4 space-y-1">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="bg-card border-b border-border px-4 py-3 space-y-0.5 overflow-y-auto overscroll-contain"
+              style={{ maxHeight: "calc(100dvh - 3.5rem)", WebkitOverflowScrolling: "touch" }}
+            >
               {menuItems.map((item: any) => (
-                <button key={item.label} onClick={item.action} className="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
-                  <span>{item.icon}</span>
-                  <span>{item.label}</span>
+                <button key={item.label} onClick={item.action} className="w-full text-left flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] leading-tight text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+                  <span className="text-sm leading-none">{item.icon}</span>
+                  <span className="truncate">{item.label}</span>
                 </button>
               ))}
 
               {/* QueerScenes Social Media */}
-              <div className="border-t border-border pt-3 mt-2">
-                <p className="px-3 pb-2 qs-section-label">
+              <div className="border-t border-border pt-2 mt-1.5">
+                <p className="px-3 pb-1.5 qs-section-label">
                   QueerScenes Social Media
                 </p>
 
-                <div className="flex items-center gap-2 px-3 pb-1 flex-wrap">
+                <div className="flex items-center gap-1.5 px-3 pb-1 flex-wrap">
                   {socialLinks.map(({ id, label, href, icon }) => {
                     const Icon = getSocialIcon(icon);
                     return (
@@ -401,18 +407,18 @@ const Browse = () => {
                         rel="noopener noreferrer"
                         title={label}
                         aria-label={label}
-                        className="w-9 h-9 flex items-center justify-center rounded-full bg-muted/50 hover:bg-primary/20 hover:text-primary text-muted-foreground transition-colors"
+                        className="w-8 h-8 flex items-center justify-center rounded-full bg-muted/50 hover:bg-primary/20 hover:text-primary text-muted-foreground transition-colors"
                       >
-                        <Icon className="w-4 h-4" />
+                        <Icon className="w-3.5 h-3.5" />
                       </a>
                     );
                   })}
                 </div>
               </div>
 
-              <div className="border-t border-border pt-2 mt-2">
-                <button onClick={async () => { setMenuOpen(false); await signOut(); navigate("/"); }} className="qs-signout w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors">
-                  <LogOut className="w-4 h-4" />
+              <div className="border-t border-border pt-1.5 mt-1.5">
+                <button onClick={async () => { setMenuOpen(false); await signOut(); navigate("/"); }} className="qs-signout w-full text-left flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] leading-tight transition-colors">
+                  <LogOut className="w-3.5 h-3.5" />
                   <span>Sign Out</span>
                 </button>
               </div>
