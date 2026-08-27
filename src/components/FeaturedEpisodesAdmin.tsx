@@ -38,8 +38,8 @@ const FeaturedEpisodesAdmin = () => {
 
   const load = async () => {
     const [{ data: ep }, { data: ct }, { data: feat }] = await Promise.all([
-      supabase.from("episodes").select("id, title, season, episode_number, content_id"),
-      supabase.from("contents").select("id, title, type"),
+      supabase.from("episodes").select("id, title, season, episode_number, content_id").limit(5000),
+      supabase.from("contents").select("id, title, type").limit(2000),
       (supabase as any).from("featured_episodes").select("*").order("position", { ascending: true }),
     ]);
     const cMap = new Map((ct || []).map((c: any) => [c.id, c]));
