@@ -78,6 +78,20 @@ const SINGLE_SEASON_SERIES: ((t: string) => string)[] = [
   (t) => `they really left ${t} like that?? i need more episodes`,
 ];
 
+/** BL/GL titles are usually closed stories — comments follow the site, not future seasons. */
+const BLGL_TITLED: ((t: string) => string)[] = [
+  (t) => `${t} is exactly the kind of story i only find here, i follow every new release on the site`,
+  (t) => `been keeping up with everything dropping on the site and ${t} is easily my favorite so far`,
+  (t) => `i check the site almost daily and ${t} was so worth the wait`,
+  (t) => `${t} broke my heart in the best way, glad i caught it here`,
+  (t) => `every time i open the site there's something new, but ${t} is the one i keep rewatching`,
+  (t) => `the leads in ${t} have the most beautiful chemistry, watched it twice already`,
+  (t) => `${t} had me smiling at my phone like an idiot, the site never misses`,
+  (t) => `i follow all the bl/gl drops here and ${t} is top tier, trust me`,
+  (t) => `${t} is so soft and so painful at the same time, i'm obsessed`,
+  (t) => `watching ${t} here with proper subs made every scene hit harder`,
+];
+
 /** Reactions about the title itself — no chat groups, no promises of future seasons. */
 const REACTION_STARTS = [
   "i clicked out of curiosity and ended up watching the whole thing",
