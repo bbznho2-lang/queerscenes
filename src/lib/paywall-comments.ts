@@ -9,6 +9,8 @@ export interface PaywallCommentContext {
   title?: string | null;
   /** Raw content type from the database (movie, serie, novela, reality...). */
   type?: string | null;
+  /** Catalog section (series, filmes, novelas, bl, gl, realities, exclusivos...). */
+  section?: string | null;
   /** Whether the series has more than one season. Avoids "next season" comments when seasons already exist. */
   hasMultipleSeasons?: boolean;
   /** Character names configured in Edit details. */
