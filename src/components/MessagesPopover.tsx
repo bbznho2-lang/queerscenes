@@ -377,6 +377,19 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
 
         {tab === "inbox" && (
           <div className="max-h-[60vh] overflow-y-auto">
+            {unread > 0 && (
+              <div className="sticky top-0 z-10 flex items-center justify-between gap-2 px-3 py-1.5 bg-card/95 backdrop-blur border-b border-border">
+                <span className="text-[10px] text-muted-foreground">
+                  {unread} unread {unread === 1 ? "message" : "messages"}
+                </span>
+                <button
+                  onClick={() => void markAllRead()}
+                  className="text-[10px] font-semibold text-primary hover:underline"
+                >
+                  Mark all as read
+                </button>
+              </div>
+            )}
             {messages.length === 0 ? (
               <p className="text-xs text-muted-foreground text-center py-8 px-4">No messages yet.</p>
             ) : (
