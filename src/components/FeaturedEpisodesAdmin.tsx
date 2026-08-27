@@ -121,13 +121,13 @@ const FeaturedEpisodesAdmin = () => {
         if (a.season !== b.season) return a.season - b.season;
         return a.episode_number - b.episode_number;
       })
-      .slice(0, 30);
+      .slice(0, 500);
 
     const contents = allContents
       .filter((c) => !featuredContentIds.has(c.id))
       .filter((c) => wantedEpisode === null && wantedSeason === null && matchesTerms(c.title))
       .sort((a, b) => a.title.localeCompare(b.title))
-      .slice(0, 30);
+      .slice(0, 100);
 
     return { episodes, contents };
   }, [search, allEpisodes, allContents, featuredEpIds, featuredContentIds]);
