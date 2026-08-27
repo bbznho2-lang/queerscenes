@@ -136,6 +136,9 @@ const PLATFORM_ENDS = [
   "watching on this platform has become my favorite way to unwind",
   "i love the catalog here, it never disappoints me",
   "the platform makes finding stories like this so worth it",
+  "i've been following every release here and it never lets me down",
+  "the site keeps dropping gems like this and i'm here for all of it",
+  "i literally refresh the site to see what's new, that's how good it's been",
 ];
 
 const CHARACTER_REACTIONS = [
