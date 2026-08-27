@@ -131,7 +131,7 @@ const TitlePage = () => {
       setLoading(true);
       const { data } = await supabase
         .from("contents")
-        .select("id, title, year, tag, type, banner_url, synopsis, preview_video_url, updated_at, is_archived, is_premium, cast_members")
+        .select("id, title, year, tag, type, section, banner_url, synopsis, preview_video_url, updated_at, is_archived, is_premium, cast_members")
         .order("title");
       if (cancelled) return;
       const list = ((data ?? []) as TitleContent[]).filter((c) => !c.is_archived);
