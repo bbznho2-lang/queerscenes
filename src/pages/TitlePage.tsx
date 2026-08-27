@@ -489,6 +489,7 @@ const TitlePage = () => {
           contentId={content.id}
           title={content.title}
           type={content.type}
+          section={(content as any).section}
           hasMultipleSeasons={hasMultipleSeasons}
           characters={(content.cast_members || []).map((member) => member.role || "").filter(Boolean)}
           custom={testimonials}
