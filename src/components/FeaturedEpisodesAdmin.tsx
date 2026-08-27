@@ -192,9 +192,9 @@ const FeaturedEpisodesAdmin = () => {
             />
           </div>
           {(results.episodes.length > 0 || results.contents.length > 0) && (
-            <div className="mt-2 max-h-72 overflow-y-auto border border-border rounded-lg divide-y divide-border/50">
+            <div className="mt-2 max-h-96 overflow-y-auto border border-border rounded-lg divide-y divide-border/50">
               {results.contents.length > 0 && (
-                <div className="px-3 py-1 text-[10px] uppercase tracking-wider text-muted-foreground bg-muted/30">Titles (Movies / Series)</div>
+                <div className="sticky top-0 z-10 px-3 py-1 text-[10px] uppercase tracking-wider text-muted-foreground bg-muted">Titles (Movies / Series) — {results.contents.length}</div>
               )}
               {results.contents.map((c) => (
                 <button
@@ -211,7 +211,7 @@ const FeaturedEpisodesAdmin = () => {
                 </button>
               ))}
               {results.episodes.length > 0 && (
-                <div className="px-3 py-1 text-[10px] uppercase tracking-wider text-muted-foreground bg-muted/30">Episodes</div>
+                <div className="px-3 py-1 text-[10px] uppercase tracking-wider text-muted-foreground bg-muted/30">Episodes — {results.episodes.length} (all seasons)</div>
               )}
               {results.episodes.map((e) => (
                 <button
