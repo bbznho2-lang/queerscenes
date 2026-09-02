@@ -314,7 +314,8 @@ const Browse = () => {
   };
 
   const dragProps = (sectionKey: string, list: ContentItem[], index: number) => {
-    if (!isAdmin) return {};
+    const cellClass = "flex-shrink-0 w-[45vw] sm:w-[200px]";
+    if (!isAdmin) return { className: cellClass };
     return {
       draggable: true,
       onDragStart: (e: React.DragEvent) => {
@@ -342,8 +343,8 @@ const Browse = () => {
         setDraggingKey(null);
         if (d && d.key === sectionKey) persistOrder(list);
       },
-      className: `flex-shrink-0 w-[45vw] sm:w-[200px] transition-opacity ${
-        draggingKey === sectionKey ? "opacity-90" : ""
+      className: `${cellClass} transition-transform ${
+        draggingKey === sectionKey ? "cursor-grabbing" : "cursor-grab"
       }`,
     };
   };
