@@ -135,34 +135,13 @@ const ContentCard = ({
           </button>
         </div>
       )}
-      {isAdmin && (onMoveLeft || onMoveRight || onMoveFirst) && (
-        <div className="absolute top-2 left-2 flex gap-1 z-10">
-          <button
-            onClick={(e) => { e.stopPropagation(); onMoveLeft?.(); }}
-            disabled={!onMoveLeft}
-            className="w-8 h-8 rounded-full bg-card/90 flex items-center justify-center hover:bg-primary/20 transition-colors shadow-md disabled:opacity-30"
-            title="Move left"
-          >
-            <ChevronLeft className="w-3.5 h-3.5 text-primary" />
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); onMoveRight?.(); }}
-            disabled={!onMoveRight}
-            className="w-8 h-8 rounded-full bg-card/90 flex items-center justify-center hover:bg-primary/20 transition-colors shadow-md disabled:opacity-30"
-            title="Move right"
-          >
-            <ChevronRight className="w-3.5 h-3.5 text-primary" />
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); onMoveFirst?.(); }}
-            disabled={!onMoveFirst}
-            className="w-8 h-8 rounded-full bg-card/90 flex items-center justify-center hover:bg-amber-500/20 transition-colors shadow-md disabled:opacity-30"
-            title="Move to front"
-          >
-            <ArrowLeftToLine className="w-3.5 h-3.5 text-amber-400" />
-          </button>
+      {isAdmin && orderIndex !== undefined && (
+        <div className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 h-7 rounded-full bg-card/90 shadow-md cursor-grab active:cursor-grabbing" title="Drag to reorder">
+          <GripVertical className="w-3.5 h-3.5 text-primary" />
+          <span className="text-[11px] font-semibold text-primary">#{orderIndex + 1}</span>
         </div>
       )}
+
       <div className="absolute inset-0 rounded-xl border border-transparent group-hover:border-primary/50 transition-all pointer-events-none" />
     </motion.div>
   );
