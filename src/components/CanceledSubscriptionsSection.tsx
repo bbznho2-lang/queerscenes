@@ -133,8 +133,18 @@ export default function CanceledSubscriptionsSection() {
     load();
   };
 
-  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
-  const pageRows = rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const q = search.trim().toLowerCase();
+  const filteredRows = q
+    ? rows.filter((r) =>
+        r.email.toLowerCase().includes(q) ||
+        (r.name || "").toLowerCase().includes(q) ||
+        (r.plan || "").toLowerCase().includes(q) ||
+        (r.notes || "").toLowerCase().includes(q)
+      )
+    : rows;
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pageRows = filteredRows.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   return (
     <Card className="bg-card border-border">
