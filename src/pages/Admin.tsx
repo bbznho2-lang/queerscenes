@@ -1211,9 +1211,18 @@ const Admin = () => {
 
         {/* Account Deletions Log */}
         {(() => {
-          const totalDelPages = Math.max(1, Math.ceil(deletions.length / DELETIONS_PER_PAGE));
-          const start = (deletionsPage - 1) * DELETIONS_PER_PAGE;
-          const pageDels = deletions.slice(start, start + DELETIONS_PER_PAGE);
+          const q = deletionSearch.trim().toLowerCase();
+          const filteredDels = q
+            ? deletions.filter((d) =>
+                (d.email || "").toLowerCase().includes(q) ||
+                `${d.first_name || ""} ${d.last_name || ""}`.toLowerCase().includes(q) ||
+                (d.premium_plan || "").toLowerCase().includes(q)
+              )
+            : deletions;
+          const totalDelPages = Math.max(1, Math.ceil(filteredDels.length / DELETIONS_PER_PAGE));
+          const page = Math.min(deletionsPage, totalDelPages);
+          const start = (page - 1) * DELETIONS_PER_PAGE;
+          const pageDels = filteredDels.slice(start, start + DELETIONS_PER_PAGE);
           return (
             <Card className="bg-card border-border">
               <CardHeader>
@@ -1221,21 +1230,31 @@ const Admin = () => {
                   <Trash2 className="w-5 h-5 text-destructive" />
                   Account Deletions
                 </CardTitle>
+                <div className="relative mt-3">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={deletionSearch}
+                    onChange={(e) => { setDeletionSearch(e.target.value); setDeletionsPage(1); }}
+                    placeholder="Search deleted accounts by email, name or plan..."
+                    className="pl-9 bg-background"
+                  />
+                </div>
               </CardHeader>
               <CardContent>
-                {deletions.length > 0 ? (
+                {filteredDels.length > 0 ? (
                   <div className="space-y-1">
-                    <div className="hidden sm:grid grid-cols-[1.5fr_1fr_110px_110px_150px] gap-3 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
+                    <div className="hidden sm:grid grid-cols-[1.5fr_1fr_110px_110px_150px_90px] gap-3 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
                       <span>Email</span>
                       <span>Name</span>
                       <span>Was supporter</span>
                       <span>Deleted by</span>
                       <span className="text-right">When</span>
+                      <span />
                     </div>
                     {pageDels.map((d) => {
                       const name = [d.first_name, d.last_name].filter(Boolean).join(" ") || "—";
                       return (
-                        <div key={d.id} className="grid grid-cols-1 sm:grid-cols-[1.5fr_1fr_110px_110px_150px] gap-1 sm:gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/30 transition-colors border-b border-border/30 last:border-0">
+                        <div key={d.id} className="grid grid-cols-1 sm:grid-cols-[1.5fr_1fr_110px_110px_150px_90px] gap-1 sm:gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/30 transition-colors border-b border-border/30 last:border-0 items-center">
                           <span className="text-sm text-foreground truncate">{d.email || "—"}</span>
                           <span className="text-sm text-muted-foreground truncate">{name}</span>
                           <span className={`text-xs font-medium ${d.was_premium ? "text-secondary" : "text-muted-foreground"}`}>
@@ -1245,6 +1264,55 @@ const Admin = () => {
                           <span className="text-xs text-muted-foreground sm:text-right">
                             {new Date(d.created_at).toLocaleString(undefined, { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" })}
                           </span>
+                          <div className="sm:justify-self-end">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 text-xs"
+                              onClick={() => {
+                                setManagingDeletion(managingDeletion === d.id ? null : d.id);
+                                setManagePlan(d.premium_plan || "lifetime");
+                                setManageUntil("");
+                              }}
+                            >
+                              <Crown className="w-3.5 h-3.5 mr-1 text-amber-400" />
+                              Plan
+                            </Button>
+                          </div>
+                          {managingDeletion === d.id && (
+                            <div className="col-span-full mt-2 rounded-lg border border-border/60 bg-muted/20 p-3 space-y-3">
+                              <p className="text-[11px] text-muted-foreground">
+                                Manage the supporter access tied to <span className="text-foreground">{d.email || "—"}</span>. It is restored automatically if they sign up again with this email.
+                              </p>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div className="space-y-1.5">
+                                  <label className="text-xs text-muted-foreground">Plan</label>
+                                  <Select value={managePlan} onValueChange={setManagePlan}>
+                                    <SelectTrigger className="bg-background h-9"><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="monthly">Monthly</SelectItem>
+                                      <SelectItem value="quarterly">Quarterly</SelectItem>
+                                      <SelectItem value="annual">Annual</SelectItem>
+                                      <SelectItem value="lifetime">Lifetime</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="space-y-1.5">
+                                  <label className="text-xs text-muted-foreground">Active until (empty = lifetime)</label>
+                                  <Input type="date" value={manageUntil} onChange={(e) => setManageUntil(e.target.value)} className="bg-background h-9" />
+                                </div>
+                              </div>
+                              <div className="flex flex-wrap items-center gap-2">
+                                <Button size="sm" className="h-8" disabled={managing} onClick={() => grantSupporterForEmail(d.email || "")}>
+                                  {managing ? "Saving..." : "Save supporter access"}
+                                </Button>
+                                <Button size="sm" variant="outline" className="h-8 border-destructive/40 text-destructive hover:bg-destructive/10" disabled={managing} onClick={() => revokeSupporterForEmail(d.email || "")}>
+                                  Revoke access
+                                </Button>
+                                <Button size="sm" variant="ghost" className="h-8" onClick={() => setManagingDeletion(null)}>Close</Button>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       );
                     })}
