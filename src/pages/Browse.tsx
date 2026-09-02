@@ -49,6 +49,9 @@ const ContentCard = ({
   onToggleWatchlist,
   userIsPremium,
   onRemoveFromExclusives,
+  onMoveLeft,
+  onMoveRight,
+  onMoveFirst,
 }: {
   item: ContentItem;
   isAdmin: boolean;
@@ -59,6 +62,9 @@ const ContentCard = ({
   onToggleWatchlist: () => void;
   userIsPremium: boolean;
   onRemoveFromExclusives?: () => void;
+  onMoveLeft?: () => void;
+  onMoveRight?: () => void;
+  onMoveFirst?: () => void;
 }) => {
   const navigate = useNavigate();
   const handleClick = () => {
