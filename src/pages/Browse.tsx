@@ -49,9 +49,8 @@ const ContentCard = ({
   onToggleWatchlist,
   userIsPremium,
   onRemoveFromExclusives,
-  onMoveLeft,
-  onMoveRight,
-  onMoveFirst,
+  orderIndex,
+
 }: {
   item: ContentItem;
   isAdmin: boolean;
