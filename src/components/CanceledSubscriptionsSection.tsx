@@ -23,6 +23,7 @@ export default function CanceledSubscriptionsSection() {
   const [rows, setRows] = useState<CanceledRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
 
   // Form state
   const [email, setEmail] = useState("");
