@@ -250,12 +250,12 @@ export default function CanceledSubscriptionsSection() {
             ))}
             {totalPages > 1 && (
               <div className="flex items-center justify-between pt-4 border-t border-border mt-2">
-                <span className="text-xs text-muted-foreground">Page {page} of {totalPages} ({rows.length} entries)</span>
+                <span className="text-xs text-muted-foreground">Page {safePage} of {totalPages} ({filteredRows.length}{q ? ` of ${rows.length}` : ""} entries)</span>
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
+                  <Button variant="outline" size="sm" disabled={safePage <= 1} onClick={() => setPage(Math.max(1, safePage - 1))}>
                     <ChevronLeft className="w-4 h-4" />
                   </Button>
-                  <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>
+                  <Button variant="outline" size="sm" disabled={safePage >= totalPages} onClick={() => setPage(Math.min(totalPages, safePage + 1))}>
                     <ChevronRight className="w-4 h-4" />
                   </Button>
                 </div>
@@ -263,7 +263,7 @@ export default function CanceledSubscriptionsSection() {
             )}
           </div>
         ) : (
-          <p className="text-muted-foreground text-center py-6 text-sm">No canceled subscriptions logged yet.</p>
+          <p className="text-muted-foreground text-center py-6 text-sm">{q ? "No canceled subscriptions match your search." : "No canceled subscriptions logged yet."}</p>
         )}
       </CardContent>
     </Card>
