@@ -310,6 +310,40 @@ const Browse = () => {
     else { toast.success("Removed from Exclusives"); fetchContents(); }
   };
 
+  const moveCard = async (list: ContentItem[], index: number, target: number) => {
+    if (index === target || target < 0 || target >= list.length) return;
+    const arr = [...list];
+    const [moved] = arr.splice(index, 1);
+    arr.splice(target, 0, moved);
+
+    const newPositions = new Map<string, number>();
+    arr.forEach((item, i) => {
+      if (item.position !== i) newPositions.set(item.id, i);
+    });
+    if (newPositions.size === 0) return;
+
+    setContents((prev) =>
+      [...prev.map((c) => (newPositions.has(c.id) ? { ...c, position: newPositions.get(c.id)! } : c))]
+        .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
+    );
+
+    const results = await Promise.all(
+      Array.from(newPositions.entries()).map(([id, pos]) =>
+        supabase.from("contents").update({ position: pos }).eq("id", id)
+      )
+    );
+    if (results.some((r) => r.error)) {
+      toast.error("Failed to save new order");
+      fetchContents();
+    }
+  };
+
+  const orderProps = (list: ContentItem[], index: number) => ({
+    onMoveLeft: index > 0 ? () => moveCard(list, index, index - 1) : undefined,
+    onMoveRight: index < list.length - 1 ? () => moveCard(list, index, index + 1) : undefined,
+    onMoveFirst: index > 0 ? () => moveCard(list, index, 0) : undefined,
+  });
+
   const handleEdit = (item: ContentItem) => {
     setEditingContent(item);
     setEditOpen(true);
