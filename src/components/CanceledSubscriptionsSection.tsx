@@ -201,9 +201,20 @@ export default function CanceledSubscriptionsSection() {
         </div>
 
         {/* List */}
+        <div className="relative">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            placeholder="Search canceled users by email, name, plan or reason..."
+            className="pl-9 bg-background"
+          />
+        </div>
+
+        {/* List */}
         {loading ? (
           <p className="text-muted-foreground text-center py-6 text-sm">Loading...</p>
-        ) : rows.length > 0 ? (
+        ) : filteredRows.length > 0 ? (
           <div className="space-y-1">
             <div className="hidden sm:grid grid-cols-[1.5fr_1fr_100px_120px_80px] gap-3 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
               <span>Email</span>
