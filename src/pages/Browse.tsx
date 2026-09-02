@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Plus, Menu, X, Search, Bookmark, LogOut, Pencil, Trash2, Crown, Settings, Sparkles, Instagram, Youtube, Facebook, Music2, StarOff, ChevronLeft, ChevronRight, ArrowLeftToLine } from "lucide-react";
+import { Play, Plus, Menu, X, Search, Bookmark, LogOut, Pencil, Trash2, Crown, Settings, Sparkles, Instagram, Youtube, Facebook, Music2, StarOff, GripVertical } from "lucide-react";
 import { XIcon } from "@/components/icons/XIcon";
 import { getSocialIcon } from "@/lib/social-icons";
 import { Button } from "@/components/ui/button";
@@ -61,9 +61,7 @@ const ContentCard = ({
   onToggleWatchlist: () => void;
   userIsPremium: boolean;
   onRemoveFromExclusives?: () => void;
-  onMoveLeft?: () => void;
-  onMoveRight?: () => void;
-  onMoveFirst?: () => void;
+  orderIndex?: number;
 }) => {
   const navigate = useNavigate();
   const handleClick = () => {
