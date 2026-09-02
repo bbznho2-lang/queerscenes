@@ -529,6 +529,55 @@ const Admin = () => {
     }
   };
 
+  const grantSupporterForEmail = async (email: string) => {
+    const emailTrimmed = (email || "").trim().toLowerCase();
+    if (!emailTrimmed) { toast.error("This deletion has no email on record"); return; }
+    const expiresIso = manageUntil ? dateInputToIso(manageUntil) : null;
+    if (manageUntil && !expiresIso) { toast.error("Invalid date"); return; }
+    setManaging(true);
+    try {
+      const { error } = await supabase.rpc("admin_grant_supporter_by_email" as never, {
+        _email: emailTrimmed,
+        _plan: managePlan,
+        _expires_at: expiresIso,
+      } as never);
+      if (error) throw error;
+      toast.success(`Supporter access saved for ${emailTrimmed}. It applies as soon as they sign up again.`);
+      setManagingDeletion(null);
+      setManageUntil("");
+      fetchData(false);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Error saving supporter access");
+    } finally {
+      setManaging(false);
+    }
+  };
+
+  const revokeSupporterForEmail = async (email: string) => {
+    const emailTrimmed = (email || "").trim().toLowerCase();
+    if (!emailTrimmed) { toast.error("This deletion has no email on record"); return; }
+    setManaging(true);
+    try {
+      const { error } = await (supabase as any)
+        .from("pending_supporters")
+        .update({ status: "canceled", premium_expires_at: new Date(Date.now() - 1000).toISOString() })
+        .ilike("email", emailTrimmed)
+        .gt("premium_expires_at", new Date().toISOString());
+      if (error) throw error;
+      await (supabase as any)
+        .from("profiles")
+        .update({ is_premium: false, premium_plan: null, premium_expires_at: null })
+        .ilike("email", emailTrimmed);
+      toast.success(`Supporter access revoked for ${emailTrimmed}`);
+      setManagingDeletion(null);
+      fetchData(false);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Error revoking access");
+    } finally {
+      setManaging(false);
+    }
+  };
+
   const deleteUser = async (profile: Profile) => {
     setDeletingUserId(profile.user_id);
     try {
