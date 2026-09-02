@@ -135,6 +135,34 @@ const ContentCard = ({
           </button>
         </div>
       )}
+      {isAdmin && (onMoveLeft || onMoveRight || onMoveFirst) && (
+        <div className="absolute top-2 left-2 flex gap-1 z-10">
+          <button
+            onClick={(e) => { e.stopPropagation(); onMoveLeft?.(); }}
+            disabled={!onMoveLeft}
+            className="w-8 h-8 rounded-full bg-card/90 flex items-center justify-center hover:bg-primary/20 transition-colors shadow-md disabled:opacity-30"
+            title="Move left"
+          >
+            <ChevronLeft className="w-3.5 h-3.5 text-primary" />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); onMoveRight?.(); }}
+            disabled={!onMoveRight}
+            className="w-8 h-8 rounded-full bg-card/90 flex items-center justify-center hover:bg-primary/20 transition-colors shadow-md disabled:opacity-30"
+            title="Move right"
+          >
+            <ChevronRight className="w-3.5 h-3.5 text-primary" />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); onMoveFirst?.(); }}
+            disabled={!onMoveFirst}
+            className="w-8 h-8 rounded-full bg-card/90 flex items-center justify-center hover:bg-amber-500/20 transition-colors shadow-md disabled:opacity-30"
+            title="Move to front"
+          >
+            <ArrowLeftToLine className="w-3.5 h-3.5 text-amber-400" />
+          </button>
+        </div>
+      )}
       <div className="absolute inset-0 rounded-xl border border-transparent group-hover:border-primary/50 transition-all pointer-events-none" />
     </motion.div>
   );
