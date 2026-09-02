@@ -286,39 +286,65 @@ const Browse = () => {
     else { toast.success("Removed from Exclusives"); fetchContents(); }
   };
 
-  const moveCard = async (list: ContentItem[], index: number, target: number) => {
-    if (index === target || target < 0 || target >= list.length) return;
+  const reorderLocal = (list: ContentItem[], from: number, to: number) => {
+    if (from === to || from < 0 || to < 0 || to >= list.length) return;
     const arr = [...list];
-    const [moved] = arr.splice(index, 1);
-    arr.splice(target, 0, moved);
-
-    const newPositions = new Map<string, number>();
-    arr.forEach((item, i) => {
-      if (item.position !== i) newPositions.set(item.id, i);
-    });
-    if (newPositions.size === 0) return;
-
+    const [moved] = arr.splice(from, 1);
+    arr.splice(to, 0, moved);
+    const pos = new Map(arr.map((it, i) => [it.id, i] as const));
     setContents((prev) =>
-      [...prev.map((c) => (newPositions.has(c.id) ? { ...c, position: newPositions.get(c.id)! } : c))]
+      [...prev.map((c) => (pos.has(c.id) ? { ...c, position: pos.get(c.id)! } : c))]
         .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
     );
+  };
 
+  const persistOrder = async (list: ContentItem[]) => {
     const results = await Promise.all(
-      Array.from(newPositions.entries()).map(([id, pos]) =>
-        supabase.from("contents").update({ position: pos }).eq("id", id)
-      )
+      list.map((it, i) => supabase.from("contents").update({ position: i }).eq("id", it.id))
     );
     if (results.some((r) => r.error)) {
       toast.error("Failed to save new order");
       fetchContents();
+    } else {
+      toast.success("Order saved");
     }
   };
 
-  const orderProps = (list: ContentItem[], index: number) => ({
-    onMoveLeft: index > 0 ? () => moveCard(list, index, index - 1) : undefined,
-    onMoveRight: index < list.length - 1 ? () => moveCard(list, index, index + 1) : undefined,
-    onMoveFirst: index > 0 ? () => moveCard(list, index, 0) : undefined,
-  });
+  const dragProps = (sectionKey: string, list: ContentItem[], index: number) => {
+    if (!isAdmin) return {};
+    return {
+      draggable: true,
+      onDragStart: (e: React.DragEvent) => {
+        dragRef.current = { key: sectionKey, index };
+        setDraggingKey(sectionKey);
+        e.dataTransfer.effectAllowed = "move";
+        try { e.dataTransfer.setData("text/plain", list[index].id); } catch { /* noop */ }
+      },
+      onDragOver: (e: React.DragEvent) => {
+        const d = dragRef.current;
+        if (!d || d.key !== sectionKey) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        if (d.index !== index) {
+          reorderLocal(list, d.index, index);
+          dragRef.current = { key: sectionKey, index };
+        }
+      },
+      onDrop: (e: React.DragEvent) => {
+        e.preventDefault();
+      },
+      onDragEnd: () => {
+        const d = dragRef.current;
+        dragRef.current = null;
+        setDraggingKey(null);
+        if (d && d.key === sectionKey) persistOrder(list);
+      },
+      className: `flex-shrink-0 w-[45vw] sm:w-[200px] transition-opacity ${
+        draggingKey === sectionKey ? "opacity-90" : ""
+      }`,
+    };
+  };
+
 
   const handleEdit = (item: ContentItem) => {
     setEditingContent(item);
