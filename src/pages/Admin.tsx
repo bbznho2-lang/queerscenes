@@ -1319,13 +1319,13 @@ const Admin = () => {
                     {totalDelPages > 1 && (
                       <div className="flex items-center justify-between pt-4 border-t border-border mt-2">
                         <span className="text-xs text-muted-foreground">
-                          Page {deletionsPage} of {totalDelPages} ({deletions.length} deletions)
+                          Page {page} of {totalDelPages} ({filteredDels.length}{q ? ` of ${deletions.length}` : ""} deletions)
                         </span>
                         <div className="flex items-center gap-2">
-                          <Button variant="outline" size="sm" disabled={deletionsPage <= 1} onClick={() => setDeletionsPage((p) => Math.max(1, p - 1))}>
+                          <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setDeletionsPage(Math.max(1, page - 1))}>
                             <ChevronLeft className="w-4 h-4" />
                           </Button>
-                          <Button variant="outline" size="sm" disabled={deletionsPage >= totalDelPages} onClick={() => setDeletionsPage((p) => Math.min(totalDelPages, p + 1))}>
+                          <Button variant="outline" size="sm" disabled={page >= totalDelPages} onClick={() => setDeletionsPage(Math.min(totalDelPages, page + 1))}>
                             <ChevronRight className="w-4 h-4" />
                           </Button>
                         </div>
@@ -1333,7 +1333,7 @@ const Admin = () => {
                     )}
                   </div>
                 ) : (
-                  <p className="text-muted-foreground text-center py-6 text-sm">No account deletions yet.</p>
+                  <p className="text-muted-foreground text-center py-6 text-sm">{q ? "No deleted accounts match your search." : "No account deletions yet."}</p>
                 )}
               </CardContent>
             </Card>
