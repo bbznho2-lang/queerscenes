@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { CircleOff, Plus, Trash2, ChevronLeft, ChevronRight, Pencil } from "lucide-react";
+import { CircleOff, Plus, Trash2, ChevronLeft, ChevronRight, Pencil, Search } from "lucide-react";
 
 interface CanceledRow {
   id: string;
@@ -23,6 +23,7 @@ export default function CanceledSubscriptionsSection() {
   const [rows, setRows] = useState<CanceledRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
 
   // Form state
   const [email, setEmail] = useState("");
@@ -133,8 +134,18 @@ export default function CanceledSubscriptionsSection() {
     load();
   };
 
-  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
-  const pageRows = rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const q = search.trim().toLowerCase();
+  const filteredRows = q
+    ? rows.filter((r) =>
+        r.email.toLowerCase().includes(q) ||
+        (r.name || "").toLowerCase().includes(q) ||
+        (r.plan || "").toLowerCase().includes(q) ||
+        (r.notes || "").toLowerCase().includes(q)
+      )
+    : rows;
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pageRows = filteredRows.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   return (
     <Card className="bg-card border-border">
@@ -190,9 +201,20 @@ export default function CanceledSubscriptionsSection() {
         </div>
 
         {/* List */}
+        <div className="relative">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            placeholder="Search canceled users by email, name, plan or reason..."
+            className="pl-9 bg-background"
+          />
+        </div>
+
+        {/* List */}
         {loading ? (
           <p className="text-muted-foreground text-center py-6 text-sm">Loading...</p>
-        ) : rows.length > 0 ? (
+        ) : filteredRows.length > 0 ? (
           <div className="space-y-1">
             <div className="hidden sm:grid grid-cols-[1.5fr_1fr_100px_120px_80px] gap-3 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
               <span>Email</span>
@@ -239,12 +261,12 @@ export default function CanceledSubscriptionsSection() {
             ))}
             {totalPages > 1 && (
               <div className="flex items-center justify-between pt-4 border-t border-border mt-2">
-                <span className="text-xs text-muted-foreground">Page {page} of {totalPages} ({rows.length} entries)</span>
+                <span className="text-xs text-muted-foreground">Page {safePage} of {totalPages} ({filteredRows.length}{q ? ` of ${rows.length}` : ""} entries)</span>
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
+                  <Button variant="outline" size="sm" disabled={safePage <= 1} onClick={() => setPage(Math.max(1, safePage - 1))}>
                     <ChevronLeft className="w-4 h-4" />
                   </Button>
-                  <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>
+                  <Button variant="outline" size="sm" disabled={safePage >= totalPages} onClick={() => setPage(Math.min(totalPages, safePage + 1))}>
                     <ChevronRight className="w-4 h-4" />
                   </Button>
                 </div>
@@ -252,7 +274,7 @@ export default function CanceledSubscriptionsSection() {
             )}
           </div>
         ) : (
-          <p className="text-muted-foreground text-center py-6 text-sm">No canceled subscriptions logged yet.</p>
+          <p className="text-muted-foreground text-center py-6 text-sm">{q ? "No canceled subscriptions match your search." : "No canceled subscriptions logged yet."}</p>
         )}
       </CardContent>
     </Card>

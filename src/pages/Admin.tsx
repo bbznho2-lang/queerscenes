@@ -102,6 +102,11 @@ const Admin = () => {
   const [deletions, setDeletions] = useState<Array<{ id: string; deleted_user_id: string; email: string | null; first_name: string | null; last_name: string | null; was_premium: boolean; premium_plan: string | null; premium_expires_at: string | null; deleted_by: string; created_at: string }>>([]);
   const [deletionsPage, setDeletionsPage] = useState(1);
   const DELETIONS_PER_PAGE = 10;
+  const [deletionSearch, setDeletionSearch] = useState("");
+  const [managingDeletion, setManagingDeletion] = useState<string | null>(null);
+  const [managePlan, setManagePlan] = useState("lifetime");
+  const [manageUntil, setManageUntil] = useState("");
+  const [managing, setManaging] = useState(false);
   // Independent signup timestamps for the "last 14 days" chart. Kept separate from
   // the paginated `profiles` list so realtime re-fetch races cannot truncate it.
   const [recentSignupDates, setRecentSignupDates] = useState<string[]>([]);
@@ -521,6 +526,55 @@ const Admin = () => {
       toast.error(error instanceof Error ? error.message : "Error granting premium");
     } finally {
       setAddingPremium(false);
+    }
+  };
+
+  const grantSupporterForEmail = async (email: string) => {
+    const emailTrimmed = (email || "").trim().toLowerCase();
+    if (!emailTrimmed) { toast.error("This deletion has no email on record"); return; }
+    const expiresIso = manageUntil ? dateInputToIso(manageUntil) : null;
+    if (manageUntil && !expiresIso) { toast.error("Invalid date"); return; }
+    setManaging(true);
+    try {
+      const { error } = await supabase.rpc("admin_grant_supporter_by_email" as never, {
+        _email: emailTrimmed,
+        _plan: managePlan,
+        _expires_at: expiresIso,
+      } as never);
+      if (error) throw error;
+      toast.success(`Supporter access saved for ${emailTrimmed}. It applies as soon as they sign up again.`);
+      setManagingDeletion(null);
+      setManageUntil("");
+      fetchData(false);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Error saving supporter access");
+    } finally {
+      setManaging(false);
+    }
+  };
+
+  const revokeSupporterForEmail = async (email: string) => {
+    const emailTrimmed = (email || "").trim().toLowerCase();
+    if (!emailTrimmed) { toast.error("This deletion has no email on record"); return; }
+    setManaging(true);
+    try {
+      const { error } = await (supabase as any)
+        .from("pending_supporters")
+        .update({ status: "canceled", premium_expires_at: new Date(Date.now() - 1000).toISOString() })
+        .ilike("email", emailTrimmed)
+        .gt("premium_expires_at", new Date().toISOString());
+      if (error) throw error;
+      await (supabase as any)
+        .from("profiles")
+        .update({ is_premium: false, premium_plan: null, premium_expires_at: null })
+        .ilike("email", emailTrimmed);
+      toast.success(`Supporter access revoked for ${emailTrimmed}`);
+      setManagingDeletion(null);
+      fetchData(false);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Error revoking access");
+    } finally {
+      setManaging(false);
     }
   };
 
@@ -1157,9 +1211,18 @@ const Admin = () => {
 
         {/* Account Deletions Log */}
         {(() => {
-          const totalDelPages = Math.max(1, Math.ceil(deletions.length / DELETIONS_PER_PAGE));
-          const start = (deletionsPage - 1) * DELETIONS_PER_PAGE;
-          const pageDels = deletions.slice(start, start + DELETIONS_PER_PAGE);
+          const q = deletionSearch.trim().toLowerCase();
+          const filteredDels = q
+            ? deletions.filter((d) =>
+                (d.email || "").toLowerCase().includes(q) ||
+                `${d.first_name || ""} ${d.last_name || ""}`.toLowerCase().includes(q) ||
+                (d.premium_plan || "").toLowerCase().includes(q)
+              )
+            : deletions;
+          const totalDelPages = Math.max(1, Math.ceil(filteredDels.length / DELETIONS_PER_PAGE));
+          const page = Math.min(deletionsPage, totalDelPages);
+          const start = (page - 1) * DELETIONS_PER_PAGE;
+          const pageDels = filteredDels.slice(start, start + DELETIONS_PER_PAGE);
           return (
             <Card className="bg-card border-border">
               <CardHeader>
@@ -1167,21 +1230,31 @@ const Admin = () => {
                   <Trash2 className="w-5 h-5 text-destructive" />
                   Account Deletions
                 </CardTitle>
+                <div className="relative mt-3">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={deletionSearch}
+                    onChange={(e) => { setDeletionSearch(e.target.value); setDeletionsPage(1); }}
+                    placeholder="Search deleted accounts by email, name or plan..."
+                    className="pl-9 bg-background"
+                  />
+                </div>
               </CardHeader>
               <CardContent>
-                {deletions.length > 0 ? (
+                {filteredDels.length > 0 ? (
                   <div className="space-y-1">
-                    <div className="hidden sm:grid grid-cols-[1.5fr_1fr_110px_110px_150px] gap-3 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
+                    <div className="hidden sm:grid grid-cols-[1.5fr_1fr_110px_110px_150px_90px] gap-3 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
                       <span>Email</span>
                       <span>Name</span>
                       <span>Was supporter</span>
                       <span>Deleted by</span>
                       <span className="text-right">When</span>
+                      <span />
                     </div>
                     {pageDels.map((d) => {
                       const name = [d.first_name, d.last_name].filter(Boolean).join(" ") || "—";
                       return (
-                        <div key={d.id} className="grid grid-cols-1 sm:grid-cols-[1.5fr_1fr_110px_110px_150px] gap-1 sm:gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/30 transition-colors border-b border-border/30 last:border-0">
+                        <div key={d.id} className="grid grid-cols-1 sm:grid-cols-[1.5fr_1fr_110px_110px_150px_90px] gap-1 sm:gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/30 transition-colors border-b border-border/30 last:border-0 items-center">
                           <span className="text-sm text-foreground truncate">{d.email || "—"}</span>
                           <span className="text-sm text-muted-foreground truncate">{name}</span>
                           <span className={`text-xs font-medium ${d.was_premium ? "text-secondary" : "text-muted-foreground"}`}>
@@ -1191,19 +1264,68 @@ const Admin = () => {
                           <span className="text-xs text-muted-foreground sm:text-right">
                             {new Date(d.created_at).toLocaleString(undefined, { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" })}
                           </span>
+                          <div className="sm:justify-self-end">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 text-xs"
+                              onClick={() => {
+                                setManagingDeletion(managingDeletion === d.id ? null : d.id);
+                                setManagePlan(d.premium_plan || "lifetime");
+                                setManageUntil("");
+                              }}
+                            >
+                              <Crown className="w-3.5 h-3.5 mr-1 text-amber-400" />
+                              Plan
+                            </Button>
+                          </div>
+                          {managingDeletion === d.id && (
+                            <div className="col-span-full mt-2 rounded-lg border border-border/60 bg-muted/20 p-3 space-y-3">
+                              <p className="text-[11px] text-muted-foreground">
+                                Manage the supporter access tied to <span className="text-foreground">{d.email || "—"}</span>. It is restored automatically if they sign up again with this email.
+                              </p>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div className="space-y-1.5">
+                                  <label className="text-xs text-muted-foreground">Plan</label>
+                                  <Select value={managePlan} onValueChange={setManagePlan}>
+                                    <SelectTrigger className="bg-background h-9"><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="monthly">Monthly</SelectItem>
+                                      <SelectItem value="quarterly">Quarterly</SelectItem>
+                                      <SelectItem value="annual">Annual</SelectItem>
+                                      <SelectItem value="lifetime">Lifetime</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="space-y-1.5">
+                                  <label className="text-xs text-muted-foreground">Active until (empty = lifetime)</label>
+                                  <Input type="date" value={manageUntil} onChange={(e) => setManageUntil(e.target.value)} className="bg-background h-9" />
+                                </div>
+                              </div>
+                              <div className="flex flex-wrap items-center gap-2">
+                                <Button size="sm" className="h-8" disabled={managing} onClick={() => grantSupporterForEmail(d.email || "")}>
+                                  {managing ? "Saving..." : "Save supporter access"}
+                                </Button>
+                                <Button size="sm" variant="outline" className="h-8 border-destructive/40 text-destructive hover:bg-destructive/10" disabled={managing} onClick={() => revokeSupporterForEmail(d.email || "")}>
+                                  Revoke access
+                                </Button>
+                                <Button size="sm" variant="ghost" className="h-8" onClick={() => setManagingDeletion(null)}>Close</Button>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       );
                     })}
                     {totalDelPages > 1 && (
                       <div className="flex items-center justify-between pt-4 border-t border-border mt-2">
                         <span className="text-xs text-muted-foreground">
-                          Page {deletionsPage} of {totalDelPages} ({deletions.length} deletions)
+                          Page {page} of {totalDelPages} ({filteredDels.length}{q ? ` of ${deletions.length}` : ""} deletions)
                         </span>
                         <div className="flex items-center gap-2">
-                          <Button variant="outline" size="sm" disabled={deletionsPage <= 1} onClick={() => setDeletionsPage((p) => Math.max(1, p - 1))}>
+                          <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setDeletionsPage(Math.max(1, page - 1))}>
                             <ChevronLeft className="w-4 h-4" />
                           </Button>
-                          <Button variant="outline" size="sm" disabled={deletionsPage >= totalDelPages} onClick={() => setDeletionsPage((p) => Math.min(totalDelPages, p + 1))}>
+                          <Button variant="outline" size="sm" disabled={page >= totalDelPages} onClick={() => setDeletionsPage(Math.min(totalDelPages, page + 1))}>
                             <ChevronRight className="w-4 h-4" />
                           </Button>
                         </div>
@@ -1211,7 +1333,7 @@ const Admin = () => {
                     )}
                   </div>
                 ) : (
-                  <p className="text-muted-foreground text-center py-6 text-sm">No account deletions yet.</p>
+                  <p className="text-muted-foreground text-center py-6 text-sm">{q ? "No deleted accounts match your search." : "No account deletions yet."}</p>
                 )}
               </CardContent>
             </Card>
