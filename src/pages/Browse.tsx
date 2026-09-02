@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Plus, Menu, X, Search, Bookmark, LogOut, Pencil, Trash2, Crown, Settings, Sparkles, Instagram, Youtube, Facebook, Music2, StarOff, ChevronLeft, ChevronRight, ArrowLeftToLine } from "lucide-react";
+import { Play, Plus, Menu, X, Search, Bookmark, LogOut, Pencil, Trash2, Crown, Settings, Sparkles, Instagram, Youtube, Facebook, Music2, StarOff, GripVertical } from "lucide-react";
 import { XIcon } from "@/components/icons/XIcon";
 import { getSocialIcon } from "@/lib/social-icons";
 import { Button } from "@/components/ui/button";
@@ -49,9 +49,8 @@ const ContentCard = ({
   onToggleWatchlist,
   userIsPremium,
   onRemoveFromExclusives,
-  onMoveLeft,
-  onMoveRight,
-  onMoveFirst,
+  orderIndex,
+
 }: {
   item: ContentItem;
   isAdmin: boolean;
@@ -62,9 +61,7 @@ const ContentCard = ({
   onToggleWatchlist: () => void;
   userIsPremium: boolean;
   onRemoveFromExclusives?: () => void;
-  onMoveLeft?: () => void;
-  onMoveRight?: () => void;
-  onMoveFirst?: () => void;
+  orderIndex?: number;
 }) => {
   const navigate = useNavigate();
   const handleClick = () => {
@@ -135,34 +132,13 @@ const ContentCard = ({
           </button>
         </div>
       )}
-      {isAdmin && (onMoveLeft || onMoveRight || onMoveFirst) && (
-        <div className="absolute top-2 left-2 flex gap-1 z-10">
-          <button
-            onClick={(e) => { e.stopPropagation(); onMoveLeft?.(); }}
-            disabled={!onMoveLeft}
-            className="w-8 h-8 rounded-full bg-card/90 flex items-center justify-center hover:bg-primary/20 transition-colors shadow-md disabled:opacity-30"
-            title="Move left"
-          >
-            <ChevronLeft className="w-3.5 h-3.5 text-primary" />
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); onMoveRight?.(); }}
-            disabled={!onMoveRight}
-            className="w-8 h-8 rounded-full bg-card/90 flex items-center justify-center hover:bg-primary/20 transition-colors shadow-md disabled:opacity-30"
-            title="Move right"
-          >
-            <ChevronRight className="w-3.5 h-3.5 text-primary" />
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); onMoveFirst?.(); }}
-            disabled={!onMoveFirst}
-            className="w-8 h-8 rounded-full bg-card/90 flex items-center justify-center hover:bg-amber-500/20 transition-colors shadow-md disabled:opacity-30"
-            title="Move to front"
-          >
-            <ArrowLeftToLine className="w-3.5 h-3.5 text-amber-400" />
-          </button>
+      {isAdmin && orderIndex !== undefined && (
+        <div className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 h-7 rounded-full bg-card/90 shadow-md cursor-grab active:cursor-grabbing" title="Drag to reorder">
+          <GripVertical className="w-3.5 h-3.5 text-primary" />
+          <span className="text-[11px] font-semibold text-primary">#{orderIndex + 1}</span>
         </div>
       )}
+
       <div className="absolute inset-0 rounded-xl border border-transparent group-hover:border-primary/50 transition-all pointer-events-none" />
     </motion.div>
   );
@@ -310,39 +286,69 @@ const Browse = () => {
     else { toast.success("Removed from Exclusives"); fetchContents(); }
   };
 
-  const moveCard = async (list: ContentItem[], index: number, target: number) => {
-    if (index === target || target < 0 || target >= list.length) return;
+  const dragRef = useRef<{ key: string; index: number } | null>(null);
+  const [draggingKey, setDraggingKey] = useState<string | null>(null);
+
+  const reorderLocal = (list: ContentItem[], from: number, to: number) => {
+    if (from === to || from < 0 || to < 0 || to >= list.length) return;
     const arr = [...list];
-    const [moved] = arr.splice(index, 1);
-    arr.splice(target, 0, moved);
-
-    const newPositions = new Map<string, number>();
-    arr.forEach((item, i) => {
-      if (item.position !== i) newPositions.set(item.id, i);
-    });
-    if (newPositions.size === 0) return;
-
+    const [moved] = arr.splice(from, 1);
+    arr.splice(to, 0, moved);
+    const pos = new Map(arr.map((it, i) => [it.id, i] as const));
     setContents((prev) =>
-      [...prev.map((c) => (newPositions.has(c.id) ? { ...c, position: newPositions.get(c.id)! } : c))]
+      [...prev.map((c) => (pos.has(c.id) ? { ...c, position: pos.get(c.id)! } : c))]
         .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
     );
+  };
 
+  const persistOrder = async (list: ContentItem[]) => {
     const results = await Promise.all(
-      Array.from(newPositions.entries()).map(([id, pos]) =>
-        supabase.from("contents").update({ position: pos }).eq("id", id)
-      )
+      list.map((it, i) => supabase.from("contents").update({ position: i }).eq("id", it.id))
     );
     if (results.some((r) => r.error)) {
       toast.error("Failed to save new order");
       fetchContents();
+    } else {
+      toast.success("Order saved");
     }
   };
 
-  const orderProps = (list: ContentItem[], index: number) => ({
-    onMoveLeft: index > 0 ? () => moveCard(list, index, index - 1) : undefined,
-    onMoveRight: index < list.length - 1 ? () => moveCard(list, index, index + 1) : undefined,
-    onMoveFirst: index > 0 ? () => moveCard(list, index, 0) : undefined,
-  });
+  const dragProps = (sectionKey: string, list: ContentItem[], index: number) => {
+    const cellClass = "flex-shrink-0 w-[45vw] sm:w-[200px]";
+    if (!isAdmin) return { className: cellClass };
+    return {
+      draggable: true,
+      onDragStart: (e: React.DragEvent) => {
+        dragRef.current = { key: sectionKey, index };
+        setDraggingKey(sectionKey);
+        e.dataTransfer.effectAllowed = "move";
+        try { e.dataTransfer.setData("text/plain", list[index].id); } catch { /* noop */ }
+      },
+      onDragOver: (e: React.DragEvent) => {
+        const d = dragRef.current;
+        if (!d || d.key !== sectionKey) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        if (d.index !== index) {
+          reorderLocal(list, d.index, index);
+          dragRef.current = { key: sectionKey, index };
+        }
+      },
+      onDrop: (e: React.DragEvent) => {
+        e.preventDefault();
+      },
+      onDragEnd: () => {
+        const d = dragRef.current;
+        dragRef.current = null;
+        setDraggingKey(null);
+        if (d && d.key === sectionKey) persistOrder(list);
+      },
+      className: `${cellClass} transition-transform ${
+        draggingKey === sectionKey ? "cursor-grabbing" : "cursor-grab"
+      }`,
+    };
+  };
+
 
   const handleEdit = (item: ContentItem) => {
     setEditingContent(item);
@@ -620,8 +626,8 @@ const Browse = () => {
             {series.length > 0 ? (
               <AutoScrollRow>
                 {series.map((s, si) => (
-                  <div key={s.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={s} isAdmin={isAdmin} onEdit={() => handleEdit(s)} onDelete={() => handleDelete(s.id)} onClickTrack={() => trackClick(s.id)} isInWatchlist={watchlistIds.has(s.id)} onToggleWatchlist={() => toggleWatchlist(s.id)} userIsPremium={userIsPremium} {...orderProps(series, si)} />
+                  <div key={s.id} {...dragProps("series", series, si)}>
+                    <ContentCard item={s} isAdmin={isAdmin} onEdit={() => handleEdit(s)} onDelete={() => handleDelete(s.id)} onClickTrack={() => trackClick(s.id)} isInWatchlist={watchlistIds.has(s.id)} onToggleWatchlist={() => toggleWatchlist(s.id)} userIsPremium={userIsPremium} orderIndex={isAdmin ? si : undefined} />
                   </div>
                 ))}
               </AutoScrollRow>
@@ -649,8 +655,8 @@ const Browse = () => {
             {filmes.length > 0 ? (
               <AutoScrollRow>
                 {filmes.map((f, fi) => (
-                  <div key={f.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={f} isAdmin={isAdmin} onEdit={() => handleEdit(f)} onDelete={() => handleDelete(f.id)} onClickTrack={() => trackClick(f.id)} isInWatchlist={watchlistIds.has(f.id)} onToggleWatchlist={() => toggleWatchlist(f.id)} userIsPremium={userIsPremium} {...orderProps(filmes, fi)} />
+                  <div key={f.id} {...dragProps("filmes", filmes, fi)}>
+                    <ContentCard item={f} isAdmin={isAdmin} onEdit={() => handleEdit(f)} onDelete={() => handleDelete(f.id)} onClickTrack={() => trackClick(f.id)} isInWatchlist={watchlistIds.has(f.id)} onToggleWatchlist={() => toggleWatchlist(f.id)} userIsPremium={userIsPremium} orderIndex={isAdmin ? fi : undefined} />
                   </div>
                 ))}
               </AutoScrollRow>
@@ -681,8 +687,8 @@ const Browse = () => {
             {novelas.length > 0 ? (
               <AutoScrollRow>
                 {novelas.map((n, ni) => (
-                  <div key={n.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={n} isAdmin={isAdmin} onEdit={() => handleEdit(n)} onDelete={() => handleDelete(n.id)} onClickTrack={() => trackClick(n.id)} isInWatchlist={watchlistIds.has(n.id)} onToggleWatchlist={() => toggleWatchlist(n.id)} userIsPremium={userIsPremium} {...orderProps(novelas, ni)} />
+                  <div key={n.id} {...dragProps("novelas", novelas, ni)}>
+                    <ContentCard item={n} isAdmin={isAdmin} onEdit={() => handleEdit(n)} onDelete={() => handleDelete(n.id)} onClickTrack={() => trackClick(n.id)} isInWatchlist={watchlistIds.has(n.id)} onToggleWatchlist={() => toggleWatchlist(n.id)} userIsPremium={userIsPremium} orderIndex={isAdmin ? ni : undefined} />
                   </div>
                 ))}
               </AutoScrollRow>
@@ -718,8 +724,8 @@ const Browse = () => {
             {gl.length > 0 ? (
               <AutoScrollRow>
                 {gl.map((g, gi) => (
-                  <div key={g.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={g} isAdmin={isAdmin} onEdit={() => handleEdit(g)} onDelete={() => handleDelete(g.id)} onClickTrack={() => trackClick(g.id)} isInWatchlist={watchlistIds.has(g.id)} onToggleWatchlist={() => toggleWatchlist(g.id)} userIsPremium={userIsPremium} {...orderProps(gl, gi)} />
+                  <div key={g.id} {...dragProps("gl", gl, gi)}>
+                    <ContentCard item={g} isAdmin={isAdmin} onEdit={() => handleEdit(g)} onDelete={() => handleDelete(g.id)} onClickTrack={() => trackClick(g.id)} isInWatchlist={watchlistIds.has(g.id)} onToggleWatchlist={() => toggleWatchlist(g.id)} userIsPremium={userIsPremium} orderIndex={isAdmin ? gi : undefined} />
                   </div>
                 ))}
               </AutoScrollRow>
@@ -754,8 +760,8 @@ const Browse = () => {
             {bl.length > 0 ? (
               <AutoScrollRow>
                 {bl.map((b, bi) => (
-                  <div key={b.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={b} isAdmin={isAdmin} onEdit={() => handleEdit(b)} onDelete={() => handleDelete(b.id)} onClickTrack={() => trackClick(b.id)} isInWatchlist={watchlistIds.has(b.id)} onToggleWatchlist={() => toggleWatchlist(b.id)} userIsPremium={userIsPremium} {...orderProps(bl, bi)} />
+                  <div key={b.id} {...dragProps("bl", bl, bi)}>
+                    <ContentCard item={b} isAdmin={isAdmin} onEdit={() => handleEdit(b)} onDelete={() => handleDelete(b.id)} onClickTrack={() => trackClick(b.id)} isInWatchlist={watchlistIds.has(b.id)} onToggleWatchlist={() => toggleWatchlist(b.id)} userIsPremium={userIsPremium} orderIndex={isAdmin ? bi : undefined} />
                   </div>
                 ))}
               </AutoScrollRow>
@@ -786,8 +792,8 @@ const Browse = () => {
             {realities.length > 0 ? (
               <AutoScrollRow>
                 {realities.map((r, ri) => (
-                  <div key={r.id} className="flex-shrink-0 w-[45vw] sm:w-[200px]">
-                    <ContentCard item={r} isAdmin={isAdmin} onEdit={() => handleEdit(r)} onDelete={() => handleDelete(r.id)} onClickTrack={() => trackClick(r.id)} isInWatchlist={watchlistIds.has(r.id)} onToggleWatchlist={() => toggleWatchlist(r.id)} userIsPremium={userIsPremium} {...orderProps(realities, ri)} />
+                  <div key={r.id} {...dragProps("realities", realities, ri)}>
+                    <ContentCard item={r} isAdmin={isAdmin} onEdit={() => handleEdit(r)} onDelete={() => handleDelete(r.id)} onClickTrack={() => trackClick(r.id)} isInWatchlist={watchlistIds.has(r.id)} onToggleWatchlist={() => toggleWatchlist(r.id)} userIsPremium={userIsPremium} orderIndex={isAdmin ? ri : undefined} />
                   </div>
                 ))}
               </AutoScrollRow>
