@@ -70,7 +70,7 @@ const Player = () => {
   const [signupSuccess, setSignupSuccess] = useState(false);
   const [paywallMode, setPaywallMode] = useState<"signup" | "login">("login");
   const [telegramPopupOpen, setTelegramPopupOpen] = useState(false);
-  const [paywallCustom, setPaywallCustom] = useState<{ custom_text: string | null; testimonials: { name: string; quote: string }[] } | null>(null);
+  const [paywallCustom, setPaywallCustom] = useState<{ custom_text: string | null; testimonials: { name: string; quote: string }[]; languages: string[] } | null>(null);
   const trackedPaywallViewsRef = useRef<Set<string>>(new Set());
   const [detailTab, setDetailTab] = useState<"episodes" | "trailer" | "similar" | "details">("episodes");
   const [similar, setSimilar] = useState<{ id: string; title: string; banner_url: string | null; tag: string | null; year: number | null }[]>([]);
@@ -293,7 +293,7 @@ const Player = () => {
     (async () => {
       const { data } = await (supabase as any)
         .from("paywall_customizations")
-        .select("custom_text, testimonials")
+        .select("custom_text, testimonials, languages")
         .eq("content_id", content.id)
         .maybeSingle();
       if (cancelled) return;
@@ -302,7 +302,11 @@ const Player = () => {
         const testimonials = raw
           .map((t: any) => ({ name: String(t?.name ?? "").trim(), quote: String(t?.quote ?? "").trim() }))
           .filter((t: any) => t.name && t.quote);
-        setPaywallCustom({ custom_text: data.custom_text ?? null, testimonials });
+        setPaywallCustom({
+          custom_text: data.custom_text ?? null,
+          testimonials,
+          languages: Array.isArray((data as any).languages) ? (data as any).languages.map((l: any) => String(l)).filter(Boolean) : [],
+        });
       } else {
         setPaywallCustom(null);
       }
@@ -673,6 +677,16 @@ const Player = () => {
                       </div>
                     );
                   })()}
+
+                  {!!paywallCustom?.languages?.length && (
+                    <div className="flex flex-wrap items-center justify-center gap-1.5 mb-3">
+                      {paywallCustom.languages.map((l) => (
+                        <span key={l} className="px-2 py-0.5 rounded-full bg-primary/15 border border-primary/30 text-primary text-[10px] font-bold">
+                          {l}
+                        </span>
+                      ))}
+                    </div>
+                  )}
 
                   {paywallCustom?.custom_text?.trim() && paywallCustom.custom_text.trim() !== DEFAULT_PAYWALL_TEXT && (
                     <p className="text-foreground text-xs sm:text-sm mb-5 max-w-md font-bold whitespace-pre-wrap">

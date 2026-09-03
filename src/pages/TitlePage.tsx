@@ -81,6 +81,7 @@ const TitlePage = () => {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [customText, setCustomText] = useState<string | null>(null);
+  const [paywallLanguages, setPaywallLanguages] = useState<string[]>([]);
   const [testimonials, setTestimonials] = useState<{ name: string; quote: string }[]>([]);
   const [readMore, setReadMore] = useState(false);
   const [telegramOpen, setTelegramOpen] = useState(false);
@@ -169,11 +170,12 @@ const TitlePage = () => {
       setPlayableContentId(playable.id);
       const { data: pw } = await (supabase as any)
         .from("paywall_customizations")
-        .select("custom_text, testimonials")
+        .select("custom_text, testimonials, languages")
         .eq("content_id", match.id)
         .maybeSingle();
       if (!cancelled) {
         setCustomText(pw?.custom_text ?? null);
+        setPaywallLanguages(Array.isArray((pw as any)?.languages) ? (pw as any).languages.map((l: any) => String(l)).filter(Boolean) : []);
         const raw = Array.isArray(pw?.testimonials) ? pw.testimonials : [];
         setTestimonials(
           raw
@@ -476,6 +478,16 @@ const TitlePage = () => {
             {social.a}, {social.b} and {social.others} others became Supporters this month
           </span>
         </div>
+
+        {paywallLanguages.length > 0 && (
+          <div className="flex flex-wrap justify-center gap-2 mb-4">
+            {paywallLanguages.map((l) => (
+              <span key={l} className="px-2.5 py-1 rounded-full bg-primary/15 border border-primary/30 text-primary text-[11px] font-bold">
+                {l}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Paywall copy (optional, per title) */}
         {customText?.trim() && customText.trim() !== DEFAULT_PAYWALL_TEXT && (
