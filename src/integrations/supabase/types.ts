@@ -524,6 +524,7 @@ export type Database = {
           created_at: string
           custom_text: string | null
           id: string
+          languages: Json
           testimonials: Json
           updated_at: string
         }
@@ -532,6 +533,7 @@ export type Database = {
           created_at?: string
           custom_text?: string | null
           id?: string
+          languages?: Json
           testimonials?: Json
           updated_at?: string
         }
@@ -540,6 +542,7 @@ export type Database = {
           created_at?: string
           custom_text?: string | null
           id?: string
+          languages?: Json
           testimonials?: Json
           updated_at?: string
         }

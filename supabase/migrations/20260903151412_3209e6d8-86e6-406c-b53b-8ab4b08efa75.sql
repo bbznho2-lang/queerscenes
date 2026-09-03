@@ -1,0 +1,1 @@
+ALTER TABLE public.paywall_customizations ADD COLUMN IF NOT EXISTS languages jsonb NOT NULL DEFAULT '[]'::jsonb;
