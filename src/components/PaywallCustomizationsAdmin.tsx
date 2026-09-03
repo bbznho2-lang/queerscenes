@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Save, RotateCcw, Plus, Trash2 } from "lucide-react";
+import { Sparkles, Save, RotateCcw, Plus, Trash2, Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { getPaywallComments } from "@/lib/paywall-comments";
@@ -17,20 +17,23 @@ const PaywallCustomizationsAdmin = () => {
   const [contents, setContents] = useState<ContentOpt[]>([]);
   const [customMap, setCustomMap] = useState<Record<string, string>>({});
   const [testimonialMap, setTestimonialMap] = useState<Record<string, Testimonial[]>>({});
+  const [languageMap, setLanguageMap] = useState<Record<string, string[]>>({});
   const [contentId, setContentId] = useState<string>("");
   const [text, setText] = useState(DEFAULT_PAYWALL_TEXT);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [languages, setLanguages] = useState<string>("");
   const [saving, setSaving] = useState(false);
   const [seasonMap, setSeasonMap] = useState<Record<string, number[]>>({});
 
   const load = async () => {
     const [{ data: c }, { data: r }] = await Promise.all([
       supabase.from("contents").select("id, title, type").order("title"),
-      (supabase as any).from("paywall_customizations").select("content_id, custom_text, testimonials"),
+      (supabase as any).from("paywall_customizations").select("content_id, custom_text, testimonials, languages"),
     ]);
     setContents((c || []) as ContentOpt[]);
     const map: Record<string, string> = {};
     const tMap: Record<string, Testimonial[]> = {};
+    const lMap: Record<string, string[]> = {};
     (r || []).forEach((x: any) => {
       if (x.custom_text) map[x.content_id] = x.custom_text;
       if (Array.isArray(x.testimonials) && x.testimonials.length) {
@@ -38,9 +41,13 @@ const PaywallCustomizationsAdmin = () => {
           .filter((t: any) => t && typeof t.quote === "string")
           .map((t: any) => ({ name: String(t.name || ""), quote: String(t.quote || "") }));
       }
+      if (Array.isArray(x.languages) && x.languages.length) {
+        lMap[x.content_id] = x.languages.map((l: any) => String(l));
+      }
     });
     setCustomMap(map);
     setTestimonialMap(tMap);
+    setLanguageMap(lMap);
   };
 
   useEffect(() => { void load(); }, []);
@@ -49,16 +56,18 @@ const PaywallCustomizationsAdmin = () => {
     if (!contentId) {
       setText(DEFAULT_PAYWALL_TEXT);
       setTestimonials([]);
+      setLanguages("");
       return;
     }
     setText(customMap[contentId] || DEFAULT_PAYWALL_TEXT);
     setTestimonials(testimonialMap[contentId] || []);
+    setLanguages((languageMap[contentId] || []).join(", "));
     void (async () => {
       const { data } = await supabase.from("episodes").select("season").eq("content_id", contentId);
       const seasons = [...new Set((data || []).map((e: any) => Number(e.season || 1)))];
       setSeasonMap((prev) => ({ ...prev, [contentId]: seasons }));
     })();
-  }, [contentId, customMap, testimonialMap]);
+  }, [contentId, customMap, testimonialMap, languageMap]);
 
   const isCustom = useMemo(
     () => contentId && customMap[contentId] && customMap[contentId] !== DEFAULT_PAYWALL_TEXT,
@@ -92,6 +101,11 @@ const PaywallCustomizationsAdmin = () => {
         content_id: contentId,
         custom_text: trimmed && trimmed !== DEFAULT_PAYWALL_TEXT ? trimmed : null,
         testimonials: cleanTestimonials,
+        languages: languages
+          .split(",")
+          .map((l) => l.trim())
+          .filter(Boolean)
+          .slice(0, 12),
       };
       const { error } = await (supabase as any)
         .from("paywall_customizations")
@@ -110,6 +124,7 @@ const PaywallCustomizationsAdmin = () => {
     if (!contentId) return;
     setText(DEFAULT_PAYWALL_TEXT);
     setTestimonials([]);
+    setLanguages("");
     const { error } = await (supabase as any)
       .from("paywall_customizations")
       .delete()
@@ -145,6 +160,29 @@ const PaywallCustomizationsAdmin = () => {
         </div>
 
         <div className="space-y-1.5">
+          <label className="text-xs text-muted-foreground">
+            Available languages (shown at the top of the paywall) — separate with commas
+          </label>
+          <Input
+            value={languages}
+            onChange={(e) => setLanguages(e.target.value)}
+            disabled={!contentId}
+            placeholder="🇬🇧 English, 🇪🇸 Español, 🇫🇷 Français"
+            className="bg-muted border-border"
+            maxLength={200}
+          />
+          {languages.trim() && (
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {languages.split(",").map((l) => l.trim()).filter(Boolean).map((l, i) => (
+                <span key={i} className="px-2 py-0.5 rounded-full bg-primary/15 text-primary text-[11px] font-semibold">
+                  {l}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <label className="text-xs text-muted-foreground">
               Paywall text {isCustom ? "(custom)" : "(default)"}
@@ -173,6 +211,15 @@ const PaywallCustomizationsAdmin = () => {
             <label className="text-xs text-muted-foreground">
               Supporter comments {testimonials.length ? "(custom)" : "(auto — unique per title)"}
             </label>
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              disabled={!contentId || testimonials.length > 0 || !autoComments.length}
+              onClick={() => setTestimonials(autoComments.map((c) => ({ name: c.name, quote: c.quote })))}
+            >
+              <Pencil className="w-3.5 h-3.5 mr-1" /> Edit auto comments
+            </Button>
             <Button
               type="button"
               size="sm"
