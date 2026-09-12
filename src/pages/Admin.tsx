@@ -40,6 +40,14 @@ interface Profile {
   created_at: string;
 }
 
+interface PendingSupporter {
+  id: string;
+  email: string;
+  plan: string;
+  premium_expires_at: string;
+  status: string;
+}
+
 interface ClickStat {
   title: string;
   clicks: number;
@@ -86,6 +94,7 @@ const Admin = () => {
   const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
   const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [pendingSupporters, setPendingSupporters] = useState<PendingSupporter[]>([]);
   const [clickStats, setClickStats] = useState<ClickStat[]>([]);
   const [aggregatedClicks, setAggregatedClicks] = useState<AggregatedUserClick[]>([]);
   const [loadingData, setLoadingData] = useState(true);
@@ -185,10 +194,22 @@ const Admin = () => {
       )
       .subscribe();
 
+    const pendingSupportersChannel = supabase
+      .channel("admin-pending-supporters-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "pending_supporters" },
+        () => {
+          fetchData(false);
+        }
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(clicksChannel);
       supabase.removeChannel(profilesChannel);
       supabase.removeChannel(supporterEventsChannel);
+      supabase.removeChannel(pendingSupportersChannel);
     };
   }, [isAdmin]);
 
@@ -234,6 +255,18 @@ const Admin = () => {
       if (data.length < PAGE) break;
     }
     setProfiles(allProfiles);
+
+    const { data: pendingRows, error: pendingError } = await (supabase as any)
+      .from("pending_supporters")
+      .select("id,email,plan,premium_expires_at,status")
+      .in("status", ["pending", "paid", "claimed"])
+      .gt("premium_expires_at", new Date().toISOString())
+      .order("created_at", { ascending: false });
+    if (pendingError) {
+      console.error("pending supporters fetch error", pendingError);
+    } else {
+      setPendingSupporters((pendingRows as PendingSupporter[]) || []);
+    }
 
     // The chart must always be sourced from the canonical Top 10 RPC. Clear
     // any previous client-calculated values first, then rebuild it exclusively
@@ -1057,6 +1090,26 @@ const Admin = () => {
                 {addingPremium ? "Granting..." : "Grant Supporter"}
               </Button>
             </div>
+            {pendingSupporters.filter((pending) => !profiles.some((profile) => profile.email?.trim().toLowerCase() === pending.email.trim().toLowerCase())).length > 0 && (
+              <div className="mt-4 border-t border-border pt-4">
+                <p className="mb-2 text-xs font-medium text-muted-foreground">Waiting for account login</p>
+                <div className="space-y-2">
+                  {pendingSupporters
+                    .filter((pending) => !profiles.some((profile) => profile.email?.trim().toLowerCase() === pending.email.trim().toLowerCase()))
+                    .map((pending) => (
+                      <div key={pending.id} className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border bg-muted/30 px-3 py-2">
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-medium text-foreground">{pending.email}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {pending.plan === "lifetime" ? "Lifetime" : pending.plan} · activates automatically at login
+                          </p>
+                        </div>
+                        <span className="qs-badge-supporter">PENDING</span>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
