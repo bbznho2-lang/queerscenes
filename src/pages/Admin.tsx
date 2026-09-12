@@ -547,8 +547,8 @@ const Admin = () => {
       if (error) throw error;
       const status = (data as { status?: string } | null)?.status;
       const until = expiresIso ? ` until ${new Date(expiresIso).toLocaleDateString("en-US")}` : " (lifetime)";
-      if (status === "pending") {
-        toast.success(`No account yet — ${emailTrimmed} saved as pending supporter${until}. Access activates on first login.`);
+      if (status === "active") {
+        toast.success(`Supporter access is active for ${emailTrimmed}${until}. The account will link automatically at login.`);
       } else {
         toast.success(`Supporter access granted to ${emailTrimmed}${until}!`);
       }
@@ -1092,7 +1092,7 @@ const Admin = () => {
             </div>
             {pendingSupporters.filter((pending) => !profiles.some((profile) => profile.email?.trim().toLowerCase() === pending.email.trim().toLowerCase())).length > 0 && (
               <div className="mt-4 border-t border-border pt-4">
-                <p className="mb-2 text-xs font-medium text-muted-foreground">Waiting for account login</p>
+                <p className="mb-2 text-xs font-medium text-muted-foreground">Active supporters without a linked account</p>
                 <div className="space-y-2">
                   {pendingSupporters
                     .filter((pending) => !profiles.some((profile) => profile.email?.trim().toLowerCase() === pending.email.trim().toLowerCase()))
@@ -1101,10 +1101,10 @@ const Admin = () => {
                         <div className="min-w-0">
                           <p className="truncate text-sm font-medium text-foreground">{pending.email}</p>
                           <p className="text-xs text-muted-foreground">
-                            {pending.plan === "lifetime" ? "Lifetime" : pending.plan} · activates automatically at login
+                            {pending.plan === "lifetime" ? "Lifetime" : pending.plan} · active by email and links automatically at login
                           </p>
                         </div>
-                        <span className="qs-badge-supporter">PENDING</span>
+                        <span className="qs-badge-supporter">ACTIVE</span>
                       </div>
                     ))}
                 </div>
