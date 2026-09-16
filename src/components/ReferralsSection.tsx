@@ -1,8 +1,20 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { buildReferralUrl, maskEmail, normalizeRefCode } from "@/lib/referral";
-import { Copy, Link2, Plus, RefreshCw, TrendingUp } from "lucide-react";
+import { Copy, Link2, Plus, RefreshCw, Trash2, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 type RangeKey = "7" | "30" | "all";
 
@@ -59,6 +71,15 @@ const ReferralsSection = () => {
     }
   });
 
+  const [hiddenCodes, setHiddenCodes] = useState<string[]>(() => {
+    try {
+      const raw = window.localStorage.getItem("qs_ref_hidden_influencers");
+      return raw ? (JSON.parse(raw) as string[]) : [];
+    } catch {
+      return [];
+    }
+  });
+
   const persistCodes = (codes: string[]) => {
     setCustomCodes(codes);
     try {
@@ -73,15 +94,36 @@ const ReferralsSection = () => {
     if (!code) return toast.error("Type a valid influencer name");
     if (customCodes.includes(code)) return toast.info(`@${code} is already tracked`);
     persistCodes([...customCodes, code]);
+    if (hiddenCodes.includes(code)) {
+      const nextHidden = hiddenCodes.filter((item) => item !== code);
+      setHiddenCodes(nextHidden);
+      window.localStorage.setItem("qs_ref_hidden_influencers", JSON.stringify(nextHidden));
+    }
     setNewInfluencer("");
     toast.success(`@${code} added to tracking`);
   };
 
+  const removeInfluencer = (code: string) => {
+    persistCodes(customCodes.filter((item) => item !== code));
+    const nextHidden = Array.from(new Set([...hiddenCodes, code]));
+    setHiddenCodes(nextHidden);
+    try {
+      window.localStorage.setItem("qs_ref_hidden_influencers", JSON.stringify(nextHidden));
+    } catch {
+      /* ignore */
+    }
+    toast.success(`@${code} removed from referral links`);
+  };
+
   const influencers = useMemo(() => {
     const codes = new Set<string>(["artie", ...customCodes]);
-    events.forEach((e) => codes.add(e.ref_code));
+    events.forEach((e) => {
+      if (!hiddenCodes.includes(e.ref_code)) codes.add(e.ref_code);
+    });
     return Array.from(codes).sort();
-  }, [events, customCodes]);
+  }, [events, customCodes, hiddenCodes]);
+
+  const previewCode = normalizeRefCode(newInfluencer);
 
 
   const copy = async (text: string) => {
@@ -153,9 +195,9 @@ const ReferralsSection = () => {
           </button>
         </div>
 
-        {normalizeRefCode(newInfluencer) && (
+        {previewCode && (
           <p className="mt-2 text-xs text-muted-foreground break-all">
-            {buildReferralUrl(normalizeRefCode(newInfluencer)!)}
+            {buildReferralUrl(previewCode)}
           </p>
         )}
       </div>
@@ -173,12 +215,50 @@ const ReferralsSection = () => {
             <div key={code} className="rounded-xl border border-border bg-background/50 p-4">
               <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
                 <p className="text-sm font-black text-foreground">@{code}</p>
-                <button
-                  onClick={() => void copy(link)}
-                  className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground break-all"
-                >
-                  <Copy className="w-3.5 h-3.5 flex-shrink-0" /> {link}
-                </button>
+                <div className="flex min-w-0 items-center gap-1">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => void copy(link)}
+                    className="min-w-0 justify-start text-xs text-muted-foreground"
+                  >
+                    <Copy className="flex-shrink-0" /> <span className="truncate">{link}</span>
+                  </Button>
+                  {customCodes.includes(code) && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 flex-shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          title={`Delete @${code} referral link`}
+                          aria-label={`Delete @${code} referral link`}
+                        >
+                          <Trash2 />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete @{code} referral link?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            The link will be removed from this list. Existing click and payment history will not be deleted.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => removeInfluencer(code)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Delete link
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
+                </div>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
