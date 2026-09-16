@@ -1,11 +1,10 @@
-I have identified a critical issue preventing admins from adding or updating content. A previous security migration revoked `SELECT` permissions on the `player_url` column for the `authenticated` role. Because the frontend uses `.select()` (which defaults to selecting all columns) during insertion, the database returns a permission error, causing the entire save operation to fail.
+# Excluir links de indicação
 
-I will:
-1. Update `src/components/EditContentDialog.tsx` to explicitly select only the `id` column during insertion to avoid the permission error on `player_url`.
-2. Update the UI in `EditContentDialog.tsx` to include "Anime" options for content type and section, which are supported by the database but currently missing from the dialog.
-3. Add a database migration to ensure the `admin` role has explicit full permissions on the `contents` and `episodes` tables, and ensure that the `player_url` column remains protected for regular users while allowing admins to manage it.
+## Alteração
+- Adicionar um controle de exclusão ao lado de cada link criado manualmente em **Generate referral link**.
+- Pedir confirmação antes de remover.
+- Remover somente o link da lista administrativa; os acessos e pagamentos já registrados permanecem no histórico.
+- Manter links detectados automaticamente pelos eventos sem opção de exclusão.
 
-### Technical Details
-- Change `.select()` to `.select('id')` in `src/components/EditContentDialog.tsx`.
-- Add `anime` type and `animes` section to the select components.
-- Migration to explicitly GRANT permissions to admins for content management.
+## Verificação
+- Confirmar que o link desaparece após excluir e continua removido ao recarregar o painel.
