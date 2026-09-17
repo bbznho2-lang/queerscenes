@@ -108,7 +108,13 @@ const RecentUpdatesSection = () => {
             return (
               <div
                 key={item.id}
-                onClick={() => navigate(`/title/${slugify(c.title)}`)}
+                onClick={() =>
+                  navigate(
+                    ep
+                      ? `/player/${ep.content_id}?ep=${ep.id}`
+                      : `/title/${slugify(c.title)}`,
+                  )
+                }
                 className="group flex-shrink-0 w-[70vw] sm:w-[280px] cursor-pointer rounded-xl overflow-hidden bg-card border border-border hover:border-primary/50 transition-all"
               >
                 <div className="relative aspect-video bg-muted">
