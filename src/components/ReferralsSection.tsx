@@ -89,16 +89,23 @@ const ReferralsSection = () => {
     }
   };
 
+  const restoreInfluencer = (code: string) => {
+    if (!hiddenCodes.includes(code)) return;
+    const nextHidden = hiddenCodes.filter((item) => item !== code);
+    setHiddenCodes(nextHidden);
+    try {
+      window.localStorage.setItem("qs_ref_hidden_influencers", JSON.stringify(nextHidden));
+    } catch {
+      /* ignore */
+    }
+  };
+
   const addInfluencer = () => {
     const code = normalizeRefCode(newInfluencer);
     if (!code) return toast.error("Type a valid influencer name");
     if (customCodes.includes(code)) return toast.info(`@${code} is already tracked`);
     persistCodes([...customCodes, code]);
-    if (hiddenCodes.includes(code)) {
-      const nextHidden = hiddenCodes.filter((item) => item !== code);
-      setHiddenCodes(nextHidden);
-      window.localStorage.setItem("qs_ref_hidden_influencers", JSON.stringify(nextHidden));
-    }
+    restoreInfluencer(code);
     setNewInfluencer("");
     toast.success(`@${code} added to tracking`);
   };
@@ -116,7 +123,8 @@ const ReferralsSection = () => {
   };
 
   const influencers = useMemo(() => {
-    const codes = new Set<string>(["artie", ...customCodes]);
+    const codes = new Set<string>(customCodes.filter((code) => !hiddenCodes.includes(code)));
+    if (!hiddenCodes.includes("artie")) codes.add("artie");
     events.forEach((e) => {
       if (!hiddenCodes.includes(e.ref_code)) codes.add(e.ref_code);
     });
@@ -187,6 +195,7 @@ const ReferralsSection = () => {
               const code = normalizeRefCode(newInfluencer);
               if (!code) return toast.error("Type a valid influencer name");
               if (!customCodes.includes(code)) persistCodes([...customCodes, code]);
+              restoreInfluencer(code);
               void copy(buildReferralUrl(code));
             }}
             className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-semibold"
@@ -225,8 +234,7 @@ const ReferralsSection = () => {
                   >
                     <Copy className="flex-shrink-0" /> <span className="truncate">{link}</span>
                   </Button>
-                  {customCodes.includes(code) && (
-                    <AlertDialog>
+                  <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button
                           type="button"
@@ -256,8 +264,7 @@ const ReferralsSection = () => {
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
-                    </AlertDialog>
-                  )}
+                  </AlertDialog>
                 </div>
               </div>
 
