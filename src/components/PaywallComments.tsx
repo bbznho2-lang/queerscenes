@@ -30,7 +30,7 @@ const PaywallComments = ({ contentId, title, type, section, hasMultipleSeasons, 
   return (
     <div className={`w-full ${compact ? "max-w-md" : "max-w-2xl mx-auto"} space-y-2 mb-6 text-left`}>
       <p className="qs-section-label text-center text-[11px] text-muted-foreground font-bold uppercase tracking-wider">
-        What supporters say about joining now
+        What supporters say about this title
       </p>
       {comments.map((c, i) => (
         <div
