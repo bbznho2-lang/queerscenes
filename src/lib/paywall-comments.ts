@@ -5,15 +5,10 @@ export interface PaywallComment {
 }
 
 export interface PaywallCommentContext {
-  /** Title name, e.g. "Love of Siam". */
   title?: string | null;
-  /** Raw content type from the database (movie, serie, novela, reality...). */
   type?: string | null;
-  /** Catalog section (series, filmes, novelas, bl, gl, realities, exclusivos...). */
   section?: string | null;
-  /** Whether the series has more than one season. Avoids "next season" comments when seasons already exist. */
   hasMultipleSeasons?: boolean;
-  /** Character names configured in Edit details. */
   characters?: string[];
 }
 
@@ -34,212 +29,163 @@ const METAS = [
   "Supporter",
 ];
 
-type Kind = "series" | "movie";
+type Kind = "series" | "movie" | "reality";
 
 const kindOf = (type?: string | null): Kind => {
-  const t = String(type || "").toLowerCase();
-  return t === "serie" || t === "series" || t === "novela" || t === "reality" || t === "anime"
-    ? "series"
-    : "movie";
+  const value = String(type || "").toLowerCase();
+  if (value === "reality") return "reality";
+  if (["serie", "series", "novela", "anime"].includes(value)) return "series";
+  return "movie";
 };
 
-/** Title-specific comments written like real people talk — casual, lowercase, emojis. */
-const TITLED: Record<Kind, ((t: string) => string)[]> = {
-  series: [
-    (t) => `omg ${t} ate me upppp i binged the whole thing in one weekend lol`,
-    (t) => `the chemistry in ${t} is actually insane`,
-    (t) => `i started ${t} at 11pm and didn't sleep. worth it`,
-    (t) => `the acting in ${t}??? hello??? give them all awards`,
-    (t) => `${t} had no business being this addictive`,
-    (t) => `finally watching ${t} with decent subs, bless`,
-    (t) => `${t} made me feel so seen i can't even explain`,
-    (t) => `the reactions to ${t} every week are everything`,
-    (t) => `i wait for every new drop of ${t} like it's an event`,
-    (t) => `people are sleeping on ${t} and i'm tired`,
-  ],
-  movie: [
-    (t) => `${t} wrecked me. still thinking about the ending`,
-    (t) => `just watched ${t} and i'm actually emotional`,
-    (t) => `${t} is so underrated it's criminal`,
-    (t) => `the ending of ${t} lives in my head rent free`,
-    (t) => `${t} made me cry and i don't even cry at movies`,
-    (t) => `i've been looking for ${t} forever finally found it here`,
-    (t) => `${t} is quiet and slow and completely worth it`,
-    (t) => `${t} is one of those films that just stays with you`,
-    (t) => `everyone's reaction to ${t} was so real`,
-    (t) => `i put off ${t} for too long, so glad i finally watched`,
-  ],
-};
-
-/** Extra series comments that only make sense when there's only one season. */
-const SINGLE_SEASON_SERIES: ((t: string) => string)[] = [
-  (t) => `i need a season 2 of ${t} asap`,
-  (t) => `${t} ended and now i have a hole in my heart lol`,
-  (t) => `they really left ${t} like that?? i need more episodes`,
+const SERIES_OPENERS = [
+  (title: string) => `started ${title} just to check the first episode and suddenly i was fully invested`,
+  (title: string) => `${title} really has me counting the hours until i can watch another episode`,
+  (title: string) => `the episodes of ${title} keep getting better and i genuinely can't stop watching`,
+  (title: string) => `i said one episode of ${title} before bed... that was a lie lol`,
+  (title: string) => `${title} is the kind of series that makes every episode feel way too short`,
+  (title: string) => `caught up with ${title} here and now i'm completely obsessed with the story`,
+  (title: string) => `the pacing in ${title} got me hooked so fast, every episode delivers`,
+  (title: string) => `watching ${title} episode by episode here has become my favorite little routine`,
+  (title: string) => `${title} had me saying “one more episode” until way too late`,
+  (title: string) => `i'm following every episode of ${title} here and the story has me in a chokehold`,
+  (title: string) => `the drama in ${title} is unreal, i need to know what happens after every episode`,
+  (title: string) => `${title} is so easy to binge here, i completely lost track of time`,
 ];
 
-/** BL/GL titles are usually closed stories — comments follow the site, not future seasons. */
-const BLGL_TITLED: ((t: string) => string)[] = [
-  (t) => `${t} is exactly the kind of story i only find here, i follow every new release on the site`,
-  (t) => `been keeping up with everything dropping on the site and ${t} is easily my favorite so far`,
-  (t) => `i check the site almost daily and ${t} was so worth the wait`,
-  (t) => `${t} broke my heart in the best way, glad i caught it here`,
-  (t) => `every time i open the site there's something new, but ${t} is the one i keep rewatching`,
-  (t) => `the leads in ${t} have the most beautiful chemistry, watched it twice already`,
-  (t) => `${t} had me smiling at my phone like an idiot, the site never misses`,
-  (t) => `i follow all the bl/gl drops here and ${t} is top tier, trust me`,
-  (t) => `${t} is so soft and so painful at the same time, i'm obsessed`,
-  (t) => `watching ${t} here with proper subs made every scene hit harder`,
+const MOVIE_OPENERS = [
+  (title: string) => `just finished ${title} and i'm still thinking about those final scenes`,
+  (title: string) => `${title} was such a beautiful surprise, the performances felt so real`,
+  (title: string) => `i had been searching for ${title} forever and it was absolutely worth the watch`,
+  (title: string) => `${title} got me emotional in a way i really wasn't prepared for`,
+  (title: string) => `the chemistry in ${title} carried every scene, i loved this movie`,
+  (title: string) => `${title} is one of those films that stays in your head after the credits`,
+  (title: string) => `pressed play on ${title} out of curiosity and ended up loving every minute`,
+  (title: string) => `the acting and atmosphere in ${title} were honestly on another level`,
+  (title: string) => `${title} had me completely silent by the ending, what a film`,
+  (title: string) => `i already want to rewatch ${title} because there were so many little details`,
+  (title: string) => `${title} made me laugh, cry and stare at the screen when it ended lol`,
+  (title: string) => `so glad i found ${title} here, this movie deserved my full attention`,
 ];
 
-/** Reactions about the title itself — no chat groups, no promises of future seasons. */
-const REACTION_STARTS = [
-  "i clicked out of curiosity and ended up watching the whole thing",
-  "was not ready for how invested i got",
-  "i genuinely lost track of time watching this one",
-  "me and my partner could not stop reacting to every scene",
-  "i thought i'd watch ten minutes and suddenly it was over",
-  "i'm still processing what i just watched",
-  "the way i cancelled all my plans to finish this lol",
-  "started watching on my phone and moved to the tv immediately",
-  "i was hooked way faster than i expected",
-  "this one had me pausing just to breathe",
-  "i watched it twice in the same week, no regrets",
-  "this was exactly the kind of story i wanted that night",
+const REALITY_OPENERS = [
+  (title: string) => `the cast of ${title} is pure chaos and i mean that as the biggest compliment`,
+  (title: string) => `every episode of ${title} gives me something new to scream about lol`,
+  (title: string) => `${title} is dangerously easy to binge, the drama never takes a break`,
+  (title: string) => `i opened ${title} for one episode and stayed for all the plot twists`,
+  (title: string) => `keeping up with ${title} here is honestly the highlight of my week`,
+  (title: string) => `the reactions and unexpected moments in ${title} have me fully entertained`,
+  (title: string) => `${title} has exactly the kind of messy energy i wanted to watch`,
+  (title: string) => `not me getting this emotionally invested in everyone on ${title}`,
 ];
 
-const REACTION_ENDS = [
-  "the performances were sooo good",
-  "and the subtitles made every little detail land",
-  "definitely one i'm going to think about for a while",
-  "the chemistry had me yelling at my screen",
-  "honestly such a good find",
-  "the ending had me completely silent",
-  "i already know i'm rewatching it",
-  "the emotional damage was real 😭",
-  "the quality was way better than i expected ngl",
-  "and somehow it got better with every scene",
-  "i need everyone i know to watch this",
-  "still thinking about those final scenes",
-  "what a ride from beginning to end",
-  "the cast really gave everything",
-  "worth staying up way too late for",
+const BL_GL_OPENERS = [
+  (title: string) => `the chemistry in ${title} is so natural, every little look between them hits`,
+  (title: string) => `${title} had me smiling at my screen and then emotionally destroyed me`,
+  (title: string) => `the leads in ${title} are everything, i could watch their scenes all day`,
+  (title: string) => `${title} balances the soft moments and the drama so well, i'm obsessed`,
+  (title: string) => `i've watched a lot of bl/gl stories here but ${title} really stood out to me`,
+  (title: string) => `the relationship in ${title} feels so genuine, i loved watching it unfold`,
+  (title: string) => `${title} gave me butterflies and emotional damage in equal amounts lol`,
+  (title: string) => `watching ${title} with proper subtitles made every conversation hit harder`,
+  (title: string) => `${title} is exactly the kind of story i always hope to find on this site`,
+  (title: string) => `the tension in ${title}??? i was staring at the screen the entire time`,
 ];
 
-/** Closing lines about loving the platform experience. */
-const PLATFORM_ENDS = [
-  "i love watching stuff like this on the platform",
-  "watching here is always such a smooth experience, i love it",
-  "i love that i can watch titles like this properly subtitled here",
-  "honestly the reason i keep watching everything here",
-  "i love how easy the platform makes it to just sit and watch",
-  "watching on this platform has become my favorite way to unwind",
-  "i love the catalog here, it never disappoints me",
-  "the platform makes finding stories like this so worth it",
-  "i've been following every release here and it never lets me down",
-  "the site keeps dropping gems like this and i'm here for all of it",
-  "i literally refresh the site to see what's new, that's how good it's been",
+const CHARACTER_OPENERS = [
+  (title: string, character: string) => `${character} in ${title} had me completely invested from the first scene`,
+  (title: string, character: string) => `i'm still thinking about ${character}'s story in ${title}, it was handled so well`,
+  (title: string, character: string) => `${character} made every episode of ${title} impossible to stop watching`,
+  (title: string, character: string) => `the way ${character} develops through ${title} genuinely got me emotional`,
+  (title: string, character: string) => `${character}'s scenes were my favorite part of ${title}, such a good performance`,
+  (title: string, character: string) => `i started ${title} casually and now i'm way too attached to ${character}`,
 ];
 
-const CHARACTER_REACTIONS = [
-  (t: string, c: string) => `${c} in ${t} had me completely invested`,
-  (t: string, c: string) => `i could watch ${c} in ${t} for hours honestly`,
-  (t: string, c: string) => `${c}'s scenes in ${t} were everything`,
-  (t: string, c: string) => `the way ${c}'s story unfolds in ${t} really got me`,
-  (t: string, c: string) => `${c} made ${t} impossible to stop watching`,
-  (t: string, c: string) => `i'm still thinking about ${c} after watching ${t}`,
+const SITE_ENDINGS = [
+  `the subtitles on the site made every detail so easy to follow`,
+  `this is why i keep checking the site for something new to watch`,
+  `watching it here was smooth and the video quality looked amazing`,
+  `i love finding titles like this in the site's catalog`,
+  `the site made it so easy to sit down and watch everything properly`,
+  `so happy the site had it with subtitles that actually made sense`,
+  `this one alone made supporting the site worth it for me`,
+  `i've been following the releases here and this was such a good find`,
+  `the player and subtitles here made the whole experience even better`,
+  `exactly the kind of hidden gem i come to this site to find`,
+  `i love being able to keep up with every episode in one place here`,
+  `the catalog here keeps surprising me with stories i had never seen before`,
+  `i found it on the site at the perfect time and couldn't put it down`,
+  `honestly one of my favorite things i've watched on the site lately`,
+  `the site always comes through with the titles i can't find anywhere else`,
 ];
 
+const MULTI_SEASON_ENDINGS = [
+  `having all the seasons together on the site made the binge so much better`,
+  `i love that i can move between seasons here without losing where i was`,
+  `catching up on every season here has been way too easy lol`,
+  `the site keeps all the episodes organized, which saved my binge completely`,
+];
 
 const hashSeed = (value: string) => {
   let hash = 0;
-  for (let i = 0; i < value.length; i += 1) {
-    hash = (hash * 31 + value.charCodeAt(i)) >>> 0;
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash * 31 + value.charCodeAt(index)) >>> 0;
   }
   return hash;
 };
 
-/** Deterministic, title-aware comments per content id. */
+const pickUniqueIndex = (seed: number, slot: number, length: number, used: Set<number>) => {
+  let index = (seed + slot * 17 + Math.floor(seed / (slot + 3))) % length;
+  while (used.has(index)) index = (index + 1) % length;
+  used.add(index);
+  return index;
+};
+
 export const getPaywallComments = (
   key: string,
   count = 3,
   context?: PaywallCommentContext,
 ): PaywallComment[] => {
-  const title = (context?.title || "").trim();
+  const title = (context?.title || "this title").trim();
   const kind = kindOf(context?.type);
-  const hasMultipleSeasons = Boolean(context?.hasMultipleSeasons);
   const section = String(context?.section || "").toLowerCase();
-  const isBlGl = section === "bl" || section === "gl" || section.includes("bl drama");
-  const characters = (context?.characters || []).map((name) => name.trim()).filter(Boolean);
-
-  // Build the title-specific pool. BL/GL stories are usually closed (no season 2 asks);
-  // series with multiple seasons also drop comments that ask for more seasons.
-  const titledBase = TITLED[kind];
-  const titledPool = isBlGl
-    ? BLGL_TITLED
-    : kind === "series" && !hasMultipleSeasons
-      ? [...titledBase, ...SINGLE_SEASON_SERIES]
-      : titledBase;
-
-  // Use the complete title context so two different titles cannot accidentally
-  // receive the same selection merely because their id hashes share a remainder.
-  const seed = hashSeed(`${key || "queerscenes"}|${title.toLowerCase()}|${kind}`);
+  const isBlGl = section === "bl" || section === "gl" || section.includes("bl drama") || section.includes("gl drama");
+  const characters = Array.from(
+    new Set((context?.characters || []).map((name) => name.trim()).filter(Boolean)),
+  );
   const total = Math.max(1, Math.min(count, 4));
-  const out: PaywallComment[] = [];
+  const seed = hashSeed(`${key}|${title.toLowerCase()}|${kind}|${section}`);
+  const openingPool = isBlGl
+    ? BL_GL_OPENERS
+    : kind === "series"
+      ? SERIES_OPENERS
+      : kind === "reality"
+        ? REALITY_OPENERS
+        : MOVIE_OPENERS;
+  const endings = context?.hasMultipleSeasons && kind === "series"
+    ? [...SITE_ENDINGS, ...MULTI_SEASON_ENDINGS]
+    : SITE_ENDINGS;
+  const usedOpenings = new Set<number>();
+  const usedEndings = new Set<number>();
+  const usedNames = new Set<number>();
 
-  // 1 (sometimes 2) comment mentioning the title, the rest generic.
-  const titledCount = title ? (seed % 3 === 0 ? 2 : 1) : 0;
+  return Array.from({ length: total }, (_, slot) => {
+    const useCharacter = characters.length > 0 && slot === seed % total;
+    const opening = useCharacter
+      ? CHARACTER_OPENERS[(seed + slot * 7) % CHARACTER_OPENERS.length](
+          title,
+          characters[(seed + slot) % characters.length],
+        )
+      : openingPool[pickUniqueIndex(seed, slot, openingPool.length, usedOpenings)](title);
+    const ending = endings[pickUniqueIndex(Math.floor(seed / 7), slot, endings.length, usedEndings)];
+    const nameIndex = pickUniqueIndex(Math.floor(seed / 13), slot, NAMES.length, usedNames);
 
-  for (let i = 0; i < titledCount && i < total; i += 1) {
-    const base = characters.length && i === 0
-      ? CHARACTER_REACTIONS[(seed + i * 5) % CHARACTER_REACTIONS.length](title, characters[seed % characters.length])
-      : titledPool[(seed + i * 5) % titledPool.length](title);
-    out.push({
-      name: NAMES[(seed + i * 7) % NAMES.length],
-      quote: `${base}, ${PLATFORM_ENDS[(seed + i * 3) % PLATFORM_ENDS.length]}`,
-      meta: METAS[(seed + i * 3) % METAS.length],
-    });
-  }
-
-  const usedReactions = new Set<string>();
-  let step = 0;
-  while (out.length < total) {
-    const slot = out.length;
-    const startIdx = (seed + step * 11 + slot * 3) % REACTION_STARTS.length;
-    const endIdx = (Math.floor(seed / 7) + step * 13 + slot * 5) % REACTION_ENDS.length;
-    const platformIdx = (Math.floor(seed / 17) + slot * 7 + 5) % PLATFORM_ENDS.length;
-    const subject = title || "this one";
-    let quote = slot === total - 1
-      ? `${subject} was such a good watch, ${PLATFORM_ENDS[platformIdx]}`
-      : `${REACTION_STARTS[startIdx]}, ${REACTION_ENDS[endIdx]}`;
-    while (usedReactions.has(quote)) {
-      step += 1;
-      const nextEnd = (endIdx + step) % REACTION_ENDS.length;
-      quote = `${REACTION_STARTS[startIdx]}, ${REACTION_ENDS[nextEnd]}`;
-    }
-
-    usedReactions.add(quote);
-    out.push({
-      name: NAMES[(seed + (out.length + 2) * 7) % NAMES.length],
-      quote,
-      meta: METAS[(seed + out.length * 3) % METAS.length],
-    });
-    step += 1;
-  }
-
-  // Avoid duplicate display names.
-  const seen = new Set<string>();
-  return out.map((c) => {
-    let name = c.name;
-    let bump = 1;
-    while (seen.has(name)) {
-      name = NAMES[(NAMES.indexOf(c.name) + bump) % NAMES.length];
-      bump += 1;
-    }
-    seen.add(name);
-    return { ...c, name };
+    return {
+      name: NAMES[nameIndex],
+      quote: `${opening}, ${ending}`,
+      meta: METAS[(seed + slot * 5) % METAS.length],
+    };
   });
 };
 
-/** Kept for compatibility with older imports. */
 export const PAYWALL_COMMENT_POOL: PaywallComment[] = getPaywallComments("queerscenes", 3);
