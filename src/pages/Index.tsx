@@ -16,6 +16,7 @@ import { getReferralCode } from "@/lib/referral";
 import { smoothScrollToElement } from "@/lib/scroll-to";
 import { toast } from "sonner";
 import SupportDialog from "@/components/SupportDialog";
+import { PASSWORD_REQUIREMENTS, validatePassword } from "@/lib/password-validation";
 
 const fade = {
   hidden: { opacity: 0, y: 20 },
@@ -345,6 +346,11 @@ const Index = () => {
           toast.error("Please enter your first and last name");
           return;
         }
+        const passwordError = validatePassword(password);
+        if (passwordError) {
+          toast.error(passwordError);
+          return;
+        }
         const { error } = await signUp(email, password, firstName.trim(), lastName.trim());
         if (error) { toast.error(error.message); return; }
         toast.success("Account created! You can now sign in.");
@@ -592,11 +598,16 @@ const Index = () => {
                   <div className="space-y-1">
                     <label className="text-xs font-semibold tracking-wider uppercase text-[var(--t2)]">Password</label>
                     <div className="relative">
-                      <Input type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="qs-input pr-10" required />
+                      <Input type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="qs-input pr-10" required minLength={isSignUp ? 8 : undefined} maxLength={72} aria-describedby={isSignUp ? "signup-password-requirements" : undefined} />
                       <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--t2)] hover:text-[var(--t1)]">
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
+                    {isSignUp && (
+                      <p id="signup-password-requirements" className="text-xs leading-relaxed text-[var(--t2)]">
+                        {PASSWORD_REQUIREMENTS}
+                      </p>
+                    )}
                   </div>
                 )}
                 <Button type="submit" disabled={loading} className="qs-btn-primary w-full h-11">

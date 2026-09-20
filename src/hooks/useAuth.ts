@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import { getEmailRedirectUrl } from '@/lib/auth-urls';
+import { validatePassword } from '@/lib/password-validation';
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -81,6 +82,9 @@ export const useAuth = () => {
   };
 
   const signUp = async (email: string, password: string, firstName?: string, lastName?: string, redirectPath?: string) => {
+    const passwordError = validatePassword(password);
+    if (passwordError) return { error: new Error(passwordError), data: null };
+
     const { error, data } = await supabase.auth.signUp({
       email,
       password,

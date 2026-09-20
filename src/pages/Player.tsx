@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { DEFAULT_PAYWALL_TEXT } from "@/components/PaywallCustomizationsAdmin";
 import PaywallComments from "@/components/PaywallComments";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PASSWORD_REQUIREMENTS, validatePassword } from "@/lib/password-validation";
 
 
 interface ContentItem {
@@ -472,6 +473,13 @@ const Player = () => {
   const handleSupporterSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (signupSubmitting) return;
+    if (paywallMode === "signup") {
+      const passwordError = validatePassword(signupPassword);
+      if (passwordError) {
+        toast({ title: "Choose a stronger password", description: passwordError, variant: "destructive" });
+        return;
+      }
+    }
     setSignupSubmitting(true);
     const visitorId = getFunnelVisitorId();
     const email = signupEmail.trim().toLowerCase();
@@ -699,6 +707,7 @@ const Player = () => {
                       contentId={content.id}
                       title={content.title}
                       type={content.type}
+                      section={content.section}
                       hasMultipleSeasons={new Set(episodes.map((e) => e.season)).size > 1}
                       characters={parseCast((content as any).cast_members).map((member) => member.role || "").filter(Boolean)}
                       custom={paywallCustom?.testimonials}
@@ -764,14 +773,20 @@ const Player = () => {
                   />
                   <input
                     type="password"
-                    placeholder="Password (min 6 chars)"
+                    placeholder={paywallMode === "signup" ? "Create a strong password" : "Password"}
                     value={signupPassword}
                     onChange={(e) => setSignupPassword(e.target.value)}
                     className="w-full rounded-lg bg-card border border-border px-3 py-2 text-sm focus:outline-none focus:border-primary"
                     required
-                    minLength={6}
+                    minLength={paywallMode === "signup" ? 8 : undefined}
                     maxLength={72}
+                    aria-describedby={paywallMode === "signup" ? "paywall-password-requirements" : undefined}
                   />
+                  {paywallMode === "signup" && (
+                    <p id="paywall-password-requirements" className="text-left text-xs leading-relaxed text-muted-foreground">
+                      {PASSWORD_REQUIREMENTS}
+                    </p>
+                  )}
                   <button
                     type="submit"
                     onClick={() => void trackEvent("paywall_signup_click", "paywall_inline_form")}
