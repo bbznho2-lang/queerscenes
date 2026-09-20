@@ -10,7 +10,13 @@ import { getPaywallComments } from "@/lib/paywall-comments";
 
 export const DEFAULT_PAYWALL_TEXT = "Subtitles: 🇬🇧";
 
-type ContentOpt = { id: string; title: string; type?: string | null };
+type ContentOpt = {
+  id: string;
+  title: string;
+  type?: string | null;
+  section?: string | null;
+  cast_members?: { name?: string; role?: string }[] | null;
+};
 type Testimonial = { name: string; quote: string };
 
 const PaywallCustomizationsAdmin = () => {
@@ -27,7 +33,7 @@ const PaywallCustomizationsAdmin = () => {
 
   const load = async () => {
     const [{ data: c }, { data: r }] = await Promise.all([
-      supabase.from("contents").select("id, title, type").order("title"),
+      supabase.from("contents").select("id, title, type, section, cast_members").order("title"),
       (supabase as any).from("paywall_customizations").select("content_id, custom_text, testimonials, languages"),
     ]);
     setContents((c || []) as ContentOpt[]);
@@ -82,7 +88,9 @@ const PaywallCustomizationsAdmin = () => {
       return getPaywallComments(contentId, 3, {
         title: opt?.title,
         type: opt?.type,
+        section: opt?.section,
         hasMultipleSeasons: seasons.length > 1,
+        characters: (opt?.cast_members || []).map((member) => member.role || "").filter(Boolean),
       });
     },
     [contentId, contents, seasonMap]

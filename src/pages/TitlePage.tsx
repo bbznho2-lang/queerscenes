@@ -16,6 +16,7 @@ interface TitleContent {
   year: number | null;
   tag: string | null;
   type: string | null;
+  section?: string | null;
   banner_url: string | null;
   synopsis: string | null;
   preview_video_url: string | null;
@@ -501,7 +502,7 @@ const TitlePage = () => {
           contentId={content.id}
           title={content.title}
           type={content.type}
-          section={(content as any).section}
+          section={content.section}
           hasMultipleSeasons={hasMultipleSeasons}
           characters={(content.cast_members || []).map((member) => member.role || "").filter(Boolean)}
           custom={testimonials}
