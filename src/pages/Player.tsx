@@ -192,45 +192,52 @@ const Player = () => {
     }
 
     if (data.type === "serie" || data.type === "novela" || data.type === "anime" || data.type === "reality") {
+      const { data: duplicates } = await supabase
+        .from("contents")
+        .select("id, title, year, tag, type, banner_url, section, position, is_premium, supporter_player_enabled, synopsis, preview_video_url")
+        .ilike("title", data.title.trim())
+        .in("type", ["serie", "novela", "anime", "reality"]);
+      const matchingContents = ((duplicates || []) as ContentItem[]).filter(
+        (item) => item.title.trim().toLocaleLowerCase() === data.title.trim().toLocaleLowerCase(),
+      );
+      if (!matchingContents.some((item) => item.id === data.id)) matchingContents.push(data as ContentItem);
+      const matchingIds = matchingContents.map((item) => item.id);
       const { data: eps } = await supabase
         .from("episodes")
         .select("id, content_id, title, episode_number, season, is_premium, created_at")
-        .eq("content_id", requestedContentId)
+        .in("content_id", matchingIds)
         .order("season")
         .order("episode_number");
-      let normalizedEpisodes = ((eps || []) as Episode[]).map(e => ({ ...e, season: e.season || 1 }));
-      if (normalizedEpisodes.length === 0) {
-        const { data: duplicates } = await supabase
-          .from("contents")
-          .select("id, title, year, tag, type, banner_url, section, position, is_premium, supporter_player_enabled, synopsis, preview_video_url")
-          .ilike("title", `${data.title.trim()}%`)
-          .neq("id", id)
-          .in("type", ["serie", "novela", "anime", "reality"]);
-        const duplicateIds = ((duplicates || []) as ContentItem[]).map((item) => item.id);
-        if (duplicateIds.length > 0) {
-          const { data: duplicateEpisodes } = await supabase
-            .from("episodes")
-            .select("id, content_id, title, episode_number, season, is_premium, created_at")
-            .in("content_id", duplicateIds)
-            .order("season")
-            .order("episode_number");
-          const firstEpisode = duplicateEpisodes?.[0] as Episode | undefined;
-          const duplicateWithEpisodes = firstEpisode
-            ? ((duplicates || []) as ContentItem[]).find((item) => item.id === firstEpisode.content_id)
-            : null;
-          if (duplicateWithEpisodes) {
-            requestedContentId = duplicateWithEpisodes.id;
-            resolvedContent = duplicateWithEpisodes;
-            normalizedEpisodes = ((duplicateEpisodes || []) as Episode[])
-              .filter((episode) => episode.content_id === requestedContentId)
-              .map(e => ({ ...e, season: e.season || 1 }));
-          }
-        }
+      const allMatchingEpisodes = ((eps || []) as Episode[]).map((episode) => ({
+        ...episode,
+        season: episode.season || 1,
+      }));
+      const requestedEpId = new URLSearchParams(window.location.search).get("ep");
+      const requestedEpisode = requestedEpId
+        ? allMatchingEpisodes.find((episode) => episode.id === requestedEpId)
+        : null;
+      const rankedContents = matchingContents
+        .map((item) => {
+          const itemEpisodes = allMatchingEpisodes.filter((episode) => episode.content_id === item.id);
+          return {
+            item,
+            episodes: itemEpisodes,
+            latestSeason: itemEpisodes.reduce((latest, episode) => Math.max(latest, episode.season), 0),
+          };
+        })
+        .sort((a, b) => b.latestSeason - a.latestSeason || b.episodes.length - a.episodes.length);
+      const selectedEntry = requestedEpisode
+        ? rankedContents.find((entry) => entry.item.id === requestedEpisode.content_id)
+        : rankedContents[0];
+      let normalizedEpisodes: Episode[] = [];
+      if (selectedEntry) {
+        requestedContentId = selectedEntry.item.id;
+        resolvedContent = selectedEntry.item;
+        normalizedEpisodes = selectedEntry.episodes;
       }
       setContent(resolvedContent);
       setEpisodes(normalizedEpisodes);
       if (normalizedEpisodes.length > 0) {
-        const requestedEpId = new URLSearchParams(window.location.search).get("ep");
         const resumeEp =
           (requestedEpId && normalizedEpisodes.find((e) => e.id === requestedEpId)) || normalizedEpisodes[0];
         setSelectedSeason(resumeEp.season);
