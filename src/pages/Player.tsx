@@ -194,7 +194,7 @@ const Player = () => {
     if (data.type === "serie" || data.type === "novela" || data.type === "anime" || data.type === "reality") {
       const { data: duplicates } = await supabase
         .from("contents")
-        .select("id, title, year, tag, type, banner_url, section, position, is_premium, supporter_player_enabled, synopsis, preview_video_url")
+        .select("id, title, year, tag, type, banner_url, section, position, is_premium, supporter_player_enabled, synopsis, preview_video_url, cast_members")
         .ilike("title", data.title.trim())
         .in("type", ["serie", "novela", "anime", "reality"]);
       const matchingContents = ((duplicates || []) as ContentItem[]).filter(
