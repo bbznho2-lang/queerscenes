@@ -100,6 +100,7 @@ const Admin = () => {
   const [loadingData, setLoadingData] = useState(true);
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
   const [premiumEmail, setPremiumEmail] = useState("");
+  const [premiumPlan, setPremiumPlan] = useState("monthly");
   const [premiumUntil, setPremiumUntil] = useState("");
   const [addingPremium, setAddingPremium] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -113,7 +114,7 @@ const Admin = () => {
   const DELETIONS_PER_PAGE = 10;
   const [deletionSearch, setDeletionSearch] = useState("");
   const [managingDeletion, setManagingDeletion] = useState<string | null>(null);
-  const [managePlan, setManagePlan] = useState("lifetime");
+  const [managePlan, setManagePlan] = useState("monthly");
   const [manageUntil, setManageUntil] = useState("");
   const [managing, setManaging] = useState(false);
   // Independent signup timestamps for the "last 14 days" chart. Kept separate from
@@ -472,11 +473,14 @@ const Admin = () => {
   const togglePremium = async (profile: Profile) => {
     const newPremium = !profile.is_premium;
     try {
+      const defaultExpiration = newPremium && !profile.premium_expires_at
+        ? new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString()
+        : profile.premium_expires_at;
       await applyPremiumUpdate(
         profile,
         newPremium,
-        newPremium ? (profile.premium_plan || "lifetime") : null,
-        newPremium ? profile.premium_expires_at : null
+        newPremium ? (profile.premium_plan || "monthly") : null,
+        newPremium ? defaultExpiration : null
       );
       toast.success(newPremium ? "Supporter activated" : "Supporter removed");
     } catch (error) {
@@ -523,10 +527,13 @@ const Admin = () => {
 
   const updateExpirationDate = async (profile: Profile, dateStr: string) => {
     const iso = dateStr ? dateInputToIso(dateStr) : null;
-    if (dateStr && !iso) return;
+    if (!iso) {
+      toast.error("An expiration date is required");
+      return;
+    }
     try {
       await applyPremiumUpdate(profile, true, profile.premium_plan || "monthly", iso);
-      toast.success(iso ? "Expiration date updated" : "Set to lifetime access");
+      toast.success("Expiration date updated");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Error updating date");
     }
@@ -536,17 +543,17 @@ const Admin = () => {
     const emailTrimmed = premiumEmail.trim().toLowerCase();
     if (!emailTrimmed) { toast.error("Please enter an email address"); return; }
     const expiresIso = premiumUntil ? dateInputToIso(premiumUntil) : null;
-    if (premiumUntil && !expiresIso) { toast.error("Invalid date"); return; }
+    if (!expiresIso) { toast.error("Please select an expiration date"); return; }
     setAddingPremium(true);
     try {
       const { data, error } = await supabase.rpc("admin_grant_supporter_by_email" as never, {
         _email: emailTrimmed,
-        _plan: expiresIso ? "monthly" : "lifetime",
+        _plan: premiumPlan,
         _expires_at: expiresIso,
       } as never);
       if (error) throw error;
       const status = (data as { status?: string } | null)?.status;
-      const until = expiresIso ? ` until ${new Date(expiresIso).toLocaleDateString("en-US")}` : " (lifetime)";
+      const until = ` until ${new Date(expiresIso).toLocaleDateString("en-US")}`;
       if (status === "active") {
         toast.success(`Supporter access is active for ${emailTrimmed}${until}. The account will link automatically at login.`);
       } else {
@@ -566,7 +573,7 @@ const Admin = () => {
     const emailTrimmed = (email || "").trim().toLowerCase();
     if (!emailTrimmed) { toast.error("This deletion has no email on record"); return; }
     const expiresIso = manageUntil ? dateInputToIso(manageUntil) : null;
-    if (manageUntil && !expiresIso) { toast.error("Invalid date"); return; }
+    if (!expiresIso) { toast.error("Please select an expiration date"); return; }
     setManaging(true);
     try {
       const { error } = await supabase.rpc("admin_grant_supporter_by_email" as never, {
@@ -632,7 +639,7 @@ const Admin = () => {
     // Priority: 2 = expired supporter (top), 1 = active supporter, 0 = free
     const supporterPriority = (p: Profile) => {
       if (!p.is_premium) return 0;
-      if (!p.premium_expires_at) return 1; // lifetime active
+      if (!p.premium_expires_at) return 0;
       return new Date(p.premium_expires_at) > new Date() ? 1 : 2;
     };
     return [...profiles].sort((a, b) => {
@@ -1130,7 +1137,18 @@ const Admin = () => {
                 <Input type="email" placeholder="user@email.com" value={premiumEmail} onChange={(e) => setPremiumEmail(e.target.value)} className="bg-muted border-border" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs text-muted-foreground">Active until (empty = lifetime)</label>
+                <label className="text-xs text-muted-foreground">Plan</label>
+                <Select value={premiumPlan} onValueChange={setPremiumPlan}>
+                  <SelectTrigger className="bg-muted border-border"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                    <SelectItem value="quarterly">Quarterly</SelectItem>
+                    <SelectItem value="annual">Annual</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs text-muted-foreground">Active until</label>
                 <Input type="date" value={premiumUntil} onChange={(e) => setPremiumUntil(e.target.value)} className="bg-muted border-border" />
               </div>
               <Button onClick={grantPremiumByEmail} disabled={addingPremium} className="bg-secondary text-secondary-foreground hover:bg-secondary/90">
@@ -1149,7 +1167,7 @@ const Admin = () => {
                         <div className="min-w-0">
                           <p className="truncate text-sm font-medium text-foreground">{pending.email}</p>
                           <p className="text-xs text-muted-foreground">
-                            {pending.plan === "lifetime" ? "Lifetime" : pending.plan} · active by email and links automatically at login
+                            {pending.plan} · active by email and links automatically at login
                           </p>
                         </div>
                         <span className="qs-badge-supporter">ACTIVE</span>
@@ -1266,7 +1284,7 @@ const Admin = () => {
                             <div className="space-y-1.5">
                               <label className="text-xs text-muted-foreground">Status</label>
                               <div className={`h-9 flex items-center px-3 rounded-md text-xs font-medium ${!p.is_premium ? 'bg-muted text-muted-foreground' : expired ? 'bg-destructive/10 text-destructive' : 'bg-secondary/10 text-secondary'}`}>
-                                {!p.is_premium ? "Free" : expired ? "Expired" : p.premium_expires_at ? `Active until ${new Date(p.premium_expires_at).toLocaleDateString("en-US")}` : "Lifetime supporter"}
+                                {!p.is_premium ? "Free" : expired ? "Expired" : p.premium_expires_at ? `Active until ${new Date(p.premium_expires_at).toLocaleDateString("en-US")}` : "Expiration date missing"}
                               </div>
                             </div>
                           </div>
@@ -1372,7 +1390,7 @@ const Admin = () => {
                               className="h-8 text-xs"
                               onClick={() => {
                                 setManagingDeletion(managingDeletion === d.id ? null : d.id);
-                                setManagePlan(d.premium_plan || "lifetime");
+                                setManagePlan(["monthly", "quarterly", "annual"].includes(d.premium_plan || "") ? (d.premium_plan as string) : "monthly");
                                 setManageUntil("");
                               }}
                             >
@@ -1394,12 +1412,11 @@ const Admin = () => {
                                       <SelectItem value="monthly">Monthly</SelectItem>
                                       <SelectItem value="quarterly">Quarterly</SelectItem>
                                       <SelectItem value="annual">Annual</SelectItem>
-                                      <SelectItem value="lifetime">Lifetime</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
                                 <div className="space-y-1.5">
-                                  <label className="text-xs text-muted-foreground">Active until (empty = lifetime)</label>
+                                  <label className="text-xs text-muted-foreground">Active until</label>
                                   <Input type="date" value={manageUntil} onChange={(e) => setManageUntil(e.target.value)} className="bg-background h-9" />
                                 </div>
                               </div>

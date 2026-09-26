@@ -30,7 +30,6 @@ const planNames: Record<string, string> = {
   quarterly: "Quarterly Supporter",
   yearly: "Yearly Supporter",
   annual: "Yearly Supporter",
-  lifetime: "Lifetime Supporter",
 };
 
 const benefits = [
