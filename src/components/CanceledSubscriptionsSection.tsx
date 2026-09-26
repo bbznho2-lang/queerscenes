@@ -15,6 +15,8 @@ interface CanceledRow {
   previous_expires_at: string | null;
   canceled_at: string;
   notes: string | null;
+  user_id: string | null;
+  source: string;
 }
 
 const PAGE_SIZE = 10;
@@ -154,6 +156,7 @@ export default function CanceledSubscriptionsSection() {
           <CircleOff className="w-5 h-5 text-destructive" />
           Canceled Subscriptions
         </CardTitle>
+        <p className="text-xs text-muted-foreground">Stripe-confirmed cancellations appear automatically and are linked to the matching account.</p>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Add form */}
@@ -216,18 +219,22 @@ export default function CanceledSubscriptionsSection() {
           <p className="text-muted-foreground text-center py-6 text-sm">Loading...</p>
         ) : filteredRows.length > 0 ? (
           <div className="space-y-1">
-            <div className="hidden sm:grid grid-cols-[1.5fr_1fr_100px_120px_80px] gap-3 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
+            <div className="hidden sm:grid grid-cols-[1.4fr_1fr_90px_90px_120px_80px] gap-3 px-3 py-2 text-xs text-muted-foreground font-medium border-b border-border">
               <span>Email</span>
               <span>Name</span>
               <span>Plan</span>
+              <span>Source</span>
               <span className="text-right">Canceled on</span>
               <span />
             </div>
             {pageRows.map((r) => (
-              <div key={r.id} className="grid grid-cols-1 sm:grid-cols-[1.5fr_1fr_100px_120px_80px] gap-1 sm:gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/30 transition-colors border-b border-border/30 last:border-0 items-center">
+              <div key={r.id} className="grid grid-cols-1 sm:grid-cols-[1.4fr_1fr_90px_90px_120px_80px] gap-1 sm:gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/30 transition-colors border-b border-border/30 last:border-0 items-center">
                 <span className="text-sm text-foreground truncate" title={r.email}>{r.email}</span>
                 <span className="text-sm text-muted-foreground truncate">{r.name || "—"}</span>
                 <span className="text-xs capitalize text-muted-foreground">{r.plan || "—"}</span>
+                <span className={r.source === "stripe_webhook" ? "text-xs font-semibold text-primary" : "text-xs text-muted-foreground"}>
+                  {r.source === "stripe_webhook" ? "Stripe verified" : "Manual"}
+                </span>
                 <span className="text-xs text-muted-foreground sm:text-right whitespace-nowrap">
                   {new Date(r.canceled_at).toLocaleDateString(undefined, { day: "2-digit", month: "2-digit", year: "numeric" })}
                 </span>
