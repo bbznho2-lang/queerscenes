@@ -80,14 +80,10 @@ Deno.serve(async (req) => {
       ? new Date(opts.periodEnd * 1000)
       : addMonths(new Date(), mapping.months);
 
-    console.log("[stripe-webhook] applySupporter", {
-      email,
-      plan: mapping.plan,
-      months: mapping.months,
-      expiresAt: expiresAt.toISOString(),
-      customerId: opts.customerId,
-      subscriptionId: opts.subscriptionId,
-    });
+    // Never write customer identifiers, email addresses, or subscription
+    // details to operational logs. The verified Stripe event ID is already
+    // logged above and is sufficient for correlating webhook processing.
+    console.log("[stripe-webhook] applying supporter entitlement");
 
     // 1) Upsert pending_supporters (for users that haven't signed up yet)
     const { error: pendErr } = await supabase
@@ -101,7 +97,7 @@ Deno.serve(async (req) => {
         status: "paid",
       });
     if (pendErr) console.error("[stripe-webhook] pending_supporters insert error", pendErr);
-    else console.log("[stripe-webhook] pending_supporters inserted for", email);
+    else console.log("[stripe-webhook] pending supporter entitlement inserted");
 
     // 2) If a profile already exists with that email, also promote it immediately.
     const { data: existing, error: lookupErr } = await supabase
@@ -131,7 +127,7 @@ Deno.serve(async (req) => {
 
       await sendWelcomeDM(existing.user_id);
     } else {
-      console.log("[stripe-webhook] no profile yet for", email, "— will be claimed at next login");
+      console.log("[stripe-webhook] no matching profile yet; entitlement will be claimed at next login");
     }
   }
 
