@@ -9,7 +9,8 @@ export type SupporterEventType =
   | "paywall_signup_submit"
   | "checkout_session_created"
   | "checkout_completed"
-  | "watch_free_fallback_click";
+  | "watch_free_fallback_click"
+  | "billing_portal_opened";
 
 export interface TrackSupporterEventParams {
   event_type: SupporterEventType;
