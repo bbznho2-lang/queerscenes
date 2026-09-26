@@ -317,6 +317,105 @@ Deno.serve(async (req) => {
     }
   }
 
+  async function recordCanceledSubscription(subscription: Stripe.Subscription) {
+    const subscriptionId = subscription.id;
+    const customerId = typeof subscription.customer === "string"
+      ? subscription.customer
+      : subscription.customer.id;
+
+    const { data: duplicate, error: duplicateError } = await supabase
+      .from("canceled_subscriptions")
+      .select("id")
+      .eq("stripe_event_id", event.id)
+      .maybeSingle();
+    if (duplicateError) throw duplicateError;
+    if (duplicate?.id) return;
+
+    const { data: entitlement, error: entitlementError } = await supabase
+      .from("pending_supporters")
+      .select("email, plan, premium_expires_at")
+      .eq("stripe_subscription_id", subscriptionId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (entitlementError) throw entitlementError;
+
+    let email = entitlement?.email?.trim().toLowerCase() ||
+      subscription.metadata?.email?.trim().toLowerCase() || "";
+    if (!email && customerId) {
+      const customer = await stripe.customers.retrieve(customerId);
+      if (!customer.deleted && customer.email) email = customer.email.trim().toLowerCase();
+    }
+    if (!email) {
+      console.warn("[stripe-webhook] canceled subscription could not be linked", { event_id: event.id });
+      return;
+    }
+
+    const metadataUserId = subscription.metadata?.user_id || null;
+    const profileQuery = supabase
+      .from("profiles")
+      .select("user_id, first_name, last_name, premium_plan, premium_expires_at");
+    const { data: profile, error: profileError } = metadataUserId
+      ? await profileQuery.eq("user_id", metadataUserId).maybeSingle()
+      : await profileQuery.ilike("email", email).maybeSingle();
+    if (profileError) throw profileError;
+
+    const userId = profile?.user_id || metadataUserId;
+    const name = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ").trim() || null;
+    const plan = entitlement?.plan || profile?.premium_plan || null;
+    const previousExpiresAt = entitlement?.premium_expires_at || profile?.premium_expires_at || null;
+    const canceledAtSeconds = subscription.ended_at || subscription.canceled_at || event.created;
+    const cancellationReason = subscription.cancellation_details?.reason || null;
+
+    const { error: insertError } = await supabase.from("canceled_subscriptions").insert({
+      email,
+      name,
+      plan,
+      previous_expires_at: previousExpiresAt,
+      canceled_at: new Date(canceledAtSeconds * 1000).toISOString(),
+      notes: cancellationReason ? `Stripe confirmed: ${cancellationReason}` : "Stripe confirmed cancellation",
+      user_id: userId,
+      stripe_customer_id: customerId,
+      stripe_subscription_id: subscriptionId,
+      stripe_event_id: event.id,
+      source: "stripe_webhook",
+    });
+    if (insertError && insertError.code !== "23505") throw insertError;
+
+    const { error: cancelEntitlementError } = await supabase
+      .from("pending_supporters")
+      .update({ status: "canceled", updated_at: new Date().toISOString() })
+      .eq("stripe_subscription_id", subscriptionId)
+      .in("status", ["pending", "paid", "claimed"]);
+    if (cancelEntitlementError) throw cancelEntitlementError;
+
+    if (userId) {
+      const { data: otherEntitlement, error: otherError } = await supabase
+        .from("pending_supporters")
+        .select("id")
+        .ilike("email", email)
+        .in("status", ["pending", "paid", "claimed"])
+        .gt("premium_expires_at", new Date().toISOString())
+        .neq("stripe_subscription_id", subscriptionId)
+        .limit(1)
+        .maybeSingle();
+      if (otherError) throw otherError;
+
+      if (!otherEntitlement?.id) {
+        const { error: revokeError } = await supabase
+          .from("profiles")
+          .update({ is_premium: false, premium_plan: null, premium_expires_at: null })
+          .eq("user_id", userId);
+        if (revokeError) throw revokeError;
+      }
+    }
+
+    console.log("[stripe-webhook] verified subscription cancellation recorded", {
+      event_id: event.id,
+      linked_user: Boolean(userId),
+    });
+  }
+
   try {
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
@@ -402,6 +501,8 @@ Deno.serve(async (req) => {
       if (email && priceId) {
         await applySupporter({ email, priceId, customerId, subscriptionId: subId, periodEnd });
       }
+    } else if (event.type === "customer.subscription.deleted") {
+      await recordCanceledSubscription(event.data.object as Stripe.Subscription);
     }
 
     return new Response(JSON.stringify({ received: true }), {
