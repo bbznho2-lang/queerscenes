@@ -380,6 +380,7 @@ Deno.serve(async (req) => {
         .select("id, stripe_subscription_id")
         .ilike("email", email)
         .in("status", ["pending", "paid", "claimed"])
+        .in("plan", ["monthly", "quarterly", "annual"])
         .gt("premium_expires_at", new Date().toISOString())
         .limit(20);
       if (otherError) throw otherError;
