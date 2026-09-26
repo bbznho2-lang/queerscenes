@@ -695,7 +695,7 @@ const Admin = () => {
   const premiumUsers = profiles.filter(
     (p) =>
       p.is_premium &&
-      (!p.premium_expires_at || new Date(p.premium_expires_at).getTime() > Date.now())
+      Boolean(p.premium_expires_at && new Date(p.premium_expires_at).getTime() > Date.now())
   ).length;
   const totalClicks = clickStats.reduce((a, b) => a + b.clicks, 0);
 
