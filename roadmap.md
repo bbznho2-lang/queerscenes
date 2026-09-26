@@ -8,4 +8,4 @@
 - [x] Verify compilation and the complete flow on desktop and mobile.
 - [x] Record each confirmed billing portal opening.
 - [x] Show billing portal activity with user details in the admin panel.
-- [ ] Verify the tracking and admin list.
+- [x] Verify the tracking and admin list.
