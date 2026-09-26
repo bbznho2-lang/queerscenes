@@ -367,6 +367,37 @@ Deno.serve(async (req) => {
     const canceledAtSeconds = subscription.ended_at || subscription.canceled_at || event.created;
     const cancellationReason = subscription.cancellation_details?.reason || null;
 
+    const { error: cancelEntitlementError } = await supabase
+      .from("pending_supporters")
+      .update({ status: "canceled", updated_at: new Date().toISOString() })
+      .eq("stripe_subscription_id", subscriptionId)
+      .in("status", ["pending", "paid", "claimed"]);
+    if (cancelEntitlementError) throw cancelEntitlementError;
+
+    if (userId) {
+      const { data: otherEntitlement, error: otherError } = await supabase
+        .from("pending_supporters")
+        .select("id, stripe_subscription_id")
+        .ilike("email", email)
+        .in("status", ["pending", "paid", "claimed"])
+        .gt("premium_expires_at", new Date().toISOString())
+        .limit(20);
+      if (otherError) throw otherError;
+
+      const hasOtherEntitlement = (otherEntitlement || []).some(
+        (row) => row.stripe_subscription_id !== subscriptionId,
+      );
+      if (!hasOtherEntitlement) {
+        const { error: revokeError } = await supabase
+          .from("profiles")
+          .update({ is_premium: false, premium_plan: null, premium_expires_at: null })
+          .eq("user_id", userId);
+        if (revokeError) throw revokeError;
+      }
+    }
+
+    // Store the event last. If any entitlement update above fails, Stripe can
+    // retry safely instead of seeing a recorded event with incomplete effects.
     const { error: insertError } = await supabase.from("canceled_subscriptions").insert({
       email,
       name,
@@ -381,34 +412,6 @@ Deno.serve(async (req) => {
       source: "stripe_webhook",
     });
     if (insertError && insertError.code !== "23505") throw insertError;
-
-    const { error: cancelEntitlementError } = await supabase
-      .from("pending_supporters")
-      .update({ status: "canceled", updated_at: new Date().toISOString() })
-      .eq("stripe_subscription_id", subscriptionId)
-      .in("status", ["pending", "paid", "claimed"]);
-    if (cancelEntitlementError) throw cancelEntitlementError;
-
-    if (userId) {
-      const { data: otherEntitlement, error: otherError } = await supabase
-        .from("pending_supporters")
-        .select("id")
-        .ilike("email", email)
-        .in("status", ["pending", "paid", "claimed"])
-        .gt("premium_expires_at", new Date().toISOString())
-        .neq("stripe_subscription_id", subscriptionId)
-        .limit(1)
-        .maybeSingle();
-      if (otherError) throw otherError;
-
-      if (!otherEntitlement?.id) {
-        const { error: revokeError } = await supabase
-          .from("profiles")
-          .update({ is_premium: false, premium_plan: null, premium_expires_at: null })
-          .eq("user_id", userId);
-        if (revokeError) throw revokeError;
-      }
-    }
 
     console.log("[stripe-webhook] verified subscription cancellation recorded", {
       event_id: event.id,
