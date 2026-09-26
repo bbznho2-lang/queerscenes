@@ -66,7 +66,12 @@ export type Database = {
           notes: string | null
           plan: string | null
           previous_expires_at: string | null
+          source: string
+          stripe_customer_id: string | null
+          stripe_event_id: string | null
+          stripe_subscription_id: string | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           canceled_at?: string
@@ -77,7 +82,12 @@ export type Database = {
           notes?: string | null
           plan?: string | null
           previous_expires_at?: string | null
+          source?: string
+          stripe_customer_id?: string | null
+          stripe_event_id?: string | null
+          stripe_subscription_id?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           canceled_at?: string
@@ -88,7 +98,12 @@ export type Database = {
           notes?: string | null
           plan?: string | null
           previous_expires_at?: string | null
+          source?: string
+          stripe_customer_id?: string | null
+          stripe_event_id?: string | null
+          stripe_subscription_id?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
