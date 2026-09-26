@@ -9,7 +9,7 @@
 - [x] Record each confirmed billing portal opening.
 - [x] Show billing portal activity with user details in the admin panel.
 - [x] Verify the tracking and admin list.
-- [ ] Store verified Stripe cancellation records without duplicates.
-- [ ] Link real cancellations to the matching user and revoke only the ended entitlement.
-- [ ] Distinguish Stripe-confirmed cancellations in the admin panel.
-- [ ] Deploy and test the updated Stripe webhook.
+- [x] Store verified Stripe cancellation records without duplicates.
+- [x] Link real cancellations to the matching user and revoke only the ended entitlement.
+- [x] Distinguish Stripe-confirmed cancellations in the admin panel.
+- [x] Deploy and test the updated Stripe webhook.
