@@ -214,7 +214,7 @@ const TitlePage = () => {
           .maybeSingle(),
       ]);
       if (cancelled) return;
-      const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
+      const notExpired = Boolean(profile?.premium_expires_at && new Date(profile.premium_expires_at) > new Date());
       const allowed = isAdmin || Boolean(canPlay) || Boolean(profile?.is_premium && notExpired);
       setCanWatch(allowed);
       setExpiredAt(

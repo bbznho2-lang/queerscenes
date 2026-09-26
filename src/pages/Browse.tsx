@@ -184,7 +184,7 @@ const Browse = () => {
         .eq("user_id", user.id)
         .maybeSingle();
       if (data) {
-        const notExpired = !data.premium_expires_at || new Date(data.premium_expires_at) > new Date();
+        const notExpired = Boolean(data.premium_expires_at && new Date(data.premium_expires_at) > new Date());
         const isPrem = data.is_premium && notExpired;
         setUserIsPremium(isPrem);
       }

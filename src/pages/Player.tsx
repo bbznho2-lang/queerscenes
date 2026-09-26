@@ -149,7 +149,7 @@ const Player = () => {
     }
     let resolvedContent = data as ContentItem;
 
-    const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
+    const notExpired = Boolean(profile?.premium_expires_at && new Date(profile.premium_expires_at) > new Date());
     const hasPremiumFromProfile = !!(profile?.is_premium && notExpired);
     const hasPremium = isAdmin || Boolean(canPlayPremium) || hasPremiumFromProfile;
     const expired = !hasPremium && !!(profile?.is_premium && profile?.premium_expires_at && new Date(profile.premium_expires_at) <= new Date());

@@ -179,7 +179,7 @@ const Index = () => {
         .maybeSingle();
 
       if (!active) return;
-      const notExpired = !profile?.premium_expires_at || new Date(profile.premium_expires_at) > new Date();
+      const notExpired = Boolean(profile?.premium_expires_at && new Date(profile.premium_expires_at) > new Date());
       setIsPremiumUser(Boolean(profile?.is_premium && notExpired));
       setProfileLoading(false);
     };
