@@ -15,6 +15,7 @@ import {
 import SupportDialog from "@/components/SupportDialog";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { trackSupporterEvent } from "@/lib/supporter-tracking";
 
 const BILLING_PORTAL_URL = "https://billing.stripe.com/p/login/aFaaEY4o4gKC1MXf2xg3600";
 
@@ -79,7 +80,15 @@ const ManageSubscription = () => {
   const expired = Boolean(expiresAt && expiresAt <= new Date());
   const status = summary?.is_premium && !expired ? "Active" : expired ? "Expired" : "No active plan";
 
-  const openPortal = () => {
+  const openPortal = async () => {
+    await trackSupporterEvent(supabase, {
+      event_type: "billing_portal_opened",
+      source: "manage_subscription",
+      metadata: {
+        plan: summary?.premium_plan ?? null,
+        subscription_status: status,
+      },
+    });
     window.location.assign(BILLING_PORTAL_URL);
   };
 
@@ -176,7 +185,7 @@ const ManageSubscription = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Stay on Queer Scenes</AlertDialogCancel>
-            <AlertDialogAction onClick={openPortal}>Open secure portal</AlertDialogAction>
+            <AlertDialogAction onClick={() => void openPortal()}>Open secure portal</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Users, BarChart3, Crown, Mail, Eye, Calendar, CreditCard, Trash2, ChevronLeft, ChevronRight, MessageCircle, MousePointerClick, Send, X, Search } from "lucide-react";
+import { ArrowLeft, Users, BarChart3, Crown, Mail, Eye, Calendar, CreditCard, Trash2, ChevronLeft, ChevronRight, MessageCircle, MousePointerClick, Send, X, Search, UserMinus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -839,6 +839,53 @@ const Admin = () => {
           <ReferralsSection />
         </div>
 
+        {(() => {
+          const profileById = new Map(profiles.map((profile) => [profile.user_id, profile]));
+          const portalEvents = supporterEvents.filter((event) => event.event_type === "billing_portal_opened");
+          return (
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-foreground">
+                  <UserMinus className="h-5 w-5 text-destructive" />
+                  Subscription cancellation activity
+                </CardTitle>
+                <p className="text-xs text-muted-foreground">
+                  People who confirmed leaving Queer Scenes and opened the Stripe portal. Opening it does not confirm a completed cancellation.
+                </p>
+              </CardHeader>
+              <CardContent>
+                {portalEvents.length > 0 ? (
+                  <div className="space-y-1">
+                    <div className="hidden sm:grid grid-cols-[1fr_1.4fr_100px_150px] gap-3 border-b border-border px-3 py-2 text-xs font-medium text-muted-foreground">
+                      <span>Name</span>
+                      <span>Email</span>
+                      <span>Plan</span>
+                      <span className="text-right">Portal opened</span>
+                    </div>
+                    {portalEvents.map((event) => {
+                      const profile = event.user_id ? profileById.get(event.user_id) : null;
+                      const name = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ");
+                      const plan = profile?.premium_plan || event.metadata?.plan || "—";
+                      return (
+                        <div key={event.id} className="grid grid-cols-1 gap-1 border-b border-border/30 px-3 py-2.5 last:border-0 sm:grid-cols-[1fr_1.4fr_100px_150px] sm:gap-3">
+                          <span className="text-sm font-semibold text-foreground">{name || "Account holder"}</span>
+                          <span className="truncate text-sm text-muted-foreground">{profile?.email || (event.user_id ? `User ${event.user_id.slice(0, 8)}` : "Not signed in")}</span>
+                          <span className="text-xs capitalize text-muted-foreground">{String(plan)}</span>
+                          <span className="text-xs text-muted-foreground sm:text-right">
+                            {new Date(event.created_at).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="py-6 text-center text-sm text-muted-foreground">No one has opened the cancellation portal yet.</p>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })()}
+
         {/* Supporter Conversion Events */}
         {(() => {
           const totals = supporterEvents.reduce<Record<string, number>>((acc, e) => {
@@ -952,6 +999,7 @@ const Admin = () => {
                             checkout_session_created: "Checkout started",
                             checkout_completed: "Checkout completed",
                             watch_free_fallback_click: "Watch free fallback",
+                            billing_portal_opened: "Billing portal opened",
                           } as Record<string, string>)[ev.event_type] || ev.event_type}</span>
                           <span className="text-xs sm:text-sm text-foreground truncate">{ev.source || "—"}</span>
                           <span className="text-xs sm:text-sm truncate" style={{ color: refCode ? "#2dd4bf" : undefined }}>
