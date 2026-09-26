@@ -5,4 +5,4 @@
 - [x] Link the confirmed exit to the Stripe customer portal.
 - [x] Update the cancellation FAQ with clear steps.
 - [x] Simplify Support to subscription questions only.
-- [ ] Verify compilation and the complete flow on desktop and mobile.
+- [x] Verify compilation and the complete flow on desktop and mobile.
