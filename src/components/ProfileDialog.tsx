@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -8,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, Trash2, Crown } from "lucide-react";
+import { Camera, Trash2, Crown, CreditCard, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import SupportDialog from "./SupportDialog";
@@ -19,6 +20,7 @@ interface ProfileDialogProps {
 }
 
 const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
+  const navigate = useNavigate();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -179,6 +181,23 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
                     </p>
                   )}
                 </div>
+                {isPremium && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      onOpenChange(false);
+                      navigate("/manage-subscription");
+                    }}
+                    className="w-full justify-between border-primary/30 bg-primary/5 text-foreground hover:bg-primary/10"
+                  >
+                    <span className="flex items-center gap-2">
+                      <CreditCard className="h-4 w-4 text-primary" />
+                      Manage subscription
+                    </span>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  </Button>
+                )}
               </div>
             );
           })()}
@@ -198,7 +217,7 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
 
             <div className="mt-4 rounded-xl border border-white/10 bg-white/[.03] p-3">
               <p className="text-[11px] text-muted-foreground text-center break-words">
-                Deleting your profile does not cancel your subscription. Need help or thinking about leaving? Talk to{" "}
+                Deleting your profile does not cancel your subscription. For billing questions, talk to{" "}
                 <button
                   type="button"
                   onClick={() => setSupportOpen(true)}
