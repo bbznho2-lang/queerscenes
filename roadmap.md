@@ -13,5 +13,5 @@
 - [x] Link real cancellations to the matching user and revoke only the ended entitlement.
 - [x] Distinguish Stripe-confirmed cancellations in the admin panel.
 - [x] Deploy and test the updated Stripe webhook.
-- [ ] Remove lifetime plans from the admin, account labels, and backend rules.
-- [ ] Remove inactive historical lifetime entries and verify cancellation behavior.
+- [x] Remove lifetime plans from the admin, account labels, and backend rules.
+- [x] Remove inactive historical lifetime entries and verify cancellation behavior.

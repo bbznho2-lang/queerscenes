@@ -142,12 +142,11 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
 
           {(() => {
             const expired = !!(isPremium && premiumExpiresAt && new Date(premiumExpiresAt) <= new Date());
-            const active = isPremium && !expired;
+            const active = !!(isPremium && premiumExpiresAt && !expired);
             const planLabel =
               premiumPlan === "monthly" ? "Monthly"
               : premiumPlan === "quarterly" ? "Quarterly"
               : premiumPlan === "yearly" || premiumPlan === "annual" ? "Yearly"
-              : premiumPlan === "lifetime" ? "Lifetime"
               : "Supporter";
             return (
               <div className="space-y-2">
@@ -160,7 +159,7 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
                     </span>
                     {active ? (
                       <span className="text-xs text-muted-foreground whitespace-nowrap">
-                        {premiumExpiresAt ? `Active until ${new Date(premiumExpiresAt).toLocaleDateString("en-US")}` : "Lifetime"}
+                        Active until {new Date(premiumExpiresAt).toLocaleDateString("en-US")}
                       </span>
                     ) : expired ? (
                       <a
