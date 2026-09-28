@@ -473,13 +473,18 @@ const Admin = () => {
   const togglePremium = async (profile: Profile) => {
     const newPremium = !profile.is_premium;
     try {
-      const defaultExpiration = newPremium && !profile.premium_expires_at
+      const storedExpiration = profile.premium_expires_at ? new Date(profile.premium_expires_at) : null;
+      const needsNewExpiration = newPremium && (!storedExpiration || storedExpiration <= new Date());
+      const defaultExpiration = needsNewExpiration
         ? new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString()
         : profile.premium_expires_at;
+      const supportedPlan = ["monthly", "quarterly", "annual", "yearly"].includes(profile.premium_plan || "")
+        ? profile.premium_plan
+        : "monthly";
       await applyPremiumUpdate(
         profile,
         newPremium,
-        newPremium ? (profile.premium_plan || "monthly") : null,
+        newPremium ? supportedPlan : null,
         newPremium ? defaultExpiration : null
       );
       toast.success(newPremium ? "Supporter activated" : "Supporter removed");

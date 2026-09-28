@@ -15,3 +15,5 @@
 - [x] Deploy and test the updated Stripe webhook.
 - [x] Remove lifetime plans from the admin, account labels, and backend rules.
 - [x] Remove inactive historical lifetime entries and verify cancellation behavior.
+- [x] Preserve active yearly access when another Stripe subscription is canceled.
+- [x] Reactivate expired supporters from the admin toggle with a new monthly validity period.
