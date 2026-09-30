@@ -17,3 +17,6 @@
 - [x] Remove inactive historical lifetime entries and verify cancellation behavior.
 - [x] Preserve active yearly access when another Stripe subscription is canceled.
 - [x] Reactivate expired supporters from the admin toggle with a new monthly validity period.
+- [x] Update DOMPurify beyond 3.4.12 and verify the lockfiles.
+- [x] Update React Router DOM beyond 6.30.5 and React Router to 7.18.0 or later.
+- [x] Scan production dependencies and verify the site build.
