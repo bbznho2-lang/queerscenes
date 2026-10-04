@@ -100,14 +100,15 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
     }
 
 
-    // Sign URLs
+    // Keep private attachment links short-lived. Deleting the underlying object
+    // below revokes any still-open signed URL immediately.
     const toSign = list.filter((m) => m.media_url);
     if (toSign.length) {
       const entries = await Promise.all(
         toSign.map(async (m) => {
           const { data: signed } = await supabase.storage
             .from("dm-media")
-            .createSignedUrl(m.media_url!, 60 * 60);
+            .createSignedUrl(m.media_url!, 60);
           return [m.id, signed?.signedUrl || ""] as const;
         }),
       );
@@ -283,9 +284,39 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
 
   const handleDelete = async (id: string) => {
     if (isAdmin) {
-      const { error } = await (supabase as any).from("direct_messages").delete().eq("id", id);
+      const message = messages.find((item) => item.id === id);
+
+      // Remove the private object before its authorization record. A broadcast
+      // can reference one shared object, so retract every matching message too.
+      if (message?.media_url) {
+        const { error: storageError } = await supabase.storage
+          .from("dm-media")
+          .remove([message.media_url]);
+        if (storageError) {
+          toast.error("Failed to delete attachment");
+          return;
+        }
+      }
+
+      const deleteQuery = (supabase as any).from("direct_messages").delete();
+      const { error } = message?.media_url
+        ? await deleteQuery.eq("media_url", message.media_url)
+        : await deleteQuery.eq("id", id);
       if (error) {
         toast.error("Failed to delete");
+        return;
+      }
+
+      if (message?.media_url) {
+        setMediaUrls((prev) => {
+          const next = { ...prev };
+          for (const item of messages) {
+            if (item.media_url === message.media_url) delete next[item.id];
+          }
+          return next;
+        });
+        setMessages((prev) => prev.filter((item) => item.media_url !== message.media_url));
+        void fetchUnread();
         return;
       }
     } else {
