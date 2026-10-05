@@ -184,6 +184,15 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
     }
   }, [open, fetchMessages, fetchProfiles]);
 
+  // Signed attachment links expire after 60s; refresh them while the inbox is open
+  useEffect(() => {
+    if (!open) return;
+    const t = setInterval(() => {
+      if (messages.length) void refreshMediaUrls(messages);
+    }, 45_000);
+    return () => clearInterval(t);
+  }, [open, messages, refreshMediaUrls]);
+
   const markAllRead = async () => {
     const unreadMsgs = messages.filter((m) => !readIds.has(m.id));
     if (!unreadMsgs.length) return;
