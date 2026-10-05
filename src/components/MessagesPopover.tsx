@@ -100,21 +100,8 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
     }
 
 
-    // Keep private attachment links short-lived. Deleting the underlying object
-    // below revokes any still-open signed URL immediately.
-    const toSign = list.filter((m) => m.media_url);
-    if (toSign.length) {
-      const entries = await Promise.all(
-        toSign.map(async (m) => {
-          const { data: signed } = await supabase.storage
-            .from("dm-media")
-            .createSignedUrl(m.media_url!, 60);
-          return [m.id, signed?.signedUrl || ""] as const;
-        }),
-      );
-      setMediaUrls(Object.fromEntries(entries));
-    }
-  }, [userId]);
+    await refreshMediaUrls(list);
+  }, [userId, refreshMediaUrls]);
 
   const fetchProfiles = useCallback(async () => {
     if (!isAdmin) return;
