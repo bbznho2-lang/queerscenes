@@ -65,6 +65,25 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
     setUnread(typeof data === "number" ? data : 0);
   }, []);
 
+  // Keep private attachment links short-lived. Deleting the underlying object
+  // revokes any still-open signed URL immediately.
+  const refreshMediaUrls = useCallback(async (list: Message[]) => {
+    const toSign = list.filter((m) => m.media_url);
+    if (!toSign.length) {
+      setMediaUrls({});
+      return;
+    }
+    const entries = await Promise.all(
+      toSign.map(async (m) => {
+        const { data: signed } = await supabase.storage
+          .from("dm-media")
+          .createSignedUrl(m.media_url!, 60);
+        return [m.id, signed?.signedUrl || ""] as const;
+      }),
+    );
+    setMediaUrls(Object.fromEntries(entries));
+  }, []);
+
   const fetchMessages = useCallback(async () => {
     const { data } = await (supabase as any)
       .from("direct_messages")
