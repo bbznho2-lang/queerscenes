@@ -449,18 +449,19 @@ const TitlePage = () => {
               </p>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                 Your renewal didn't go through — usually an insufficient balance or an expired card.
-                Update your payment method to restore access.
+                Go to <strong className="text-foreground">Profile → Manage subscription</strong> to update your payment method and restore access.
               </p>
-              <a
-                href="https://t.me/l7kznr"
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={() => navigate("/manage-subscription")}
                 className="mt-6 block w-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500 py-3 text-sm font-medium text-white hover:opacity-95"
               >
-                Contact Support to Renew
-              </a>
+                Manage subscription
+              </button>
               <p className="mt-3 text-xs text-muted-foreground">
-                or email{" "}
+                Questions? Talk to{" "}
+                <a href="https://t.me/l7kznr" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">Support</a>
+                {" "}or email{" "}
                 <a href="mailto:scenes.queer@gmail.com" className="underline hover:text-foreground" translate="no">
                   scenes.queer@gmail.com
                 </a>

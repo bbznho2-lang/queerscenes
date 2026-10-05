@@ -162,25 +162,20 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
                         Active until {new Date(premiumExpiresAt).toLocaleDateString("en-US")}
                       </span>
                     ) : expired ? (
-                      <a
-                        href="https://t.me/l7kznr"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs font-semibold text-red-400 underline whitespace-nowrap hover:opacity-80"
-                      >
-                        Contact Support
-                      </a>
+                      <span className="text-xs font-semibold text-red-400 whitespace-nowrap">
+                        Ended {new Date(premiumExpiresAt!).toLocaleDateString("en-US")}
+                      </span>
                     ) : (
                       <span className="text-xs text-muted-foreground whitespace-nowrap">No active plan</span>
                     )}
                   </div>
                   {expired && (
                     <p className="mt-1.5 text-[11px] text-red-400/75 leading-snug">
-                      Should have renewed on {new Date(premiumExpiresAt!).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" })} — check your balance or update your card.
+                      Should have renewed on {new Date(premiumExpiresAt!).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" })} — tap <strong>Manage subscription</strong> below to update your card and renew.
                     </p>
                   )}
                 </div>
-                {isPremium && (
+                {(isPremium || premiumExpiresAt) && (
                   <Button
                     type="button"
                     variant="outline"
@@ -188,11 +183,11 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
                       onOpenChange(false);
                       navigate("/manage-subscription");
                     }}
-                    className="w-full justify-between border-primary/30 bg-primary/5 text-foreground hover:bg-primary/10"
+                    className={`w-full justify-between text-foreground ${expired ? 'border-destructive/50 bg-destructive/10 hover:bg-destructive/20' : 'border-primary/30 bg-primary/5 hover:bg-primary/10'}`}
                   >
                     <span className="flex items-center gap-2">
                       <CreditCard className="h-4 w-4 text-primary" />
-                      Manage subscription
+                      {expired ? "Manage subscription · Renew" : "Manage subscription"}
                     </span>
                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </Button>

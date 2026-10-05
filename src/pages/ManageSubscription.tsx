@@ -111,10 +111,17 @@ const ManageSubscription = () => {
             <CreditCard className="h-6 w-6 text-primary" />
           </div>
           <p className="text-xs font-bold uppercase text-accent">Manage subscription</p>
-          <h1 className="mt-3 text-3xl font-black sm:text-5xl">Before you make a change</h1>
+          <h1 className="mt-3 text-3xl font-black sm:text-5xl">{expired ? "Your plan has expired" : "Before you make a change"}</h1>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-            We would love to keep you with us. Take a moment to see what your subscription makes possible and what you will lose if you cancel.
+            {expired
+              ? "Your renewal didn't go through — usually an insufficient balance or an expired card. Update your payment method in the secure portal to restore access right away."
+              : "We would love to keep you with us. Take a moment to see what your subscription makes possible and what you will lose if you cancel."}
           </p>
+          {expired && (
+            <Button className="qs-btn-primary mt-6 h-12 w-full sm:w-auto sm:min-w-72" onClick={() => setConfirmPortal(true)}>
+              <CreditCard className="mr-2 h-4 w-4" /> Update payment & renew
+            </Button>
+          )}
         </section>
 
         <section className="mx-auto mt-8 max-w-3xl border-y border-border py-5">
@@ -129,7 +136,7 @@ const ManageSubscription = () => {
                 <p className="mt-1 text-lg font-bold">{planName}</p>
               </div>
               <div className="sm:text-right">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+                <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold ${expired ? "border-destructive/40 bg-destructive/10 text-destructive" : "border-primary/30 bg-primary/10 text-primary"}`}>
                   <Check className="h-3.5 w-3.5" /> {status}
                 </span>
                 {expiresAt && (
@@ -149,7 +156,7 @@ const ManageSubscription = () => {
         </section>
 
         <section className="mx-auto mt-10 max-w-3xl">
-          <h2 className="text-xl font-bold sm:text-2xl">What you keep by staying</h2>
+          <h2 className="text-xl font-bold sm:text-2xl">{expired ? "What you get back when you renew" : "What you keep by staying"}</h2>
           <div className="mt-5 grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3">
             {benefits.map(({ icon: Icon, title, text }) => (
               <article key={title} className="bg-card p-5">
@@ -162,7 +169,11 @@ const ManageSubscription = () => {
         </section>
 
         <section className="mx-auto mt-10 max-w-3xl border-t border-border pt-8 text-center">
-          <Button className="qs-btn-primary h-12 w-full sm:w-auto sm:min-w-72" onClick={() => navigate("/browse")}>I want to keep supporting 💜</Button>
+          {expired ? (
+            <Button className="qs-btn-primary h-12 w-full sm:w-auto sm:min-w-72" onClick={() => setConfirmPortal(true)}>Renew my Supporter plan 💜</Button>
+          ) : (
+            <Button className="qs-btn-primary h-12 w-full sm:w-auto sm:min-w-72" onClick={() => navigate("/browse")}>I want to keep supporting 💜</Button>
+          )}
           <div className="mt-5">
             <Button variant="ghost" className="text-xs text-muted-foreground hover:text-foreground" onClick={() => setConfirmPortal(true)}>
               Continue to manage or cancel <ArrowRight className="ml-2 h-3.5 w-3.5" />

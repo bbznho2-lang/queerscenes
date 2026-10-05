@@ -609,9 +609,15 @@ const Player = () => {
                   <div className="flex items-start gap-2 max-w-md mx-auto mb-5 rounded-lg bg-primary/10 border border-primary/30 px-3 py-2.5 text-left">
                     <span className="text-xl leading-none" aria-hidden>😊</span>
                     <p className="text-xs sm:text-sm text-foreground">
-                      Don't worry! Renew your plan to keep watching from where you stopped and unlock all the new updates.
+                      Don't worry! Your renewal probably didn't go through. Go to <strong>Profile → Manage subscription</strong> to update your card and restore access instantly.
                     </p>
                   </div>
+                  <button
+                    onClick={() => navigate("/manage-subscription")}
+                    className="mb-4 w-full max-w-sm rounded-full border border-primary/40 bg-primary/10 py-2.5 text-sm font-semibold text-foreground hover:bg-primary/20"
+                  >
+                    Manage subscription
+                  </button>
                 </>
               ) : (
                 <>
