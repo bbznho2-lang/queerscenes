@@ -175,7 +175,7 @@ const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
                     </p>
                   )}
                 </div>
-                {isPremium && (
+                {(isPremium || premiumExpiresAt) && (
                   <Button
                     type="button"
                     variant="outline"
