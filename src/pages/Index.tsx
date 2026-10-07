@@ -862,8 +862,11 @@ const Index = () => {
 
                 <div className="relative z-10 mt-5 space-y-2.5">
                   {[
+                    "Every title in HD, no ads",
+                    "Request subtitles in your language",
+                    "Request titles on the wishlist",
+                    "New titles added every month",
                     "Full catalog access",
-                    "Uninterrupted experience",
                     "Soap operas — weekly",
                     "LGBT series & movies",
                     "GL & BL Dramas subtitled",
@@ -881,6 +884,9 @@ const Index = () => {
                   <label htmlFor="supporter-email" className="text-[11px] text-[var(--t2)] block uppercase tracking-[0.16em] font-bold">
                     Your email (we'll send access here)
                   </label>
+                  <p className="text-[11px] text-[var(--t2)] -mt-1.5">
+                    Your email is your access. We send your login link here, no password needed.
+                  </p>
                   <Input
                     id="supporter-email"
                     type="email"
@@ -911,12 +917,24 @@ const Index = () => {
                   </button>
 
                   <p className="text-center text-[11px] text-[var(--t2)]">
-                    Secure checkout by Stripe · Cancel anytime
+                    Secure payment by Stripe. We never see or store your card.
                   </p>
+                  <p className="text-center text-[11px] text-[var(--t2)]">
+                    Cancel in 1 click, anytime
+                  </p>
+                  <div className="flex items-center justify-center gap-2 text-[11px] font-bold text-[var(--t2)]">
+                    <span>VISA</span>
+                    <span>·</span>
+                    <span>Mastercard</span>
+                    <span>·</span>
+                    <span>Apple Pay</span>
+                    <span>·</span>
+                    <span>Google Pay</span>
+                  </div>
                   <div className="flex items-center justify-center gap-1.5 text-[12px] text-[var(--t2)]">
-                    <span>💬 Need help?</span>
-                    <a href="https://t.me/L7kznr" target="_blank" rel="noopener noreferrer" className="font-semibold" style={{ color: "#c084fc" }}>
-                      Talk to support on Telegram
+                    <span>Questions?</span>
+                    <a href="mailto:scenes.queer@gmail.com" className="font-semibold underline" style={{ color: "#c084fc" }}>
+                      scenes.queer@gmail.com
                     </a>
                   </div>
                 </div>
