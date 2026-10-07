@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import DOMPurify from "dompurify";
-import { Play, Heart, Sparkles, ChevronLeft, Crown, Lock } from "lucide-react";
+import { Play, Heart, Sparkles, ChevronLeft, Crown, Lock, Languages } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { slugify } from "@/lib/slug";
 import { useAuth } from "@/hooks/useAuth";
@@ -376,7 +376,7 @@ const TitlePage = () => {
                 Subtitles: <span className="text-base">{unique.join(" ")}</span>
               </div>
               <p className="text-[11px] text-muted-foreground mt-1 mb-4">
-                Don't have your language? Request it in support.
+                Supporters can request subtitles in any language.
               </p>
             </>
           );
@@ -498,6 +498,21 @@ const TitlePage = () => {
           </p>
         )}
 
+        {/* Benefits */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mb-6">
+          {[
+            { Icon: Play, title: "Every title in HD, no ads" },
+            { Icon: Languages, title: "Request subtitles in your language" },
+            { Icon: Heart, title: "Request titles on the wishlist" },
+            { Icon: Sparkles, title: "New titles added every month" },
+          ].map(({ Icon, title }) => (
+            <div key={title} className="rounded-xl bg-card/70 border border-border px-2 py-3 text-center backdrop-blur-sm">
+              <Icon className="w-5 h-5 mx-auto mb-1 text-primary" />
+              <div className="text-[11px] md:text-xs font-bold text-foreground leading-tight">{title}</div>
+            </div>
+          ))}
+        </div>
+
         {/* Supporter comments — unique per title */}
         <PaywallComments
           contentId={content.id}
@@ -512,20 +527,6 @@ const TitlePage = () => {
 
 
 
-
-        {/* Benefits */}
-        <div className="grid grid-cols-3 gap-2 md:gap-3 mb-6">
-          {[
-            { Icon: Play, title: "Watch this title right now" },
-            { Icon: Heart, title: "Full access to our exclusive catalog" },
-            { Icon: Sparkles, title: "New titles added every month" },
-          ].map(({ Icon, title }) => (
-            <div key={title} className="rounded-xl bg-card/70 border border-border px-2 py-3 text-center backdrop-blur-sm">
-              <Icon className="w-5 h-5 mx-auto mb-1 text-primary" />
-              <div className="text-[11px] md:text-xs font-bold text-foreground leading-tight">{title}</div>
-            </div>
-          ))}
-        </div>
 
         {/* CTA — always route through the Player, which enforces supporter access
              and shows the episode list to supporters or the paywall to everyone else. */}
@@ -546,8 +547,12 @@ const TitlePage = () => {
             className="shine-cta w-full flex items-center justify-center gap-2 rounded-full py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-500 via-fuchsia-500 to-purple-600 hover:opacity-95 shadow-lg shadow-fuchsia-500/30"
           >
             {canWatch ? <Play className="w-4 h-4" /> : <Crown className="w-4 h-4" />}
-            {canWatch ? "Watch episodes now" : "Yes, become a Supporter"}
+            {canWatch ? "Watch episodes now" : `Watch ${content.title} in HD`}
           </Link>
+
+          <p className="text-center mt-2 text-[11px] text-muted-foreground">
+            Secure payment by Stripe · Cancel in 1 click, anytime
+          </p>
 
           <div className="text-center mt-3 mb-8">
             <button
