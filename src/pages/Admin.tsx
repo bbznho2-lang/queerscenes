@@ -309,7 +309,21 @@ const Admin = () => {
       allEvents.push(...data);
       if (data.length < EVT_PAGE) break;
     }
-    setSupporterEvents(allEvents as any);
+    // Billing portal openings are rare compared to the ~77k view events, so the
+    // 4000-row cap above almost never includes them. Fetch them separately so
+    // the "Subscription cancellation activity" card always has the full list.
+    const { data: portalEventsData } = await supabase
+      .from("supporter_events" as any)
+      .select("*")
+      .eq("event_type", "billing_portal_opened")
+      .order("created_at", { ascending: false })
+      .limit(500) as any;
+    const knownIds = new Set(allEvents.map((e) => e.id));
+    const mergedEvents = [
+      ...allEvents,
+      ...((portalEventsData || []) as any[]).filter((e) => !knownIds.has(e.id)),
+    ];
+    setSupporterEvents(mergedEvents as any);
 
     // Every click row — paginated to bypass the 1000-row PostgREST cap so
     // "User Click Details" shows every user, not just the most recent page.
