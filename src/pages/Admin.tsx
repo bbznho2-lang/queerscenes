@@ -1215,6 +1215,31 @@ const Admin = () => {
                 className="pl-9"
               />
             </div>
+            {(() => {
+              const q = userSearch.trim().toLowerCase();
+              if (!q) return null;
+              const matches = pendingSupporters.filter((pending) =>
+                !profiles.some((profile) => profile.email?.trim().toLowerCase() === pending.email.trim().toLowerCase()) &&
+                pending.email.trim().toLowerCase().includes(q)
+              );
+              if (matches.length === 0) return null;
+              return (
+                <div className="mb-4 space-y-2 rounded-md border border-border bg-muted/20 p-3">
+                  <p className="text-xs font-medium text-muted-foreground">Supporters without a linked account (not signed up yet)</p>
+                  {matches.map((pending) => (
+                    <div key={pending.id} className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border bg-muted/30 px-3 py-2">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-foreground">{pending.email}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {pending.plan} · active by email and links automatically at login
+                        </p>
+                      </div>
+                      <span className="qs-badge-supporter">ACTIVE</span>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
             {profiles.length > 0 ? (
               <div className="space-y-1">
 
