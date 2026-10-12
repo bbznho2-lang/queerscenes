@@ -710,6 +710,35 @@ const Admin = () => {
     );
   }
 
+  if (!pinUnlocked) {
+    const submitPin = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setPinChecking(true);
+      setPinError("");
+      const { data } = await supabase.rpc("verify_admin_pin" as any, { _pin: pinInput });
+      setPinChecking(false);
+      if (data === true) {
+        sessionStorage.setItem("admin_pin_ok", user?.id ?? "");
+        setPinUnlocked(true);
+      } else {
+        setPinError("Incorrect password");
+        setPinInput("");
+      }
+    };
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <form onSubmit={submitPin} className="w-full max-w-xs space-y-4 rounded-2xl border border-border bg-card p-6">
+          <h1 className="text-lg font-bold text-foreground text-center">Admin password</h1>
+          <Input type="password" inputMode="numeric" autoFocus value={pinInput} onChange={(e) => setPinInput(e.target.value)} placeholder="Password" />
+          {pinError && <p className="text-sm text-destructive text-center">{pinError}</p>}
+          <Button type="submit" className="w-full" disabled={pinChecking || !pinInput}>
+            {pinChecking ? "Checking..." : "Enter"}
+          </Button>
+        </form>
+      </div>
+    );
+  }
+
   const totalUsers = profiles.length;
   const premiumUsers = profiles.filter(
     (p) =>
