@@ -56,6 +56,21 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_settings: {
+        Row: {
+          id: number
+          pin_hash: string
+        }
+        Insert: {
+          id?: number
+          pin_hash: string
+        }
+        Update: {
+          id?: number
+          pin_hash?: string
+        }
+        Relationships: []
+      }
       canceled_subscriptions: {
         Row: {
           canceled_at: string
@@ -1175,6 +1190,7 @@ export type Database = {
         Returns: Json
       }
       system_notification_sender: { Args: never; Returns: string }
+      verify_admin_pin: { Args: { _pin: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"

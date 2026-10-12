@@ -93,6 +93,13 @@ const AdminStatsCards = ({ totalUsers, premiumUsers, totalClicks }: { totalUsers
 const Admin = () => {
   const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
+  const [pinUnlocked, setPinUnlocked] = useState(false);
+  const [pinInput, setPinInput] = useState("");
+  const [pinError, setPinError] = useState("");
+  const [pinChecking, setPinChecking] = useState(false);
+  useEffect(() => {
+    if (user && sessionStorage.getItem("admin_pin_ok") === user.id) setPinUnlocked(true);
+  }, [user]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [pendingSupporters, setPendingSupporters] = useState<PendingSupporter[]>([]);
   const [clickStats, setClickStats] = useState<ClickStat[]>([]);
@@ -706,6 +713,35 @@ const Admin = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-pulse text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!pinUnlocked) {
+    const submitPin = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setPinChecking(true);
+      setPinError("");
+      const { data } = await supabase.rpc("verify_admin_pin" as any, { _pin: pinInput });
+      setPinChecking(false);
+      if (data === true) {
+        sessionStorage.setItem("admin_pin_ok", user?.id ?? "");
+        setPinUnlocked(true);
+      } else {
+        setPinError("Incorrect password");
+        setPinInput("");
+      }
+    };
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <form onSubmit={submitPin} className="w-full max-w-xs space-y-4 rounded-2xl border border-border bg-card p-6">
+          <h1 className="text-lg font-bold text-foreground text-center">Admin password</h1>
+          <Input type="password" inputMode="numeric" autoFocus value={pinInput} onChange={(e) => setPinInput(e.target.value)} placeholder="Password" />
+          {pinError && <p className="text-sm text-destructive text-center">{pinError}</p>}
+          <Button type="submit" className="w-full" disabled={pinChecking || !pinInput}>
+            {pinChecking ? "Checking..." : "Enter"}
+          </Button>
+        </form>
       </div>
     );
   }
