@@ -93,6 +93,13 @@ const AdminStatsCards = ({ totalUsers, premiumUsers, totalClicks }: { totalUsers
 const Admin = () => {
   const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
+  const [pinUnlocked, setPinUnlocked] = useState(false);
+  const [pinInput, setPinInput] = useState("");
+  const [pinError, setPinError] = useState("");
+  const [pinChecking, setPinChecking] = useState(false);
+  useEffect(() => {
+    if (user && sessionStorage.getItem("admin_pin_ok") === user.id) setPinUnlocked(true);
+  }, [user]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [pendingSupporters, setPendingSupporters] = useState<PendingSupporter[]>([]);
   const [clickStats, setClickStats] = useState<ClickStat[]>([]);
