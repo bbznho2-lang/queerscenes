@@ -1,5 +1,10 @@
 # Roadmap
 
+- [ ] Update only the requested home hero copy.
+- [ ] Add Supporter subtitle requests with duplicate prevention and owner/admin access.
+- [ ] Add the admin request tab and atomic completion notifications in the existing inbox.
+- [ ] Verify submission, completion, inbox delivery and access restrictions.
+
 - [x] Add Manage subscription link in Profile.
 - [x] Create a retention-first subscription management page.
 - [x] Link the confirmed exit to the Stripe customer portal.
