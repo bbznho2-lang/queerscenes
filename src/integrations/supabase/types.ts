@@ -368,6 +368,8 @@ export type Database = {
           media_name: string | null
           media_type: string | null
           media_url: string | null
+          notification_link: string | null
+          notification_title: string | null
           recipient_id: string | null
           sender_id: string
         }
@@ -378,6 +380,8 @@ export type Database = {
           media_name?: string | null
           media_type?: string | null
           media_url?: string | null
+          notification_link?: string | null
+          notification_title?: string | null
           recipient_id?: string | null
           sender_id: string
         }
@@ -388,6 +392,8 @@ export type Database = {
           media_name?: string | null
           media_type?: string | null
           media_url?: string | null
+          notification_link?: string | null
+          notification_title?: string | null
           recipient_id?: string | null
           sender_id?: string
         }
@@ -765,6 +771,44 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      subtitle_requests: {
+        Row: {
+          created_at: string
+          done: boolean
+          email: string
+          id: string
+          language: string
+          title_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          done?: boolean
+          email: string
+          id?: string
+          language: string
+          title_id: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          done?: boolean
+          email?: string
+          id?: string
+          language?: string
+          title_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subtitle_requests_title_id_fkey"
+            columns: ["title_id"]
+            isOneToOne: false
+            referencedRelation: "contents"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       support_chats: {
         Row: {
