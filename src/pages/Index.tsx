@@ -430,27 +430,19 @@ const Index = () => {
             QUEER SCENES
           </motion.h1>
 
-          <motion.p
-            className="mx-auto mb-3 px-2"
-            style={{ fontSize: "14px", color: "rgba(238,234,255,.75)", lineHeight: 1.68, maxWidth: 320 }}
+          <motion.h2
+            className="mx-auto mb-3 px-2 max-w-80 text-xl font-bold text-foreground leading-snug"
             initial="hidden" animate="visible" variants={fade} custom={2}
           >
-            The queer streaming experience you've been waiting for. Hand-subtitled titles, rare series, GL & BL Dramas and exclusive premieres — all in one place.
-          </motion.p>
+            If it's queer and everyone's talking about it, it's here.
+          </motion.h2>
 
           <motion.p
             className="mx-auto mb-7 px-2"
             style={{ fontSize: "12px", color: "#9996bb", lineHeight: 1.6, maxWidth: 290 }}
             initial="hidden" animate="visible" variants={fade} custom={3}
           >
-            Want the full experience?{" "}
-            <button
-              onClick={() => handleBecomeSupporterClick("landing_hero_text")}
-              style={{ color: "#a855f7", background: "none", border: "none", padding: 0, cursor: "pointer", fontWeight: 600 }}
-            >
-              Become a Supporter
-            </button>{" "}
-            — unlock exclusive titles, weekly subtitled soap operas, GL & BL Dramas & early access. 💜
+            Hand-subtitled titles, rare series, GL & BL Dramas and exclusive premieres.
           </motion.p>
 
           <motion.div initial="hidden" animate="visible" variants={fade} custom={4} className="flex flex-col items-center gap-3 mx-auto" style={{ maxWidth: 290 }}>
