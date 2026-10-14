@@ -26,6 +26,7 @@ import FeaturedEpisodesAdmin from "@/components/FeaturedEpisodesAdmin";
 import CanceledSubscriptionsSection from "@/components/CanceledSubscriptionsSection";
 import ReferralsSection from "@/components/ReferralsSection";
 import { fetchTopContentRanking } from "@/lib/top-content";
+import SubtitleRequestsAdmin from "@/components/SubtitleRequestsAdmin";
 
 
 interface Profile {
@@ -870,6 +871,7 @@ const Admin = () => {
         <PaywallCustomizationsAdmin />
         <SocialLinksAdmin />
         <TitleRequestsAdmin />
+        <SubtitleRequestsAdmin />
         <FeaturedEpisodesAdmin />
 
 

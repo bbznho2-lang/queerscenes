@@ -7,6 +7,7 @@ import { Mail, Send, Paperclip, X, ExternalLink, Search, Loader2, Trash2 } from 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { linkify } from "@/lib/linkify";
+import { Link } from "react-router-dom";
 
 const TELEGRAM_REPLY_URL = "https://t.me/L7kznr";
 
@@ -19,6 +20,8 @@ interface Message {
   media_type: string | null;
   media_name: string | null;
   created_at: string;
+  notification_title?: string | null;
+  notification_link?: string | null;
 }
 
 interface ProfileLite {
@@ -466,12 +469,14 @@ const MessagesPopover = ({ userId, isAdmin }: Props) => {
                         </button>
 
                       </div>
+                      {msg.notification_title && <p className="mb-1 text-sm font-semibold text-foreground">{msg.notification_title}</p>}
                       {msg.body && (
                         <p className="text-xs text-foreground whitespace-pre-wrap break-words">
                           {linkify(msg.body)}
                         </p>
                       )}
                       {renderMedia(msg)}
+                      {msg.notification_link?.startsWith("/title/") && !msg.notification_link.startsWith("//") && <Link to={msg.notification_link} className="mt-2 inline-flex items-center gap-1.5 text-xs text-primary underline"><ExternalLink className="h-3.5 w-3.5" />Watch it now</Link>}
                       {!isAdmin && (
                         <a
                           href={TELEGRAM_REPLY_URL}

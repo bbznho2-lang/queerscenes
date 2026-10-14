@@ -17,6 +17,7 @@ import { DEFAULT_PAYWALL_TEXT } from "@/components/PaywallCustomizationsAdmin";
 import PaywallComments from "@/components/PaywallComments";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PASSWORD_REQUIREMENTS, validatePassword } from "@/lib/password-validation";
+import SubtitleRequestForm from "@/components/SubtitleRequestForm";
 
 
 interface ContentItem {
@@ -73,7 +74,7 @@ const Player = () => {
   const [telegramPopupOpen, setTelegramPopupOpen] = useState(false);
   const [paywallCustom, setPaywallCustom] = useState<{ custom_text: string | null; testimonials: { name: string; quote: string }[]; languages: string[] } | null>(null);
   const trackedPaywallViewsRef = useRef<Set<string>>(new Set());
-  const [detailTab, setDetailTab] = useState<"episodes" | "trailer" | "similar" | "details">("episodes");
+  const [detailTab, setDetailTab] = useState<"episodes" | "trailer" | "similar" | "details" | "subtitles">("episodes");
   const [similar, setSimilar] = useState<{ id: string; title: string; banner_url: string | null; tag: string | null; year: number | null }[]>([]);
 
   // Similar titles — matched by shared genre keywords from the title's tag.
@@ -536,11 +537,11 @@ const Player = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content?.id, isBlocked, episodePremiumBlocked, currentEp?.id]);
 
-  // Old in-player paywall is disabled — redirect non-supporters straight to the plans page
+  // Keep the new locked request form available without granting playback access.
   useEffect(() => {
     if (!accessResolved) return;
     if (isBlocked && !userIsPremium && !isAdmin) {
-      navigate("/?highlight=supporter#supporter-card", { replace: true });
+      setDetailTab("subtitles");
     }
   }, [accessResolved, isBlocked, userIsPremium, isAdmin, navigate]);
 
@@ -992,7 +993,7 @@ const Player = () => {
       )}
 
 
-      {!isBlocked && content && (() => {
+      {accessResolved && content && (() => {
         const isEpisodic = content.type === "serie" || content.type === "novela" || content.type === "anime" || content.type === "reality";
         const hasEpisodes = !premiumBlocked && isEpisodic && episodes.length > 0;
         const trailer = (content as any)?.preview_video_url?.trim() || "";
@@ -1001,6 +1002,7 @@ const Player = () => {
           { key: "details" as const, label: "Details" },
           ...(trailer ? [{ key: "trailer" as const, label: "Trailer" }] : []),
           ...(similar.length ? [{ key: "similar" as const, label: "Similar" }] : []),
+          { key: "subtitles" as const, label: "Request subtitles" },
         ];
         const active = tabs.some((t) => t.key === detailTab) ? detailTab : tabs[0].key;
         const seasons = [...new Set(episodes.map((e) => e.season))].sort((a, b) => a - b);
@@ -1009,7 +1011,7 @@ const Player = () => {
         const isTrailerIframe = trailer.toLowerCase().startsWith("<iframe");
 
         return (
-          <div className="w-full max-w-5xl mx-auto px-4 sm:px-0 pb-8">
+          <div className={`w-full max-w-5xl mx-auto px-4 sm:px-0 pb-8 ${isBlocked ? "pt-16" : ""}`}>
             {/* Tabs */}
             <div className="mt-5 sm:mt-7 border-b border-border">
               <div className="flex gap-5 sm:gap-7 overflow-x-auto scrollbar-hide">
@@ -1031,6 +1033,7 @@ const Player = () => {
             </div>
 
             {/* Episodes */}
+            {active === "subtitles" && <SubtitleRequestForm key={content.id} titleId={content.id} userId={user?.id} userEmail={user?.email} active={userIsPremium} />}
             {active === "episodes" && hasEpisodes && (
               <div className="mt-5 space-y-3">
                 {seasons.length > 1 && (
