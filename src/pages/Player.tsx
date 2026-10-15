@@ -540,10 +540,10 @@ const Player = () => {
   // Keep the new locked request form available without granting playback access.
   useEffect(() => {
     if (!accessResolved) return;
-    if (isBlocked && !userIsPremium && !isAdmin) {
+    if (isBlocked && !userIsPremium && !isAdmin && content?.type === "filme") {
       setDetailTab("subtitles");
     }
-  }, [accessResolved, isBlocked, userIsPremium, isAdmin, navigate]);
+  }, [accessResolved, isBlocked, userIsPremium, isAdmin, navigate, content?.type]);
 
   const playerTierSelector = null;
 
@@ -1002,7 +1002,7 @@ const Player = () => {
           { key: "details" as const, label: "Details" },
           ...(trailer ? [{ key: "trailer" as const, label: "Trailer" }] : []),
           ...(similar.length ? [{ key: "similar" as const, label: "Similar" }] : []),
-          { key: "subtitles" as const, label: "Request subtitles" },
+          ...(content.type === "filme" ? [{ key: "subtitles" as const, label: "Request subtitles" }] : []),
         ];
         const active = tabs.some((t) => t.key === detailTab) ? detailTab : tabs[0].key;
         const seasons = [...new Set(episodes.map((e) => e.season))].sort((a, b) => a - b);
