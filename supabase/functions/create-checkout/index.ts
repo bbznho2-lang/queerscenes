@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { priceId, visitorId, refCode } = await req.json();
+    const { priceId, visitorId, refCode, adConsent, consentVersion, ttp, ttclid, pageUrl, userAgent } = await req.json();
     if (!priceId || !ALLOWED_PRICE_IDS.has(priceId)) {
       return new Response(JSON.stringify({ error: "Invalid priceId" }), {
         status: 400,
@@ -77,6 +77,14 @@ Deno.serve(async (req) => {
         typeof refCode === "string"
           ? refCode.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 60)
           : "",
+      // Advertising consent at checkout time; webhook only reports to TikTok when granted.
+      ad_consent: adConsent === "granted" ? "granted" : "denied",
+      ad_consent_version: typeof consentVersion === "string" ? consentVersion.slice(0, 60) : "",
+      tt_ttp: adConsent === "granted" && typeof ttp === "string" ? ttp.slice(0, 200) : "",
+      tt_ttclid: adConsent === "granted" && typeof ttclid === "string" ? ttclid.slice(0, 200) : "",
+      tt_page: typeof pageUrl === "string" && ALLOWED_ORIGINS.has(pageUrl.replace(/\/$/, "")) ? pageUrl.slice(0, 100) : origin + "/",
+      tt_ua: adConsent === "granted" && typeof userAgent === "string" ? userAgent.slice(0, 450) : "",
+      tt_ip: adConsent === "granted" ? (req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "").slice(0, 60) : "",
     };
 
     const session = await stripe.checkout.sessions.create({
