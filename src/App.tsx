@@ -13,8 +13,6 @@ import TitlePage from "./pages/TitlePage";
 import Wishlist from "./pages/Wishlist";
 import ManageSubscription from "./pages/ManageSubscription";
 import NotFound from "./pages/NotFound";
-import Privacy from "./pages/Privacy";
-import CookieConsent from "./components/CookieConsent";
 import { useEffect } from "react";
 import { captureReferralFromUrl } from "@/lib/referral";
 
@@ -23,10 +21,6 @@ const queryClient = new QueryClient();
 const App = () => {
   useEffect(() => {
     void captureReferralFromUrl();
-    try {
-      const ttclid = new URLSearchParams(window.location.search).get("ttclid");
-      if (ttclid) sessionStorage.setItem("qs_ttclid", ttclid.slice(0, 200));
-    } catch { /* ignore */ }
   }, []);
 
   return (
@@ -35,7 +29,6 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <CookieConsent />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/index" element={<Navigate to="/" replace />} />
@@ -46,7 +39,6 @@ const App = () => {
             <Route path="/manage-subscription" element={<ManageSubscription />} />
             <Route path="/player/:id" element={<Player />} />
             <Route path="/admin" element={<Admin />} />
-            <Route path="/privacy" element={<Privacy />} />
             <Route path="/reset-password" element={<ResetPassword />} />
 
             <Route path="*" element={<NotFound />} />

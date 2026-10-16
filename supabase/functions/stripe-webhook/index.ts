@@ -420,56 +420,9 @@ Deno.serve(async (req) => {
     });
   }
 
-  // TikTok Events API: CompletePayment, only for confirmed payments with ad consent.
-  async function reportTikTokPurchase(session: Stripe.Checkout.Session) {
-    try {
-      const token = Deno.env.get("TIKTOK_EVENTS_API_TOKEN");
-      const md = session.metadata ?? {};
-      if (!token) return;
-      if (session.payment_status !== "paid") return;
-      if (md.ad_consent !== "granted") return;
-      const testCode = Deno.env.get("TIKTOK_TEST_EVENT_CODE");
-      const user: Record<string, string> = {};
-      if (md.tt_ttp) user.ttp = md.tt_ttp;
-      if (md.tt_ttclid) user.ttclid = md.tt_ttclid;
-      if (md.tt_ip) user.ip = md.tt_ip;
-      if (md.tt_ua) user.user_agent = md.tt_ua;
-      const body: Record<string, unknown> = {
-        event_source: "web",
-        event_source_id: "DB8R6QJC77U2CDFHK5GG",
-        data: [{
-          event: "CompletePayment",
-          event_time: session.created ?? Math.floor(Date.now() / 1000),
-          event_id: `purchase_${session.id}`,
-          user,
-          page: { url: md.tt_page || "https://queerscenes.com/" },
-          properties: {
-            currency: (session.currency ?? "eur").toUpperCase(),
-            value: (session.amount_total ?? 0) / 100,
-            content_type: "product",
-            contents: [{ content_id: "supporter_plan", quantity: 1 }],
-          },
-        }],
-      };
-      if (testCode) body.test_event_code = testCode;
-      const res = await fetch("https://business-api.tiktok.com/open_api/v1.3/event/track/", {
-        method: "POST",
-        headers: { "Access-Token": token, "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const text = await res.text();
-      let code: unknown = null;
-      try { code = JSON.parse(text)?.code; } catch { /* ignore */ }
-      console.log("[stripe-webhook] tiktok purchase report", { status: res.status, code, event_id: `purchase_${session.id}` });
-    } catch (e) {
-      console.error("[stripe-webhook] tiktok purchase report failed", (e as Error).message);
-    }
-  }
-
   try {
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
-      await reportTikTokPurchase(session);
       const email = session.customer_email || (session.customer_details?.email ?? "");
       const priceId = (session.metadata?.price_id as string) || "";
       const metaUserId = (session.metadata?.user_id as string) || session.client_reference_id || null;

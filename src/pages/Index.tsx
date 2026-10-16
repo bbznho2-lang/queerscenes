@@ -1,5 +1,3 @@
-import { hasAdvertisingConsent, readConsentRecord } from "@/lib/consent";
-import { tiktokTrack } from "@/lib/tiktok";
 import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -310,20 +308,8 @@ const Index = () => {
     try {
       const visitorId = getFunnelVisitorId();
       const refCode = getReferralCode();
-      const adConsent = hasAdvertisingConsent();
-      if (adConsent) tiktokTrack("InitiateCheckout", { content_type: "product", content_id: "supporter_plan" });
-      const consentRecord = readConsentRecord();
-      const ttp = adConsent ? (document.cookie.match(/(?:^|; )_ttp=([^;]*)/)?.[1] ?? "") : "";
-      const ttclid = adConsent ? (sessionStorage.getItem("qs_ttclid") ?? "") : "";
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: {
-          priceId, visitorId, refCode,
-          adConsent: adConsent ? "granted" : "denied",
-          consentVersion: consentRecord?.notice_version ?? "regional_default",
-          ttp, ttclid,
-          pageUrl: `${window.location.origin}/`,
-          userAgent: navigator.userAgent,
-        },
+        body: { priceId, visitorId, refCode },
       });
       if (error) throw error;
       const url = (data as any)?.url;
@@ -1044,10 +1030,6 @@ const Index = () => {
 
       <footer className="border-t border-border py-6 sm:py-8 text-center text-xs sm:text-sm text-muted-foreground">
         <p>© 2026 Queer Scenes. All rights reserved. 🌈</p>
-        <p className="mt-2 space-x-3">
-          <a href="/privacy" className="underline hover:text-foreground">Privacy policy</a>
-          <button type="button" onClick={() => window.dispatchEvent(new Event("qs-open-cookie-settings"))} className="underline hover:text-foreground">Cookie settings</button>
-        </p>
       </footer>
 
       <SupportDialog open={supportOpen} onOpenChange={setSupportOpen} />
