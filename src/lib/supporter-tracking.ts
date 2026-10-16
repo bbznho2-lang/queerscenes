@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { tiktokTrack } from "./tiktok";
 
 export type SupporterEventType =
   | "paywall_view"
@@ -72,6 +73,10 @@ export async function trackSupporterEvent(
   params: TrackSupporterEventParams,
 ): Promise<{ ok: boolean; error?: unknown }> {
   try {
+    // Locked title view → TikTok ViewContent (no title names or URLs sent).
+    if (params.event_type === "locked_content_view") {
+      try { tiktokTrack("ViewContent", { content_type: "product", content_id: "locked_title" }); } catch { /* ignore */ }
+    }
     const visitorId = getFunnelVisitorId();
     const metadata = { ...(params.metadata ?? {}) };
     if (visitorId) metadata.visitor_id = visitorId;
