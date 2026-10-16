@@ -8,7 +8,8 @@ import { hasAdvertisingConsent } from "./consent";
 
 const PIXEL_ID = "DB8R6QJC77U2CDFHK5GG";
 
-type TtqFn = ((...args: unknown[]) => void) & Record<string, unknown>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type TtqFn = any;
 
 declare global {
   interface Window {
@@ -60,36 +61,37 @@ function bootstrapPixel() {
   /* eslint-enable */
 }
 
-/** Loads the pixel if consent allows; safe to call repeatedly. */
-export function ensureTikTokPixel(): boolean {
+/** Loads the pixel if consent allows. Returns "loaded" when this call sent the initial PageView. */
+export function ensureTikTokPixel(): "loaded" | "ready" | false {
   if (typeof window === "undefined") return false;
   if (!hasAdvertisingConsent()) return false;
   if (!loaded) {
     bootstrapPixel();
     loaded = true;
     revoked = false;
-    return true;
+    return "loaded";
   }
   if (revoked) {
-    window.ttq?.("grantConsent");
+    window.ttq?.grantConsent?.();
     revoked = false;
   }
-  return true;
+  return "ready";
 }
 
 /** Stops further hits without reloading the page. */
 export function revokeTikTokConsent() {
   if (typeof window === "undefined" || !loaded) return;
-  window.ttq?.("revokeConsent");
+  window.ttq?.revokeConsent?.();
   revoked = true;
 }
 
 export function tiktokPage() {
-  if (!ensureTikTokPixel()) return;
-  window.ttq?.("page");
+  // The base code already sends the first PageView when it loads.
+  if (ensureTikTokPixel() !== "ready") return;
+  window.ttq?.page?.();
 }
 
 export function tiktokTrack(event: string, params?: Record<string, unknown>) {
   if (!ensureTikTokPixel()) return;
-  window.ttq?.("track", event, params ?? {});
+  window.ttq?.track?.(event, params ?? {});
 }
