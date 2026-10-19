@@ -920,6 +920,7 @@ export type Database = {
       }
       title_requests: {
         Row: {
+          admin_reply: string | null
           country: string | null
           created_at: string
           email: string
@@ -933,6 +934,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          admin_reply?: string | null
           country?: string | null
           created_at?: string
           email: string
@@ -946,6 +948,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          admin_reply?: string | null
           country?: string | null
           created_at?: string
           email?: string
@@ -1112,6 +1115,15 @@ export type Database = {
         Args: { _email: string; _expires_at?: string; _plan?: string }
         Returns: Json
       }
+      admin_send_direct_message: {
+        Args: {
+          _body: string
+          _notification_link?: string
+          _notification_title?: string
+          _user_id: string
+        }
+        Returns: string
+      }
       admin_set_profile_premium: {
         Args: {
           _is_premium: boolean
@@ -1179,6 +1191,7 @@ export type Database = {
       list_public_title_requests: {
         Args: { _limit?: number }
         Returns: {
+          admin_reply: string
           country: string
           created_at: string
           display_name: string
