@@ -537,13 +537,13 @@ const Player = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content?.id, isBlocked, episodePremiumBlocked, currentEp?.id]);
 
-  // Keep the new locked request form available without granting playback access.
+  // Non-supporters opening a locked title go straight to the Supporter plans.
   useEffect(() => {
     if (!accessResolved) return;
-    if (isBlocked && !userIsPremium && !isAdmin && content?.type === "filme") {
-      setDetailTab("subtitles");
+    if (isBlocked && !userIsPremium && !isAdmin) {
+      navigate("/?highlight=supporter#supporter-card", { replace: true });
     }
-  }, [accessResolved, isBlocked, userIsPremium, isAdmin, navigate, content?.type]);
+  }, [accessResolved, isBlocked, userIsPremium, isAdmin, navigate]);
 
   const playerTierSelector = null;
 
