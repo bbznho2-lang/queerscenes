@@ -38,6 +38,7 @@ interface PublicRequest {
   country: string | null;
   note: string | null;
   status: string;
+  admin_reply: string | null;
   created_at: string;
 }
 
@@ -226,6 +227,11 @@ const Wishlist = () => {
                     {r.title_name}{r.country ? ` — ${r.country}` : ""}
                   </p>
                   {r.note && <p className="mt-0.5 text-xs text-muted-foreground line-clamp-3">{r.note}</p>}
+                  {r.admin_reply && (
+                    <p className="mt-1.5 text-xs rounded-lg border border-primary/30 bg-primary/10 px-2.5 py-1.5 text-foreground">
+                      <span className="font-semibold text-primary">Queer Scenes:</span> {r.admin_reply}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
