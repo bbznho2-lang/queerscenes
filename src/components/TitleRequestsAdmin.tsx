@@ -2,12 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ListChecks, Search, Trash2, Check, RotateCcw } from "lucide-react";
+import { ListChecks, Loader2, MessageSquare, Search, Trash2, Check, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 interface TitleRequest {
   id: string;
+  user_id: string | null;
   email: string;
   requester_name: string | null;
   title_name: string;
@@ -15,6 +16,7 @@ interface TitleRequest {
   country: string | null;
   note: string | null;
   status: string;
+  admin_reply: string | null;
   created_at: string;
 }
 
@@ -27,7 +29,7 @@ const TitleRequestsAdmin = () => {
     setLoading(true);
     const { data, error } = await (supabase as any)
       .from("title_requests")
-      .select("id, email, requester_name, title_name, genre, country, note, status, created_at")
+      .select("id, user_id, email, requester_name, title_name, genre, country, note, status, admin_reply, created_at")
       .order("created_at", { ascending: false })
       .limit(300);
     if (error) toast.error(error.message);
@@ -47,10 +49,46 @@ const TitleRequestsAdmin = () => {
     );
   }, [rows, query]);
 
+  const [replyFor, setReplyFor] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [busy, setBusy] = useState<string | null>(null);
+
   const setStatus = async (id: string, status: string) => {
     const { error } = await (supabase as any).from("title_requests").update({ status }).eq("id", id);
     if (error) { toast.error(error.message); return; }
     setRows((v) => v.map((r) => (r.id === id ? { ...r, status } : r)));
+    if (status === "added") {
+      const req = rows.find((r) => r.id === id);
+      if (req?.email) {
+        // Notify the requester by email; the inbox message is sent automatically.
+        void supabase.functions.invoke("send-transactional-email", {
+          body: {
+            templateName: "title-added",
+            recipientEmail: req.email,
+            idempotencyKey: `title-added-${id}`,
+            templateData: {
+              titleName: req.title_name,
+              titleUrl: `${window.location.origin}/browse`,
+            },
+          },
+        }).then(({ error: mailError }) => {
+          if (mailError) toast.error("Email could not be sent: " + mailError.message);
+          else toast.success("Requester notified by email and inbox");
+        });
+      }
+    }
+  };
+
+  const saveReply = async (id: string) => {
+    setBusy(id);
+    const { error } = await (supabase as any).from("title_requests").update({ admin_reply: replyText.trim() || null }).eq("id", id);
+    if (error) toast.error(error.message);
+    else {
+      setRows((v) => v.map((r) => (r.id === id ? { ...r, admin_reply: replyText.trim() || null } : r)));
+      setReplyFor(null);
+      toast.success("Public reply saved — it now shows on the wishlist page");
+    }
+    setBusy(null);
   };
 
   const remove = async (id: string) => {
@@ -107,7 +145,12 @@ const TitleRequestsAdmin = () => {
                   }`}>{r.status}</span>
                 </div>
                 {r.note && <p className="mt-1.5 text-xs text-foreground/80 whitespace-pre-wrap">{r.note}</p>}
-                <div className="flex items-center gap-1 mt-2">
+                {r.admin_reply && (
+                  <p className="mt-1.5 text-xs rounded-lg border border-primary/30 bg-primary/10 px-2.5 py-1.5 text-foreground">
+                    <span className="font-semibold text-primary">Queer Scenes:</span> {r.admin_reply}
+                  </p>
+                )}
+                <div className="flex items-center gap-1 mt-2 flex-wrap">
                   {r.status !== "added" ? (
                     <Button size="sm" variant="ghost" onClick={() => setStatus(r.id, "added")}>
                       <Check className="w-3.5 h-3.5 mr-1" /> Mark as added
@@ -117,10 +160,28 @@ const TitleRequestsAdmin = () => {
                       <RotateCcw className="w-3.5 h-3.5 mr-1" /> Back to pending
                     </Button>
                   )}
+                  <Button size="sm" variant="ghost" disabled={busy !== null} onClick={() => { setReplyFor(replyFor === r.id ? null : r.id); setReplyText(r.admin_reply || ""); }}>
+                    <MessageSquare className="w-3.5 h-3.5 mr-1" /> Public reply
+                  </Button>
                   <Button size="sm" variant="ghost" onClick={() => remove(r.id)}>
                     <Trash2 className="w-3.5 h-3.5 mr-1 text-destructive" /> Delete
                   </Button>
                 </div>
+                {replyFor === r.id && (
+                  <div className="mt-2 space-y-1.5">
+                    <textarea
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                      rows={2}
+                      maxLength={500}
+                      placeholder="e.g. It's available now — enjoy! 💜"
+                      className="w-full rounded-lg bg-card border border-border px-2.5 py-2 text-xs focus:outline-none focus:border-primary"
+                    />
+                    <Button size="sm" disabled={busy !== null} onClick={() => void saveReply(r.id)}>
+                      {busy === r.id ? <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> : null}Save reply
+                    </Button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
