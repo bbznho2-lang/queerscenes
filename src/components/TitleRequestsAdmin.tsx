@@ -8,6 +8,7 @@ import { toast } from "sonner";
 
 interface TitleRequest {
   id: string;
+  user_id: string | null;
   email: string;
   requester_name: string | null;
   title_name: string;
@@ -15,6 +16,7 @@ interface TitleRequest {
   country: string | null;
   note: string | null;
   status: string;
+  admin_reply: string | null;
   created_at: string;
 }
 
@@ -27,7 +29,7 @@ const TitleRequestsAdmin = () => {
     setLoading(true);
     const { data, error } = await (supabase as any)
       .from("title_requests")
-      .select("id, email, requester_name, title_name, genre, country, note, status, created_at")
+      .select("id, user_id, email, requester_name, title_name, genre, country, note, status, admin_reply, created_at")
       .order("created_at", { ascending: false })
       .limit(300);
     if (error) toast.error(error.message);
