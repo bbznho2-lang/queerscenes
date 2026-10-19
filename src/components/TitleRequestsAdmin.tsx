@@ -49,10 +49,46 @@ const TitleRequestsAdmin = () => {
     );
   }, [rows, query]);
 
+  const [replyFor, setReplyFor] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [busy, setBusy] = useState<string | null>(null);
+
   const setStatus = async (id: string, status: string) => {
     const { error } = await (supabase as any).from("title_requests").update({ status }).eq("id", id);
     if (error) { toast.error(error.message); return; }
     setRows((v) => v.map((r) => (r.id === id ? { ...r, status } : r)));
+    if (status === "added") {
+      const req = rows.find((r) => r.id === id);
+      if (req?.email) {
+        // Notify the requester by email; the inbox message is sent automatically.
+        void supabase.functions.invoke("send-transactional-email", {
+          body: {
+            templateName: "title-added",
+            recipientEmail: req.email,
+            idempotencyKey: `title-added-${id}`,
+            templateData: {
+              titleName: req.title_name,
+              titleUrl: `${window.location.origin}/browse`,
+            },
+          },
+        }).then(({ error: mailError }) => {
+          if (mailError) toast.error("Email could not be sent: " + mailError.message);
+          else toast.success("Requester notified by email and inbox");
+        });
+      }
+    }
+  };
+
+  const saveReply = async (id: string) => {
+    setBusy(id);
+    const { error } = await (supabase as any).from("title_requests").update({ admin_reply: replyText.trim() || null }).eq("id", id);
+    if (error) toast.error(error.message);
+    else {
+      setRows((v) => v.map((r) => (r.id === id ? { ...r, admin_reply: replyText.trim() || null } : r)));
+      setReplyFor(null);
+      toast.success("Public reply saved — it now shows on the wishlist page");
+    }
+    setBusy(null);
   };
 
   const remove = async (id: string) => {
