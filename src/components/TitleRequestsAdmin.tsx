@@ -145,7 +145,12 @@ const TitleRequestsAdmin = () => {
                   }`}>{r.status}</span>
                 </div>
                 {r.note && <p className="mt-1.5 text-xs text-foreground/80 whitespace-pre-wrap">{r.note}</p>}
-                <div className="flex items-center gap-1 mt-2">
+                {r.admin_reply && (
+                  <p className="mt-1.5 text-xs rounded-lg border border-primary/30 bg-primary/10 px-2.5 py-1.5 text-foreground">
+                    <span className="font-semibold text-primary">Queer Scenes:</span> {r.admin_reply}
+                  </p>
+                )}
+                <div className="flex items-center gap-1 mt-2 flex-wrap">
                   {r.status !== "added" ? (
                     <Button size="sm" variant="ghost" onClick={() => setStatus(r.id, "added")}>
                       <Check className="w-3.5 h-3.5 mr-1" /> Mark as added
@@ -155,10 +160,28 @@ const TitleRequestsAdmin = () => {
                       <RotateCcw className="w-3.5 h-3.5 mr-1" /> Back to pending
                     </Button>
                   )}
+                  <Button size="sm" variant="ghost" disabled={busy !== null} onClick={() => { setReplyFor(replyFor === r.id ? null : r.id); setReplyText(r.admin_reply || ""); }}>
+                    <MessageSquare className="w-3.5 h-3.5 mr-1" /> Public reply
+                  </Button>
                   <Button size="sm" variant="ghost" onClick={() => remove(r.id)}>
                     <Trash2 className="w-3.5 h-3.5 mr-1 text-destructive" /> Delete
                   </Button>
                 </div>
+                {replyFor === r.id && (
+                  <div className="mt-2 space-y-1.5">
+                    <textarea
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                      rows={2}
+                      maxLength={500}
+                      placeholder="e.g. It's available now — enjoy! 💜"
+                      className="w-full rounded-lg bg-card border border-border px-2.5 py-2 text-xs focus:outline-none focus:border-primary"
+                    />
+                    <Button size="sm" disabled={busy !== null} onClick={() => void saveReply(r.id)}>
+                      {busy === r.id ? <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> : null}Save reply
+                    </Button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
