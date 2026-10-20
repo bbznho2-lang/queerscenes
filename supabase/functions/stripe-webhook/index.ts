@@ -132,7 +132,7 @@ Deno.serve(async (req) => {
   }
 
   const ADMIN_SENDER_ID = "97109920-d00e-4242-8374-6d774914bd26";
-  const WELCOME_DM_BODY = `Welcome to Queer Scenes 💜\n\nHii!! Some titles are available to watch directly on Telegram — we store them there because it's safer and provides a better viewing experience.\n\nJoin our main community channel so you don't miss any title or update. We post new releases, announcements and recommendations there.\n\nJoin the community here https://t.me/QueerScenesTv`;
+  const WELCOME_DM_BODY = `Welcome to Queer Scenes 💜\n\nHii!! join our main community channel so you don't miss any title or update. We post new releases, announcements and recommendations there.\n\nJoin the community here https://t.me/QueerScenesTv`;
 
   async function sendWelcomeDM(userId: string) {
     try {
