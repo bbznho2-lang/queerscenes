@@ -911,9 +911,6 @@ const Index = () => {
                   <p className="text-center text-[11px] text-[var(--t2)]">
                     Secure payment by Stripe. We never see or store your card.
                   </p>
-                  <p className="text-center text-[11px] text-[var(--t2)]">
-                    Cancel in 1 click, anytime
-                  </p>
                   <div className="flex items-center justify-center gap-2 text-[11px] font-bold text-[var(--t2)]">
                     <span>VISA</span>
                     <span>·</span>
