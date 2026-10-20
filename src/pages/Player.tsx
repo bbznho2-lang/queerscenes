@@ -540,10 +540,11 @@ const Player = () => {
   // Non-supporters opening a locked title go straight to the Supporter plans.
   useEffect(() => {
     if (!accessResolved) return;
-    if (isBlocked && !userIsPremium && !isAdmin) {
+    // Only a fully locked title redirects; a premium episode inside an open series keeps the page.
+    if (isBlocked && premiumBlocked && !userIsPremium && !isAdmin) {
       navigate("/?highlight=supporter#supporter-card", { replace: true });
     }
-  }, [accessResolved, isBlocked, userIsPremium, isAdmin, navigate]);
+  }, [accessResolved, isBlocked, premiumBlocked, userIsPremium, isAdmin, navigate]);
 
   const playerTierSelector = null;
 
