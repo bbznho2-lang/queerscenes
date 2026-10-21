@@ -986,6 +986,30 @@ const Player = () => {
                 ) : null}
 
                 {playerTierSelector}
+
+                {currentEp && episodes.length > 1 && (() => {
+                  const ordered = [...episodes].sort((a, b) => a.season - b.season || a.episode_number - b.episode_number);
+                  const idx = ordered.findIndex((e) => e.id === currentEp.id);
+                  const prev = idx > 0 ? ordered[idx - 1] : null;
+                  const next = idx >= 0 && idx < ordered.length - 1 ? ordered[idx + 1] : null;
+                  const go = (ep: Episode) => {
+                    setCurrentEp(ep);
+                    setSelectedSeason(ep.season);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  };
+                  return (
+                    <div className={`flex gap-3 ${isMobile ? "mt-4 px-3" : "mt-5"}`}>
+                      <button type="button" disabled={!prev} onClick={() => prev && go(prev)}
+                        className="flex-1 rounded-xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground disabled:opacity-40 hover:border-primary/40">
+                        ← Previous episode
+                      </button>
+                      <button type="button" disabled={!next} onClick={() => next && go(next)}
+                        className="flex-1 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-40">
+                        Next episode →
+                      </button>
+                    </div>
+                  );
+                })()}
               </>
             );
           })()}
@@ -1063,6 +1087,7 @@ const Player = () => {
                       key={ep.id}
                       onClick={async () => {
                         setCurrentEp(ep);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
                         if (user && content) {
                           await supabase.from("content_clicks").insert({ content_id: content.id, user_id: user.id, episode_id: ep.id } as any);
                         }
