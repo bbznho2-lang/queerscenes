@@ -584,9 +584,12 @@ const Player = () => {
             </div>
           </div>
         </div>
-      ) : isBlocked && !userIsPremium && !isAdmin ? (
+      ) : isBlocked && premiumBlocked && !userIsPremium && !isAdmin ? (
+        // Fully locked titles redirect to the Supporter plans; render nothing meanwhile.
         null
-      ) : false ? (
+      ) : isBlocked && !userIsPremium && !isAdmin ? (
+        // Premium episode inside an open series: keep the page and show the paywall.
+
         <div className="w-full">
           <div className="relative w-full overflow-hidden sm:max-w-3xl sm:mx-auto sm:mt-16 sm:rounded-2xl sm:neon-border-purple bg-card">
             {content?.banner_url && (
