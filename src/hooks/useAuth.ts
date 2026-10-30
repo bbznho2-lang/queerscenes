@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import { getEmailRedirectUrl } from '@/lib/auth-urls';
 import { validatePassword } from '@/lib/password-validation';
+import { CLOCK_SKEW_MESSAGE, hasClockSkew } from '@/lib/clock-skew';
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -80,7 +81,13 @@ export const useAuth = () => {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (!error && data.session && hasClockSkew(data.session.access_token)) {
+      // A wrong device clock makes every session look expired and triggers a
+      // refresh storm; stop it locally and tell the user how to fix it.
+      await supabase.auth.signOut({ scope: 'local' });
+      return { error: new Error(CLOCK_SKEW_MESSAGE) };
+    }
     return { error };
   };
 
