@@ -12,5 +12,5 @@
 - Supporter access must use only monthly, quarterly, or annual plans with an explicit expiration date; lifetime access is not supported.
 - Keep subtitle request forms and administration in dedicated components; enforce ownership, active access and case-insensitive deduplication in the database so client edits cannot bypass restrictions.
 - Generate subtitle completion messages through a database trigger in the existing direct-message inbox, with optional notification title and internal title link, so completion and delivery are atomic and repeat clicks cannot duplicate notifications.
-- Admin panel dates, times and day buckets must use the São Paulo helpers in src/lib/sp-time.ts, never device-locale formatting; a misconfigured device clock otherwise shifts hours and breaks the daily access chart.
+- Admin panel dates, times and day buckets must use the pinned-timezone helpers in src/lib/sp-time.ts (currently America/Manaus via the SP_TIMEZONE constant), never device-locale formatting; a misconfigured device clock otherwise shifts hours and breaks the daily access chart.
 - The admin dashboard refetches data on a 60s interval alongside realtime channels; keep the polling fallback so the panel still updates if the realtime socket drops.

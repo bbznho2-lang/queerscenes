@@ -1,9 +1,9 @@
-// São Paulo time helpers for the admin panel.
+// Manaus time helpers for the admin panel.
 // The dashboard must show the same dates/times on every device, even when the
 // computer's clock or timezone is misconfigured, so everything here pins
-// America/Sao_Paulo instead of relying on the device timezone.
+// America/Manaus instead of relying on the device timezone.
 
-export const SP_TIMEZONE = "America/Sao_Paulo";
+export const SP_TIMEZONE = "America/Manaus";
 
 const dayKeyFormatter = new Intl.DateTimeFormat("en-CA", {
   timeZone: SP_TIMEZONE,
@@ -12,12 +12,12 @@ const dayKeyFormatter = new Intl.DateTimeFormat("en-CA", {
   day: "2-digit",
 });
 
-/** Calendar day key ("YYYY-MM-DD") of an instant in São Paulo. */
+/** Calendar day key ("YYYY-MM-DD") of an instant in Manaus. */
 export function spDayKey(date: Date): string {
   return dayKeyFormatter.format(date);
 }
 
-/** Date+time in São Paulo, pt-BR style: "30/10/2026 15:39". */
+/** Date+time in Manaus, pt-BR style: "30/10/2026 14:39". */
 export function formatSpDateTime(iso: string, withYear: "numeric" | "2-digit" = "2-digit"): string {
   return new Date(iso).toLocaleString("pt-BR", {
     timeZone: SP_TIMEZONE,
@@ -29,7 +29,7 @@ export function formatSpDateTime(iso: string, withYear: "numeric" | "2-digit" = 
   });
 }
 
-/** Date only in São Paulo. */
+/** Date only in Manaus. */
 export function formatSpDate(iso: string, options: Intl.DateTimeFormatOptions = {}): string {
   return new Date(iso).toLocaleDateString("en-US", {
     timeZone: SP_TIMEZONE,
