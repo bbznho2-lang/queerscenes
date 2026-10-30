@@ -576,7 +576,7 @@ const Admin = () => {
       } as never);
       if (error) throw error;
       const status = (data as { status?: string } | null)?.status;
-      const until = ` until ${new Date(expiresIso).toLocaleDateString("en-US")}`;
+      const until = ` until ${formatSpDate(expiresIso)}`;
       if (status === "active") {
         toast.success(`Supporter access is active for ${emailTrimmed}${until}. The account will link automatically at login.`);
       } else {
