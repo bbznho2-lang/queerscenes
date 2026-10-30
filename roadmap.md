@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Verify existing administrator recognition and remove dashboard loading from the PIN entry path on a fresh notebook session.
+- [x] Verify existing administrator recognition and remove dashboard loading from the PIN entry path on a fresh notebook session.
 
 - [x] Keep admin entry on /admin and verify signed-out, sign-in and protected access states.
 
