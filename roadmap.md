@@ -1,7 +1,7 @@
 # Roadmap
 
-- [ ] Fix admin entry on a fresh computer and verify the existing account.
-- [ ] Restore the Privacy policy page with owner-specific content and verify deep links.
+- [x] Fix admin entry on a fresh computer and verify the existing account.
+- [x] Restore the Privacy policy page with owner-specific content and verify deep links.
 
 - [ ] Update only the requested home hero copy.
 - [ ] Add Supporter subtitle requests with duplicate prevention and owner/admin access.
