@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Keep admin entry on /admin and verify signed-out, sign-in and protected access states.
+
 - [x] Fix admin entry on a fresh computer and verify the existing account.
 - [x] Restore the Privacy policy page with owner-specific content and verify deep links.
 
