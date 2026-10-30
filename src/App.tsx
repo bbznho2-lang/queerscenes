@@ -13,6 +13,7 @@ import TitlePage from "./pages/TitlePage";
 import Wishlist from "./pages/Wishlist";
 import ManageSubscription from "./pages/ManageSubscription";
 import Unsubscribe from "./pages/Unsubscribe";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
 import { captureReferralFromUrl } from "@/lib/referral";
@@ -39,6 +40,8 @@ const App = () => {
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/manage-subscription" element={<ManageSubscription />} />
             <Route path="/unsubscribe" element={<Unsubscribe />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/privacy" element={<Navigate to="/privacy-policy" replace />} />
             <Route path="/player/:id" element={<Player />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/reset-password" element={<ResetPassword />} />

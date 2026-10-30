@@ -1,5 +1,8 @@
 # Roadmap
 
+- [ ] Fix admin entry on a fresh computer and verify the existing account.
+- [ ] Restore the Privacy policy page with owner-specific content and verify deep links.
+
 - [ ] Update only the requested home hero copy.
 - [ ] Add Supporter subtitle requests with duplicate prevention and owner/admin access.
 - [ ] Add the admin request tab and atomic completion notifications in the existing inbox.
