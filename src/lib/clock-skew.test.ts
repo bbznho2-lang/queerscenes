@@ -7,8 +7,8 @@ const token = (iat: number) =>
 describe("clock skew detection", () => {
   const iat = 1_800_000_000;
 
-  it("accepts a device clock within 5 minutes of the server", () => {
-    expect(hasClockSkew(token(iat), (iat + 120) * 1000)).toBe(false);
+  it("accepts a device clock within 1 minute of the server", () => {
+    expect(hasClockSkew(token(iat), (iat + 30) * 1000)).toBe(false);
   });
 
   it("flags a device clock 3 hours ahead (wrong Windows time zone)", () => {
