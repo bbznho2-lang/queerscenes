@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import { getEmailRedirectUrl } from '@/lib/auth-urls';
 import { validatePassword } from '@/lib/password-validation';
-import { CLOCK_SKEW_MESSAGE, hasClockSkew } from '@/lib/clock-skew';
+import { syncClockFromToken } from '@/lib/clock-skew';
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -55,6 +55,8 @@ export const useAuth = () => {
         if (!isMounted) return;
         const nextUser = session?.user ?? null;
         setUser(nextUser);
+        // A refreshed token is always freshly issued, so it re-measures the clock.
+        if (event === 'TOKEN_REFRESHED' && session) syncClockFromToken(session.access_token);
         // Refreshing a token doesn't change roles. Authenticated requests must
         // run after this callback releases the auth client's session lock.
         if (event === 'TOKEN_REFRESHED') return;
@@ -82,12 +84,9 @@ export const useAuth = () => {
 
   const signIn = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (!error && data.session && hasClockSkew(data.session.access_token)) {
-      // A wrong device clock makes every session look expired and triggers a
-      // refresh storm; stop it locally and tell the user how to fix it.
-      await supabase.auth.signOut({ scope: 'local' });
-      return { error: new Error(CLOCK_SKEW_MESSAGE) };
-    }
+    // A wrong device clock would make the session look expired; correct the
+    // app's clock from the server's token time so the login stays open.
+    if (!error && data.session) syncClockFromToken(data.session.access_token);
     return { error };
   };
 
