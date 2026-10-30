@@ -90,6 +90,13 @@ const Index = () => {
   const { user, loading: authLoading, isAdmin, signIn, signUp } = useAuth();
   const routerLocation = useLocation();
 
+  // Old admin sign-in links must lead to the dedicated entry, not the hero.
+  useEffect(() => {
+    if (new URLSearchParams(routerLocation.search).get("next") === "admin") {
+      navigate("/admin", { replace: true });
+    }
+  }, [routerLocation.search, navigate]);
+
   const scrollToPlanCards = useCallback((target?: "supporter" | "plans", behavior: ScrollBehavior = "smooth") => {
     if (typeof window === "undefined") return false;
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
