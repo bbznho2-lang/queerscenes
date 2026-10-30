@@ -775,24 +775,18 @@ const Admin = () => {
   ).length;
   const totalClicks = clickStats.reduce((a, b) => a + b.clicks, 0);
 
-  // New users per day — last 14 days (use LOCAL calendar days so "today"
-  // matches the viewer's timezone and doesn't get bucketed into yesterday.)
-  const localDayKey = (d: Date) => {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
-  };
+  // New users per day — last 14 days. Days are pinned to São Paulo so the
+  // chart is identical on every device, even when the computer's clock or
+  // timezone is misconfigured.
+  const localDayKey = spDayKey;
   const newUsersByDay = (() => {
     const days: { key: string; label: string; count: number; visits: number }[] = [];
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const DAY_MS = 24 * 60 * 60 * 1000;
     for (let i = 13; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(today.getDate() - i);
+      const d = new Date(Date.now() - i * DAY_MS);
       days.push({
         key: localDayKey(d),
-        label: d.toLocaleDateString("en-US", { month: "short", day: "2-digit" }),
+        label: d.toLocaleDateString("en-US", { timeZone: SP_TIMEZONE, month: "short", day: "2-digit" }),
         count: 0,
         visits: 0,
       });
