@@ -11,6 +11,7 @@ export const useAuth = () => {
 
   useEffect(() => {
     let isMounted = true;
+    const pendingTasks = new Set<ReturnType<typeof setTimeout>>();
 
     const loadAdminStatus = async (userId: string | null) => {
       if (!userId) {
@@ -57,21 +58,28 @@ export const useAuth = () => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        if (!isMounted) return;
         const nextUser = session?.user ?? null;
         setUser(nextUser);
-        void loadAdminStatus(nextUser?.id ?? null);
-        // Auto-claim any pending Stripe Supporter payment tied to this email.
-        if (event === 'SIGNED_IN' && nextUser) {
-          // Defer to avoid running inside the auth callback's transaction
-          setTimeout(() => {
+        // Refreshing a token doesn't change roles. Authenticated requests must
+        // run after this callback releases the auth client's session lock.
+        if (event === 'TOKEN_REFRESHED') return;
+        if (!nextUser) setIsAdmin(false);
+        const task = setTimeout(() => {
+          pendingTasks.delete(task);
+          if (!isMounted) return;
+          void loadAdminStatus(nextUser?.id ?? null);
+          if (event === 'SIGNED_IN' && nextUser) {
             void supabase.rpc('claim_supporter_for_current_user' as any);
-          }, 0);
-        }
+          }
+        }, 0);
+        pendingTasks.add(task);
       }
     );
 
     return () => {
       isMounted = false;
+      pendingTasks.forEach(clearTimeout);
       subscription.unsubscribe();
     };
   }, []);
