@@ -27,6 +27,7 @@ import CanceledSubscriptionsSection from "@/components/CanceledSubscriptionsSect
 import ReferralsSection from "@/components/ReferralsSection";
 import { fetchTopContentRanking } from "@/lib/top-content";
 import SubtitleRequestsAdmin from "@/components/SubtitleRequestsAdmin";
+import AdminSignIn from "@/components/AdminSignIn";
 
 
 interface Profile {
@@ -92,7 +93,7 @@ const AdminStatsCards = ({ totalUsers, premiumUsers, totalClicks }: { totalUsers
 };
 
 const Admin = () => {
-  const { user, isAdmin, loading } = useAuth();
+  const { user, isAdmin, loading, signIn, signOut } = useAuth();
   const navigate = useNavigate();
   const [pinUnlocked, setPinUnlocked] = useState(false);
   const [pinInput, setPinInput] = useState("");
@@ -135,12 +136,6 @@ const Admin = () => {
 
   const USERS_PER_PAGE = 20;
   const CLICKS_PER_PAGE = 20;
-
-  useEffect(() => {
-    if (!loading && (!user || !isAdmin)) {
-      if (!user) navigate("/?next=admin#login", { replace: true });
-    }
-  }, [user, isAdmin, loading, navigate]);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -710,12 +705,14 @@ const Admin = () => {
     clicks: { label: "Clicks", color: "hsl(var(--primary))" },
   };
 
+  if (!loading && !user) return <AdminSignIn signIn={signIn} />;
+
   if (!loading && user && !isAdmin) {
     return <main className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center gap-4 p-6 text-center">
       <h1 className="text-xl font-bold">Admin access unavailable</h1>
       <p className="text-muted-foreground">Signed in as {user.email}. This account could not be verified as an administrator.</p>
       <Button onClick={() => window.location.reload()}>Try again</Button>
-      <Button variant="outline" onClick={() => navigate("/?next=admin#login")}>Return to sign in</Button>
+      <Button variant="outline" onClick={() => void signOut()}>Sign in with another account</Button>
     </main>;
   }
 
