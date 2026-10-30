@@ -19,39 +19,32 @@ export const useAuth = () => {
         return;
       }
 
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .eq('role', 'admin')
-        .maybeSingle();
-
-      if (!isMounted) return;
-      setIsAdmin(!error && !!data);
+      try {
+        const { data, error } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId)
+          .eq('role', 'admin')
+          .maybeSingle();
+        if (isMounted) setIsAdmin(!error && !!data);
+      } catch {
+        if (isMounted) setIsAdmin(false);
+      }
     };
 
     const bootstrapAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!isMounted) return;
-
-      let currentUser = session?.user ?? null;
-
-      if (!currentUser) {
+      try {
         const { data: userData } = await supabase.auth.getUser();
         if (!isMounted) return;
-        currentUser = userData.user ?? null;
+        const currentUser = userData.user ?? null;
+        setUser(currentUser);
+        await loadAdminStatus(currentUser?.id ?? null);
+        if (currentUser) void supabase.rpc('claim_supporter_for_current_user' as any);
+      } catch {
+        if (isMounted) { setUser(null); setIsAdmin(false); }
+      } finally {
+        if (isMounted) setLoading(false);
       }
-
-      setUser(currentUser);
-      await loadAdminStatus(currentUser?.id ?? null);
-
-      // Restore supporter status (manual grants or prior Stripe payments) for
-      // sessions that are already active when the app loads.
-      if (currentUser) {
-        void supabase.rpc('claim_supporter_for_current_user' as any);
-      }
-
-      if (isMounted) setLoading(false);
     };
 
     void bootstrapAuth();
@@ -64,11 +57,13 @@ export const useAuth = () => {
         // Refreshing a token doesn't change roles. Authenticated requests must
         // run after this callback releases the auth client's session lock.
         if (event === 'TOKEN_REFRESHED') return;
-        if (!nextUser) setIsAdmin(false);
-        const task = setTimeout(() => {
+        setIsAdmin(false);
+        setLoading(true);
+        const task = setTimeout(async () => {
           pendingTasks.delete(task);
           if (!isMounted) return;
-          void loadAdminStatus(nextUser?.id ?? null);
+          await loadAdminStatus(nextUser?.id ?? null);
+          if (isMounted) setLoading(false);
           if (event === 'SIGNED_IN' && nextUser) {
             void supabase.rpc('claim_supporter_for_current_user' as any);
           }
