@@ -99,7 +99,7 @@ const Admin = () => {
   const [pinError, setPinError] = useState("");
   const [pinChecking, setPinChecking] = useState(false);
   useEffect(() => {
-    if (user && sessionStorage.getItem("admin_pin_ok") === user.id) setPinUnlocked(true);
+    setPinUnlocked(Boolean(user && sessionStorage.getItem("admin_pin_ok") === user.id));
   }, [user]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [pendingSupporters, setPendingSupporters] = useState<PendingSupporter[]>([]);
@@ -723,14 +723,21 @@ const Admin = () => {
       e.preventDefault();
       setPinChecking(true);
       setPinError("");
-      const { data } = await supabase.rpc("verify_admin_pin" as any, { _pin: pinInput });
-      setPinChecking(false);
-      if (data === true) {
-        sessionStorage.setItem("admin_pin_ok", user?.id ?? "");
-        setPinUnlocked(true);
-      } else {
-        setPinError("Incorrect password");
-        setPinInput("");
+      try {
+        const { data, error } = await supabase.rpc("verify_admin_pin" as any, { _pin: pinInput });
+        if (error) {
+          setPinError("Unable to verify access right now. Please wait a moment and try again.");
+        } else if (data === true) {
+          sessionStorage.setItem("admin_pin_ok", user?.id ?? "");
+          setPinUnlocked(true);
+        } else {
+          setPinError("Incorrect password");
+          setPinInput("");
+        }
+      } catch {
+        setPinError("Unable to verify access right now. Please wait a moment and try again.");
+      } finally {
+        setPinChecking(false);
       }
     };
     return (
