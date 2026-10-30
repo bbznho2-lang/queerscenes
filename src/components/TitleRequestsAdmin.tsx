@@ -134,7 +134,7 @@ const TitleRequestsAdmin = () => {
                     </p>
                   </div>
                   <span className="ml-auto text-[10px] text-muted-foreground">
-                    {new Date(r.created_at).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" })}
+                    {formatSpDate(r.created_at)}
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5 flex-wrap mt-1.5">

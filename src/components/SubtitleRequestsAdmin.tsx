@@ -90,7 +90,7 @@ export default function SubtitleRequestsAdmin() {
                   <td className="p-3 text-foreground">{titles[row.title_id] || "Title unavailable"}</td>
                   <td className="p-3 text-foreground">{row.language}</td>
                   <td className="p-3 text-muted-foreground" translate="no">{row.email}</td>
-                  <td className="whitespace-nowrap p-3 text-muted-foreground">{new Date(row.created_at).toLocaleDateString("en-US")}</td>
+                  <td className="whitespace-nowrap p-3 text-muted-foreground">{formatSpDate(row.created_at)}</td>
                   <td className="p-3">
                     <div className="flex flex-col gap-1.5">
                       <Button size="sm" variant="outline" disabled={row.done || busy !== null} onClick={() => void complete(row.id)}>{busy === row.id ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Check className="mr-1 h-4 w-4" />}Subtitled</Button>

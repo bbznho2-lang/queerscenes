@@ -235,7 +235,7 @@ export default function CanceledSubscriptionsSection() {
                   {r.source === "stripe_webhook" ? "Stripe verified" : "Manual"}
                 </span>
                 <span className="text-xs text-muted-foreground sm:text-right whitespace-nowrap">
-                  {new Date(r.canceled_at).toLocaleDateString(undefined, { day: "2-digit", month: "2-digit", year: "numeric" })}
+                  {formatSpDate(r.canceled_at, { day: "2-digit", month: "2-digit" })}
                 </span>
                 <div className="sm:justify-self-end flex items-center gap-1">
                   <Button size="icon" variant="ghost" onClick={() => startEdit(r)} className="h-8 w-8 text-muted-foreground hover:text-foreground" title="Edit reason">
