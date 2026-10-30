@@ -210,7 +210,12 @@ const Admin = () => {
       )
       .subscribe();
 
+    // Fallback refresh: if the realtime socket drops (unstable network, device
+    // clock skew breaking the connection), the dashboard still updates.
+    const poll = setInterval(() => fetchData(false), 60_000);
+
     return () => {
+      clearInterval(poll);
       supabase.removeChannel(clicksChannel);
       supabase.removeChannel(profilesChannel);
       supabase.removeChannel(supporterEventsChannel);
