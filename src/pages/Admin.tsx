@@ -950,7 +950,7 @@ const Admin = () => {
                           <span className="truncate text-sm text-muted-foreground">{profile?.email || (event.user_id ? `User ${event.user_id.slice(0, 8)}` : "Not signed in")}</span>
                           <span className="text-xs capitalize text-muted-foreground">{String(plan)}</span>
                           <span className="text-xs text-muted-foreground sm:text-right">
-                            {new Date(event.created_at).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                            {formatSpDateTime(event.created_at, "numeric")}
                           </span>
                         </div>
                       );
@@ -1085,7 +1085,7 @@ const Admin = () => {
                           </span>
                           <span className="text-xs sm:text-sm text-muted-foreground truncate">{prof?.email || ev.metadata?.email || (ev.user_id ? ev.user_id.slice(0, 8) : "anon")}</span>
                           <span className="text-[11px] sm:text-xs text-muted-foreground truncate">{ev.content_id?.slice(0, 8) || "—"}</span>
-                          <span className="text-xs text-muted-foreground text-right">{new Date(ev.created_at).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>
+                          <span className="text-xs text-muted-foreground text-right">{formatSpDateTime(ev.created_at)}</span>
                         </div>
                       );
                     })}
@@ -1143,7 +1143,7 @@ const Admin = () => {
                     <span className="text-xs sm:text-sm text-foreground truncate">{click.content_title}</span>
                     <span className="text-xs sm:text-sm text-muted-foreground truncate" title={click.episode_label}>{click.episode_label}</span>
                     <span className="text-sm font-semibold text-center text-primary">{click.click_count}×</span>
-                    <span className="text-xs text-muted-foreground text-right">{new Date(click.last_clicked_at).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>
+                    <span className="text-xs text-muted-foreground text-right">{formatSpDateTime(click.last_clicked_at)}</span>
                   </div>
                 ))}
                 {totalClickPages > 1 && (
@@ -1332,7 +1332,7 @@ const Admin = () => {
                         <div className="hidden sm:block">
                           <Switch checked={p.is_premium} onCheckedChange={() => togglePremium(p)} onClick={(e) => e.stopPropagation()} />
                         </div>
-                        <span className="text-xs text-muted-foreground hidden sm:block">{new Date(p.created_at).toLocaleDateString("en-US")}</span>
+                        <span className="text-xs text-muted-foreground hidden sm:block">{formatSpDate(p.created_at)}</span>
                         <div className="hidden sm:flex justify-center">
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
@@ -1380,7 +1380,7 @@ const Admin = () => {
                             <div className="space-y-1.5">
                               <label className="text-xs text-muted-foreground">Status</label>
                               <div className={`h-9 flex items-center px-3 rounded-md text-xs font-medium ${!p.is_premium ? 'bg-muted text-muted-foreground' : expired ? 'bg-destructive/10 text-destructive' : 'bg-secondary/10 text-secondary'}`}>
-                                {!p.is_premium ? "Free" : expired ? "Expired" : p.premium_expires_at ? `Active until ${new Date(p.premium_expires_at).toLocaleDateString("en-US")}` : "Expiration date missing"}
+                                {!p.is_premium ? "Free" : expired ? "Expired" : p.premium_expires_at ? `Active until ${formatSpDate(p.premium_expires_at)}` : "Expiration date missing"}
                               </div>
                             </div>
                           </div>
@@ -1477,7 +1477,7 @@ const Admin = () => {
                           </span>
                           <span className="text-xs text-muted-foreground capitalize">{d.deleted_by}</span>
                           <span className="text-xs text-muted-foreground sm:text-right">
-                            {new Date(d.created_at).toLocaleString(undefined, { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                            {formatSpDateTime(d.created_at)}
                           </span>
                           <div className="sm:justify-self-end">
                             <Button
