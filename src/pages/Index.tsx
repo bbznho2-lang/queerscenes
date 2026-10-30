@@ -367,7 +367,7 @@ const Index = () => {
         localStorage.removeItem("qs_remember_email");
         localStorage.setItem("qs_remember_me", "false");
       }
-      navigate("/browse");
+      navigate(new URLSearchParams(window.location.search).get("next") === "admin" ? "/admin" : "/browse");
     } finally {
       setLoading(false);
     }
@@ -1027,6 +1027,7 @@ const Index = () => {
 
       <footer className="border-t border-border py-6 sm:py-8 text-center text-xs sm:text-sm text-muted-foreground">
         <p>© 2026 Queer Scenes. All rights reserved. 🌈</p>
+        <a href="/privacy-policy" className="mt-3 inline-block underline">Privacy policy</a>
       </footer>
 
       <SupportDialog open={supportOpen} onOpenChange={setSupportOpen} />

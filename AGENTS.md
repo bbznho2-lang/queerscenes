@@ -1,6 +1,8 @@
 # Project Architecture
 
 - Defer authenticated requests out of auth event callbacks and skip role reloads on token refresh; this prevents session-lock deadlocks and refresh-request amplification.
+- Validate restored users with getUser and keep auth loading until role verification completes; fresh-device admin entry must return through sign-in to /admin, not silently send users to the catalog.
+- Keep owner-authored privacy content on /privacy-policy with /privacy as an alias; this preserves public deep links without using platform-owned Trust center routes.
 
 - Route subscription self-service through `/manage-subscription` before the external Stripe portal so retention messaging remains centralized and Stripe remains the billing authority.
 - Record confirmed billing portal openings as supporter events so admins can monitor cancellation intent without changing Stripe subscriptions.

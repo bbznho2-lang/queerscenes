@@ -138,7 +138,7 @@ const Admin = () => {
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
-      navigate("/browse");
+      if (!user) navigate("/?next=admin#login", { replace: true });
     }
   }, [user, isAdmin, loading, navigate]);
 
@@ -709,6 +709,15 @@ const Admin = () => {
   const chartConfig = {
     clicks: { label: "Clicks", color: "hsl(var(--primary))" },
   };
+
+  if (!loading && user && !isAdmin) {
+    return <main className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center gap-4 p-6 text-center">
+      <h1 className="text-xl font-bold">Admin access unavailable</h1>
+      <p className="text-muted-foreground">Signed in as {user.email}. This account could not be verified as an administrator.</p>
+      <Button onClick={() => window.location.reload()}>Try again</Button>
+      <Button variant="outline" onClick={() => navigate("/?next=admin#login")}>Return to sign in</Button>
+    </main>;
+  }
 
   if (loading || loadingData) {
     return (

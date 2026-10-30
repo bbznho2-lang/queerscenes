@@ -6,12 +6,13 @@ const mocks = vi.hoisted(() => ({
   roleQuery: vi.fn(),
   rpc: vi.fn(),
   unsubscribe: vi.fn(),
+  getUser: vi.fn(),
 }));
 
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     auth: {
-      getSession: vi.fn().mockResolvedValue({ data: { session: { user: { id: 'admin-user' } } } }),
+      getUser: mocks.getUser,
       onAuthStateChange: vi.fn((callback) => {
         mocks.callback = callback;
         return { data: { subscription: { unsubscribe: mocks.unsubscribe } } };
@@ -28,6 +29,7 @@ describe('admin session handling', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.roleQuery.mockResolvedValue({ data: { role: 'admin' }, error: null });
+    mocks.getUser.mockResolvedValue({ data: { user: { id: 'admin-user' } } });
   });
 
   it('recognizes the existing admin on a fresh browser session', async () => {
@@ -59,5 +61,32 @@ describe('admin session handling', () => {
     expect(mocks.roleQuery).not.toHaveBeenCalled();
     expect(mocks.rpc).not.toHaveBeenCalled();
     expect(result.current.isAdmin).toBe(true);
+  });
+
+  it('finishes loading safely when session validation fails', async () => {
+    mocks.getUser.mockRejectedValueOnce(new Error('Offline'));
+    const { result } = renderHook(() => useAuth());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.user).toBeNull();
+    expect(result.current.isAdmin).toBe(false);
+  });
+
+  it('waits for admin verification after sign-in instead of redirecting prematurely', async () => {
+    const { result } = renderHook(() => useAuth());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    act(() => mocks.callback?.('SIGNED_IN', { user: { id: 'admin-user' } }));
+    expect(result.current.loading).toBe(true);
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.isAdmin).toBe(true);
+  });
+
+  it('clears admin access when a different account signs in', async () => {
+    const { result } = renderHook(() => useAuth());
+    await waitFor(() => expect(result.current.isAdmin).toBe(true));
+    mocks.roleQuery.mockResolvedValue({ data: null, error: null });
+    act(() => mocks.callback?.('SIGNED_IN', { user: { id: 'non-admin' } }));
+    expect(result.current.isAdmin).toBe(false);
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.isAdmin).toBe(false);
   });
 });
