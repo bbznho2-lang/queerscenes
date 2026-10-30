@@ -28,6 +28,7 @@ import ReferralsSection from "@/components/ReferralsSection";
 import { fetchTopContentRanking } from "@/lib/top-content";
 import SubtitleRequestsAdmin from "@/components/SubtitleRequestsAdmin";
 import AdminSignIn from "@/components/AdminSignIn";
+import { SP_TIMEZONE, spDayKey, formatSpDateTime, formatSpDate } from "@/lib/sp-time";
 
 
 interface Profile {
@@ -209,7 +210,12 @@ const Admin = () => {
       )
       .subscribe();
 
+    // Fallback refresh: if the realtime socket drops (unstable network, device
+    // clock skew breaking the connection), the dashboard still updates.
+    const poll = setInterval(() => fetchData(false), 60_000);
+
     return () => {
+      clearInterval(poll);
       supabase.removeChannel(clicksChannel);
       supabase.removeChannel(profilesChannel);
       supabase.removeChannel(supporterEventsChannel);
@@ -575,7 +581,7 @@ const Admin = () => {
       } as never);
       if (error) throw error;
       const status = (data as { status?: string } | null)?.status;
-      const until = ` until ${new Date(expiresIso).toLocaleDateString("en-US")}`;
+      const until = ` until ${formatSpDate(expiresIso)}`;
       if (status === "active") {
         toast.success(`Supporter access is active for ${emailTrimmed}${until}. The account will link automatically at login.`);
       } else {
@@ -774,24 +780,18 @@ const Admin = () => {
   ).length;
   const totalClicks = clickStats.reduce((a, b) => a + b.clicks, 0);
 
-  // New users per day — last 14 days (use LOCAL calendar days so "today"
-  // matches the viewer's timezone and doesn't get bucketed into yesterday.)
-  const localDayKey = (d: Date) => {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
-  };
+  // New users per day — last 14 days. Days are pinned to São Paulo so the
+  // chart is identical on every device, even when the computer's clock or
+  // timezone is misconfigured.
+  const localDayKey = spDayKey;
   const newUsersByDay = (() => {
     const days: { key: string; label: string; count: number; visits: number }[] = [];
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const DAY_MS = 24 * 60 * 60 * 1000;
     for (let i = 13; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(today.getDate() - i);
+      const d = new Date(Date.now() - i * DAY_MS);
       days.push({
         key: localDayKey(d),
-        label: d.toLocaleDateString("en-US", { month: "short", day: "2-digit" }),
+        label: d.toLocaleDateString("en-US", { timeZone: SP_TIMEZONE, month: "short", day: "2-digit" }),
         count: 0,
         visits: 0,
       });
@@ -955,7 +955,7 @@ const Admin = () => {
                           <span className="truncate text-sm text-muted-foreground">{profile?.email || (event.user_id ? `User ${event.user_id.slice(0, 8)}` : "Not signed in")}</span>
                           <span className="text-xs capitalize text-muted-foreground">{String(plan)}</span>
                           <span className="text-xs text-muted-foreground sm:text-right">
-                            {new Date(event.created_at).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                            {formatSpDateTime(event.created_at, "numeric")}
                           </span>
                         </div>
                       );
@@ -1090,7 +1090,7 @@ const Admin = () => {
                           </span>
                           <span className="text-xs sm:text-sm text-muted-foreground truncate">{prof?.email || ev.metadata?.email || (ev.user_id ? ev.user_id.slice(0, 8) : "anon")}</span>
                           <span className="text-[11px] sm:text-xs text-muted-foreground truncate">{ev.content_id?.slice(0, 8) || "—"}</span>
-                          <span className="text-xs text-muted-foreground text-right">{new Date(ev.created_at).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>
+                          <span className="text-xs text-muted-foreground text-right">{formatSpDateTime(ev.created_at)}</span>
                         </div>
                       );
                     })}
@@ -1148,7 +1148,7 @@ const Admin = () => {
                     <span className="text-xs sm:text-sm text-foreground truncate">{click.content_title}</span>
                     <span className="text-xs sm:text-sm text-muted-foreground truncate" title={click.episode_label}>{click.episode_label}</span>
                     <span className="text-sm font-semibold text-center text-primary">{click.click_count}×</span>
-                    <span className="text-xs text-muted-foreground text-right">{new Date(click.last_clicked_at).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>
+                    <span className="text-xs text-muted-foreground text-right">{formatSpDateTime(click.last_clicked_at)}</span>
                   </div>
                 ))}
                 {totalClickPages > 1 && (
@@ -1337,7 +1337,7 @@ const Admin = () => {
                         <div className="hidden sm:block">
                           <Switch checked={p.is_premium} onCheckedChange={() => togglePremium(p)} onClick={(e) => e.stopPropagation()} />
                         </div>
-                        <span className="text-xs text-muted-foreground hidden sm:block">{new Date(p.created_at).toLocaleDateString("en-US")}</span>
+                        <span className="text-xs text-muted-foreground hidden sm:block">{formatSpDate(p.created_at)}</span>
                         <div className="hidden sm:flex justify-center">
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
@@ -1385,7 +1385,7 @@ const Admin = () => {
                             <div className="space-y-1.5">
                               <label className="text-xs text-muted-foreground">Status</label>
                               <div className={`h-9 flex items-center px-3 rounded-md text-xs font-medium ${!p.is_premium ? 'bg-muted text-muted-foreground' : expired ? 'bg-destructive/10 text-destructive' : 'bg-secondary/10 text-secondary'}`}>
-                                {!p.is_premium ? "Free" : expired ? "Expired" : p.premium_expires_at ? `Active until ${new Date(p.premium_expires_at).toLocaleDateString("en-US")}` : "Expiration date missing"}
+                                {!p.is_premium ? "Free" : expired ? "Expired" : p.premium_expires_at ? `Active until ${formatSpDate(p.premium_expires_at)}` : "Expiration date missing"}
                               </div>
                             </div>
                           </div>
@@ -1482,7 +1482,7 @@ const Admin = () => {
                           </span>
                           <span className="text-xs text-muted-foreground capitalize">{d.deleted_by}</span>
                           <span className="text-xs text-muted-foreground sm:text-right">
-                            {new Date(d.created_at).toLocaleString(undefined, { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                            {formatSpDateTime(d.created_at)}
                           </span>
                           <div className="sm:justify-self-end">
                             <Button
