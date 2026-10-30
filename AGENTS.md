@@ -2,6 +2,7 @@
 
 - Defer authenticated requests out of auth event callbacks and skip role reloads on token refresh; this prevents session-lock deadlocks and refresh-request amplification.
 - Validate restored users with getUser and keep auth loading until role verification completes; render account sign-in directly at /admin on fresh devices without navigating away, then require the existing administrator role and PIN.
+- Show the admin PIN gate before loading dashboard data, and start dashboard queries and subscriptions only after role and PIN verification; slow analytics must not block account recognition or PIN entry.
 - Keep owner-authored privacy content on /privacy-policy with /privacy as an alias; this preserves public deep links without using platform-owned Trust center routes.
 
 - Route subscription self-service through `/manage-subscription` before the external Stripe portal so retention messaging remains centralized and Stripe remains the billing authority.

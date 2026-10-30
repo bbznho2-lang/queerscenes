@@ -138,17 +138,17 @@ const Admin = () => {
   const CLICKS_PER_PAGE = 20;
 
   useEffect(() => {
-    if (!isAdmin) return;
+    if (!isAdmin || !pinUnlocked) return;
     fetchData();
     // Poll every 30s so the "today" bar keeps growing even if a realtime
     // event is missed (WebSocket drops, tab throttling, RLS delays, etc.).
     const t = window.setInterval(() => { fetchData(false); }, 30_000);
     return () => window.clearInterval(t);
-  }, [isAdmin]);
+  }, [isAdmin, pinUnlocked]);
 
   // Realtime for new clicks
   useEffect(() => {
-    if (!isAdmin) return;
+    if (!isAdmin || !pinUnlocked) return;
 
     const clicksChannel = supabase
       .channel("admin-clicks-realtime")
@@ -215,7 +215,7 @@ const Admin = () => {
       supabase.removeChannel(supporterEventsChannel);
       supabase.removeChannel(pendingSupportersChannel);
     };
-  }, [isAdmin]);
+  }, [isAdmin, pinUnlocked]);
 
 
   const fetchData = async (showLoading = true) => {
@@ -716,7 +716,7 @@ const Admin = () => {
     </main>;
   }
 
-  if (loading || loadingData) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-pulse text-muted-foreground">Loading...</div>
@@ -758,6 +758,12 @@ const Admin = () => {
         </form>
       </div>
     );
+  }
+
+  if (loadingData) {
+    return <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="animate-pulse text-muted-foreground">Loading dashboard...</div>
+    </div>;
   }
 
   const totalUsers = profiles.length;
