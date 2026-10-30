@@ -1,1 +1,0 @@
-insert into public.supporter_events (event_type, metadata) values ('locked_content_view', jsonb_build_object('visitor_id', 'realtime-probe-test'));
