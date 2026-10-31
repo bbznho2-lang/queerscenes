@@ -43,13 +43,6 @@
       "when": 1793417161349,
       "tag": "0005_fix_claim_supporter_blocked_by_trigger",
       "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1793417177969,
-      "tag": "0006_seed_claim_test_pending",
-      "breakpoints": true
     }
   ]
 }
