@@ -36,6 +36,13 @@
       "when": 1792458403777,
       "tag": "0004_replace_welcome_message",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793417161349,
+      "tag": "0005_fix_claim_supporter_blocked_by_trigger",
+      "breakpoints": true
     }
   ]
 }
