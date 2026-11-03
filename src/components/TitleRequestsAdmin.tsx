@@ -62,16 +62,8 @@ const TitleRequestsAdmin = () => {
       const req = rows.find((r) => r.id === id);
       if (req?.email) {
         // Notify the requester by email; the inbox message is sent automatically.
-        void supabase.functions.invoke("send-transactional-email", {
-          body: {
-            templateName: "title-added",
-            recipientEmail: req.email,
-            idempotencyKey: `title-added-${id}`,
-            templateData: {
-              titleName: req.title_name,
-              titleUrl: `${window.location.origin}/browse`,
-            },
-          },
+        void supabase.functions.invoke("notify-title-added", {
+          body: { requestId: id },
         }).then(({ error: mailError }) => {
           if (mailError) toast.error("Email could not be sent: " + mailError.message);
           else toast.success("Requester notified by email and inbox");
