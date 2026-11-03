@@ -1067,7 +1067,11 @@ const Index = () => {
 
       <footer className="border-t border-border py-6 sm:py-8 text-center text-xs sm:text-sm text-muted-foreground">
         <p>© 2026 Queer Scenes. All rights reserved. 🌈</p>
-        <a href="/privacy-policy" className="mt-3 inline-block underline">Privacy policy</a>
+        <div className="mt-3 flex items-center justify-center gap-4 flex-wrap">
+          <a href="#partnerships" className="underline">Partnerships</a>
+          <a href="/privacy-policy" className="underline">Privacy policy</a>
+          <a href="mailto:scenes.queer@gmail.com" className="underline">scenes.queer@gmail.com</a>
+        </div>
       </footer>
 
       <SupportDialog open={supportOpen} onOpenChange={setSupportOpen} />
