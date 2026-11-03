@@ -16,6 +16,7 @@ import { getReferralCode } from "@/lib/referral";
 import { smoothScrollToElement } from "@/lib/scroll-to";
 import { toast } from "sonner";
 import SupportDialog from "@/components/SupportDialog";
+import PartnershipsSection from "@/components/PartnershipsSection";
 import { PASSWORD_REQUIREMENTS, validatePassword } from "@/lib/password-validation";
 
 const fade = {
@@ -241,6 +242,15 @@ const Index = () => {
 
     return stop;
   }, [scrollToPlanCards, routerLocation.key]);
+
+  // Scroll to the partnerships section when arriving with #partnerships (e.g. from the app menu).
+  useEffect(() => {
+    if (window.location.hash !== "#partnerships") return;
+    const t = window.setTimeout(() => {
+      document.getElementById("partnerships")?.scrollIntoView({ behavior: "smooth" });
+    }, 300);
+    return () => window.clearTimeout(t);
+  }, [routerLocation.key]);
 
 
 
