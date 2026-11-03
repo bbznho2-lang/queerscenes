@@ -33,27 +33,25 @@ export default function PartnershipsSection() {
       return;
     }
     setSending(true);
-    const { error: insertError } = await supabase.from("partnership_requests").insert({
+    const { data: inserted, error: insertError } = await supabase.from("partnership_requests").insert({
       name: name.trim(),
       email: email.trim().toLowerCase(),
       kind,
       link: link.trim() || null,
       message: message.trim(),
       honeypot,
-    });
+    }).select("id").single();
     setSending(false);
     if (insertError) {
       setError("Something went wrong. Please try again or write to us directly.");
       return;
     }
     setSent(true);
-    void supabase.functions.invoke("send-transactional-email", {
-      body: {
-        templateName: "partnership-request",
-        idempotencyKey: `partnership-${crypto.randomUUID()}`,
-        templateData: { name: name.trim(), email: email.trim().toLowerCase(), kind, link: link.trim() || null, message: message.trim() },
-      },
-    }).catch(() => {});
+    if (inserted?.id) {
+      void supabase.functions.invoke("notify-partnership-request", {
+        body: { requestId: inserted.id },
+      }).catch(() => {});
+    }
   };
 
   const inputClass =
