@@ -16,6 +16,7 @@ import { getReferralCode } from "@/lib/referral";
 import { smoothScrollToElement } from "@/lib/scroll-to";
 import { toast } from "sonner";
 import SupportDialog from "@/components/SupportDialog";
+import PartnershipsSection from "@/components/PartnershipsSection";
 import { PASSWORD_REQUIREMENTS, validatePassword } from "@/lib/password-validation";
 
 const fade = {
@@ -241,6 +242,15 @@ const Index = () => {
 
     return stop;
   }, [scrollToPlanCards, routerLocation.key]);
+
+  // Scroll to the partnerships section when arriving with #partnerships (e.g. from the app menu).
+  useEffect(() => {
+    if (window.location.hash !== "#partnerships") return;
+    const t = window.setTimeout(() => {
+      document.getElementById("partnerships")?.scrollIntoView({ behavior: "smooth" });
+    }, 300);
+    return () => window.clearTimeout(t);
+  }, [routerLocation.key]);
 
 
 
@@ -638,7 +648,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ABOUT */}
+            {/* ABOUT */}
       <section className="relative py-16 sm:py-24 px-4 overflow-hidden">
         <div
           className="pointer-events-none absolute inset-0"
@@ -655,48 +665,52 @@ const Index = () => {
               <span className="qs-section-label" style={{ color: "#d946a8" }}>About Queer Scenes</span>
             </div>
             <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--t1)] leading-tight">
-              See yourself<br />on screen — <span className="italic" style={{ color: "#d946a8" }}>finally.</span>
+              See yourself on screen, <span className="italic" style={{ color: "#d946a8" }}>finally.</span>
             </h2>
           </motion.div>
 
           <div className="space-y-4 text-[var(--t2)] text-base sm:text-lg leading-relaxed mb-8">
             <p>
-              Queer Scenes exists so people <span className="font-semibold" style={{ color: "#a855f7" }}>all over the world</span> can watch titles that represent them — series, films, soap operas, GL & BL Dramas and reality shows. Hand-subtitled by our team, curated with love, brought to you by fans who get it.
+              We exist so people all over the world can watch titles that represent them: series, films, soap operas, GL & BL dramas and reality shows. Hand-subtitled by our team and curated with love by fans who get it.
             </p>
           </div>
 
-          {/* Numbered inline steps */}
-          <div className="grid grid-cols-3 gap-4 mb-14">
-            {[
-              { n: "01", text: "Discover rare titles" },
-              { n: "02", text: "Watch hand-subtitled content" },
-              { n: "03", text: "Join a community that gets you" },
-            ].map((s) => (
+          {/* HOW IT WORKS */}
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.6 }} className="mb-14">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="h-px flex-1 max-w-[36px]" style={{ background: "rgba(217,70,168,.5)" }} />
+              <span className="qs-section-label" style={{ color: "#d946a8" }}>How it works</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-6">
+              {[
+                { n: "01", title: "Discover rare titles", text: "Browse the Top 10 or the full catalog." },
+                { n: "02", title: "Become a Supporter", text: "Enter your email, pay securely with Stripe and get your login link. No password." },
+                { n: "03", title: "Watch in HD", text: "On mobile, tablet or desktop, with no ads." },
+                { n: "04", title: "Shape what's next", text: "Request subtitles in your language and wishlist new titles." },
+              ].map((s) => (
+                <div key={s.n} className="p-4 rounded-2xl border border-white/10 bg-white/[0.03]">
+                  <p className="text-[10px] font-bold tracking-widest mb-1" style={{ color: "#d946a8" }}>{s.n}</p>
+                  <p className="text-sm font-semibold text-[var(--t1)] mb-1">{s.title}</p>
+                  <p className="text-xs text-[var(--t2)] leading-relaxed">{s.text}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
 
-              <div key={s.n}>
-                <p className="text-[10px] font-bold tracking-widest mb-1" style={{ color: "#d946a8" }}>{s.n}</p>
-                <p className="text-sm font-semibold text-[var(--t1)]">{s.text}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* WHY WE'RE DIFFERENT */}
+          {/* WHY YOU CAN TRUST OUR WORK */}
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.6 }}>
             <div className="flex items-center gap-2 mb-3">
               <span className="h-px flex-1 max-w-[36px]" style={{ background: "rgba(217,70,168,.5)" }} />
-              <span className="qs-section-label" style={{ color: "#d946a8" }}>Why we're different</span>
+              <span className="qs-section-label" style={{ color: "#d946a8" }}>Why you can trust our work</span>
             </div>
-            <h3 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-[var(--t1)] leading-tight mb-8">
-              Crafted by hand,<br />for <span className="italic" style={{ color: "#a855f7" }}>you.</span>
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-7">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-7 mt-6">
               {[
-                { title: "Manual subtitles", text: "Translated & reviewed by hand. No auto-translate." },
-                { title: "Exclusive titles", text: "Films & series you won't find anywhere else." },
-                { title: "Handcrafted XP", text: "Every release curated, tested and polished." },
-                { title: "Human support", text: "Real people on Telegram. No bots, ever." },
-                { title: "Latest premieres", text: "Always fresh — newest releases always here." },
-                { title: "Made with care", text: "Quality uploads with working players inside." },
+                { title: "Manual subtitles", text: "Translated and reviewed by hand. No auto-translate." },
+                { title: "Exclusive titles", text: "Films and series you won't find anywhere else." },
+                { title: "Tested before release", text: "Every title is checked, with a working player, before it goes live." },
+                { title: "Human support", text: "Real people answer by email. Most issues are solved in minutes." },
+                { title: "Latest premieres", text: "Always fresh. Newest releases land here first." },
+                { title: "Secure payments", text: "Payments are processed by Stripe. We never see your card details." },
               ].map((c) => (
                 <div key={c.title}>
                   <div className="h-[2px] w-10 mb-3" style={{ background: "linear-gradient(90deg, #d946a8, transparent)" }} />
@@ -725,22 +739,22 @@ const Index = () => {
               <span className="qs-section-label" style={{ color: "#a855f7" }}>Keep the scene alive</span>
             </div>
             <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--t1)] leading-tight">
-              Your support <br />powers <span className="italic" style={{ color: "#a855f7" }}>everything.</span>
+              Your support powers <span className="italic" style={{ color: "#a855f7" }}>everything.</span>
             </h2>
           </motion.div>
 
           <div className="space-y-4 text-[var(--t2)] text-base sm:text-lg leading-relaxed mb-8">
             <p>
-              Queer Scenes is built by a small team that works every day to bring you rare, hand-subtitled titles. Staying subscribed means we can keep updating the site, adding new releases, and growing the catalog for the whole community.
+              We're a small team that works every day to bring you rare, hand-subtitled titles. Your support lets us keep updating the site, adding releases and growing the catalog for the whole community.
             </p>
           </div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.6 }}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
               {[
-                { title: "More releases, always", text: "Your subscription helps us upload and subtitle new titles every single week." },
-                { title: "A stronger community", text: "Continuous support lets us improve the platform and keep the Telegram groups active." },
-                { title: "No interrupted access", text: "Staying active means you never lose the titles you love or miss a new premiere." },
+                { title: "More releases, always", text: "Your subscription helps us upload and subtitle new titles every week." },
+                { title: "A stronger community", text: "Continuous support lets us improve the platform and keep the community active." },
+                { title: "Always-on access", text: "Stay active and you never miss a premiere or lose the titles you love." },
                 { title: "Help us grow", text: "Every supporter directly funds more content, better players and faster support." },
               ].map((c) => (
                 <div key={c.title}>
@@ -751,25 +765,44 @@ const Index = () => {
               ))}
             </div>
 
+            {/* EASY TO USE, EASY TO MANAGE */}
+            <div className="mt-12">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="h-px flex-1 max-w-[36px]" style={{ background: "rgba(168,85,247,.5)" }} />
+                <span className="qs-section-label" style={{ color: "#a855f7" }}>Easy to use, easy to manage</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+                {[
+                  { n: "01", title: "Find what you want", text: "Search, browse by genre or check the Top 10. Everything is a click away." },
+                  { n: "02", title: "Pick up where you left off", text: "Your account keeps your favorites, your wishlist and your subtitle requests in one place." },
+                  { n: "03", title: "Manage everything in your account", text: "Your plan, your email and your requests are all easy to find and change." },
+                ].map((s) => (
+                  <div key={s.n} className="p-4 rounded-2xl border border-white/10 bg-white/[0.03]">
+                    <p className="text-[10px] font-bold tracking-widest mb-1" style={{ color: "#a855f7" }}>{s.n}</p>
+                    <p className="text-sm font-semibold text-[var(--t1)] mb-1">{s.title}</p>
+                    <p className="text-xs text-[var(--t2)] leading-relaxed">{s.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div className="mt-10 p-5 sm:p-6 rounded-2xl border border-white/10 bg-white/[0.03]">
               <p className="text-sm sm:text-base text-[var(--t1)] leading-relaxed">
-                <span className="font-semibold" style={{ color: "#a855f7"}}>Don't cancel — your support keeps Queer Scenes alive.</span> Every subscription funds new titles, subtitles and the community we built together. If something is bothering you — payment, access or content — reach out to support first. Most issues are solved in minutes, so you can keep watching and supporting without losing anything.
-              </p>
-              <div className="mt-4 flex items-center gap-2 text-sm">
-                <a href="https://t.me/L7kznr" target="_blank" rel="noopener noreferrer" className="font-semibold underline" style={{ color: "#c084fc" }}>
-                  Talk to support on Telegram
+                <span className="font-semibold" style={{ color: "#a855f7" }}>Need a hand?</span> Write to{" "}
+                <a href="mailto:scenes.queer@gmail.com" className="font-semibold underline" style={{ color: "#c084fc" }}>
+                  scenes.queer@gmail.com
                 </a>
-                <span className="text-[var(--t3)]">— we'll find a solution together.</span>
-              </div>
+                . A real person answers, and most issues are solved in minutes.
+              </p>
             </div>
           </motion.div>
         </div>
       </section>
 
+      <PartnershipsSection />
 
 
-
-      {/* PLANS */}
+{/* PLANS */}
       <section id="planos" className="py-16 sm:py-24 px-4">
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-10">
@@ -1034,7 +1067,11 @@ const Index = () => {
 
       <footer className="border-t border-border py-6 sm:py-8 text-center text-xs sm:text-sm text-muted-foreground">
         <p>© 2026 Queer Scenes. All rights reserved. 🌈</p>
-        <a href="/privacy-policy" className="mt-3 inline-block underline">Privacy policy</a>
+        <div className="mt-3 flex items-center justify-center gap-4 flex-wrap">
+          <a href="#partnerships" className="underline">Partnerships</a>
+          <a href="/privacy-policy" className="underline">Privacy policy</a>
+          <a href="mailto:scenes.queer@gmail.com" className="underline">scenes.queer@gmail.com</a>
+        </div>
       </footer>
 
       <SupportDialog open={supportOpen} onOpenChange={setSupportOpen} />

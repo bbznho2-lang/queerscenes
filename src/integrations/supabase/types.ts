@@ -554,6 +554,42 @@ export type Database = {
         }
         Relationships: []
       }
+      partnership_requests: {
+        Row: {
+          created_at: string
+          email: string
+          honeypot: string
+          id: string
+          kind: string
+          link: string | null
+          message: string
+          name: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          honeypot?: string
+          id?: string
+          kind: string
+          link?: string | null
+          message: string
+          name: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          honeypot?: string
+          id?: string
+          kind?: string
+          link?: string | null
+          message?: string
+          name?: string
+          status?: string
+        }
+        Relationships: []
+      }
       paywall_customizations: {
         Row: {
           content_id: string

@@ -27,6 +27,7 @@ import CanceledSubscriptionsSection from "@/components/CanceledSubscriptionsSect
 import ReferralsSection from "@/components/ReferralsSection";
 import { fetchTopContentRanking } from "@/lib/top-content";
 import SubtitleRequestsAdmin from "@/components/SubtitleRequestsAdmin";
+import PartnershipRequestsAdmin from "@/components/PartnershipRequestsAdmin";
 import AdminSignIn from "@/components/AdminSignIn";
 import { SP_TIMEZONE, spDayKey, formatSpDateTime, formatSpDate } from "@/lib/sp-time";
 
@@ -891,6 +892,7 @@ const Admin = () => {
         <SocialLinksAdmin />
         <TitleRequestsAdmin />
         <SubtitleRequestsAdmin />
+        <PartnershipRequestsAdmin />
         <FeaturedEpisodesAdmin />
 
 
