@@ -196,7 +196,9 @@ const Player = () => {
       const { data: duplicates } = await supabase
         .from("contents")
         .select("id, title, year, tag, type, banner_url, section, position, is_premium, supporter_player_enabled, synopsis, preview_video_url, cast_members")
-        .ilike("title", data.title.trim())
+        // Wildcards tolerate stray spaces around titles (e.g. "Title " vs "Title");
+        // exact trimmed match is enforced by the filter below.
+        .ilike("title", `%${data.title.trim().replace(/[\\%_]/g, (c) => `\\${c}`)}%`)
         .in("type", ["serie", "novela", "anime", "reality"]);
       const matchingContents = ((duplicates || []) as ContentItem[]).filter(
         (item) => item.title.trim().toLocaleLowerCase() === data.title.trim().toLocaleLowerCase(),
