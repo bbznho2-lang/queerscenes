@@ -1,0 +1,1 @@
+REVOKE INSERT ON public.partnership_requests FROM anon;
