@@ -1256,6 +1256,17 @@ export type Database = {
         Args: { _email: string; _name: string }
         Returns: Json
       }
+      submit_partnership_request: {
+        Args: {
+          p_email: string
+          p_honeypot: string
+          p_kind: string
+          p_link: string
+          p_message: string
+          p_name: string
+        }
+        Returns: string
+      }
       system_notification_sender: { Args: never; Returns: string }
       verify_admin_pin: { Args: { _pin: string }; Returns: boolean }
     }

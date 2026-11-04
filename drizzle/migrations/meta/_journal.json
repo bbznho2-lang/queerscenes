@@ -64,6 +64,13 @@
       "when": 1793750455198,
       "tag": "0008_grant_partnership_requests_insert",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793750479428,
+      "tag": "0009_submit_partnership_request_rpc",
+      "breakpoints": true
     }
   ]
 }
