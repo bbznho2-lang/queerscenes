@@ -47,9 +47,9 @@ export default function PartnershipsSection() {
       return;
     }
     setSent(true);
-    if (inserted?.id) {
+    if (insertedId) {
       void supabase.functions.invoke("notify-partnership-request", {
-        body: { requestId: inserted.id },
+        body: { requestId: insertedId },
       }).catch(() => {});
     }
   };
