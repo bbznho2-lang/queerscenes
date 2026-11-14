@@ -85,6 +85,13 @@
       "when": 1794676905475,
       "tag": "0011_restrict_role_and_supporter_lookups",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1794677036168,
+      "tag": "0012_claim_requires_confirmed_email",
+      "breakpoints": true
     }
   ]
 }

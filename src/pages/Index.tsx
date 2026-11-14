@@ -370,7 +370,7 @@ const Index = () => {
         }
         const { error } = await signUp(email, password, firstName.trim(), lastName.trim());
         if (error) { toast.error(error.message); return; }
-        toast.success("Account created! You can now sign in.");
+        toast.success("Account created! Check your email and click the confirmation link, then sign in.");
         setIsSignUp(false);
         setLoading(false);
         return;

@@ -503,6 +503,7 @@ const Player = () => {
           options: {
             emailRedirectTo: getEmailRedirectUrl(redirectPath),
             data: { first_name: signupFirstName.trim() },
+            
           },
         });
 

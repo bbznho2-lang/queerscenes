@@ -97,7 +97,7 @@ export const useAuth = () => {
     const { error, data } = await supabase.auth.signUp({
       email,
       password,
-      options: { emailRedirectTo: getEmailRedirectUrl(redirectPath) }
+      options: { emailRedirectTo: getEmailRedirectUrl(redirectPath), data: { first_name: firstName, last_name: lastName } }
     });
     if (!error && data.user) {
       // Update profile with name
