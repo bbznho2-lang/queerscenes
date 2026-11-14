@@ -78,6 +78,13 @@
       "when": 1793750506783,
       "tag": "0010_revoke_anon_insert_partnership_requests",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794676905475,
+      "tag": "0011_restrict_role_and_supporter_lookups",
+      "breakpoints": true
     }
   ]
 }
