@@ -39,11 +39,17 @@ Deno.serve(async (req) => {
 
   const { data: request, error: lookupError } = await supabase
     .from('partnership_requests')
-    .select('id, name, email, kind, link, message')
+    .select('id, name, email, kind, link, message, created_at')
     .eq('id', requestId)
     .maybeSingle()
 
   if (lookupError || !request) {
+    return jsonResponse({ error: 'Partnership request not found' }, 404)
+  }
+
+  // Only notify for freshly submitted requests; old IDs cannot re-trigger emails.
+  const ageMs = Date.now() - new Date(request.created_at).getTime()
+  if (!Number.isFinite(ageMs) || ageMs > 10 * 60 * 1000) {
     return jsonResponse({ error: 'Partnership request not found' }, 404)
   }
 
