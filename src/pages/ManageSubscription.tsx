@@ -33,7 +33,7 @@ const planNames: Record<string, string> = {
 };
 
 const benefits = [
-  { icon: Tv, title: "Your full catalog", text: "Rare queer films, series, reality shows, GL and BL dramas." },
+  { icon: Tv, title: "Your full catalog", text: "Rare queer films, series and reality shows." },
   { icon: Sparkles, title: "Every new release", text: "Keep following new episodes and hand-subtitled premieres as they arrive." },
   { icon: Heart, title: "The project you support", text: "Your subscription keeps Queer Scenes curated, online and growing." },
 ];

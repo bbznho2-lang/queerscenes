@@ -1,4 +1,5 @@
 # Project Architecture
+- Use the catalog-section retirement predicate for catalog surfaces and reject retired sections on old player links; archive removed titles instead of deleting their episodes or user history.
 
 - Defer authenticated requests out of auth event callbacks and skip role reloads on token refresh; this prevents session-lock deadlocks and refresh-request amplification.
 - Validate restored users with getUser and keep auth loading until role verification completes; render account sign-in directly at /admin on fresh devices without navigating away, then require the existing administrator role and PIN.

@@ -6,8 +6,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 const GENRES = [
-  "GL Drama",
-  "BL Drama",
   "Series",
   "Movie",
   "Soap Opera",
@@ -125,7 +123,7 @@ const Wishlist = () => {
           Is there a title you'd love to see on Queer Scenes?
         </h1>
         <p className="mt-3 text-sm text-muted-foreground text-center leading-relaxed">
-          Tell us what you're looking for — a series, film, GL drama, soap opera.
+          Tell us what you're looking for — a series, film or soap opera.
           If we can find it, we'll bring it here and let you know by email.
         </p>
 

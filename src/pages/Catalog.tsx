@@ -13,8 +13,8 @@ interface CatalogItem {
   is_archived?: boolean;
 }
 
-const PAGE_TITLE = "Catalog — LGBT series subtitled, queer movies & GL dramas | QueerScenes";
-const PAGE_DESC = "Browse the full QueerScenes catalog of LGBTQIA+ movies, GL dramas, queer series and soap operas with subtitles.";
+const PAGE_TITLE = "Catalog — LGBT series subtitled, queer movies | QueerScenes";
+const PAGE_DESC = "Browse the full QueerScenes catalog of LGBTQIA+ movies, queer series and soap operas with subtitles.";
 const CANONICAL = "https://queerscenes.lovable.app/catalog";
 
 const setMeta = (selector: string, attr: string, value: string) => {
@@ -77,7 +77,7 @@ const Catalog = () => {
       <main className="max-w-6xl mx-auto px-4 py-10">
         <h1 className="text-4xl font-bold mb-3">Full catalog of LGBTQIA+ series and movies</h1>
         <p className="text-muted-foreground mb-10 max-w-3xl">
-          Explore every title available on QueerScenes — LGBT series subtitled, queer movies, GL dramas, BL stories and soap operas. Sign up to watch the queer scenes you love.
+          Explore every title available on QueerScenes — LGBT series subtitled, queer movies and soap operas. Sign up to watch the queer scenes you love.
         </p>
 
         {loading ? (
@@ -128,7 +128,7 @@ const Catalog = () => {
 
         <div className="mt-12 p-6 rounded-xl border border-primary/40 bg-primary/5">
           <h2 className="text-xl font-semibold mb-2">Watch the full queer scenes catalog</h2>
-          <p className="text-muted-foreground mb-4">Sign up free and unlock subtitled LGBT series, GL dramas and queer movies.</p>
+          <p className="text-muted-foreground mb-4">Sign up free and unlock subtitled LGBT series and queer movies.</p>
           <Link to="/" className="inline-block px-5 py-2 rounded-lg bg-primary text-primary-foreground font-medium">Get started</Link>
         </div>
       </main>

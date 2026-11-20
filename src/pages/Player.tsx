@@ -148,6 +148,13 @@ const Player = () => {
       setAccessResolved(true);
       return;
     }
+    if (["gl", "bl"].includes(data.section.trim().toLowerCase())) {
+      setContent(null);
+      setEpisodes([]);
+      setAccessResolved(true);
+      navigate("/browse", { replace: true });
+      return;
+    }
     let resolvedContent = data as ContentItem;
 
     const notExpired = Boolean(profile?.premium_expires_at && new Date(profile.premium_expires_at) > new Date());

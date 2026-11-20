@@ -7,10 +7,10 @@
 - [x] Fix admin entry on a fresh computer and verify the existing account.
 - [x] Restore the Privacy policy page with owner-specific content and verify deep links.
 
-- [ ] Update only the requested home hero copy.
-- [ ] Add Supporter subtitle requests with duplicate prevention and owner/admin access.
-- [ ] Add the admin request tab and atomic completion notifications in the existing inbox.
-- [ ] Verify submission, completion, inbox delivery and access restrictions.
+- [x] Update only the requested home hero copy.
+- [x] Add Supporter subtitle requests with duplicate prevention and owner/admin access.
+- [x] Add the admin request tab and atomic completion notifications in the existing inbox.
+- [x] Verify submission, completion, inbox delivery and access restrictions.
 
 - [x] Add Manage subscription link in Profile.
 - [x] Create a retention-first subscription management page.
@@ -32,3 +32,8 @@
 - [x] Update DOMPurify beyond 3.4.12 and verify the lockfiles.
 - [x] Update React Router DOM beyond 6.30.5 and React Router to 7.18.0 or later.
 - [x] Scan production dependencies and verify the site build.
+
+## Remove retired drama categories
+- [x] Remove category mentions, sections and editor/wishlist options.
+- [x] Remove their titles from the public catalog, including duplicate listings.
+- [x] Verify remaining catalog and page rendering.

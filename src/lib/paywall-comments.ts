@@ -79,19 +79,6 @@ const REALITY_OPENERS = [
   (title: string) => `not me getting this emotionally invested in everyone on ${title}`,
 ];
 
-const BL_GL_OPENERS = [
-  (title: string) => `the chemistry in ${title} is so natural, every little look between them hits`,
-  (title: string) => `${title} had me smiling at my screen and then emotionally destroyed me`,
-  (title: string) => `the leads in ${title} are everything, i could watch their scenes all day`,
-  (title: string) => `${title} balances the soft moments and the drama so well, i'm obsessed`,
-  (title: string) => `i've watched a lot of bl/gl stories here but ${title} really stood out to me`,
-  (title: string) => `the relationship in ${title} feels so genuine, i loved watching it unfold`,
-  (title: string) => `${title} gave me butterflies and emotional damage in equal amounts lol`,
-  (title: string) => `watching ${title} with proper subtitles made every conversation hit harder`,
-  (title: string) => `${title} is exactly the kind of story i always hope to find on this site`,
-  (title: string) => `the tension in ${title}??? i was staring at the screen the entire time`,
-];
-
 const CHARACTER_OPENERS = [
   (title: string, character: string) => `${character} in ${title} had me completely invested from the first scene`,
   (title: string, character: string) => `i'm still thinking about ${character}'s story in ${title}, it was handled so well`,
@@ -149,15 +136,12 @@ export const getPaywallComments = (
   const title = (context?.title || "this title").trim();
   const kind = kindOf(context?.type);
   const section = String(context?.section || "").toLowerCase();
-  const isBlGl = section === "bl" || section === "gl" || section.includes("bl drama") || section.includes("gl drama");
   const characters = Array.from(
     new Set((context?.characters || []).map((name) => name.trim()).filter(Boolean)),
   );
   const total = Math.max(1, Math.min(count, 4));
   const seed = hashSeed(`${key}|${title.toLowerCase()}|${kind}|${section}`);
-  const openingPool = isBlGl
-    ? BL_GL_OPENERS
-    : kind === "series"
+  const openingPool = kind === "series"
       ? SERIES_OPENERS
       : kind === "reality"
         ? REALITY_OPENERS
