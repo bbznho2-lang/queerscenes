@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import FeaturedEpisodesAdmin from "@/components/FeaturedEpisodesAdmin";
 import { isRetiredCatalogSection } from "@/lib/catalog-sections";
 import { supabase } from "@/integrations/supabase/client";
+import { loadAllPages } from "@/lib/load-all-pages";
 import { slugify } from "@/lib/slug";
 
 interface FeaturedItem {
@@ -35,11 +36,12 @@ const RecentUpdatesSection = ({ isAdmin = false, revision = 0 }: { isAdmin?: boo
   const navigate = useNavigate();
 
   const load = async () => {
-    const { data: featured } = await (supabase as any)
+    try {
+    const featured = await loadAllPages((from, to) => supabase
       .from("featured_episodes")
       .select("id, episode_id, content_id, position")
       .order("position", { ascending: true })
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false }).order("id").range(from, to));
     if (!featured?.length) {
       setItems([]);
       return;
@@ -47,16 +49,16 @@ const RecentUpdatesSection = ({ isAdmin = false, revision = 0 }: { isAdmin?: boo
     const epIds = featured.map((f: any) => f.episode_id).filter(Boolean);
     const directContentIds = featured.map((f: any) => f.content_id).filter(Boolean);
 
-    const { data: episodes } = epIds.length
-      ? await supabase.from("episodes").select("id, title, season, episode_number, content_id").in("id", epIds)
-      : { data: [] as any[] };
+    const episodes = epIds.length
+      ? await loadAllPages((from, to) => supabase.from("episodes").select("id, title, season, episode_number, content_id").in("id", epIds).order("id").range(from, to))
+      : [];
 
     const epContentIds = (episodes || []).map((e: any) => e.content_id);
     const allContentIds = Array.from(new Set([...directContentIds, ...epContentIds]));
 
-    const { data: contents } = allContentIds.length
-      ? await supabase.from("contents").select("id, title, banner_url, tag, year, is_archived, section").in("id", allContentIds)
-      : { data: [] as any[] };
+    const contents = allContentIds.length
+      ? await loadAllPages((from, to) => supabase.from("contents").select("id, title, banner_url, tag, year, is_archived, section").in("id", allContentIds).order("id").range(from, to))
+      : [];
     const visibleContents = (contents || []).filter((c: any) => !c.is_archived && !isRetiredCatalogSection(c.section));
     const visibleIds = new Set(visibleContents.map((c: any) => c.id));
 
@@ -90,6 +92,9 @@ const RecentUpdatesSection = ({ isAdmin = false, revision = 0 }: { isAdmin?: boo
         })
         .filter((i: FeaturedItem | null): i is FeaturedItem => !!i && !!i.content),
     );
+    } catch (error) {
+      console.error("Could not load Recent Updates", error);
+    }
   };
 
   useEffect(() => {

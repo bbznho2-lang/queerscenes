@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { loadAllPages } from "@/lib/load-all-pages";
 import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import {
@@ -383,10 +384,10 @@ const Admin = () => {
 
       let episodeMap: Record<string, { title: string; episode_number: number; season: number }> = {};
       if (episodeIds.length > 0) {
-        const { data: eps } = await supabase
+        const eps = await loadAllPages((from, to) => supabase
           .from("episodes")
           .select("id, title, episode_number, season")
-          .in("id", episodeIds as string[]);
+          .in("id", episodeIds as string[]).order("id").range(from, to));
         (eps || []).forEach((e: any) => { episodeMap[e.id] = { title: e.title, episode_number: e.episode_number, season: e.season || 1 }; });
       }
 

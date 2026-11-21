@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Save, RotateCcw, Plus, Trash2, Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { loadAllPages } from "@/lib/load-all-pages";
 import { toast } from "sonner";
 import { getPaywallComments } from "@/lib/paywall-comments";
 
@@ -69,10 +70,10 @@ const PaywallCustomizationsAdmin = () => {
     setTestimonials(testimonialMap[contentId] || []);
     setLanguages((languageMap[contentId] || []).join(", "));
     void (async () => {
-      const { data } = await supabase.from("episodes").select("season").eq("content_id", contentId);
+      const data = await loadAllPages((from, to) => supabase.from("episodes").select("season").eq("content_id", contentId).order("id").range(from, to));
       const seasons = [...new Set((data || []).map((e: any) => Number(e.season || 1)))];
       setSeasonMap((prev) => ({ ...prev, [contentId]: seasons }));
-    })();
+    })().catch(error => toast.error(error instanceof Error ? error.message : "Could not load seasons"));
   }, [contentId, customMap, testimonialMap, languageMap]);
 
   const isCustom = useMemo(

@@ -131,8 +131,7 @@ const FeaturedEpisodesAdmin = ({ onChanged }: { onChanged?: () => void }) => {
         if (at !== 0) return at;
         if (a.season !== b.season) return a.season - b.season;
         return a.episode_number - b.episode_number;
-      })
-      .slice(0, 500);
+      });
 
     const contents = allContents
       .filter((c) => !featuredContentIds.has(c.id))

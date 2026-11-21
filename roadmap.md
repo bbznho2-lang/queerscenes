@@ -1,6 +1,8 @@
 # Roadmap
 
 ## New seasons in Recent Updates
+- [x] Sweep season reads in playback, title details, editors, copies, public Recent Updates and admin previews/analytics; preserve data and permissions.
+- [x] Test shared paginated admin reads and existing editing/copying behavior; verify real season metadata in the browser.
 - [x] Remove incomplete catalog loading from the title/episode picker and surface loading errors.
 - [x] Verify selection/saving beyond the first 1,000 episodes in regression tests and read real Yellow Jackets S3/S4 through the signed-in browser; admin UI verification unavailable with the current non-admin session.
 

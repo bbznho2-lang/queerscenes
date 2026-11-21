@@ -3,7 +3,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import AddExistingContentDialog from "./AddExistingContentDialog";
 
 const mocks = vi.hoisted(() => ({ rpc: vi.fn(), from: vi.fn(), insert: vi.fn(), success: vi.fn(), error: vi.fn() }));
-vi.mock("@/integrations/supabase/client", () => ({ supabase: mocks }));
+vi.mock("@/integrations/supabase/client", () => ({ supabase: { ...mocks, rpc: (...args: unknown[]) => {
+  const request = mocks.rpc(...args);
+  const builder = Object.assign(request, {
+    order: () => builder,
+    range: async (from: number, to: number) => {
+      const result = await request;
+      return { ...result, data: result.data?.slice(from, to + 1) ?? null };
+    },
+  });
+  return builder;
+} } }));
 vi.mock("sonner", () => ({ toast: { success: mocks.success, error: mocks.error } }));
 const url = "https://example.com/new-video";
 const item = { id: "original", title: "Series copy test", year: 2026, tag: "Drama", type: "serie", section: "series", banner_url: null, player_url: null, links: [] };

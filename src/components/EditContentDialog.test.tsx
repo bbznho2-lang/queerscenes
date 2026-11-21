@@ -3,7 +3,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import EditContentDialog from "./EditContentDialog";
 
 const mocks = vi.hoisted(() => ({ rpc: vi.fn(), from: vi.fn(), success: vi.fn(), error: vi.fn(), single: vi.fn(), update: vi.fn() }));
-vi.mock("@/integrations/supabase/client", () => ({ supabase: mocks }));
+vi.mock("@/integrations/supabase/client", () => ({ supabase: { ...mocks, rpc: (...args: unknown[]) => {
+  const request = mocks.rpc(...args);
+  const builder = Object.assign(request, {
+    order: () => builder,
+    range: async (from: number, to: number) => {
+      const result = await request;
+      return { ...result, data: result.data?.slice(from, to + 1) ?? null };
+    },
+  });
+  return builder;
+} } }));
 vi.mock("sonner", () => ({ toast: { success: mocks.success, error: mocks.error } }));
 const oldUrl = "https://example.com/old-video";
 const newUrl = "https://example.com/new-video";

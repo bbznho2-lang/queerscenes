@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { ArrowLeft, Play, Pencil, Crown, Lock, Sparkles, Loader2, Maximize, ExternalLink, Star } from "lucide-react";
 import DOMPurify from "dompurify";
 import { supabase } from "@/integrations/supabase/client";
+import { loadAllPages } from "@/lib/load-all-pages";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
@@ -212,12 +213,19 @@ const Player = () => {
       );
       if (!matchingContents.some((item) => item.id === data.id)) matchingContents.push(data as ContentItem);
       const matchingIds = matchingContents.map((item) => item.id);
-      const { data: eps } = await supabase
+      let eps: Episode[];
+      try {
+      eps = await loadAllPages((from, to) => supabase
         .from("episodes")
         .select("id, content_id, title, episode_number, season, is_premium, created_at")
         .in("content_id", matchingIds)
         .order("season")
-        .order("episode_number");
+        .order("episode_number").order("id").range(from, to));
+      } catch {
+        toast({ title: "Could not load episodes", description: "Please try again.", variant: "destructive" });
+        setAccessResolved(true);
+        return;
+      }
       const allMatchingEpisodes = ((eps || []) as Episode[]).map((episode) => ({
         ...episode,
         season: episode.season || 1,

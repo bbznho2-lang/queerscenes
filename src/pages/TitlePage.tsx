@@ -3,12 +3,14 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import DOMPurify from "dompurify";
 import { Play, Heart, Sparkles, ChevronLeft, Crown, Lock, Languages } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { loadAllPages } from "@/lib/load-all-pages";
 import { slugify } from "@/lib/slug";
 import { useAuth } from "@/hooks/useAuth";
 import { DEFAULT_PAYWALL_TEXT } from "@/components/PaywallCustomizationsAdmin";
 import PaywallComments from "@/components/PaywallComments";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { trackSupporterEvent } from "@/lib/supporter-tracking";
+import { toast } from "sonner";
 
 interface TitleContent {
   id: string;
@@ -140,9 +142,9 @@ const TitlePage = () => {
       const matches = list.filter((c) => slugify(c.title) === slug);
       const matchIds = matches.map((c) => c.id);
       setRelatedContentIds(matchIds);
-      const { data: episodeRows } = matchIds.length
-        ? await supabase.from("episodes").select("content_id, season").in("content_id", matchIds)
-        : { data: [] as any[] };
+      const episodeRows = matchIds.length
+        ? await loadAllPages((from, to) => supabase.from("episodes").select("content_id, season").in("content_id", matchIds).order("id").range(from, to))
+        : [];
       const episodeCounts = new Map<string, number>();
       const seasonSet = new Set<number>();
       (episodeRows || []).forEach((row: any) => {
@@ -185,7 +187,11 @@ const TitlePage = () => {
         );
       }
       setLoading(false);
-    })();
+    })().catch(error => {
+      if (cancelled) return;
+      setLoading(false);
+      toast.error(error instanceof Error ? error.message : "Could not load title seasons. Please try again.");
+    });
     return () => { cancelled = true; };
   }, [slug]);
 

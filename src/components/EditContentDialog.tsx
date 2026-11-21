@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
+import { loadAdminEpisodes } from "@/lib/admin-episodes";
 import { Plus, Trash2, Save } from "lucide-react";
 import { toast } from "sonner";
 
@@ -99,11 +100,10 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
         try {
           const [titlesResult, episodesResult] = await Promise.all([
             supabase.rpc("admin_get_contents_v2", { _ids: [content.id] }),
-            supabase.rpc("admin_get_episodes", { _content_id: content.id }),
+            loadAdminEpisodes(content.id),
           ]);
           if (cancelled) return;
           if (titlesResult.error) throw titlesResult.error;
-          if (episodesResult.error) throw episodesResult.error;
           const row = titlesResult.data?.[0];
           if (!row) throw new Error("Could not load this title. Reopen the editor to retry.");
           const withLegacyLink = (links: unknown, legacy: string | null): EpisodeLink[] => {
@@ -113,7 +113,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
               : list;
           };
           setMovieLinks(withLegacyLink(row.links, row.player_url));
-          const loaded = (episodesResult.data || []).map(ep => ({
+          const loaded = episodesResult.map(ep => ({
             ...ep, links: withLegacyLink(ep.links, ep.player_url),
           }));
           loadedEpisodes.current = new Map(loaded.map(ep => [ep.id, JSON.stringify(ep)]));

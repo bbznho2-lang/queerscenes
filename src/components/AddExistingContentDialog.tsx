@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import { loadAdminEpisodes } from "@/lib/admin-episodes";
 import { Search, Plus, Check } from "lucide-react";
 import { toast } from "sonner";
 
@@ -82,8 +83,7 @@ const AddExistingContentDialog = ({ open, onOpenChange, targetSection, onSaved }
         const { id: originalId, ...rest } = item;
         // Load episode links before creating the duplicate; failed reads must not
         // create a title with missing or stale playback data.
-        const { data: eps, error: episodesErr } = await supabase.rpc("admin_get_episodes", { _content_id: originalId });
-        if (episodesErr) throw episodesErr;
+        const eps = await loadAdminEpisodes(originalId);
         const { data: inserted, error } = await supabase
           .from("contents")
           .insert({ ...rest, section: targetSection })
