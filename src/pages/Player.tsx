@@ -353,6 +353,7 @@ const Player = () => {
   type EpisodeLink = { title: string; type: "embed" | "redirect"; url: string };
   const [episodeLinks, setEpisodeLinks] = useState<EpisodeLink[]>([]);
   const [linksLoading, setLinksLoading] = useState(true);
+  const [linksRevision, setLinksRevision] = useState(0);
   const [selectedLinkIdx, setSelectedLinkIdx] = useState(-1);
   const [rawPlayerUrl, setRawPlayerUrl] = useState("");
   const normalizeEpisodeLabel = (value?: string | null, fallbackEpisodeNumber?: number) => {
@@ -399,7 +400,7 @@ const Player = () => {
     };
     void resolve();
     return () => { cancelled = true; };
-  }, [currentEp?.id, content?.id, isBlocked, userIsPremium, isAdmin]);
+  }, [currentEp?.id, content?.id, isBlocked, userIsPremium, isAdmin, linksRevision]);
 
   const selectLink = (idx: number) => {
     const lnk = episodeLinks[idx];
@@ -1250,7 +1251,10 @@ const Player = () => {
 
 
 
-      {content && <EditContentDialog open={editOpen} onOpenChange={setEditOpen} content={content} onSaved={fetchContent} />}
+      {content && <EditContentDialog open={editOpen} onOpenChange={setEditOpen} content={content} onSaved={() => {
+        void fetchContent();
+        setLinksRevision(revision => revision + 1);
+      }} />}
       {content && <EditDetailsDialog open={editDetailsOpen} onOpenChange={setEditDetailsOpen} content={content as any} onSaved={fetchContent} />}
 
       <Dialog

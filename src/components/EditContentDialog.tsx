@@ -62,7 +62,6 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
   const [tag, setTag] = useState("Drama");
   const [type, setType] = useState("filme");
   const [section, setSection] = useState("filmes");
-  const [playerUrl, setPlayerUrl] = useState("");
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [bannerPreview, setBannerPreview] = useState("");
   const [bannerUrlInput, setBannerUrlInput] = useState("");
@@ -73,56 +72,68 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [movieLinks, setMovieLinks] = useState<EpisodeLink[]>([]);
   const [saving, setSaving] = useState(false);
+  const [loadingLinks, setLoadingLinks] = useState(false);
+  const [loadError, setLoadError] = useState(false);
 
 
   useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    setLoadError(false);
+    setBannerFile(null);
+    setEpisodes([]);
+    setMovieLinks([]);
     if (content) {
       setTitle(content.title);
       setYear(content.year);
       setTag(content.tag);
       setType(content.type);
       setSection(toUiSection(content.section));
-      const legacy = content.player_url || (content as any).player_url_free || "";
-      setPlayerUrl(legacy);
-      if (!legacy) {
-        supabase.rpc("get_content_player_url", { _content_id: content.id }).then(({ data }) => {
-          if (data) setPlayerUrl(data as string);
-        });
-      }
-      // Load multi-link list for movies/single titles
-      (supabase.rpc as any)("admin_get_contents_v2", { _ids: [content.id] }).then(({ data }: any) => {
-        const row = Array.isArray(data) ? data[0] : null;
-        let links: EpisodeLink[] = Array.isArray(row?.links) ? row.links : [];
-        if (links.length === 0 && legacy && String(legacy).trim()) {
-          links = [{ title: "Watch on site", type: "embed", url: legacy }];
+      setLoadingLinks(true);
+      const loadLinks = async () => {
+        try {
+          const [titlesResult, episodesResult] = await Promise.all([
+            supabase.rpc("admin_get_contents_v2", { _ids: [content.id] }),
+            supabase.rpc("admin_get_episodes", { _content_id: content.id }),
+          ]);
+          if (cancelled) return;
+          if (titlesResult.error) throw titlesResult.error;
+          if (episodesResult.error) throw episodesResult.error;
+          const row = titlesResult.data?.[0];
+          if (!row) throw new Error("Could not load this title. Reopen the editor to retry.");
+          const withLegacyLink = (links: unknown, legacy: string | null): EpisodeLink[] => {
+            const list = Array.isArray(links) ? links as EpisodeLink[] : [];
+            return list.length === 0 && legacy?.trim()
+              ? [{ title: "Watch on site", type: "embed", url: legacy }]
+              : list;
+          };
+          setMovieLinks(withLegacyLink(row.links, row.player_url));
+          setEpisodes((episodesResult.data || []).map(ep => ({
+            ...ep, links: withLegacyLink(ep.links, ep.player_url),
+          })));
+        } catch (error: any) {
+          if (!cancelled) {
+            setLoadError(true);
+            toast.error(error.message || "Could not load links. Reopen the editor to retry.");
+          }
+        } finally {
+          if (!cancelled) setLoadingLinks(false);
         }
-        setMovieLinks(links);
-      });
+      };
+      void loadLinks();
       setBannerPreview(content.banner_url || "");
       setBannerUrlInput(content.banner_url || "");
       setIsPremium(true);
       setIsArchived(content.is_archived || false);
       setSynopsis((content as any).synopsis || "");
       setPreviewVideoUrl((content as any).preview_video_url || "");
-      supabase
-        .rpc("admin_get_episodes", { _content_id: content.id })
-        .then(({ data }) => {
-          const list = ((data as any[]) || []).map((ep: any) => {
-            let links: EpisodeLink[] = Array.isArray(ep.links) ? ep.links : [];
-            if (links.length === 0 && ep.player_url && String(ep.player_url).trim()) {
-              links = [{ title: "Watch on site", type: "embed", url: ep.player_url }];
-            }
-            return { ...ep, player_url: ep.player_url || "", links };
-          });
-          setEpisodes(list);
-        });
     } else {
+      setLoadingLinks(false);
       setTitle("");
       setYear(2025);
       setTag("Drama");
       setType(defaults?.type || "filme");
       setSection(toUiSection(defaults?.section));
-      setPlayerUrl("");
       setBannerPreview("");
       setBannerUrlInput("");
       setIsPremium(true);
@@ -132,7 +143,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setEpisodes([]);
       setMovieLinks([]);
     }
-
+    return () => { cancelled = true; };
   }, [content, open]);
 
   const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -145,6 +156,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
   };
 
   const handleSave = async () => {
+    if (loadingLinks || loadError || saving) return;
     setSaving(true);
     try {
       let bannerUrl = content?.banner_url || null;
@@ -169,7 +181,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
           type: l.type === "redirect" ? "redirect" : "embed",
           url: l.url.trim(),
         }));
-      const legacyMoviePlayer = cleanMovieLinks.find(l => l.type === "embed")?.url || playerUrl || null;
+      const legacyMoviePlayer = cleanMovieLinks.find(l => l.type === "embed")?.url || null;
 
       const payload = {
         title,
@@ -191,7 +203,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       let contentId = content?.id;
 
       if (content) {
-        const { error } = await supabase.from("contents").update(payload as any).eq("id", content.id);
+        const { error } = await supabase.from("contents").update(payload as any).eq("id", content.id).select("id").single();
         if (error) throw error;
       } else {
         const { data, error } = await supabase.from("contents").insert(payload as any).select('id').single();
@@ -211,7 +223,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
             }));
           const legacyUrl = cleanLinks.find(l => l.type === "embed")?.url || null;
           if (ep.id.startsWith("new-")) {
-            await supabase.from("episodes").insert({
+            const { error } = await supabase.from("episodes").insert({
               content_id: contentId,
               title: ep.title,
               episode_number: ep.episode_number,
@@ -219,16 +231,18 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
               links: cleanLinks as any,
               season: ep.season || 1,
               is_premium: ep.is_premium || false,
-            });
+            }).select("id").single();
+            if (error) throw error;
           } else {
-            await supabase.from("episodes").update({
+            const { error } = await supabase.from("episodes").update({
               title: ep.title,
               episode_number: ep.episode_number,
               player_url: legacyUrl,
               links: cleanLinks as any,
               season: ep.season || 1,
               is_premium: ep.is_premium || false,
-            }).eq("id", ep.id);
+            }).eq("id", ep.id).select("id").single();
+            if (error) throw error;
           }
         }
       }
@@ -555,9 +569,9 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
             </div>
           )}
 
-          <Button onClick={handleSave} disabled={saving} className="w-full bg-primary text-primary-foreground rounded-full glow-purple gap-2">
+          <Button onClick={handleSave} disabled={saving || loadingLinks || loadError} className="w-full bg-primary text-primary-foreground rounded-full glow-purple gap-2">
             <Save className="w-4 h-4" />
-            {saving ? "Saving..." : "Save"}
+            {saving ? "Saving..." : loadingLinks ? "Loading..." : "Save"}
           </Button>
         </div>
       </DialogContent>
