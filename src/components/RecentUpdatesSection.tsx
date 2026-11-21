@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Play, Sparkles } from "lucide-react";
+import { Play, Sparkles, Settings } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import FeaturedEpisodesAdmin from "@/components/FeaturedEpisodesAdmin";
+import { isRetiredCatalogSection } from "@/lib/catalog-sections";
 import { supabase } from "@/integrations/supabase/client";
 import { slugify } from "@/lib/slug";
 
@@ -25,8 +29,9 @@ interface FeaturedItem {
   } | null;
 }
 
-const RecentUpdatesSection = () => {
+const RecentUpdatesSection = ({ isAdmin = false, revision = 0 }: { isAdmin?: boolean; revision?: number }) => {
   const [items, setItems] = useState<FeaturedItem[]>([]);
+  const [manageOpen, setManageOpen] = useState(false);
   const navigate = useNavigate();
 
   const load = async () => {
@@ -50,9 +55,9 @@ const RecentUpdatesSection = () => {
     const allContentIds = Array.from(new Set([...directContentIds, ...epContentIds]));
 
     const { data: contents } = allContentIds.length
-      ? await supabase.from("contents").select("id, title, banner_url, tag, year, is_archived").in("id", allContentIds)
+      ? await supabase.from("contents").select("id, title, banner_url, tag, year, is_archived, section").in("id", allContentIds)
       : { data: [] as any[] };
-    const visibleContents = (contents || []).filter((c: any) => !c.is_archived);
+    const visibleContents = (contents || []).filter((c: any) => !c.is_archived && !isRetiredCatalogSection(c.section));
     const visibleIds = new Set(visibleContents.map((c: any) => c.id));
 
     const cMap = new Map(visibleContents.map((c: any) => [c.id, c]));
@@ -89,21 +94,30 @@ const RecentUpdatesSection = () => {
 
   useEffect(() => {
     void load();
+  }, [revision]);
+
+  useEffect(() => {
+    const timer = setInterval(() => { if (document.visibilityState === "visible") void load(); }, 60000);
+    return () => clearInterval(timer);
   }, []);
 
-  if (items.length === 0) return null;
+  if (items.length === 0 && !isAdmin) return null;
 
   return (
     <section className="py-10 sm:py-16 px-4">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-xl sm:text-2xl font-black mb-6 flex items-center gap-2 text-foreground">
+        <div className="flex items-center justify-between mb-6 gap-3">
+        <h2 className="text-xl sm:text-2xl font-black flex items-center gap-2 text-foreground">
           <Sparkles className="w-5 h-5 text-primary" />
 
           <span className="neon-text-purple">Recent Updates</span>
         </h2>
+        {isAdmin && <Button variant="outline" size="icon" title="Edit Recent Updates" aria-label="Edit Recent Updates" onClick={() => setManageOpen(true)}><Settings className="h-4 w-4" /></Button>}
+        </div>
         <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide" style={{ scrollbarWidth: "none" }}>
           {items.map((item) => {
-            const c = item.content!;
+            const c = item.content;
+            if (!c) return null;
             const ep = item.episode;
             return (
               <div
@@ -157,6 +171,12 @@ const RecentUpdatesSection = () => {
           })}
         </div>
       </div>
+      {isAdmin && <Dialog open={manageOpen} onOpenChange={setManageOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-card border-border">
+          <DialogHeader><DialogTitle>Recent Updates</DialogTitle><DialogDescription>Titles and episodes</DialogDescription></DialogHeader>
+          <FeaturedEpisodesAdmin onChanged={() => void load()} />
+        </DialogContent>
+      </Dialog>}
     </section>
   );
 };

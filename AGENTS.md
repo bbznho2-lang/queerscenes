@@ -1,4 +1,5 @@
 # Project Architecture
+- Automatically feature new movie/series inserts with a database trigger, and manage featured title/episode choices in Browse's Recent Updates; this covers every creation path without backfilling old records.
 - Treat the editor's loaded link list as authoritative and derive legacy player URLs from it; check every episode write so removed links cannot return and failed updates never report success.
 - Persist only changed episodes and keep content/details editor initialization keyed to title identity; this avoids long-series write storms and resets of unsaved drafts on background refresh.
 - Ignore repeated same-user SIGNED_IN events after role verification and refresh focused players only while access is blocked; tab switching must not reset verified access or playback.

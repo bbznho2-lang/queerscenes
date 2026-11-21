@@ -599,7 +599,7 @@ const Browse = () => {
           </section>
         )}
 
-        <RecentUpdatesSection />
+        <RecentUpdatesSection isAdmin={isAdmin} revision={contents.length} />
 
         <ContinueWatchingSection />
 

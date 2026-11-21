@@ -22,7 +22,6 @@ import SiteNoteAdmin from "@/components/SiteNoteAdmin";
 import PaywallCustomizationsAdmin from "@/components/PaywallCustomizationsAdmin";
 import SocialLinksAdmin from "@/components/SocialLinksAdmin";
 import TitleRequestsAdmin from "@/components/TitleRequestsAdmin";
-import FeaturedEpisodesAdmin from "@/components/FeaturedEpisodesAdmin";
 import CanceledSubscriptionsSection from "@/components/CanceledSubscriptionsSection";
 import ReferralsSection from "@/components/ReferralsSection";
 import { fetchTopContentRanking } from "@/lib/top-content";
@@ -893,7 +892,6 @@ const Admin = () => {
         <TitleRequestsAdmin />
         <SubtitleRequestsAdmin />
         <PartnershipRequestsAdmin />
-        <FeaturedEpisodesAdmin />
 
 
         <Card className="bg-card border-border">

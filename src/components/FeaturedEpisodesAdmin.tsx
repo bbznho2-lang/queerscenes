@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { isRetiredCatalogSection } from "@/lib/catalog-sections";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Sparkles, Trash2, ArrowUp, ArrowDown, Plus, Film, Tv } from "lucide-react";
@@ -30,7 +31,7 @@ interface FeaturedRow {
   content?: ContentRow | null;
 }
 
-const FeaturedEpisodesAdmin = () => {
+const FeaturedEpisodesAdmin = ({ onChanged }: { onChanged?: () => void }) => {
   const [featured, setFeatured] = useState<FeaturedRow[]>([]);
   const [allEpisodes, setAllEpisodes] = useState<EpisodeRow[]>([]);
   const [allContents, setAllContents] = useState<ContentRow[]>([]);
@@ -39,17 +40,18 @@ const FeaturedEpisodesAdmin = () => {
   const load = async () => {
     const [{ data: ep }, { data: ct }, { data: feat }] = await Promise.all([
       supabase.from("episodes").select("id, title, season, episode_number, content_id").limit(5000),
-      supabase.from("contents").select("id, title, type").limit(2000),
+      supabase.from("contents").select("id, title, type, section").eq("is_archived", false).limit(2000),
       (supabase as any).from("featured_episodes").select("*").order("position", { ascending: true }),
     ]);
-    const cMap = new Map((ct || []).map((c: any) => [c.id, c]));
-    const eps: EpisodeRow[] = (ep || []).map((e: any) => ({
+    const visible = (ct || []).filter(c => !isRetiredCatalogSection(c.section));
+    const cMap = new Map(visible.map((c: any) => [c.id, c]));
+    const eps: EpisodeRow[] = (ep || []).filter(e => cMap.has(e.content_id)).map((e: any) => ({
       ...e,
       content_title: (cMap.get(e.content_id) as any)?.title || "Unknown",
     }));
     const eMap = new Map(eps.map((e) => [e.id, e]));
     setAllEpisodes(eps);
-    setAllContents((ct || []) as ContentRow[]);
+    setAllContents(visible as ContentRow[]);
     setFeatured(
       (feat || []).map((f: any) => ({
         ...f,
@@ -141,6 +143,7 @@ const FeaturedEpisodesAdmin = () => {
     if (error) { toast.error(error.message); return; }
     setSearch("");
     toast.success("Added to Recent Updates");
+    onChanged?.();
     void load();
   };
 
@@ -152,12 +155,26 @@ const FeaturedEpisodesAdmin = () => {
     if (error) { toast.error(error.message); return; }
     setSearch("");
     toast.success("Added to Recent Updates");
+    onChanged?.();
     void load();
   };
 
   const removeFeatured = async (id: string) => {
     const { error } = await (supabase as any).from("featured_episodes").delete().eq("id", id);
     if (error) { toast.error(error.message); return; }
+    onChanged?.();
+    void load();
+  };
+
+  const changeFeatured = async (f: FeaturedRow, value: string) => {
+    const contentId = f.episode?.content_id || f.content_id;
+    if (!contentId) return;
+    const { error } = await supabase.from("featured_episodes").update({
+      content_id: value === "title" ? contentId : null,
+      episode_id: value === "title" ? null : value,
+    }).eq("id", f.id);
+    if (error) { toast.error(error.message); return; }
+    onChanged?.();
     void load();
   };
 
@@ -168,18 +185,19 @@ const FeaturedEpisodesAdmin = () => {
     const b = featured[newIdx];
     await (supabase as any).from("featured_episodes").update({ position: b.position }).eq("id", a.id);
     await (supabase as any).from("featured_episodes").update({ position: a.position }).eq("id", b.id);
+    onChanged?.();
     void load();
   };
 
   return (
-    <Card className="bg-card border-border">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-foreground">
+    <div className="space-y-4">
+      <div>
+        <h3 className="flex items-center gap-2 text-foreground font-semibold">
           <Sparkles className="w-5 h-5 text-primary" />
           Recent Updates (episodes & titles)
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+        </h3>
+      </div>
+      <div className="space-y-4">
         <div className="space-y-1.5">
           <label className="text-xs text-muted-foreground">Search episodes, movies, series or any title</label>
           <div className="relative">
@@ -197,7 +215,7 @@ const FeaturedEpisodesAdmin = () => {
                 <div className="sticky top-0 z-10 px-3 py-1 text-[10px] uppercase tracking-wider text-muted-foreground bg-muted">Titles (Movies / Series) — {results.contents.length}</div>
               )}
               {results.contents.map((c) => (
-                <button
+                <Button variant="ghost"
                   key={`c-${c.id}`}
                   onClick={() => addContent(c)}
                   className="w-full text-left px-3 py-2 hover:bg-muted/40 transition-colors flex items-center gap-3"
@@ -208,13 +226,13 @@ const FeaturedEpisodesAdmin = () => {
                     <p className="text-xs text-muted-foreground truncate capitalize">{c.type}</p>
                   </div>
                   <Plus className="w-4 h-4 text-primary" />
-                </button>
+                </Button>
               ))}
               {results.episodes.length > 0 && (
                 <div className="px-3 py-1 text-[10px] uppercase tracking-wider text-muted-foreground bg-muted/30">Episodes — {results.episodes.length} (all seasons)</div>
               )}
               {results.episodes.map((e) => (
-                <button
+                <Button variant="ghost"
                   key={`e-${e.id}`}
                   onClick={() => addEpisode(e)}
                   className="w-full text-left px-3 py-2 hover:bg-muted/40 transition-colors flex items-center gap-3"
@@ -227,7 +245,7 @@ const FeaturedEpisodesAdmin = () => {
                     <p className="text-xs text-muted-foreground truncate">{e.title}</p>
                   </div>
                   <Plus className="w-4 h-4 text-primary" />
-                </button>
+                </Button>
               ))}
             </div>
           )}
@@ -246,7 +264,7 @@ const FeaturedEpisodesAdmin = () => {
             featured.map((f, idx) => (
               <div
                 key={f.id}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border/40 bg-muted/20"
+                className="flex flex-wrap items-center gap-2 px-3 py-2 rounded-lg border border-border/40 bg-muted/20"
               >
                 <span className="w-6 text-center text-xs font-bold text-primary">{idx + 1}</span>
                 <div className="flex-1 min-w-0">
@@ -269,6 +287,15 @@ const FeaturedEpisodesAdmin = () => {
                     <p className="text-sm text-destructive">Item missing</p>
                   )}
                 </div>
+                <Select value={f.episode_id || "title"} onValueChange={value => void changeFeatured(f, value)}>
+                  <SelectTrigger className="w-full sm:w-40" aria-label={`Display for ${f.content?.title || f.episode?.content_title || 'title'}`}><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="title">Title only</SelectItem>
+                    {allEpisodes.filter(ep => ep.content_id === (f.episode?.content_id || f.content_id)).sort((a, b) => a.season - b.season || a.episode_number - b.episode_number).map(ep => (
+                      <SelectItem key={ep.id} value={ep.id}>S{ep.season} · E{ep.episode_number} — {ep.title}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => move(idx, -1)} disabled={idx === 0}>
                   <ArrowUp className="w-3.5 h-3.5" />
                 </Button>
@@ -282,8 +309,8 @@ const FeaturedEpisodesAdmin = () => {
             ))
           )}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
