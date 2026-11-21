@@ -22,6 +22,19 @@ beforeEach(() => {
 });
 
 describe("Recent Updates new seasons", () => {
+  it("prevents overlapping additions while a release is being saved", async () => {
+    let finish: ((result: { error: null }) => void) | undefined;
+    mocks.insert.mockReturnValue(new Promise(resolve => { finish = resolve; }));
+    render(<FeaturedEpisodesAdmin />);
+    fireEvent.change(screen.getByPlaceholderText("Type to search..."), { target: { value: "Yellow Jackets s3" } });
+    const buttons = await screen.findAllByRole("button", { name: /Yellow Jackets.*S3E/ });
+    fireEvent.click(buttons[0]);
+    fireEvent.click(buttons[1]);
+    expect(mocks.insert).toHaveBeenCalledTimes(1);
+    finish?.({ error: null });
+    await waitFor(() => expect(buttons[0]).not.toBeInTheDocument());
+  });
+
   it("saves a changed order when two releases have the same position", async () => {
     const rows = [
       { id: "first", content_id: "a", episode_id: null, position: 4 },

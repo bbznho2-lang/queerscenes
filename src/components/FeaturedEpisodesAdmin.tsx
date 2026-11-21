@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { isRetiredCatalogSection } from "@/lib/catalog-sections";
 import { loadAllPages } from "@/lib/load-all-pages";
@@ -39,14 +39,18 @@ const FeaturedEpisodesAdmin = ({ onChanged }: { onChanged?: () => void }) => {
   const [allContents, setAllContents] = useState<ContentRow[]>([]);
   const [search, setSearch] = useState("");
   const [savingOrder, setSavingOrder] = useState(false);
+  const mutationPending = useRef(false);
+  const loadRevision = useRef(0);
 
   const load = async () => {
+    const revision = ++loadRevision.current;
     try {
     const [ep, ct, feat] = await Promise.all([
       loadAllPages((from, to) => supabase.from("episodes").select("id, title, season, episode_number, content_id").order("id").range(from, to)),
       loadAllPages((from, to) => supabase.from("contents").select("id, title, type, section").eq("is_archived", false).order("id").range(from, to)),
       loadAllPages((from, to) => supabase.from("featured_episodes").select("*").order("position", { ascending: true }).order("created_at", { ascending: false }).order("id").range(from, to)),
     ]);
+    if (revision !== loadRevision.current) return;
     const visible = (ct || []).filter(c => !isRetiredCatalogSection(c.section));
     const cMap = new Map(visible.map((c: any) => [c.id, c]));
     const eps: EpisodeRow[] = (ep || []).filter(e => cMap.has(e.content_id)).map((e: any) => ({
@@ -64,14 +68,14 @@ const FeaturedEpisodesAdmin = ({ onChanged }: { onChanged?: () => void }) => {
       })),
     );
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not load Recent Updates");
+      if (revision === loadRevision.current) toast.error(error instanceof Error ? error.message : "Could not load Recent Updates");
     }
   };
 
   useEffect(() => {
     void load();
     const timer = setInterval(() => {
-      if (document.visibilityState === "visible") void load();
+      if (document.visibilityState === "visible" && !mutationPending.current) void load();
     }, 60000);
     return () => clearInterval(timer);
   }, []);
@@ -145,52 +149,58 @@ const FeaturedEpisodesAdmin = ({ onChanged }: { onChanged?: () => void }) => {
   }, [search, allEpisodes, allContents, featuredEpIds, featuredContentIds]);
 
 
+  const mutate = async (write: () => PromiseLike<{ error: { message: string } | null }>, message?: string) => {
+    if (mutationPending.current) return;
+    mutationPending.current = true;
+    ++loadRevision.current;
+    setSavingOrder(true);
+    try {
+      const { error } = await write();
+      if (error) throw new Error(error.message);
+      if (message) toast.success(message);
+      setSearch("");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not save Recent Updates");
+    } finally {
+      await load();
+      onChanged?.();
+      mutationPending.current = false;
+      setSavingOrder(false);
+    }
+  };
+
   const addEpisode = async (ep: EpisodeRow) => {
     const nextPos = nextFeaturedPosition(featured);
-    const { error } = await (supabase as any)
+    await mutate(() => supabase
       .from("featured_episodes")
-      .insert({ episode_id: ep.id, content_id: null, position: nextPos });
-    if (error) { toast.error(error.message); return; }
-    setSearch("");
-    toast.success("Added to Recent Updates");
-    onChanged?.();
-    void load();
+      .insert({ episode_id: ep.id, content_id: null, position: nextPos }), "Added to Recent Updates");
   };
 
   const addContent = async (c: ContentRow) => {
     const nextPos = nextFeaturedPosition(featured);
-    const { error } = await (supabase as any)
+    await mutate(() => supabase
       .from("featured_episodes")
-      .insert({ episode_id: null, content_id: c.id, position: nextPos });
-    if (error) { toast.error(error.message); return; }
-    setSearch("");
-    toast.success("Added to Recent Updates");
-    onChanged?.();
-    void load();
+      .insert({ episode_id: null, content_id: c.id, position: nextPos }), "Added to Recent Updates");
   };
 
   const removeFeatured = async (id: string) => {
-    const { error } = await (supabase as any).from("featured_episodes").delete().eq("id", id);
-    if (error) { toast.error(error.message); return; }
-    onChanged?.();
-    void load();
+    await mutate(() => supabase.from("featured_episodes").delete().eq("id", id).select("id").single());
   };
 
   const changeFeatured = async (f: FeaturedRow, value: string) => {
     const contentId = f.episode?.content_id || f.content_id;
     if (!contentId) return;
-    const { error } = await supabase.from("featured_episodes").update({
+    await mutate(() => supabase.from("featured_episodes").update({
       content_id: value === "title" ? contentId : null,
       episode_id: value === "title" ? null : value,
-    }).eq("id", f.id);
-    if (error) { toast.error(error.message); return; }
-    onChanged?.();
-    void load();
+    }).eq("id", f.id).select("id").single());
   };
 
   const move = async (idx: number, dir: -1 | 1) => {
     const newIdx = idx + dir;
-    if (savingOrder || newIdx < 0 || newIdx >= featured.length) return;
+    if (mutationPending.current || newIdx < 0 || newIdx >= featured.length) return;
+    mutationPending.current = true;
+    ++loadRevision.current;
     setSavingOrder(true);
     const ordered = reorderFeatured(featured, idx, newIdx);
     try {
@@ -206,6 +216,7 @@ const FeaturedEpisodesAdmin = ({ onChanged }: { onChanged?: () => void }) => {
     } finally {
       await load();
       onChanged?.();
+      mutationPending.current = false;
       setSavingOrder(false);
     }
   };
@@ -238,6 +249,7 @@ const FeaturedEpisodesAdmin = ({ onChanged }: { onChanged?: () => void }) => {
               {results.contents.map((c) => (
                 <Button variant="ghost"
                   key={`c-${c.id}`}
+                  disabled={savingOrder}
                   onClick={() => addContent(c)}
                   className="w-full text-left px-3 py-2 hover:bg-muted/40 transition-colors flex items-center gap-3"
                 >
@@ -255,6 +267,7 @@ const FeaturedEpisodesAdmin = ({ onChanged }: { onChanged?: () => void }) => {
               {results.episodes.map((e) => (
                 <Button variant="ghost"
                   key={`e-${e.id}`}
+                  disabled={savingOrder}
                   onClick={() => addEpisode(e)}
                   className="w-full text-left px-3 py-2 hover:bg-muted/40 transition-colors flex items-center gap-3"
                 >

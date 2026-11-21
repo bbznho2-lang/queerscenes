@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Recent Updates release ordering
+- [x] Review all feature writes/readers and prevent stale refreshes or overlapping edits from restoring older order; six focused tests passed, live admin checks remain unavailable.
 - [x] Diagnose duplicate positions and align editor/public list ordering.
 - [x] Make movement assign distinct positions and check save failures; append after highest position.
 - [x] Verify tied-position movement and persisted ordering with four tests; live admin interaction remains unavailable with the current non-admin session.

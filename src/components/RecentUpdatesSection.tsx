@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Play, Sparkles, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -33,9 +33,11 @@ interface FeaturedItem {
 const RecentUpdatesSection = ({ isAdmin = false, revision = 0 }: { isAdmin?: boolean; revision?: number }) => {
   const [items, setItems] = useState<FeaturedItem[]>([]);
   const [manageOpen, setManageOpen] = useState(false);
+  const loadRevision = useRef(0);
   const navigate = useNavigate();
 
   const load = async () => {
+    const revision = ++loadRevision.current;
     try {
     const featured = await loadAllPages((from, to) => supabase
       .from("featured_episodes")
@@ -43,7 +45,7 @@ const RecentUpdatesSection = ({ isAdmin = false, revision = 0 }: { isAdmin?: boo
       .order("position", { ascending: true })
       .order("created_at", { ascending: false }).order("id").range(from, to));
     if (!featured?.length) {
-      setItems([]);
+      if (revision === loadRevision.current) setItems([]);
       return;
     }
     const epIds = featured.map((f: any) => f.episode_id).filter(Boolean);
@@ -64,6 +66,7 @@ const RecentUpdatesSection = ({ isAdmin = false, revision = 0 }: { isAdmin?: boo
 
     const cMap = new Map(visibleContents.map((c: any) => [c.id, c]));
     const eMap = new Map((episodes || []).map((e: any) => [e.id, e]));
+    if (revision !== loadRevision.current) return;
 
     setItems(
       featured
