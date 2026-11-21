@@ -17,12 +17,6 @@ interface Comment {
   parent_id: string | null;
 }
 
-interface ProfileLite {
-  user_id: string;
-  is_premium: boolean | null;
-  premium_expires_at: string | null;
-}
-
 interface Props {
   contentId: string;
 }
@@ -43,7 +37,6 @@ const initialOf = (name: string) => (name || "U").trim().charAt(0).toUpperCase()
 const CommentsSection = ({ contentId }: Props) => {
   const { user, isAdmin } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
-  const [profiles, setProfiles] = useState<Record<string, ProfileLite>>({});
   const [body, setBody] = useState("");
   const [replyBody, setReplyBody] = useState("");
   const [replyTo, setReplyTo] = useState<string | null>(null);
@@ -84,19 +77,6 @@ const CommentsSection = ({ contentId }: Props) => {
     const list = (data as Comment[]) || [];
     setComments(list);
 
-    const ids = Array.from(new Set(list.map((c) => c.user_id)));
-    if (ids.length) {
-      const { data: sup } = await supabase.rpc("get_supporter_user_ids", { _user_ids: ids } as any);
-      const supSet = new Set(((sup as Array<{ user_id: string }> | null) || []).map((s) => s.user_id));
-      const map: Record<string, ProfileLite> = {};
-      ids.forEach((uid) => {
-        map[uid] = { user_id: uid, is_premium: supSet.has(uid), premium_expires_at: null };
-      });
-      setProfiles(map);
-    } else {
-      setProfiles({});
-    }
-
     await loadLikes(list.map((c) => c.id));
   };
 
@@ -117,12 +97,8 @@ const CommentsSection = ({ contentId }: Props) => {
   }, [user]);
 
   // Only supporters can comment, so every comment author is shown as a Supporter.
-  const isSupporter = (uid: string) => {
-    const p = profiles[uid];
-    if (!p) return true;
-    const notExpired = !p.premium_expires_at || new Date(p.premium_expires_at) > new Date();
-    return Boolean(p.is_premium && notExpired) || true;
-  };
+  // This is the existing author badge, not a live subscription-status lookup.
+  const isSupporter = (_uid: string) => true;
 
   const resolveAuthorName = async (): Promise<string> => {
     if (authorName) return authorName;

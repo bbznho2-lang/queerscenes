@@ -1,4 +1,5 @@
 # Project Architecture
+- Membership lookup must use caller-scoped profile access; comment badges must not query other authors' live subscription status, and new wishlist requests start pending with no administrator reply.
 - Automatically feature new movie/series inserts with a database trigger, and manage featured title/episode choices in Browse's Recent Updates; this covers every creation path without backfilling old records.
 - Treat the editor's loaded link list as authoritative and derive legacy player URLs from it; check every episode write so removed links cannot return and failed updates never report success.
 - Persist only changed episodes and keep content/details editor initialization keyed to title identity; this avoids long-series write storms and resets of unsaved drafts on background refresh.
