@@ -1,5 +1,10 @@
 # Roadmap
 
+## Recent Updates release ordering
+- [x] Diagnose duplicate positions and align editor/public list ordering.
+- [x] Make movement assign distinct positions and check save failures; append after highest position.
+- [x] Verify tied-position movement and persisted ordering with four tests; live admin interaction remains unavailable with the current non-admin session.
+
 ## New seasons in Recent Updates
 - [x] Sweep season reads in playback, title details, editors, copies, public Recent Updates and admin previews/analytics; preserve data and permissions.
 - [x] Test shared paginated admin reads and existing editing/copying behavior; verify real season metadata in the browser.

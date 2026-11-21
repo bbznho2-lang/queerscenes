@@ -22,6 +22,41 @@ beforeEach(() => {
 });
 
 describe("Recent Updates new seasons", () => {
+  it("saves a changed order when two releases have the same position", async () => {
+    const rows = [
+      { id: "first", content_id: "a", episode_id: null, position: 4 },
+      { id: "second", content_id: "b", episode_id: null, position: 4 },
+    ];
+    const saved: { id: string; position: number }[] = [];
+    mocks.from.mockImplementation((table: string) => {
+      const data = table === "contents" ? [{ id: "a", title: "First release", type: "filme", section: "filmes" }, { id: "b", title: "Second release", type: "filme", section: "filmes" }] : table === "featured_episodes" ? rows : [];
+      let update: { position: number } | undefined;
+      let id = "";
+      const chain = {
+        select: vi.fn().mockReturnThis(), order: vi.fn().mockReturnThis(),
+        eq: vi.fn((key: string, value: string) => { if (key === "id") id = value; return chain; }),
+        range: vi.fn(async () => ({ data, error: null })),
+        update: vi.fn((value: { position: number }) => { update = value; return chain; }),
+        single: vi.fn(async () => {
+          if (update) {
+            saved.push({ id, position: update.position });
+            const row = rows.find(row => row.id === id);
+            if (row) row.position = update.position;
+          }
+          rows.sort((a, b) => a.position - b.position);
+          return { data: { id }, error: null };
+        }),
+      };
+      return chain;
+    });
+    const changed = vi.fn();
+    render(<FeaturedEpisodesAdmin onChanged={changed} />);
+    fireEvent.click(await screen.findByRole("button", { name: "Move Second release up" }));
+    await waitFor(() => expect(changed).toHaveBeenCalled());
+    expect(saved).toEqual([{ id: "second", position: 0 }, { id: "first", position: 1 }]);
+    expect(rows.map(row => row.id)).toEqual(["second", "first"]);
+  });
+
   it("finds and saves S3E1 from beyond the first thousand episodes", async () => {
     render(<FeaturedEpisodesAdmin />);
     fireEvent.change(screen.getByPlaceholderText("Type to search..."), { target: { value: "Yellow Jackets s3 ep1" } });

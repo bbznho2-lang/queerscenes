@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { isRetiredCatalogSection } from "@/lib/catalog-sections";
 import { loadAllPages } from "@/lib/load-all-pages";
+import { nextFeaturedPosition, reorderFeatured } from "@/lib/featured-order";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Sparkles, Trash2, ArrowUp, ArrowDown, Plus, Film, Tv } from "lucide-react";
@@ -37,13 +38,14 @@ const FeaturedEpisodesAdmin = ({ onChanged }: { onChanged?: () => void }) => {
   const [allEpisodes, setAllEpisodes] = useState<EpisodeRow[]>([]);
   const [allContents, setAllContents] = useState<ContentRow[]>([]);
   const [search, setSearch] = useState("");
+  const [savingOrder, setSavingOrder] = useState(false);
 
   const load = async () => {
     try {
     const [ep, ct, feat] = await Promise.all([
       loadAllPages((from, to) => supabase.from("episodes").select("id, title, season, episode_number, content_id").order("id").range(from, to)),
       loadAllPages((from, to) => supabase.from("contents").select("id, title, type, section").eq("is_archived", false).order("id").range(from, to)),
-      loadAllPages((from, to) => supabase.from("featured_episodes").select("*").order("position", { ascending: true }).order("id").range(from, to)),
+      loadAllPages((from, to) => supabase.from("featured_episodes").select("*").order("position", { ascending: true }).order("created_at", { ascending: false }).order("id").range(from, to)),
     ]);
     const visible = (ct || []).filter(c => !isRetiredCatalogSection(c.section));
     const cMap = new Map(visible.map((c: any) => [c.id, c]));
@@ -144,7 +146,7 @@ const FeaturedEpisodesAdmin = ({ onChanged }: { onChanged?: () => void }) => {
 
 
   const addEpisode = async (ep: EpisodeRow) => {
-    const nextPos = featured.length;
+    const nextPos = nextFeaturedPosition(featured);
     const { error } = await (supabase as any)
       .from("featured_episodes")
       .insert({ episode_id: ep.id, content_id: null, position: nextPos });
@@ -156,7 +158,7 @@ const FeaturedEpisodesAdmin = ({ onChanged }: { onChanged?: () => void }) => {
   };
 
   const addContent = async (c: ContentRow) => {
-    const nextPos = featured.length;
+    const nextPos = nextFeaturedPosition(featured);
     const { error } = await (supabase as any)
       .from("featured_episodes")
       .insert({ episode_id: null, content_id: c.id, position: nextPos });
@@ -188,13 +190,24 @@ const FeaturedEpisodesAdmin = ({ onChanged }: { onChanged?: () => void }) => {
 
   const move = async (idx: number, dir: -1 | 1) => {
     const newIdx = idx + dir;
-    if (newIdx < 0 || newIdx >= featured.length) return;
-    const a = featured[idx];
-    const b = featured[newIdx];
-    await (supabase as any).from("featured_episodes").update({ position: b.position }).eq("id", a.id);
-    await (supabase as any).from("featured_episodes").update({ position: a.position }).eq("id", b.id);
-    onChanged?.();
-    void load();
+    if (savingOrder || newIdx < 0 || newIdx >= featured.length) return;
+    setSavingOrder(true);
+    const ordered = reorderFeatured(featured, idx, newIdx);
+    try {
+      for (const [position, item] of ordered.entries()) {
+        if (item.position === position) continue;
+        const { error } = await supabase.from("featured_episodes").update({ position }).eq("id", item.id).select("id").single();
+        if (error) throw error;
+      }
+      setFeatured(ordered.map((item, position) => ({ ...item, position })));
+      toast.success("Release order saved");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not save release order. Please try again.");
+    } finally {
+      await load();
+      onChanged?.();
+      setSavingOrder(false);
+    }
   };
 
   return (
@@ -295,7 +308,7 @@ const FeaturedEpisodesAdmin = ({ onChanged }: { onChanged?: () => void }) => {
                     <p className="text-sm text-destructive">Item missing</p>
                   )}
                 </div>
-                <Select value={f.episode_id || "title"} onValueChange={value => void changeFeatured(f, value)}>
+                <Select disabled={savingOrder} value={f.episode_id || "title"} onValueChange={value => void changeFeatured(f, value)}>
                   <SelectTrigger className="w-full sm:w-40" aria-label={`Display for ${f.content?.title || f.episode?.content_title || 'title'}`}><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="title">Title only</SelectItem>
@@ -304,13 +317,13 @@ const FeaturedEpisodesAdmin = ({ onChanged }: { onChanged?: () => void }) => {
                     ))}
                   </SelectContent>
                 </Select>
-                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => move(idx, -1)} disabled={idx === 0}>
+                <Button size="icon" variant="ghost" className="h-7 w-7" aria-label={`Move ${f.content?.title || f.episode?.content_title || 'release'} up`} onClick={() => move(idx, -1)} disabled={savingOrder || idx === 0}>
                   <ArrowUp className="w-3.5 h-3.5" />
                 </Button>
-                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => move(idx, 1)} disabled={idx === featured.length - 1}>
+                <Button size="icon" variant="ghost" className="h-7 w-7" aria-label={`Move ${f.content?.title || f.episode?.content_title || 'release'} down`} onClick={() => move(idx, 1)} disabled={savingOrder || idx === featured.length - 1}>
                   <ArrowDown className="w-3.5 h-3.5" />
                 </Button>
-                <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => removeFeatured(f.id)}>
+                <Button disabled={savingOrder} size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => removeFeatured(f.id)}>
                   <Trash2 className="w-3.5 h-3.5" />
                 </Button>
               </div>
