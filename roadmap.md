@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Episode edits and tab switching
+- [x] Sweep other catalog entry points, editors, account screens, live updates and link database functions; preserve drafts in the details editor too.
 - [x] Diagnose and fix episode link save errors without restoring old links.
 - [x] Keep the current page and unsaved editor state stable when switching browser tabs.
 - [x] Verify episode edits and tab switching with tests and the signed-in site.

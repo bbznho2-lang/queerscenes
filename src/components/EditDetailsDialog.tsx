@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,14 +38,17 @@ const EditDetailsDialog = ({ open, onOpenChange, content, onSaved }: Props) => {
   const [synopsis, setSynopsis] = useState("");
   const [cast, setCast] = useState<CastMember[]>([]);
   const [saving, setSaving] = useState(false);
+  const currentContent = useRef(content);
+  currentContent.current = content;
 
   useEffect(() => {
     if (!open) return;
+    const content = currentContent.current;
     setTag(content.tag || "");
     setYear(content.year ? String(content.year) : "");
     setSynopsis(content.synopsis || "");
     setCast(parseCast(content.cast_members));
-  }, [open, content.id, content.tag, content.year, content.synopsis, content.cast_members]);
+  }, [open, content.id]);
 
   const updateMember = (i: number, patch: Partial<CastMember>) =>
     setCast((v) => v.map((m, idx) => (idx === i ? { ...m, ...patch } : m)));
