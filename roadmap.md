@@ -1,5 +1,10 @@
 # Roadmap
 
+## Episode edits and tab switching
+- [x] Diagnose and fix episode link save errors without restoring old links.
+- [x] Keep the current page and unsaved editor state stable when switching browser tabs.
+- [x] Verify episode edits and tab switching with tests and the signed-in site.
+
 - [x] Verify existing administrator recognition and remove dashboard loading from the PIN entry path on a fresh notebook session.
 
 - [x] Keep admin entry on /admin and verify signed-out, sign-in and protected access states.

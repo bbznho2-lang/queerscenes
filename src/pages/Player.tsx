@@ -286,7 +286,7 @@ const Player = () => {
   // from Stripe checkout). Skip for signed-out visitors so the paywall doesn't
   // flicker every time the tab regains focus.
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id || !premiumBlocked) return;
     let lastRun = 0;
     const refresh = () => {
       if (document.visibilityState !== "visible" || authLoading) return;
@@ -301,7 +301,7 @@ const Player = () => {
       document.removeEventListener("visibilitychange", refresh);
       window.removeEventListener("focus", refresh);
     };
-  }, [id, user?.id, isAdmin, authLoading]);
+  }, [id, user?.id, isAdmin, authLoading, premiumBlocked]);
 
 
 

@@ -40,6 +40,7 @@ describe('admin session handling', () => {
   });
 
   it('defers authenticated queries until the auth callback releases its lock', async () => {
+    mocks.getUser.mockResolvedValueOnce({ data: { user: null } });
     const { result } = renderHook(() => useAuth());
     await waitFor(() => expect(result.current.loading).toBe(false));
     mocks.roleQuery.mockClear();
@@ -72,6 +73,7 @@ describe('admin session handling', () => {
   });
 
   it('waits for admin verification after sign-in instead of redirecting prematurely', async () => {
+    mocks.getUser.mockResolvedValueOnce({ data: { user: null } });
     const { result } = renderHook(() => useAuth());
     await waitFor(() => expect(result.current.loading).toBe(false));
     act(() => mocks.callback?.('SIGNED_IN', { user: { id: 'admin-user' } }));
@@ -88,5 +90,29 @@ describe('admin session handling', () => {
     expect(result.current.isAdmin).toBe(false);
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.isAdmin).toBe(false);
+  });
+
+  it('preserves verified access and user identity on same-user tab sign-in', async () => {
+    const { result } = renderHook(() => useAuth());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    const originalUser = result.current.user;
+    mocks.roleQuery.mockClear();
+    mocks.rpc.mockClear();
+    act(() => mocks.callback?.('SIGNED_IN', { user: { id: 'admin-user' } }));
+    expect(result.current.loading).toBe(false);
+    expect(result.current.isAdmin).toBe(true);
+    expect(result.current.user).toBe(originalUser);
+    await new Promise(resolve => setTimeout(resolve, 10));
+    expect(mocks.roleQuery).not.toHaveBeenCalled();
+    expect(mocks.rpc).not.toHaveBeenCalled();
+  });
+
+  it('removes verified access when the account signs out in another tab', async () => {
+    const { result } = renderHook(() => useAuth());
+    await waitFor(() => expect(result.current.isAdmin).toBe(true));
+    act(() => mocks.callback?.('SIGNED_OUT', null));
+    expect(result.current.user).toBeNull();
+    expect(result.current.isAdmin).toBe(false);
+    await waitFor(() => expect(result.current.loading).toBe(false));
   });
 });

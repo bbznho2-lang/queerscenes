@@ -20,6 +20,26 @@ beforeEach(() => {
 });
 
 describe("video link editing", () => {
+  it("saves only the edited chapter in a long series", async () => {
+    const manyEpisodes = Array.from({ length: 150 }, (_, index) => ({ ...episode, id: `ep-${index}`, title: `Episode ${index + 1}`, episode_number: index + 1, links: [{ title: "Watch", type: "embed", url: `${oldUrl}/${index}` }] }));
+    mocks.rpc.mockImplementation((name: string) => Promise.resolve({ data: name === "admin_get_episodes" ? manyEpisodes : [{ ...content, links: [] }], error: null }));
+    render(<EditContentDialog open content={content} onOpenChange={vi.fn()} onSaved={vi.fn()} />);
+    fireEvent.change(await screen.findByDisplayValue(`${oldUrl}/75`), { target: { value: newUrl } });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(mocks.success).toHaveBeenCalled());
+    expect(mocks.update).toHaveBeenCalledTimes(2);
+    expect(mocks.update).toHaveBeenLastCalledWith(expect.objectContaining({ player_url: newUrl }));
+  });
+
+  it("keeps unsaved links when the same title refreshes in the parent", async () => {
+    const props = { open: true, content, onOpenChange: vi.fn(), onSaved: vi.fn() };
+    const { rerender } = render(<EditContentDialog {...props} />);
+    fireEvent.change(await screen.findByDisplayValue(oldUrl), { target: { value: newUrl } });
+    rerender(<EditContentDialog {...props} content={{ ...content }} />);
+    expect(screen.getByDisplayValue(newUrl)).toBeInTheDocument();
+    expect(mocks.rpc).toHaveBeenCalledTimes(2);
+  });
+
   it("saves the new episode URL in both link fields", async () => {
     render(<EditContentDialog open content={content} onOpenChange={vi.fn()} onSaved={vi.fn()} />);
     const input = await screen.findByDisplayValue(oldUrl);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -74,11 +74,16 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
   const [saving, setSaving] = useState(false);
   const [loadingLinks, setLoadingLinks] = useState(false);
   const [loadError, setLoadError] = useState(false);
+  const loadedEpisodes = useRef(new Map<string, string>());
+  const currentContent = useRef(content);
+  currentContent.current = content;
 
 
   useEffect(() => {
     if (!open) return;
+    const content = currentContent.current;
     let cancelled = false;
+    loadedEpisodes.current.clear();
     setLoadError(false);
     setBannerFile(null);
     setEpisodes([]);
@@ -108,9 +113,11 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
               : list;
           };
           setMovieLinks(withLegacyLink(row.links, row.player_url));
-          setEpisodes((episodesResult.data || []).map(ep => ({
+          const loaded = (episodesResult.data || []).map(ep => ({
             ...ep, links: withLegacyLink(ep.links, ep.player_url),
-          })));
+          }));
+          loadedEpisodes.current = new Map(loaded.map(ep => [ep.id, JSON.stringify(ep)]));
+          setEpisodes(loaded);
         } catch (error: any) {
           if (!cancelled) {
             setLoadError(true);
@@ -144,7 +151,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
       setMovieLinks([]);
     }
     return () => { cancelled = true; };
-  }, [content, open]);
+  }, [content?.id, open]);
 
   const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -214,6 +221,9 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
 
       if (contentId && (type === "serie" || type === "novela" || type === "anime" || type === "reality")) {
         for (const ep of episodes) {
+          // Don't rewrite every chapter: a long series can otherwise time out,
+          // and stale unchanged rows can overwrite newer edits in another tab.
+          if (loadedEpisodes.current.get(ep.id) === JSON.stringify(ep)) continue;
           const cleanLinks = (ep.links || [])
             .filter(l => l && l.url && l.url.trim())
             .map(l => ({
@@ -223,7 +233,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
             }));
           const legacyUrl = cleanLinks.find(l => l.type === "embed")?.url || null;
           if (ep.id.startsWith("new-")) {
-            const { error } = await supabase.from("episodes").insert({
+            const { data: saved, error } = await supabase.from("episodes").insert({
               content_id: contentId,
               title: ep.title,
               episode_number: ep.episode_number,
@@ -233,6 +243,11 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
               is_premium: ep.is_premium || false,
             }).select("id").single();
             if (error) throw error;
+            if (saved) {
+              const persisted = { ...ep, id: saved.id };
+              loadedEpisodes.current.set(saved.id, JSON.stringify(persisted));
+              setEpisodes(current => current.map(item => item.id === ep.id ? persisted : item));
+            }
           } else {
             const { error } = await supabase.from("episodes").update({
               title: ep.title,
@@ -243,6 +258,7 @@ const EditContentDialog = ({ open, onOpenChange, content, onSaved, defaults }: P
               is_premium: ep.is_premium || false,
             }).eq("id", ep.id).select("id").single();
             if (error) throw error;
+            loadedEpisodes.current.set(ep.id, JSON.stringify(ep));
           }
         }
       }

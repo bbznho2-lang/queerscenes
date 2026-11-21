@@ -12,6 +12,7 @@ export const useAuth = () => {
 
   useEffect(() => {
     let isMounted = true;
+    let verifiedUserId: string | null | undefined;
     const pendingTasks = new Set<ReturnType<typeof setTimeout>>();
 
     const loadAdminStatus = async (userId: string | null) => {
@@ -40,6 +41,7 @@ export const useAuth = () => {
         const currentUser = userData.user ?? null;
         setUser(currentUser);
         await loadAdminStatus(currentUser?.id ?? null);
+        verifiedUserId = currentUser?.id ?? null;
         if (currentUser) void supabase.rpc('claim_supporter_for_current_user' as any);
       } catch {
         if (isMounted) { setUser(null); setIsAdmin(false); }
@@ -54,18 +56,23 @@ export const useAuth = () => {
       (event, session) => {
         if (!isMounted) return;
         const nextUser = session?.user ?? null;
-        setUser(nextUser);
         // A refreshed token is always freshly issued, so it re-measures the clock.
         if (event === 'TOKEN_REFRESHED' && session) syncClockFromToken(session.access_token);
         // Refreshing a token doesn't change roles. Authenticated requests must
         // run after this callback releases the auth client's session lock.
         if (event === 'TOKEN_REFRESHED') return;
+        // SIGNED_IN also fires when the same session returns to a browser tab.
+        // Keep verified access and mounted pages intact in that case.
+        if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') &&
+            verifiedUserId === (nextUser?.id ?? null)) return;
+        setUser(nextUser);
         setIsAdmin(false);
         setLoading(true);
         const task = setTimeout(async () => {
           pendingTasks.delete(task);
           if (!isMounted) return;
           await loadAdminStatus(nextUser?.id ?? null);
+          verifiedUserId = nextUser?.id ?? null;
           if (isMounted) setLoading(false);
           if (event === 'SIGNED_IN' && nextUser) {
             void supabase.rpc('claim_supporter_for_current_user' as any);
