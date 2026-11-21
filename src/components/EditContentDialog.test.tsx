@@ -51,4 +51,26 @@ describe("video link editing", () => {
     await waitFor(() => expect(mocks.success).toHaveBeenCalled());
     expect(mocks.update).toHaveBeenCalledWith(expect.objectContaining({ player_url: null, links: [] }));
   });
+
+  it.each(["serie", "novela", "reality"])("clears a removed episode link for %s", async type => {
+    render(<EditContentDialog open content={{ ...content, type }} onOpenChange={vi.fn()} onSaved={vi.fn()} />);
+    fireEvent.change(await screen.findByDisplayValue(oldUrl), { target: { value: "" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(mocks.success).toHaveBeenCalled());
+    expect(mocks.update).toHaveBeenLastCalledWith(expect.objectContaining({ player_url: null, links: [] }));
+  });
+
+  it("blocks saving while episode links are still loading", async () => {
+    mocks.rpc.mockReturnValue(new Promise(() => {}));
+    render(<EditContentDialog open content={content} onOpenChange={vi.fn()} onSaved={vi.fn()} />);
+    expect(screen.getByRole("button", { name: "Loading..." })).toBeDisabled();
+    expect(mocks.update).not.toHaveBeenCalled();
+  });
+
+  it("loads fresh movie links instead of the stale catalog URL", async () => {
+    mocks.rpc.mockImplementation((name: string) => Promise.resolve({ data: name === "admin_get_episodes" ? [] : [{ ...content, player_url: newUrl, links: [] }], error: null }));
+    render(<EditContentDialog open content={{ ...content, type: "filme" }} onOpenChange={vi.fn()} onSaved={vi.fn()} />);
+    await screen.findByDisplayValue(newUrl);
+    expect(screen.queryByDisplayValue(oldUrl)).not.toBeInTheDocument();
+  });
 });

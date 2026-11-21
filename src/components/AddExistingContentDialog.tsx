@@ -74,9 +74,16 @@ const AddExistingContentDialog = ({ open, onOpenChange, targetSection, onSaved }
       // Get full data (incl. player_url) via admin RPC to duplicate items
       const { data: items, error: fetchErr } = await (supabase.rpc as any)("admin_get_contents_v2", { _ids: Array.from(selected) });
       if (fetchErr) throw fetchErr;
+      if (!Array.isArray(items) || items.length !== selected.size) {
+        throw new Error("Could not load all selected titles. Please try again.");
+      }
 
       for (const item of (items as any[]) || []) {
         const { id: originalId, ...rest } = item;
+        // Load episode links before creating the duplicate; failed reads must not
+        // create a title with missing or stale playback data.
+        const { data: eps, error: episodesErr } = await supabase.rpc("admin_get_episodes", { _content_id: originalId });
+        if (episodesErr) throw episodesErr;
         const { data: inserted, error } = await supabase
           .from("contents")
           .insert({ ...rest, section: targetSection })
@@ -85,7 +92,6 @@ const AddExistingContentDialog = ({ open, onOpenChange, targetSection, onSaved }
         if (error) throw error;
 
         // Duplicate episodes for series/soap operas so the player works
-        const { data: eps } = await (supabase.rpc as any)("admin_get_episodes", { _content_id: originalId });
         if (Array.isArray(eps) && eps.length > 0 && inserted?.id) {
           const rows = eps.map((ep: any) => {
             const { id: _epId, content_id: _cid, created_at: _c, ...epRest } = ep;

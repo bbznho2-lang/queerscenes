@@ -37,3 +37,10 @@
 - [x] Remove category mentions, sections and editor/wishlist options.
 - [x] Remove their titles from the public catalog, including duplicate listings.
 - [x] Verify remaining catalog and page rendering.
+
+## Saved playback links
+- [x] Check shared movie/episode editor and immediate player refresh.
+- [x] Check catalog, title page, search, Top 10, Recent Updates, Continue Watching and A-Z navigation for stale URL storage.
+- [x] Check database link readers and duplicate-mirroring triggers without changing access rules or historical records.
+- [x] Prevent Exclusives copies from reporting success when episode links cannot be loaded.
+- [x] Run focused tests and verify replacement/removal and duplicate playback through the signed-in UI.
