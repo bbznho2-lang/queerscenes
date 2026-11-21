@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { isRetiredCatalogSection } from "@/lib/catalog-sections";
+import { loadAllPages } from "@/lib/load-all-pages";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Sparkles, Trash2, ArrowUp, ArrowDown, Plus, Film, Tv } from "lucide-react";
@@ -38,10 +39,11 @@ const FeaturedEpisodesAdmin = ({ onChanged }: { onChanged?: () => void }) => {
   const [search, setSearch] = useState("");
 
   const load = async () => {
-    const [{ data: ep }, { data: ct }, { data: feat }] = await Promise.all([
-      supabase.from("episodes").select("id, title, season, episode_number, content_id").limit(5000),
-      supabase.from("contents").select("id, title, type, section").eq("is_archived", false).limit(2000),
-      (supabase as any).from("featured_episodes").select("*").order("position", { ascending: true }),
+    try {
+    const [ep, ct, feat] = await Promise.all([
+      loadAllPages((from, to) => supabase.from("episodes").select("id, title, season, episode_number, content_id").order("id").range(from, to)),
+      loadAllPages((from, to) => supabase.from("contents").select("id, title, type, section").eq("is_archived", false).order("id").range(from, to)),
+      loadAllPages((from, to) => supabase.from("featured_episodes").select("*").order("position", { ascending: true }).order("id").range(from, to)),
     ]);
     const visible = (ct || []).filter(c => !isRetiredCatalogSection(c.section));
     const cMap = new Map(visible.map((c: any) => [c.id, c]));
@@ -59,10 +61,17 @@ const FeaturedEpisodesAdmin = ({ onChanged }: { onChanged?: () => void }) => {
         content: f.content_id ? (cMap.get(f.content_id) as any) || null : null,
       })),
     );
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not load Recent Updates");
+    }
   };
 
   useEffect(() => {
     void load();
+    const timer = setInterval(() => {
+      if (document.visibilityState === "visible") void load();
+    }, 60000);
+    return () => clearInterval(timer);
   }, []);
 
   const featuredEpIds = useMemo(() => new Set(featured.map((f) => f.episode_id).filter(Boolean) as string[]), [featured]);

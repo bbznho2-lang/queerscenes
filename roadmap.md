@@ -1,5 +1,9 @@
 # Roadmap
 
+## New seasons in Recent Updates
+- [x] Remove incomplete catalog loading from the title/episode picker and surface loading errors.
+- [x] Verify selection/saving beyond the first 1,000 episodes in regression tests and read real Yellow Jackets S3/S4 through the signed-in browser; admin UI verification unavailable with the current non-admin session.
+
 ## Automatic Recent Updates
 - [x] Automatically feature newly added movies and series without changing old entries.
 - [x] Move title/episode selection from Admin to Recent Updates, admin-only.
