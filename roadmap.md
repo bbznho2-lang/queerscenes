@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Unavailable series
+- [x] Read landing, catalog, search, A–Z, Top 10, My List, Recent Updates, Continue Watching, player, copy/editor flows, notifications, administrative history and catalog functions; unify missing public filters and prevent archived-title copies. Twelve tests passed; old public links verified in browser. Non-admin paid playback was not tested.
 - [x] Archive A vida pela frente without deleting episodes or history.
 - [x] Block archived player links and exclude unavailable duplicate seasons and recommendations.
 - [x] Verify old public player/title links in the browser and denial from all five episode link readers; five regression tests passed.

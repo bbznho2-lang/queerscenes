@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { getUniqueItemsByTitle } from "@/lib/top-content";
 import { slugify } from "@/lib/slug";
+import { isPublicCatalogContent } from "@/lib/catalog-sections";
 
 interface CatalogItem {
   id: string;
@@ -11,6 +12,7 @@ interface CatalogItem {
   tag: string | null;
   banner_url: string | null;
   is_archived?: boolean;
+  section?: string | null;
 }
 
 const PAGE_TITLE = "Catalog — LGBT series subtitled, queer movies | QueerScenes";
@@ -49,10 +51,10 @@ const Catalog = () => {
   useEffect(() => {
     supabase
       .from("contents")
-      .select("id, title, synopsis, tag, banner_url, is_archived")
+      .select("id, title, synopsis, tag, banner_url, is_archived, section")
       .order("title")
       .then(({ data }) => {
-        const visible = ((data ?? []) as CatalogItem[]).filter((c) => !c.is_archived);
+        const visible = ((data ?? []) as CatalogItem[]).filter(isPublicCatalogContent);
         setItems(getUniqueItemsByTitle(visible));
         setLoading(false);
       });

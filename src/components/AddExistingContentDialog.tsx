@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { loadAdminEpisodes } from "@/lib/admin-episodes";
+import { isPublicCatalogContent } from "@/lib/catalog-sections";
 import { Search, Plus, Check } from "lucide-react";
 import { toast } from "sonner";
 
@@ -48,11 +49,11 @@ const AddExistingContentDialog = ({ open, onOpenChange, targetSection, onSaved }
 
     const { data } = await supabase
       .from("contents")
-      .select("id, title, year, tag, type, banner_url, section")
+      .select("id, title, year, tag, type, banner_url, section, is_archived")
       .neq("section", targetSection)
       .order("title");
     // Filter out titles that already exist in target section
-    setAllContent((data || []).filter((c) => !existingTitles.has(c.title.toLowerCase())));
+    setAllContent((data || []).filter((c) => isPublicCatalogContent(c) && !existingTitles.has(c.title.toLowerCase())));
   };
 
   const filtered = search.trim()

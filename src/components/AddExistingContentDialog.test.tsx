@@ -30,6 +30,13 @@ const selectAndSave = async () => {
   fireEvent.click(screen.getByRole("button", { name: "Adicionar (1)" }));
 };
 describe("copying current playback links", () => {
+  it("does not offer archived or retired titles for a new public copy", async () => {
+    mocks.from.mockReturnValue({ select: vi.fn().mockReturnThis(), eq: vi.fn().mockResolvedValue({ data: [] }), neq: vi.fn().mockReturnThis(), order: vi.fn().mockResolvedValue({ data: [item, { ...item, id: "archived", title: "A vida pela frente", is_archived: true }, { ...item, id: "retired", title: "Retired series", section: "bl" }] }) });
+    render(<AddExistingContentDialog open targetSection="exclusivos" onOpenChange={vi.fn()} onSaved={vi.fn()} />);
+    await screen.findByText(item.title);
+    expect(screen.queryByText("A vida pela frente")).not.toBeInTheDocument();
+    expect(screen.queryByText("Retired series")).not.toBeInTheDocument();
+  });
   it("copies the current episode URL and link list into Exclusives", async () => {
     render(<AddExistingContentDialog open targetSection="exclusivos" onOpenChange={vi.fn()} onSaved={vi.fn()} />);
     await selectAndSave();

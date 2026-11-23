@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { History, Play, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { isPublicCatalogContent } from "@/lib/catalog-sections";
 
 import { removeWatchProgress } from "@/lib/watch-progress";
 import { useAuth } from "@/hooks/useAuth";
@@ -47,14 +48,14 @@ const ContinueWatchingSection = () => {
     const [{ data: contents }, { data: episodes }] = await Promise.all([
       supabase
         .from("contents")
-        .select("id, title, banner_url, tag, year, is_archived")
+        .select("id, title, banner_url, tag, year, is_archived, section")
         .in("id", contentIds as string[]),
       episodeIds.length
         ? supabase.from("episodes").select("id, title, season, episode_number").in("id", episodeIds as string[])
         : Promise.resolve({ data: [] as any[] } as any),
     ]);
 
-    const cMap = new Map((contents || []).filter((c: any) => !c.is_archived).map((c: any) => [c.id, c]));
+    const cMap = new Map((contents || []).filter(isPublicCatalogContent).map((c: any) => [c.id, c]));
     const eMap = new Map((episodes || []).map((e: any) => [e.id, e]));
 
     const seenTitles = new Set<string>();

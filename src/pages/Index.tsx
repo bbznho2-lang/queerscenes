@@ -11,6 +11,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useAuth } from "@/hooks/useAuth";
 import { getResetPasswordRedirectUrl } from "@/lib/auth-urls";
 import { buildUniqueTopContent, fetchTopContentRanking, getUniqueItemsByTitle } from "@/lib/top-content";
+import { isPublicCatalogContent } from "@/lib/catalog-sections";
 import { getFunnelVisitorId, trackSupporterClick } from "@/lib/supporter-tracking";
 import { getReferralCode } from "@/lib/referral";
 import { smoothScrollToElement } from "@/lib/scroll-to";
@@ -139,7 +140,7 @@ const Index = () => {
     const loadCatalog = async () => {
       const { data, error } = await supabase
         .from("contents")
-        .select("id, title, banner_url, tag, synopsis, is_archived, position")
+        .select("id, title, banner_url, tag, synopsis, is_archived, section, position")
         .order("position")
         .order("created_at", { ascending: false });
 
@@ -148,7 +149,7 @@ const Index = () => {
         return;
       }
 
-      const visibleItems = (data ?? []).filter((item) => !item.is_archived) as LandingContentItem[];
+      const visibleItems = (data ?? []).filter(isPublicCatalogContent) as LandingContentItem[];
       const uniqueItems = getUniqueItemsByTitle(visibleItems);
 
       setCatalogTitles(visibleItems);

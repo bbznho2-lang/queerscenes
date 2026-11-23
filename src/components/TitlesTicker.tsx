@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { slugify } from "@/lib/slug";
+import { isPublicCatalogContent } from "@/lib/catalog-sections";
 
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
@@ -15,11 +16,11 @@ const TitlesTicker = () => {
   useEffect(() => {
     supabase
       .from("contents")
-      .select("id, title, synopsis")
+      .select("id, title, synopsis, section, is_archived")
       .eq("is_archived", false)
       .order("title")
       .then(({ data }) => {
-        setContents(data || []);
+        setContents((data || []).filter(isPublicCatalogContent));
       });
   }, []);
 

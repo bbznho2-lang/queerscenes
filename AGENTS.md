@@ -7,7 +7,7 @@
 - Treat the editor's loaded link list as authoritative and derive legacy player URLs from it; check every episode write so removed links cannot return and failed updates never report success.
 - Persist only changed episodes and keep content/details editor initialization keyed to title identity; this avoids long-series write storms and resets of unsaved drafts on background refresh.
 - Ignore repeated same-user SIGNED_IN events after role verification and refresh focused players only while access is blocked; tab switching must not reset verified access or playback.
-- Use the public-catalog predicate on title pages, similar titles and duplicate-season merging; reject archived player links for non-admins and retired sections for everyone, so removed titles cannot reappear through old links. Archive removed titles instead of deleting episodes or user history.
+- Use the public-catalog predicate in landing/catalog lists, A–Z, Continue Watching, copy pickers, title pages, similar titles and duplicate-season merging; reject archived player links for non-admins and retired sections for everyone. Keep administrative history and archive removed titles instead of deleting episodes or user history.
 
 - Defer authenticated requests out of auth event callbacks and skip role reloads on token refresh; this prevents session-lock deadlocks and refresh-request amplification.
 - Validate restored users with getUser and keep auth loading until role verification completes; render account sign-in directly at /admin on fresh devices without navigating away, then require the existing administrator role and PIN.
