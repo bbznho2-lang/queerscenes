@@ -4,6 +4,7 @@ import DOMPurify from "dompurify";
 import { Play, Heart, Sparkles, ChevronLeft, Crown, Lock, Languages } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { loadAllPages } from "@/lib/load-all-pages";
+import { isPublicCatalogContent } from "@/lib/catalog-sections";
 import { slugify } from "@/lib/slug";
 import { useAuth } from "@/hooks/useAuth";
 import { DEFAULT_PAYWALL_TEXT } from "@/components/PaywallCustomizationsAdmin";
@@ -138,7 +139,7 @@ const TitlePage = () => {
         .select("id, title, year, tag, type, section, banner_url, synopsis, preview_video_url, updated_at, is_archived, is_premium, cast_members")
         .order("title");
       if (cancelled) return;
-      const list = ((data ?? []) as TitleContent[]).filter((c) => !c.is_archived);
+      const list = ((data ?? []) as TitleContent[]).filter(isPublicCatalogContent);
       const matches = list.filter((c) => slugify(c.title) === slug);
       const matchIds = matches.map((c) => c.id);
       setRelatedContentIds(matchIds);

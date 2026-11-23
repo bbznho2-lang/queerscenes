@@ -4,6 +4,7 @@ import { ArrowLeft, Play, Pencil, Crown, Lock, Sparkles, Loader2, Maximize, Exte
 import DOMPurify from "dompurify";
 import { supabase } from "@/integrations/supabase/client";
 import { loadAllPages } from "@/lib/load-all-pages";
+import { isPublicCatalogContent, isRetiredCatalogSection } from "@/lib/catalog-sections";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
@@ -30,6 +31,7 @@ interface ContentItem {
   banner_url: string | null;
   player_url?: string | null;
   section: string;
+  is_archived?: boolean | null;
   position: number;
   is_premium: boolean;
   supporter_player_enabled?: boolean;
@@ -85,7 +87,7 @@ const Player = () => {
     (async () => {
       const { data } = await supabase
         .from("contents")
-        .select("id, title, banner_url, tag, year, is_archived")
+        .select("id, title, banner_url, tag, year, is_archived, section")
         .limit(400);
       if (cancelled) return;
       const genres = String(content.tag || "")
@@ -94,7 +96,7 @@ const Player = () => {
         .filter(Boolean);
       const seenTitles = new Set([content.title.trim().toLowerCase()]);
       const scored = ((data || []) as any[])
-        .filter((c) => !c.is_archived && c.id !== content.id)
+        .filter((c) => isPublicCatalogContent(c) && c.id !== content.id)
         .map((c) => {
           const key = String(c.title).trim().toLowerCase();
           const cGenres = String(c.tag || "").split(/[,/|]/).map((g: string) => g.trim().toLowerCase()).filter(Boolean);
@@ -126,7 +128,7 @@ const Player = () => {
     let requestedContentId = id;
     const contentPromise = supabase
       .from("contents")
-      .select("id, title, year, tag, type, banner_url, section, position, is_premium, supporter_player_enabled, synopsis, preview_video_url, cast_members")
+      .select("id, title, year, tag, type, banner_url, section, position, is_archived, is_premium, supporter_player_enabled, synopsis, preview_video_url, cast_members")
       .eq("id", id)
       .single();
     const profilePromise = user
@@ -145,13 +147,10 @@ const Player = () => {
       profilePromise,
       premiumAccessPromise,
     ]);
-    if (!data) {
-      setAccessResolved(true);
-      return;
-    }
-    if (["gl", "bl"].includes(data.section.trim().toLowerCase())) {
+    if (!data || isRetiredCatalogSection(data.section) || (!isAdmin && !isPublicCatalogContent(data))) {
       setContent(null);
       setEpisodes([]);
+      setCurrentEp(null);
       setAccessResolved(true);
       navigate("/browse", { replace: true });
       return;
@@ -203,13 +202,14 @@ const Player = () => {
     if (data.type === "serie" || data.type === "novela" || data.type === "anime" || data.type === "reality") {
       const { data: duplicates } = await supabase
         .from("contents")
-        .select("id, title, year, tag, type, banner_url, section, position, is_premium, supporter_player_enabled, synopsis, preview_video_url, cast_members")
+        .select("id, title, year, tag, type, banner_url, section, position, is_archived, is_premium, supporter_player_enabled, synopsis, preview_video_url, cast_members")
         // Wildcards tolerate stray spaces around titles (e.g. "Title " vs "Title");
         // exact trimmed match is enforced by the filter below.
         .ilike("title", `%${data.title.trim().replace(/[\\%_]/g, (c) => `\\${c}`)}%`)
         .in("type", ["serie", "novela", "anime", "reality"]);
       const matchingContents = ((duplicates || []) as ContentItem[]).filter(
-        (item) => item.title.trim().toLocaleLowerCase() === data.title.trim().toLocaleLowerCase(),
+        (item) => (isAdmin ? !isRetiredCatalogSection(item.section) : isPublicCatalogContent(item)) &&
+          item.title.trim().toLocaleLowerCase() === data.title.trim().toLocaleLowerCase(),
       );
       if (!matchingContents.some((item) => item.id === data.id)) matchingContents.push(data as ContentItem);
       const matchingIds = matchingContents.map((item) => item.id);

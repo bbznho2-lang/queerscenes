@@ -1,5 +1,10 @@
 # Roadmap
 
+## Unavailable series
+- [x] Archive A vida pela frente without deleting episodes or history.
+- [x] Block archived player links and exclude unavailable duplicate seasons and recommendations.
+- [x] Verify old public player/title links in the browser and denial from all five episode link readers; five regression tests passed.
+
 ## Recent Updates release ordering
 - [x] Review all feature writes/readers and prevent stale refreshes or overlapping edits from restoring older order; six focused tests passed, live admin checks remain unavailable.
 - [x] Diagnose duplicate positions and align editor/public list ordering.
